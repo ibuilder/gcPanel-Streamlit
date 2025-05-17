@@ -20,6 +20,8 @@ from modules.bim_viewer.ifc_viewer import render_bim_viewer
 from modules.field_operations import render_field_operations
 from modules.scheduling import render_scheduling
 from modules.safety import render_safety
+from modules.contracts import render_contracts
+from modules.cost_management import render_cost_management
 
 # Import components
 from components.simple_breadcrumbs import simple_breadcrumbs, get_breadcrumbs_for_page
@@ -368,13 +370,9 @@ def main():
         elif current_menu == "Safety":
             render_safety()
         elif current_menu == "Contracts":
-            # Add contracts module rendering here
-            st.header("Contracts")
-            st.info("Contracts module under development")
+            render_contracts()
         elif current_menu == "Cost Management":
-            # Add cost management module rendering here
-            st.header("Cost Management")
-            st.info("Cost Management module under development")
+            render_cost_management()
         elif current_menu == "Schedule":
             render_scheduling()
         elif current_menu == "Closeout":

@@ -188,21 +188,15 @@ def render_milestones():
     
     # Create the milestone timeline chart
     if not timeline_df.empty:
-        # Define fixed colors based on status
-        colors = {
-            "Completed": "green",
-            "On Track": "blue",
-            "At Risk": "orange",
-            "Delayed": "red"
-        }
-        
-        status_colors = [colors.get(status, "blue") for status in timeline_df['Status'].tolist()]
+        # Create a single fixed color list based on the number of tasks
+        num_tasks = len(timeline_df)
+        status_colors = ['rgb(31, 119, 180)'] * num_tasks  # Use a consistent blue color
         
         fig = ff.create_gantt(
             timeline_df, 
             colors=status_colors,
             index_col='Status',
-            show_colorbar=True,
+            show_colorbar=False,
             group_tasks=True,
             showgrid_x=True,
             showgrid_y=True,

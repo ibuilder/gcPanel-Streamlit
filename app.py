@@ -213,22 +213,128 @@ with st.sidebar:
     # Check if menu is in session state, if not initialize to Dashboard
     if "menu" not in st.session_state:
         st.session_state.menu = "Dashboard"
-        
-    # Create radio buttons for menu selection and update session state
-    selected = st.radio("", [
-        "Dashboard", 
-        "Projects", 
-        "Engineering",
-        "Field Operations",
-        "Cost Management",
-        "Settings",
-        "Profile"
-    ], index=["Dashboard", "Projects", "Engineering", "Field Operations", 
-              "Cost Management", "Settings", "Profile"].index(st.session_state.menu))
     
-    # Update session state when menu selection changes
-    if selected != st.session_state.menu:
-        st.session_state.menu = selected
+    # Define menu items with icons
+    menu_items = {
+        "Dashboard": "📊",
+        "Projects": "🏗️",
+        "Engineering": "📐",
+        "Field Operations": "👷",
+        "Safety": "⚠️",
+        "Contracts": "📝",
+        "Cost Management": "💰",
+        "BIM": "🏢",
+        "Resources": "🔧",
+        "Closeout": "✅",
+        "Settings": "⚙️",
+        "Profile": "👤"
+    }
+    
+    # Custom CSS for the sidebar menu
+    st.markdown("""
+    <style>
+    .nav-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0 0 15px 0;
+    }
+    
+    .nav-item {
+        padding: 10px 15px;
+        border-radius: 4px;
+        margin-bottom: 5px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background-color: #f8f9fa;
+        color: #2c3e50;
+    }
+    
+    .nav-item:hover {
+        background-color: #e9ecef;
+    }
+    
+    .nav-item.active {
+        background-color: #4caf50;
+        color: white;
+        font-weight: 500;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .nav-icon {
+        margin-right: 10px;
+        display: inline-block;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Create the navigation list
+    nav_html = '<ul class="nav-list">'
+    
+    # Add each menu item
+    for menu_name, menu_icon in menu_items.items():
+        is_active = st.session_state.menu == menu_name
+        active_class = "active" if is_active else ""
+        
+        nav_html += f"""
+        <li class="nav-item {active_class}" 
+            onclick="handleNavClick('{menu_name}')" 
+            id="nav-{menu_name.replace(' ', '-').lower()}">
+            <span class="nav-icon">{menu_icon}</span>
+            {menu_name}
+        </li>
+        """
+    
+    nav_html += '</ul>'
+    
+    # Display the navigation
+    st.markdown(nav_html, unsafe_allow_html=True)
+    
+    # JavaScript for handling navigation clicks
+    st.markdown("""
+    <script>
+        function handleNavClick(menuName) {
+            // Set a cookie to store the selected menu
+            document.cookie = `selected_menu=${menuName};path=/`;
+            
+            // Reload the page to apply the navigation
+            window.location.reload();
+        }
+        
+        // Check for URL parameters on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the cookie value
+            const getCookie = (name) => {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+            };
+            
+            // If there's a selected_menu cookie, highlight that menu item
+            const selectedMenu = getCookie('selected_menu');
+            if (selectedMenu) {
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                const navItem = document.getElementById(`nav-${selectedMenu.replace(' ', '-').toLowerCase()}`);
+                if (navItem) {
+                    navItem.classList.add('active');
+                }
+            }
+        });
+    </script>
+    """, unsafe_allow_html=True)
+    
+    # Hidden form for menu selection handling
+    # This is needed because JavaScript can't directly trigger Streamlit
+    with st.form(key="menu_form", clear_on_submit=True):
+        menu_selection = st.text_input("Menu", value="", key="menu_selection", label_visibility="collapsed")
+        submitted = st.form_submit_button("Submit", type="primary", label_visibility="collapsed")
+        
+    # Handle form submission
+    if submitted and menu_selection:
+        st.session_state.menu = menu_selection
+        st.rerun()
     
     if st.button("Logout"):
         logout()
@@ -318,11 +424,231 @@ elif st.session_state.menu == "Engineering":
 
 elif st.session_state.menu == "Field Operations":
     st.header("Field Operations")
-    st.info("Field Operations module is under development")
+    
+    # Field Operations tabs
+    field_tab = st.tabs(["Daily Reports", "Safety Inspections", "Quality Control", "Site Photos"])
+    
+    with field_tab[0]:
+        st.subheader("Daily Reports")
+        
+        # Filter controls
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            project_filter = st.selectbox("Project", ["All Projects", "Highland Tower", "City Center", "Riverside Apartments"])
+        with col2:
+            date_filter = st.date_input("Date Range (Start)", value=None)
+        with col3:
+            date_end = st.date_input("Date Range (End)", value=None)
+            
+        # Add report button
+        st.button("Add Daily Report", type="primary", key="add_daily_report")
+        
+        # Sample data for daily reports
+        reports = [
+            {"date": "2025-05-15", "project": "Highland Tower", "author": "John Smith", "workers": 23, "weather": "Clear", "temperature": 72},
+            {"date": "2025-05-14", "project": "Highland Tower", "author": "John Smith", "workers": 21, "weather": "Partly Cloudy", "temperature": 68},
+            {"date": "2025-05-13", "project": "City Center", "author": "Maria Johnson", "workers": 15, "weather": "Rain", "temperature": 65},
+            {"date": "2025-05-12", "project": "Riverside Apartments", "author": "Robert Davis", "workers": 12, "weather": "Clear", "temperature": 70}
+        ]
+        
+        # Display reports
+        for report in reports:
+            with st.expander(f"{report['project']} - {report['date']}"):
+                st.write(f"**Author:** {report['author']}")
+                st.write(f"**Workers on Site:** {report['workers']}")
+                st.write(f"**Weather:** {report['weather']}, {report['temperature']}°F")
+                st.write("**Work Completed:**")
+                st.write("- Completed foundation pouring for east wing")
+                st.write("- Installed temporary power for floors 3-5")
+                st.write("- Delivered steel beams for phase 2")
+    
+    with field_tab[1]:
+        st.subheader("Safety Inspections")
+        st.info("Safety inspections module is coming soon")
+    
+    with field_tab[2]:
+        st.subheader("Quality Control")
+        st.info("Quality control module is coming soon")
+        
+    with field_tab[3]:
+        st.subheader("Site Photos")
+        st.info("Site photos gallery is coming soon")
+
+elif st.session_state.menu == "Safety":
+    st.header("Safety Management")
+    
+    # Safety tabs
+    safety_tab = st.tabs(["Incident Reports", "Safety Training", "Compliance"])
+    
+    with safety_tab[0]:
+        st.subheader("Incident Reports")
+        
+        # Filter controls
+        col1, col2 = st.columns(2)
+        with col1:
+            project_filter = st.selectbox("Project", ["All Projects", "Highland Tower", "City Center", "Riverside Apartments"], key="safety_project")
+        with col2:
+            severity_filter = st.selectbox("Severity", ["All", "Low", "Medium", "High", "Critical"])
+            
+        # Add incident button
+        st.button("Report New Incident", type="primary")
+        
+        # Sample data for incidents
+        incidents = [
+            {"date": "2025-05-10", "project": "Highland Tower", "type": "Near Miss", "severity": "Low", "status": "Closed"},
+            {"date": "2025-05-05", "project": "City Center", "type": "Property Damage", "severity": "Medium", "status": "Under Investigation"},
+            {"date": "2025-04-28", "project": "Riverside Apartments", "type": "Minor Injury", "severity": "Medium", "status": "Closed"},
+            {"date": "2025-04-15", "project": "Highland Tower", "type": "Equipment Failure", "severity": "High", "status": "Resolved"}
+        ]
+        
+        # Display incidents
+        for incident in incidents:
+            status_color = "green" if incident["status"] == "Closed" else "orange" if incident["status"] == "Resolved" else "red"
+            severity_color = "green" if incident["severity"] == "Low" else "orange" if incident["severity"] == "Medium" else "red"
+            
+            with st.expander(f"{incident['date']} - {incident['project']} - {incident['type']}"):
+                st.write(f"**Severity:** <span style='color:{severity_color}'>{incident['severity']}</span>", unsafe_allow_html=True)
+                st.write(f"**Status:** <span style='color:{status_color}'>{incident['status']}</span>", unsafe_allow_html=True)
+                st.write("**Description:**")
+                st.write("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies.")
+                st.write("**Actions Taken:**")
+                st.write("- Immediate area secured")
+                st.write("- Safety briefing conducted")
+                st.write("- Equipment inspection scheduled")
+    
+    with safety_tab[1]:
+        st.subheader("Safety Training")
+        st.info("Safety training module is coming soon")
+    
+    with safety_tab[2]:
+        st.subheader("Compliance")
+        st.info("Safety compliance module is coming soon")
+
+elif st.session_state.menu == "Contracts":
+    st.header("Contract Management")
+    
+    # Contracts tabs
+    contracts_tab = st.tabs(["Contracts", "Change Orders", "Purchase Orders"])
+    
+    with contracts_tab[0]:
+        st.subheader("Contracts")
+        
+        # Filter controls
+        col1, col2 = st.columns(2)
+        with col1:
+            project_filter = st.selectbox("Project", ["All Projects", "Highland Tower", "City Center", "Riverside Apartments"], key="contract_project")
+        with col2:
+            status_filter = st.selectbox("Status", ["All", "Draft", "Under Review", "Executed", "Completed", "Terminated"])
+            
+        # Add contract button
+        st.button("Add Contract", type="primary")
+        
+        # Sample data for contracts
+        contracts = [
+            {"number": "C-2025-001", "project": "Highland Tower", "vendor": "ABC Concrete", "type": "Subcontract", "value": "$1,250,000", "status": "Executed"},
+            {"number": "C-2025-002", "project": "City Center", "vendor": "XYZ Electrical", "type": "Subcontract", "value": "$875,000", "status": "Under Review"},
+            {"number": "C-2025-003", "project": "Riverside Apartments", "vendor": "123 Plumbing", "type": "Subcontract", "value": "$450,000", "status": "Executed"},
+            {"number": "C-2025-004", "project": "Highland Tower", "vendor": "Smith & Co. Steel", "type": "Purchase", "value": "$2,100,000", "status": "Executed"}
+        ]
+        
+        # Display contracts
+        for contract in contracts:
+            with st.expander(f"{contract['number']} - {contract['vendor']} - {contract['project']}"):
+                st.write(f"**Type:** {contract['type']}")
+                st.write(f"**Value:** {contract['value']}")
+                st.write(f"**Status:** {contract['status']}")
+                st.write("**Scope:**")
+                st.write("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies.")
+                
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.button("View Contract", key=f"view_{contract['number']}")
+                with col2:
+                    st.button("Edit", key=f"edit_{contract['number']}")
+                with col3:
+                    st.button("Download", key=f"download_{contract['number']}")
+    
+    with contracts_tab[1]:
+        st.subheader("Change Orders")
+        st.info("Change orders module is coming soon")
+    
+    with contracts_tab[2]:
+        st.subheader("Purchase Orders")
+        st.info("Purchase orders module is coming soon")
 
 elif st.session_state.menu == "Cost Management":
     st.header("Cost Management")
-    st.info("Cost Management module is under development")
+    
+    # Cost Management tabs
+    cost_tab = st.tabs(["Budget", "Cost Tracking", "Invoices", "Forecasting"])
+    
+    with cost_tab[0]:
+        st.subheader("Project Budgets")
+        
+        # Project selection
+        project = st.selectbox("Select Project", ["Highland Tower", "City Center", "Riverside Apartments"], key="budget_project")
+        
+        # Budget overview
+        st.subheader(f"{project} Budget Overview")
+        
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Total Budget", "$12,500,000", "")
+        with col2:
+            st.metric("Committed", "$8,750,000", "70%")
+        with col3:
+            st.metric("Spent to Date", "$5,250,000", "42%")
+        with col4:
+            st.metric("Remaining", "$7,250,000", "")
+        
+        # Budget breakdown
+        st.subheader("Budget Breakdown")
+        
+        # Sample data for budget categories
+        categories = [
+            {"name": "General Conditions", "budget": 750000, "committed": 680000, "spent": 450000},
+            {"name": "Site Work", "budget": 1250000, "committed": 1200000, "spent": 980000},
+            {"name": "Concrete", "budget": 2500000, "committed": 2350000, "spent": 1850000},
+            {"name": "Steel", "budget": 3500000, "committed": 3100000, "spent": 1500000},
+            {"name": "Mechanical", "budget": 1750000, "committed": 950000, "spent": 250000},
+            {"name": "Electrical", "budget": 1250000, "committed": 350000, "spent": 120000},
+            {"name": "Finishes", "budget": 1500000, "committed": 120000, "spent": 100000}
+        ]
+        
+        # Create DataFrame
+        import pandas as pd
+        df = pd.DataFrame(categories)
+        df["remaining"] = df["budget"] - df["spent"]
+        df["percent_spent"] = (df["spent"] / df["budget"] * 100).round(1).astype(str) + "%"
+        
+        # Format currency
+        for col in ["budget", "committed", "spent", "remaining"]:
+            df[col] = df[col].apply(lambda x: f"${x:,.0f}")
+        
+        # Display table
+        st.dataframe(df, use_container_width=True)
+        
+        # Budget chart
+        st.subheader("Budget vs. Actual")
+        chart_data = pd.DataFrame({
+            "Category": [cat["name"] for cat in categories],
+            "Budget": [cat["budget"] for cat in categories],
+            "Committed": [cat["committed"] for cat in categories],
+            "Actual": [cat["spent"] for cat in categories]
+        })
+        st.bar_chart(chart_data.set_index("Category"))
+    
+    with cost_tab[1]:
+        st.subheader("Cost Tracking")
+        st.info("Cost tracking module is coming soon")
+    
+    with cost_tab[2]:
+        st.subheader("Invoices")
+        st.info("Invoices module is coming soon")
+        
+    with cost_tab[3]:
+        st.subheader("Forecasting")
+        st.info("Cost forecasting module is coming soon")
 
 elif st.session_state.menu == "Settings":
     st.header("Settings")

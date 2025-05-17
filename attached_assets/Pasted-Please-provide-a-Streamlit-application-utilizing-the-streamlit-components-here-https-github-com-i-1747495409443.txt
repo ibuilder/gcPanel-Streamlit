@@ -1,0 +1,29 @@
+Please provide a Streamlit application utilizing the streamlit components here: https://github.com/ibuilder/streamlit-components with the most current coding techniques so it is lightweight and easy using Bootstrap or Tailwind, HTML5 Templating, CSS and javascript to create a dashboard system framework with a Supabase database for a set of modules that are made with CRUD. Please make different user roles administrator (create/read/update/delete), editor (create/read/update), contributor (create/read), viewer (read), restricted (no access). Users can delete only there own records. Tables that display CRUD records should be sortable and filterable with statuses approriate to the module. Forms schould use bootstrap and the api should have functions for create, read, update, and delete. CRUD Tables should be sortable and filterable. Every read record of the CRUD pages should have the ability to comment by a user and should be exportable to PDF. Please separate all files to minimize size and organize by HTML as .html, Javascript as .js, CSS ass .css. Please create the registration and login pages along with user management and authentication through Supabase. Create a connection to Supabase to house an SQL database. Administrator settings should contain sections for database connection to Supabase, project information, user management, and company management. Each user should be associatied with a company.
+
+Modules Split into Sections Each module should have a view, list, form (ad or edit) page.
+
+Section "Preconstruction" should include modules for Qualified Bidders, Bid Packages, Bid Manual
+
+Section "Engineering" should include modules for Request for Information (RFIs), Submittals, Drawings, Specifications, File Explorer (similar to elFiinder), Permitting, Meeting Agenda/Minutes, and Transmittals
+
+Section "Field" should include modules for Daily Reports with weather, Photo Library, Schedule, Checklists, Punchlist, Pull-Planning
+
+Section "Safety" should include modules for Observations, PreTask Plans (PTPs), Job Hazard Analysis (JHAs), Employee Orientations
+
+Section "Contracts" should include modules for Prime Contract (GMP, Cost Plus, Lump Sum, CMAR), Subcontracts, Professional Service Agreements, Lien Waivers, Certificates of Insurance, Letters of Intent
+
+Section "Cost" should include modules for Budget and Forecast, Invoicing (AIA G702/G703), Direct Costs (Invoices, Certified Payroll, and Expenses), Potential Changes, Change Orders, Approval Letters & Directives, Time and Materials Tickets with digital signatures where required.
+
+Section "BIM" should include modules for 3D Model (Models should be able to view .IFC files with three.js) and Coordination Issues
+
+Section "Closeout" should include modules for O&M Manuals, Warranties, Attic Stock
+
+Section "Resources" should include modules for Locations, CSI Divisions, Cost Codes, Labor Rates, Material Rates, Equipment Rates which will be relational databses for forms in the other modules.
+
+Section "Settings" should contain modules for Project Info, Locations, Company Management, User Management, Project Help, Database Settings (Connection to Supabase DB)
+
+Section "Reports" should include a module to display statistics of the CRUD database/modules with the ability to export to PDF and CSV.
+
+Everything should be modular and lightweight so a user can easily add additional modules. Show me the file structure to build the app and create a README.md. Make the web application production ready. Can you redo the code and separate/modularize the header, navbar, sidebar, and/or footer for faster coding and quicker load time? Modules can be added via a zip file. Can you create an explanation for module creation. Site architecture should be modular and compartmented with the latest HTML5 standards.
+
+The program is called gcPanel for construction Management dashboard and should be a framework to implement CRUD modules for a series of construction project related processes for a particular project.

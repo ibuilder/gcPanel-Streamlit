@@ -74,6 +74,21 @@ def local_css():
             background-color: {secondary_color} !important;
             box-shadow: 0 3px 5px rgba(0,0,0,0.2) !important;
         }}
+        
+        /* Navigation button styling */
+        .nav-button {{
+            background-color: transparent !important;
+            color: {text_color} !important;
+            border-left: 3px solid transparent !important;
+            text-align: left !important;
+            font-weight: 400 !important;
+        }}
+        
+        .nav-button.active {{
+            background-color: rgba(30, 58, 138, 0.1) !important;
+            border-left: 3px solid {primary_color} !important;
+            font-weight: 600 !important;
+        }}
         /* Form input styling */
         .stTextInput input, .stNumberInput input, .stDateInput input, 
         .stSelectbox select, .stTextArea textarea {{
@@ -277,27 +292,20 @@ with st.sidebar:
     </style>
     """, unsafe_allow_html=True)
     
-    # Create radio options with icons
-    options = [f"{icon} {name}" for name, icon in menu_items.items()]
-    
-    # Get the index of the current menu
-    current_menu = st.session_state.menu
-    current_index = list(menu_items.keys()).index(current_menu) if current_menu in menu_items else 0
-    
-    # Create the radio buttons with Streamlit 
-    selected_option = st.radio(
-        "Navigation",
-        options,
-        index=current_index
-    )
-    
-    # Extract the menu name (remove the emoji)
-    selected_menu = selected_option.split(" ", 1)[1] if " " in selected_option else selected_option
-    
-    # Update the menu selection if it changed
-    if selected_menu != st.session_state.menu:
-        st.session_state.menu = selected_menu
-        st.rerun()
+    # Create buttons for each menu item
+    for name, icon in menu_items.items():
+        # Determine if this menu item is active
+        is_active = name == st.session_state.menu
+        
+        # Apply different styling based on active state
+        button_style = "nav-button active" if is_active else "nav-button"
+        
+        # Use a container to apply custom styling
+        with st.container():
+            if st.button(f"{icon} {name}", key=f"nav_{name}", use_container_width=True, 
+                        help=f"Navigate to {name}"):
+                st.session_state.menu = name
+                st.rerun()
     
     if st.button("Logout"):
         logout()

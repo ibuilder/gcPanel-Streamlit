@@ -316,15 +316,15 @@ elif st.session_state.menu == "Engineering":
         else:
             rfi_list_component()
 
-elif menu == "Field Operations":
+elif st.session_state.menu == "Field Operations":
     st.header("Field Operations")
     st.info("Field Operations module is under development")
 
-elif menu == "Cost Management":
+elif st.session_state.menu == "Cost Management":
     st.header("Cost Management")
     st.info("Cost Management module is under development")
 
-elif menu == "Settings":
+elif st.session_state.menu == "Settings":
     st.header("Settings")
     
     # Settings tabs
@@ -346,24 +346,24 @@ elif menu == "Settings":
         st.subheader("Role Permissions")
         st.info("Role permissions interface is under development")
 
-elif menu == "Profile":
+elif st.session_state.menu == "Profile":
     user_profile_component()
 
 # Clear navigation state if we've changed main menu
-if menu == "Projects" and "selected_project_code" in st.session_state:
+if st.session_state.menu == "Projects" and "selected_project_code" in st.session_state:
     # Keep project selection state only in project section
     pass
-elif menu != "Projects" and "selected_project_code" in st.session_state:
+elif st.session_state.menu != "Projects" and "selected_project_code" in st.session_state:
     del st.session_state.selected_project_code
 
-if menu == "Engineering" and "selected_submittal_id" in st.session_state:
+if st.session_state.menu == "Engineering" and "selected_submittal_id" in st.session_state:
     # Keep submittal selection state only in engineering section
     pass
-elif menu != "Engineering" and "selected_submittal_id" in st.session_state:
+elif st.session_state.menu != "Engineering" and "selected_submittal_id" in st.session_state:
     del st.session_state.selected_submittal_id
 
-if menu == "Engineering" and "selected_rfi_id" in st.session_state:
+if st.session_state.menu == "Engineering" and "selected_rfi_id" in st.session_state:
     # Keep RFI selection state only in engineering section
     pass
-elif menu != "Engineering" and "selected_rfi_id" in st.session_state:
+elif st.session_state.menu != "Engineering" and "selected_rfi_id" in st.session_state:
     del st.session_state.selected_rfi_id

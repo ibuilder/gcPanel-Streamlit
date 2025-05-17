@@ -473,9 +473,67 @@ def apply_styles():
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     """, unsafe_allow_html=True)
     
-    # Apply theme-specific class
+    # Apply theme-specific styling
     if st.session_state.get('theme', 'dark') == 'light':
-        st.markdown('<style>.stApp { class="light-mode"; }</style>', unsafe_allow_html=True)
+        st.markdown("""
+        <style>
+            /* Light theme overrides */
+            :root {
+                --primary-color: #1976d2;
+                --primary-light: #4791db;
+                --primary-dark: #115293;
+                --secondary-color: #388e3c;
+                --secondary-light: #5eae60;
+                --secondary-dark: #1b5e20;
+                --accent-color: #f57c00;
+                --accent-light: #ff9e40;
+                --accent-dark: #bb4d00;
+                
+                /* Light theme specific colors */
+                --background-color: #ffffff;
+                --surface-color: #f5f5f5;
+                --card-bg: #ffffff;
+                --sidebar-bg: #f0f0f0;
+                --error-color: #d32f2f;
+                --warning-color: #ffa000;
+                --info-color: #0288d1;
+                --success-color: #388e3c;
+                
+                /* Text colors for light theme */
+                --text-primary: rgba(0, 0, 0, 0.87);
+                --text-secondary: rgba(0, 0, 0, 0.6);
+                --text-disabled: rgba(0, 0, 0, 0.38);
+                --sidebar-text: rgba(0, 0, 0, 0.87);
+                
+                /* UI elements for light theme */
+                --border-color: rgba(0, 0, 0, 0.12);
+                --divider-color: rgba(0, 0, 0, 0.12);
+                --shadow-color: rgba(0, 0, 0, 0.1);
+            }
+            
+            /* Sidebar specific overrides for light theme */
+            section[data-testid="stSidebar"] {
+                background-color: var(--sidebar-bg);
+                border-right: 1px solid var(--divider-color);
+            }
+            
+            /* Override the active states for better visibility in light mode */
+            .sidebar-nav-item.active {
+                background-color: var(--primary-color);
+                color: white !important;
+            }
+            
+            .sidebar-nav-item:not(.active) {
+                color: var(--text-primary);
+            }
+            
+            /* Make status pills more visible in light mode */
+            .status-pill {
+                border: 1px solid rgba(0, 0, 0, 0.1);
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
+        </style>
+        """, unsafe_allow_html=True)
 
 def apply_theme():
     """Apply theme settings (alternative to config.toml)"""

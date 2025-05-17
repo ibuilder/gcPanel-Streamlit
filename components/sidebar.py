@@ -17,59 +17,52 @@ def render_sidebar():
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         """, unsafe_allow_html=True)
         
-        # Logo and title area with improved styling
+        # Logo and title area with professional styling
         st.markdown("""
-        <div style="display: flex; align-items: center; padding: 10px 0 20px 0;">
-            <div style="font-size: 32px; margin-right: 10px;">🏗️</div>
+        <div style="display: flex; align-items: center; padding: 10px 0 20px 0; margin-bottom: 10px; border-bottom: 1px solid var(--divider-color);">
+            <div style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; 
+                      background-color: var(--primary-color); border-radius: 8px; margin-right: 15px;">
+                <span class="material-icons" style="font-size: 24px; color: white;">construction</span>
+            </div>
             <div>
-                <h1 style="margin: 0; padding: 0; color: #ffffff; font-size: 24px;">gcPanel</h1>
-                <p style="margin: 0; padding: 0; color: #cccccc; font-size: 12px;">Construction Management</p>
+                <h1 style="margin: 0; padding: 0; color: var(--text-primary); font-size: 22px; font-weight: 600;">gcPanel</h1>
+                <p style="margin: 0; padding: 0; color: var(--text-secondary); font-size: 12px;">Construction Management</p>
             </div>
         </div>
         """, unsafe_allow_html=True)
         
-        # Project Selection with better styling
-        st.markdown('<div class="sidebar-section-title">Project Selection</div>', unsafe_allow_html=True)
-        
-        # Project selector - using two columns for better layout
-        col1, col2 = st.columns([4, 1])
+        # Project Selection with modern styling
+        st.markdown("""
+        <div style="background-color: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; margin-bottom: 20px; 
+                  border: 1px solid var(--divider-color); box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                <span class="material-icons" style="color: var(--primary-color); margin-right: 8px; font-size: 20px;">apartment</span>
+                <span style="font-weight: 500; color: var(--text-primary); font-size: 16px;">Project Selection</span>
+            </div>
+        """, unsafe_allow_html=True)
         
         # List of projects - would normally come from a database
         projects = ["Highland Tower Development", "Riverfront Mall Renovation", "Metro Station Expansion"]
         
-        with col1:
-            selected_project = st.selectbox(
-                "Select Project",
-                projects,
-                index=0 if 'current_project' not in st.session_state else projects.index(st.session_state.current_project),
-                key="project_selector",
-                label_visibility="collapsed"
-            )
+        # Project selector with better styling
+        selected_project = st.selectbox(
+            "Select Project",
+            projects,
+            index=0 if 'current_project' not in st.session_state else projects.index(st.session_state.current_project),
+            key="project_selector",
+            label_visibility="collapsed"
+        )
         
+        # Load project button with better styling
+        col1, col2 = st.columns([3, 1])
         with col2:
-            # CSS for load button styling
-            st.markdown("""
-            <style>
-            div[data-testid="element-container"]:has(button#load_project_btn) {
-                height: 38px !important;
-                display: flex;
-                align-items: center;
-            }
-            
-            div[data-testid="element-container"]:has(button#load_project_btn) button {
-                height: 38px !important;
-                width: 100%;
-                padding: 0 !important;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            </style>
-            """, unsafe_allow_html=True)
-            
-            if st.button("Load", key="load_project_btn") or 'current_project' not in st.session_state:
+            # Use primary button style
+            if st.button("Load", key="load_project_btn", type="primary") or 'current_project' not in st.session_state:
                 st.session_state.current_project = selected_project
                 st.rerun()
+                
+        # Close the project card container
+        st.markdown('</div>', unsafe_allow_html=True)
         
         # Project Quick Metrics Grid
         if 'current_project' in st.session_state:
@@ -112,14 +105,11 @@ def render_sidebar():
                 </div>
                 """, unsafe_allow_html=True)
         
-        # Module quick navigation
-        st.markdown('<div class="sidebar-section-title">Quick Access</div>', unsafe_allow_html=True)
-        
-        # Material icons styling for better visuals
+        # Style for hiding buttons but keeping their functionality
         st.markdown("""
         <style>
-        /* Fix button styling */
-        div[data-testid="element-container"] button {
+        /* Hide button visually but maintain functionality */
+        div[data-testid="element-container"] button.invisible-button {
             background-color: transparent;
             border: none;
             padding: 0;
@@ -133,45 +123,6 @@ def render_sidebar():
         }
         </style>
         """, unsafe_allow_html=True)
-        
-        # Create a grid of quick access buttons
-        # Most commonly used modules
-        quick_access_modules = [
-            {'section': 'engineering', 'module': 'submittals', 'icon': 'upload', 'label': 'Submittals'},
-            {'section': 'engineering', 'module': 'rfi', 'icon': 'help_outline', 'label': 'RFIs'},
-            {'section': 'field', 'module': 'daily_reports', 'icon': 'description', 'label': 'Daily Reports'},
-            {'section': 'cost', 'module': 'budget', 'icon': 'attach_money', 'label': 'Budget'}
-        ]
-        
-        # Create 2x2 grid
-        quick_col1, quick_col2 = st.columns(2)
-        
-        for i, module in enumerate(quick_access_modules):
-            is_active = (st.session_state.get('current_section') == module['section'] and 
-                         st.session_state.get('current_module') == module['module'])
-            
-            col = quick_col1 if i % 2 == 0 else quick_col2
-            
-            with col:
-                # Define styling based on active state
-                active_class = "active" if is_active else ""
-                
-                # Create the button with material icons
-                st.markdown(f"""
-                <div class="quick-access-btn {active_class}" id="quick-access-{i}">
-                    <span class="material-icons">{module['icon']}</span>
-                    <div>{module['label']}</div>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                # Button with minimal text for navigation
-                button_container = st.container()
-                button_container.markdown('<div style="height: 0; visibility: hidden;">.</div>', unsafe_allow_html=True)
-                if button_container.button(module['label'], key=f"quick_btn_{module['section']}_{module['module']}"):
-                    st.session_state.current_section = module['section']
-                    st.session_state.current_module = module['module']
-                    st.session_state.current_view = "list"
-                    st.rerun()
                     
         # Modules organized by category
         st.markdown('<div class="sidebar-section-title">Modules</div>', unsafe_allow_html=True)

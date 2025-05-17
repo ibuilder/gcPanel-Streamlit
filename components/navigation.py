@@ -98,7 +98,7 @@ def render_navigation():
                 </div>
                 <div class="breadcrumb-item">
                     <a href="#" id="back-to-section">
-                        <span class="material-icons" style="font-size: 16px; vertical-align: bottom;">{category_info['icon']}</span>
+                        <span class="material-icons" style="font-size: 16px; vertical-align: bottom;">folder</span>
                         {section_display_name}
                     </a>
                 </div>

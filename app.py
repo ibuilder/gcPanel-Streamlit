@@ -50,7 +50,7 @@ def local_css():
     text_color = "#2c3e50"
     primary_color = "#1e3a8a"
     secondary_color = "#2a9fd6"
-    accent_color = "#26a69a"
+    accent_color = "#1e3a8a"
     
     # Apply CSS
     st.markdown(f"""
@@ -284,12 +284,11 @@ with st.sidebar:
     current_menu = st.session_state.menu
     current_index = list(menu_items.keys()).index(current_menu) if current_menu in menu_items else 0
     
-    # Create the radio buttons
+    # Create the radio buttons with Streamlit 
     selected_option = st.radio(
         "Navigation",
         options,
-        index=current_index,
-        label_visibility="collapsed"
+        index=current_index
     )
     
     # Extract the menu name (remove the emoji)

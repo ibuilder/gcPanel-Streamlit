@@ -1,55 +1,42 @@
 """
-Breadcrumbs component for navigation.
+Simple breadcrumbs component for navigation.
 
-This module provides a breadcrumb trail to show the user's current location in the application.
+This module provides a simple breadcrumb trail using Streamlit's native components.
 """
 
 import streamlit as st
 from typing import List, Dict, Any
 
-def breadcrumbs(items: List[Dict[str, Any]], current_page: str) -> None:
+def simple_breadcrumbs(items: List[Dict[str, Any]]) -> None:
     """
-    Display breadcrumb navigation trail.
+    Display a simplified breadcrumb navigation trail using Streamlit components.
     
     Args:
         items: List of breadcrumb items, each with keys 'label' and 'path'
-        current_page: The label of the current page
     """
-    # Create the HTML for the breadcrumbs
-    breadcrumbs_html = """
-    <nav aria-label="breadcrumb" style="margin-bottom: 20px;">
-        <ol class="breadcrumb" style="display: flex; list-style: none; padding: 0; margin: 0 0 1rem 0;">
-    """
+    # Create a horizontal layout for the breadcrumbs
+    cols = st.columns(len(items) * 2 - 1)
     
     # Add each breadcrumb item
     for i, item in enumerate(items):
         is_last = i == len(items) - 1
-        is_current = item.get('label') == current_page
         
-        if is_current or is_last:
-            # Current page or last item (active)
-            breadcrumbs_html += f"""
-            <li class="breadcrumb-item active" style="color: #3e79f7; font-weight: 500;" aria-current="page">
-                {item.get('label')}
-            </li>
-            """
-        else:
-            # For navigation, we'll use Streamlit's session state instead of JavaScript
-            nav_key = f"nav_to_{item.get('path').replace(' ', '_')}"
-            if st.button(item.get('label'), key=nav_key, type="text"):
-                st.session_state.menu = item.get('path')
-                st.rerun()
-            
-            # Add separator
-            st.markdown('<span style="color: #6c757d; margin: 0 5px;">›</span>', unsafe_allow_html=True)
-    
-    breadcrumbs_html += """
-        </ol>
-    </nav>
-    """
-    
-    # Display the breadcrumbs
-    st.markdown(breadcrumbs_html, unsafe_allow_html=True)
+        # Breadcrumb item (in even columns)
+        with cols[i * 2]:
+            if is_last:
+                # Current page (no click action)
+                st.markdown(f"<div style='color: #3e79f7; font-weight: 500;'>{item.get('label')}</div>", unsafe_allow_html=True)
+            else:
+                # Clickable breadcrumb
+                label = item.get('label', '')
+                if st.button(label, key=f"breadcrumb_{i}", type="secondary", use_container_width=True):
+                    st.session_state.menu = item.get('path', 'Dashboard')
+                    st.rerun()
+        
+        # Separator (in odd columns)
+        if not is_last:
+            with cols[i * 2 + 1]:
+                st.markdown("<div style='text-align: center; color: #6c757d;'>›</div>", unsafe_allow_html=True)
 
 def get_breadcrumbs_for_page(page: str) -> List[Dict[str, Any]]:
     """

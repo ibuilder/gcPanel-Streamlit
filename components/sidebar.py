@@ -82,44 +82,35 @@ def render_sidebar():
         
         for item in menu_items:
             is_active = st.session_state.menu == item["label"]
-            active_class = "active" if is_active else ""
             
-            st.markdown(
-                f"""
-                <div class="nav-item {active_class}" 
-                     onclick="parent.postMessage({{key: 'nav_to', value: '{item["label"]}'}}, '*')">
-                    <span class="nav-icon material-icons">{item["icon"]}</span>
-                    {item["label"]}
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+            # Create a unique key for each navigation button
+            button_key = f"nav_{item['label'].lower().replace(' ', '_')}"
             
-            # Handle navigation clicks
-            if f"nav_to_{item['label']}" not in st.session_state:
-                st.session_state[f"nav_to_{item['label']}"] = False
-                
-            # JavaScript to handle navigation
-            st.markdown(
-                """
-                <script>
-                window.addEventListener('message', function(e) {
-                    if (e.data.key === 'nav_to') {
-                        const data = {
-                            nav_to: e.data.value
-                        };
-                        
-                        // Send data to Streamlit
-                        window.parent.postMessage({
-                            type: 'streamlit:setComponentValue',
-                            value: data
-                        }, '*');
-                    }
-                });
-                </script>
-                """,
-                unsafe_allow_html=True
-            )
+            # Use Streamlit columns to create custom styled navigation buttons
+            col1, col2 = st.columns([1, 9])
+            
+            with col1:
+                # Icon
+                st.markdown(
+                    f"""
+                    <div style="color: {'#3e79f7' if is_active else '#6c757d'}; 
+                         margin-top: 10px; text-align: center;">
+                        <span class="material-icons">{item["icon"]}</span>
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+            
+            with col2:
+                # Navigation button using Streamlit's button
+                if st.button(
+                    item["label"], 
+                    key=button_key, 
+                    type="primary" if is_active else "secondary",
+                    use_container_width=True
+                ):
+                    st.session_state.menu = item["label"]
+                    st.rerun()
         
         # Project selection
         st.markdown("<hr style='margin: 1.5rem 0;'>", unsafe_allow_html=True)

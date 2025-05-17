@@ -19,9 +19,8 @@ from modules.pdf_viewer.pdf_viewer import render_pdf_viewer
 from modules.bim_viewer.ifc_viewer import render_bim_viewer
 
 # Import components
-from components.custom_breadcrumbs import render_breadcrumbs, get_breadcrumbs_for_page
+from components.simple_breadcrumbs import simple_breadcrumbs, get_breadcrumbs_for_page
 from components.sidebar import render_sidebar
-from components.data_tables import data_table, repeatable_fieldset
 from core.digital_signatures.signature import DigitalSignature
 
 # Initialize core application
@@ -346,7 +345,7 @@ def main():
         breadcrumb_items = get_breadcrumbs_for_page(current_menu)
         
         # Render breadcrumbs
-        render_breadcrumbs(breadcrumb_items, current_menu)
+        simple_breadcrumbs(breadcrumb_items)
         
         # Render selected module
         if current_menu == "Dashboard":

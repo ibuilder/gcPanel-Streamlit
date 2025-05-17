@@ -205,20 +205,32 @@ def initialize_auth():
                 {"name": "viewer", "description": "Read-only access"}
             ]
             
+            # Track if any roles were added
+            roles_added = False
+            
             for role_data in default_roles:
                 role = db.query(Role).filter(Role.name == role_data["name"]).first()
                 if not role:
                     role = Role(**role_data)
                     db.add(role)
+                    roles_added = True
             
-            # Commit role changes
-            db.commit()
+            # Only commit if roles were added
+            if roles_added:
+                db.commit()
+                logger.info("Default roles created")
             
-            # Create admin user if it doesn't exist
-            admin = db.query(User).filter(User.username == "admin").first()
+            # Check if admin user exists by username OR email (to avoid unique constraint errors)
+            admin = db.query(User).filter(
+                (User.username == "admin") | (User.email == "admin@example.com")
+            ).first()
+            
             if not admin:
                 # Get admin role
                 admin_role = db.query(Role).filter(Role.name == "admin").first()
+                if not admin_role:
+                    logger.error("Admin role not found during initialization")
+                    return False
                 
                 # Create admin user
                 admin = User(
@@ -232,8 +244,18 @@ def initialize_auth():
                 admin.roles = [admin_role]
                 db.add(admin)
                 db.commit()
+                logger.info("Admin user created")
+            else:
+                # Make sure existing admin has the admin role
+                admin_role = db.query(Role).filter(Role.name == "admin").first()
+                if admin_role and admin_role not in admin.roles:
+                    admin.roles.append(admin_role)
+                    db.commit()
+                    logger.info("Added admin role to existing admin user")
                 
             logger.info("Authentication system initialized successfully")
+            return True
     except Exception as e:
         logger.error(f"Error initializing authentication system: {str(e)}")
-        raise
+        # Don't crash on initialization error, return False instead
+        return False

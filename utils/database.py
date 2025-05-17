@@ -86,6 +86,65 @@ def initialize_db():
                         text("INSERT INTO sections (name, display_name, icon, sort_order) VALUES (:name, :display_name, :icon, :sort_order)"),
                         {"name": section[0], "display_name": section[1], "icon": section[2], "sort_order": section[3]}
                     )
+                
+                # Add default modules for each section
+                # First get the section IDs
+                sections_result = conn.execute(text("SELECT id, name FROM sections"))
+                section_ids = {row[1]: row[0] for row in sections_result.fetchall()}
+                
+                # Define some default modules
+                default_modules = [
+                    # Preconstruction modules
+                    (section_ids['preconstruction'], 'bid_packages', 'Bid Packages', 'package', 1),
+                    (section_ids['preconstruction'], 'qualified_bidders', 'Qualified Bidders', 'users', 2),
+                    # Engineering modules
+                    (section_ids['engineering'], 'rfi', 'RFIs', 'help-circle', 1),
+                    (section_ids['engineering'], 'file_explorer', 'Document Library', 'folder', 2),
+                    # Field modules
+                    (section_ids['field'], 'daily_reports', 'Daily Reports', 'clipboard', 1),
+                    (section_ids['field'], 'photo_log', 'Photo Log', 'camera', 2),
+                    # Safety modules
+                    (section_ids['safety'], 'observations', 'Safety Observations', 'eye', 1),
+                    (section_ids['safety'], 'incidents', 'Incident Reports', 'alert-triangle', 2),
+                    # Contracts modules
+                    (section_ids['contracts'], 'prime_contract', 'Prime Contract', 'file-text', 1),
+                    (section_ids['contracts'], 'subcontracts', 'Subcontracts', 'file-minus', 2),
+                    # Cost modules
+                    (section_ids['cost'], 'budget', 'Budget', 'dollar-sign', 1),
+                    (section_ids['cost'], 'change_orders', 'Change Orders', 'git-branch', 2),
+                    # BIM modules
+                    (section_ids['bim'], 'model_viewer', 'Model Viewer', '3d-model', 1),
+                    (section_ids['bim'], 'clash_detection', 'Clash Detection', 'alert-circle', 2),
+                    # Closeout modules
+                    (section_ids['closeout'], 'warranties', 'Warranties', 'award', 1),
+                    (section_ids['closeout'], 'as_built', 'As-Built Documents', 'file-plus', 2),
+                    # Resources modules
+                    (section_ids['resources'], 'locations', 'Locations', 'map-pin', 1),
+                    (section_ids['resources'], 'equipment', 'Equipment', 'truck', 2),
+                    # Settings modules
+                    (section_ids['settings'], 'project_info', 'Project Info', 'info', 1),
+                    (section_ids['settings'], 'user_management', 'User Management', 'users', 2),
+                    # Reports modules
+                    (section_ids['reports'], 'statistics', 'Statistics', 'bar-chart-2', 1),
+                    (section_ids['reports'], 'exports', 'Export Reports', 'download', 2)
+                ]
+                
+                # Insert default modules
+                for module in default_modules:
+                    conn.execute(
+                        text("""
+                            INSERT INTO modules 
+                            (section_id, name, display_name, icon, sort_order, enabled) 
+                            VALUES (:section_id, :name, :display_name, :icon, :sort_order, 1)
+                        """),
+                        {
+                            "section_id": module[0], 
+                            "name": module[1], 
+                            "display_name": module[2], 
+                            "icon": module[3], 
+                            "sort_order": module[4]
+                        }
+                    )
             
             # Modules table (using SQLite syntax)
             conn.execute(text('''

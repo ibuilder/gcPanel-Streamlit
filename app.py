@@ -38,8 +38,8 @@ if 'current_module' not in st.session_state:
     st.session_state.current_module = None
 if 'current_view' not in st.session_state:
     st.session_state.current_view = "list"  # Default view (list, view, form)
-if 'modules' not in st.session_state:
-    st.session_state.modules = load_modules()
+# Always refresh modules on startup to ensure they're properly loaded
+st.session_state.modules = load_modules()
 
 # Authentication check
 if not st.session_state.authenticated:
@@ -85,7 +85,7 @@ else:
                 col1, col2 = st.columns(2)
                 with col1:
                     st.image("https://pixabay.com/get/gba48db1250efd35c9dffd0db152d0ebc3f28f4c90bb444aedf8c8d35ed6483d95bb97cefd51fa783369788c90562bb037d3745554751db92e1d14ef5ec963950_1280.jpg", 
-                             caption="Construction Management", use_column_width=True)
+                             caption="Construction Management", use_container_width=True)
                     
                     st.subheader("Recent Activity")
                     st.info("Welcome to gcPanel, your comprehensive construction management dashboard.")
@@ -97,7 +97,7 @@ else:
                 
                 with col2:
                     st.image("https://pixabay.com/get/g9f0f096f46d0d28520ae0a9a4b0d21826da014234b3817602a97ab8e49a66e97f590ed7492657c0a12df3ec17fb129eeb4afbeed9ab0173cd54afee551d2cf09_1280.jpg", 
-                             caption="Construction Site", use_column_width=True)
+                             caption="Construction Site", use_container_width=True)
                     
                     st.subheader("System Statistics")
                     st.info("Select a module from the sidebar to get started.")

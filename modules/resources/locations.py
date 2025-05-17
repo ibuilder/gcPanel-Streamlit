@@ -342,18 +342,18 @@ def render_form():
                         # Add ID for WHERE clause
                         update_values.append(editing_id)
                         
-                        update_sql = f"UPDATE locations SET {', '.join(update_fields)} WHERE id = %s"
+                        update_sql = f"UPDATE locations SET {', '.join(update_fields)} WHERE id = ?"
                         cursor.execute(update_sql, update_values)
                         
                     else:
                         # Insert new record
                         field_names = list(form_data.keys())
-                        field_placeholders = ["%s"] * len(field_names)
+                        field_placeholders = ["?"] * len(field_names)
                         field_values = list(form_data.values())
                         
                         # Add audit fields
                         field_names.append("created_by")
-                        field_placeholders.append("%s")
+                        field_placeholders.append("?")
                         field_values.append(st.session_state.get('user_id'))
                         
                         # Create SQL

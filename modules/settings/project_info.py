@@ -16,10 +16,10 @@ def init_database():
             
         cursor = conn.cursor()
         
-        # Create project_info table
+        # Create project_info table (using SQLite syntax)
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS project_info (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 key VARCHAR(100) NOT NULL UNIQUE,
                 value TEXT,
                 description TEXT,
@@ -60,11 +60,13 @@ def init_database():
         ]
         
         for key, default_value, description in default_keys:
-            cursor.execute('''
-                INSERT INTO project_info (key, value, description)
-                VALUES (%s, %s, %s)
-                ON CONFLICT (key) DO NOTHING
-            ''', (key, default_value, description))
+            # Check if key already exists (SQLite doesn't support ON CONFLICT)
+            cursor.execute("SELECT COUNT(*) FROM project_info WHERE key = ?", (key,))
+            if cursor.fetchone()[0] == 0:
+                cursor.execute('''
+                    INSERT INTO project_info (key, value, description)
+                    VALUES (?, ?, ?)
+                ''', (key, default_value, description))
         
         conn.commit()
         cursor.close()
@@ -113,10 +115,11 @@ def update_project_info(key, value):
             
         cursor = conn.cursor()
         
+        # SQLite syntax for update with placeholders
         cursor.execute('''
             UPDATE project_info
-            SET value = %s, updated_by = %s, updated_at = CURRENT_TIMESTAMP
-            WHERE key = %s
+            SET value = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE key = ?
         ''', (value, st.session_state.get('user_id'), key))
         
         conn.commit()

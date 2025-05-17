@@ -20,32 +20,29 @@ user_roles = Table(
 )
 
 class UserStatus(enum.Enum):
-    """User account status enumeration"""
+    """User status enumeration"""
     ACTIVE = "active"
     INACTIVE = "inactive"
+    SUSPENDED = "suspended"
     PENDING = "pending"
-    LOCKED = "locked"
 
 class User(BaseModel):
     """
-    User model for authentication and user profile information.
+    User model for authentication and permissions.
     
     Attributes:
         username (str): Unique username for login
-        email (str): User's email address
-        password_hash (str): Hashed password (never store plain text)
+        email (str): User email address
+        password_hash (str): Hashed password (not stored in plaintext)
         first_name (str): User's first name
         last_name (str): User's last name
-        status (UserStatus): Account status
-        roles (list): User's roles for authorization
+        status (UserStatus): Current user status
+        roles (list): User's assigned roles
     """
     
-    # User authentication fields
-    username = Column(String(50), unique=True, index=True, nullable=False)
-    email = Column(String(100), unique=True, index=True, nullable=False)
+    username = Column(String(50), unique=True, nullable=False, index=True)
+    email = Column(String(100), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
-    
-    # User profile fields
     first_name = Column(String(50), nullable=True)
     last_name = Column(String(50), nullable=True)
     status = Column(Enum(UserStatus), default=UserStatus.ACTIVE, nullable=False)
@@ -55,9 +52,13 @@ class User(BaseModel):
     
     @property
     def full_name(self):
-        """Get user's full name or username if name is not set"""
+        """Get user's full name"""
         if self.first_name and self.last_name:
             return f"{self.first_name} {self.last_name}"
+        elif self.first_name:
+            return self.first_name
+        elif self.last_name:
+            return self.last_name
         return self.username
     
     def has_role(self, role_name):
@@ -65,66 +66,41 @@ class User(BaseModel):
         Check if user has a specific role.
         
         Args:
-            role_name (str): Name of role to check
+            role_name (str): Role name to check
             
         Returns:
             bool: True if user has role, False otherwise
         """
         return any(role.name == role_name for role in self.roles)
     
-    def has_permission(self, permission_name):
+    def has_any_role(self, role_names):
         """
-        Check if user has a specific permission through any of their roles.
+        Check if user has any of the specified roles.
         
         Args:
-            permission_name (str): Name of permission to check
+            role_names (list): List of role names to check
             
         Returns:
-            bool: True if user has permission, False otherwise
+            bool: True if user has any role, False otherwise
         """
-        for role in self.roles:
-            if any(perm.name == permission_name for perm in role.permissions):
-                return True
-        return False
+        return any(role.name in role_names for role in self.roles)
 
 class Role(BaseModel):
     """
-    Role model for role-based access control.
+    Role model for permission management.
     
     Attributes:
-        name (str): Unique role name
+        name (str): Unique role name (e.g., 'admin', 'editor')
         description (str): Role description
-        permissions (list): Permissions granted by this role
-        users (list): Users with this role
+        users (list): Users assigned to this role
     """
     
-    name = Column(String(50), unique=True, nullable=False)
+    name = Column(String(50), unique=True, nullable=False, index=True)
     description = Column(String(255), nullable=True)
     
     # Relationships
-    permissions = relationship("Permission", secondary="role_permissions", back_populates="roles")
     users = relationship("User", secondary=user_roles, back_populates="roles")
-
-# Many-to-many relationship between roles and permissions
-role_permissions = Table(
-    'role_permissions',
-    Base.metadata,
-    Column('role_id', Integer, ForeignKey('role.id'), primary_key=True),
-    Column('permission_id', Integer, ForeignKey('permission.id'), primary_key=True)
-)
-
-class Permission(BaseModel):
-    """
-    Permission model for fine-grained access control.
     
-    Attributes:
-        name (str): Unique permission name
-        description (str): Permission description
-        roles (list): Roles that include this permission
-    """
-    
-    name = Column(String(50), unique=True, nullable=False)
-    description = Column(String(255), nullable=True)
-    
-    # Relationships
-    roles = relationship("Role", secondary="role_permissions", back_populates="permissions")
+    def __repr__(self):
+        """String representation of role"""
+        return f"<Role name={self.name}>"

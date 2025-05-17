@@ -1,72 +1,62 @@
 """
-Base model for all database models in gcPanel.
+Base model for SQLAlchemy models.
 
-This module defines the Base model class with common fields and methods
-that all database models will inherit from.
+This module defines a base model class that all other models will inherit from,
+providing common fields and functionality.
 """
 
-from datetime import datetime
-from sqlalchemy import Column, Integer, DateTime, String, Boolean
+import datetime
+from sqlalchemy import Column, Integer, Boolean, DateTime
 from sqlalchemy.ext.declarative import declared_attr
 from core.database.config import Base
 
 class BaseModel(Base):
     """
-    Base model class that all database models will inherit from.
+    Base model class for all entities.
     
-    This abstract class provides common fields and functionality for all models:
-    - id: Primary key
-    - created_at: Creation timestamp
-    - updated_at: Last update timestamp
-    - created_by: User who created the record
-    - is_active: Soft deletion flag
+    This abstract base class provides common fields and functionality that
+    all model classes should inherit.
+    
+    Attributes:
+        id (int): Primary key
+        created_at (datetime): Record creation timestamp
+        updated_at (datetime): Record last update timestamp
+        is_active (bool): Soft deletion flag
     """
     
-    # Make class abstract (won't create a table)
+    # Make this class abstract
     __abstract__ = True
     
     # Primary key
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     
-    # Audit fields
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
-    created_by = Column(String, nullable=True)
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, nullable=False)
     
-    # Soft deletion
+    # Soft deletion flag
     is_active = Column(Boolean, default=True, nullable=False)
     
+    # Common methods
     @declared_attr
     def __tablename__(cls):
         """
-        Automatically generate table name from class name.
+        Generate table name automatically based on class name.
         
-        Table names will be snake_case versions of the class name.
-        Example: UserProfile -> user_profile
+        This converts CamelCase class names to snake_case table names.
         """
-        from re import sub
-        # Convert CamelCase to snake_case
-        name = sub(r'(?<!^)(?=[A-Z])', '_', cls.__name__).lower()
-        return name
+        name = cls.__name__
+        return ''.join(['_' + c.lower() if c.isupper() else c for c in name]).lstrip('_')
     
     def to_dict(self):
         """
-        Convert model instance to dictionary.
+        Convert model to dictionary.
         
         Returns:
-            dict: Model data as dictionary
+            Dictionary representation of model
         """
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     
-    @classmethod
-    def from_dict(cls, data):
-        """
-        Create model instance from dictionary.
-        
-        Args:
-            data (dict): Data to create model from
-            
-        Returns:
-            BaseModel: New model instance
-        """
-        return cls(**{k: v for k, v in data.items() if k in cls.__table__.columns.keys()})
+    def __repr__(self):
+        """String representation of model"""
+        return f"<{self.__class__.__name__} id={self.id}>"

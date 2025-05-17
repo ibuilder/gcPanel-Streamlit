@@ -362,9 +362,7 @@ def main():
             st.header("Engineering")
             st.info("Engineering module under development")
         elif current_menu == "Field Operations":
-            # Add field operations module rendering here
-            st.header("Field Operations")
-            st.info("Field Operations module under development")
+            render_field_operations()
         elif current_menu == "Safety":
             # Add safety module rendering here
             st.header("Safety")

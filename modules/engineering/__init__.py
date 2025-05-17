@@ -12,6 +12,9 @@ import random
 import plotly.express as px
 from enum import Enum, auto
 
+# Import form components
+from components.engineering_forms import rfi_form, submittal_form
+
 # Enums for status types
 class SubmittalStatus(Enum):
     DRAFT = "Draft"
@@ -380,50 +383,82 @@ def render_rfis():
                     st.button("Close RFI", key=f"close_rfi_{rfi['id']}")
             
             with buttons_col2:
-                st.button("Edit", key=f"edit_rfi_{rfi['id']}")
+                if st.button("Edit", key=f"edit_rfi_{rfi['id']}"):
+                    st.session_state.edit_rfi_id = rfi["id"]
+                    st.session_state.show_rfi_form = True
+                    st.rerun()
             
             with buttons_col3:
                 st.button("View Attachments", key=f"attach_rfi_{rfi['id']}")
     
-    # Create RFI button
+    # Create RFI button with action buttons in a row
     st.divider()
-    if st.button("Create New RFI", type="primary", key="create_rfi_btn"):
-        st.session_state.show_rfi_form = True
+    col1, col2, col3 = st.columns([1, 1, 2])
+    with col1:
+        if st.button("Create New RFI", type="primary", key="create_rfi_btn", use_container_width=True):
+            # Initialize form state
+            st.session_state.show_rfi_form = True
+            st.session_state.edit_rfi_id = None
     
-    # RFI creation form
+    # RFI creation/edit form
     if st.session_state.get("show_rfi_form", False):
-        with st.form("rfi_form"):
-            st.subheader("Create New RFI")
+        # Get RFI data if editing
+        rfi_to_edit = None
+        if st.session_state.get("edit_rfi_id"):
+            rfi_to_edit = next((rfi for rfi in rfis if rfi.get("id") == st.session_state.get("edit_rfi_id")), None)
+        
+        # Use the enhanced form component
+        form_submitted, form_data = rfi_form(
+            is_edit=st.session_state.get("edit_rfi_id") is not None,
+            rfi_data=rfi_to_edit
+        )
+        
+        if form_submitted and form_data:
+            # In a real app, this would save to database
             
-            form_col1, form_col2 = st.columns(2)
+            # Update or create RFI
+            if st.session_state.get("edit_rfi_id"):
+                # Update existing RFI
+                for i, rfi in enumerate(rfis):
+                    if rfi["id"] == st.session_state.get("edit_rfi_id"):
+                        # Preserve ID and other metadata
+                        form_data["id"] = rfi["id"]
+                        form_data["number"] = rfi["number"]
+                        form_data["submitted_date"] = datetime.now()
+                        rfis[i].update(form_data)
+                        break
+                st.success("RFI updated successfully!")
+            else:
+                # Add new RFI to the list
+                new_rfi = {
+                    "id": f"RFI-{len(rfis) + 1:03d}",
+                    "number": len(rfis) + 1,
+                    "title": form_data["title"],
+                    "description": form_data["description"],
+                    "discipline": form_data["discipline"],
+                    "location": form_data["location"],
+                    "submitted_by": form_data["submitted_by"],
+                    "submitted_date": datetime.now(),
+                    "due_date": form_data["due_date"],
+                    "status": form_data["status"],
+                    "responsible": form_data["responsible"],
+                    "response": None,
+                    "response_date": None,
+                    "closed_date": None,
+                    "attachments": len(form_data.get("attachments", [])),
+                    "cost_impact": form_data["cost_impact"],
+                    "schedule_impact": form_data["schedule_impact"],
+                    "priority": form_data["priority"]
+                }
+                rfis.insert(0, new_rfi)  # Add to beginning of list
+                st.success(f"RFI {form_data['status'].lower()} successfully!")
             
-            with form_col1:
-                rfi_title = st.text_input("Title", key="new_rfi_title")
-                rfi_discipline = st.selectbox("Discipline", disciplines, key="new_rfi_discipline")
-                rfi_location = st.selectbox("Location", locations, key="new_rfi_location")
-                rfi_priority = st.selectbox("Priority", ["Low", "Medium", "High", "Critical"], key="new_rfi_priority")
-                rfi_submitted_by = st.text_input("Submitted By", key="new_rfi_submitted_by")
+            # Reset form state
+            st.session_state.show_rfi_form = False
+            st.session_state.edit_rfi_id = None
             
-            with form_col2:
-                rfi_responsible = st.selectbox("Responsible Party", responsibles, key="new_rfi_responsible")
-                rfi_due_date = st.date_input("Due Date", datetime.now() + timedelta(days=7), key="new_rfi_due_date")
-                rfi_cost_impact = st.checkbox("Cost Impact", value=False, key="new_rfi_cost_impact")
-                rfi_schedule_impact = st.checkbox("Schedule Impact", value=False, key="new_rfi_schedule_impact")
-            
-            rfi_description = st.text_area("Description", key="new_rfi_description", height=150)
-            
-            # File upload
-            rfi_attachments = st.file_uploader("Add Attachments", accept_multiple_files=True, key="new_rfi_attachments")
-            
-            # Form buttons
-            submitted = st.form_submit_button("Submit RFI")
-            draft = st.form_submit_button("Save as Draft")
-            
-            if submitted or draft:
-                status = RfiStatus.SUBMITTED.value if submitted else RfiStatus.DRAFT.value
-                st.success(f"RFI {status.lower()} successfully!")
-                st.session_state.show_rfi_form = False
-                st.rerun()
+            # Force rerender
+            st.rerun()
 
 def render_submittals():
     """Render the submittals section"""
@@ -790,49 +825,77 @@ def render_submittals():
                     st.button("Resubmit", key=f"resubmit_subm_{submittal['id']}")
             
             with buttons_col2:
-                st.button("Edit", key=f"edit_subm_{submittal['id']}")
+                if st.button("Edit", key=f"edit_subm_{submittal['id']}"):
+                    st.session_state.edit_submittal_id = submittal["id"]
+                    st.session_state.show_submittal_form = True
+                    st.rerun()
             
             with buttons_col3:
                 st.button("View Attachments", key=f"attach_subm_{submittal['id']}")
     
-    # Create Submittal button
+    # Create Submittal button with action buttons in a row
     st.divider()
-    if st.button("Create New Submittal", type="primary", key="create_submittal_btn"):
-        st.session_state.show_submittal_form = True
+    col1, col2, col3 = st.columns([1, 1, 2])
+    with col1:
+        if st.button("Create New Submittal", type="primary", key="create_submittal_btn", use_container_width=True):
+            # Initialize form state
+            st.session_state.show_submittal_form = True
+            st.session_state.edit_submittal_id = None
     
-    # Submittal creation form
+    # Submittal creation/edit form
     if st.session_state.get("show_submittal_form", False):
-        with st.form("submittal_form"):
-            st.subheader("Create New Submittal")
+        # Get submittal data if editing
+        submittal_to_edit = None
+        if st.session_state.get("edit_submittal_id"):
+            submittal_to_edit = next((s for s in submittals if s.get("id") == st.session_state.get("edit_submittal_id")), None)
+        
+        # Use the enhanced form component
+        form_submitted, form_data = submittal_form(
+            is_edit=st.session_state.get("edit_submittal_id") is not None,
+            submittal_data=submittal_to_edit
+        )
+        
+        if form_submitted and form_data:
+            # In a real app, this would save to database
             
-            form_col1, form_col2 = st.columns(2)
+            # Update or create submittal
+            if st.session_state.get("edit_submittal_id"):
+                # Update existing submittal
+                for i, submittal in enumerate(submittals):
+                    if submittal["id"] == st.session_state.get("edit_submittal_id"):
+                        # Preserve ID and other metadata
+                        form_data["id"] = submittal["id"]
+                        form_data["number"] = submittal["number"]
+                        form_data["submitted_date"] = datetime.now()
+                        submittals[i].update(form_data)
+                        break
+                st.success("Submittal updated successfully!")
+            else:
+                # Add new submittal to the list
+                new_submittal = {
+                    "id": f"SUBM-{len(submittals) + 1:03d}",
+                    "number": len(submittals) + 1,
+                    "spec_section": form_data["spec_section"],
+                    "submittal_type": form_data["submittal_type"],
+                    "title": form_data["title"],
+                    "submitting_party": form_data["submitting_party"],
+                    "reviewing_party": form_data["reviewing_party"],
+                    "priority": form_data["priority"],
+                    "due_date": form_data["due_date"],
+                    "description": form_data["description"],
+                    "status": form_data["status"],
+                    "submitted_date": datetime.now(),
+                    "response_date": None,
+                    "days_to_respond": None,
+                    "attachments": len(form_data.get("attachments", [])),
+                    "revision": 0
+                }
+                submittals.insert(0, new_submittal)  # Add to beginning of list
+                st.success(f"Submittal {form_data['status'].lower()} successfully!")
             
-            with form_col1:
-                submittal_spec = st.selectbox("Specification Section", specification_sections, key="new_submittal_spec")
-                submittal_type = st.selectbox(
-                    "Submittal Type", 
-                    ["Product Data", "Shop Drawings", "Samples", "Certificates", "Test Reports", "Mix Designs", "Cut Sheets"],
-                    key="new_submittal_type"
-                )
-                submittal_title = st.text_input("Title", key="new_submittal_title")
-                submittal_submitter = st.selectbox("Submitting Party", submitting_parties, key="new_submittal_submitter")
+            # Reset form state
+            st.session_state.show_submittal_form = False
+            st.session_state.edit_submittal_id = None
             
-            with form_col2:
-                submittal_reviewer = st.selectbox("Reviewing Party", reviewing_parties, key="new_submittal_reviewer")
-                submittal_priority = st.selectbox("Priority", ["Low", "Medium", "High"], key="new_submittal_priority")
-                submittal_due_date = st.date_input("Due Date", datetime.now() + timedelta(days=14), key="new_submittal_due_date")
-            
-            submittal_description = st.text_area("Description", key="new_submittal_description", height=100)
-            
-            # File upload
-            submittal_attachments = st.file_uploader("Add Attachments", accept_multiple_files=True, key="new_submittal_attachments")
-            
-            # Form buttons
-            submitted = st.form_submit_button("Submit")
-            draft = st.form_submit_button("Save as Draft")
-            
-            if submitted or draft:
-                status = SubmittalStatus.SUBMITTED.value if submitted else SubmittalStatus.DRAFT.value
-                st.success(f"Submittal {status.lower()} successfully!")
-                st.session_state.show_submittal_form = False
-                st.rerun()
+            # Force rerender
+            st.rerun()

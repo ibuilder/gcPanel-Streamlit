@@ -434,6 +434,107 @@ class PDFViewer:
         # Display the PDF viewer
         st.components.v1.html(pdf_viewer_html, height=height + 50)  # Add some extra height for the toolbar
 
+def generate_drawing_set(discipline, current_only=True):
+    """
+    Generate a sample set of construction drawings based on discipline.
+    
+    Args:
+        discipline: Drawing discipline (Architectural, Structural, etc.)
+        current_only: Whether to show only current drawings
+        
+    Returns:
+        List of drawing dictionaries
+    """
+    drawing_data = []
+    today = datetime.now()
+    
+    # Drawing types and counts by discipline
+    discipline_info = {
+        "Architectural": {
+            "prefix": "A",
+            "count": 30,
+            "types": ["Floor Plans", "Elevations", "Sections", "Details", "Finishes"]
+        },
+        "Structural": {
+            "prefix": "S", 
+            "count": 25,
+            "types": ["Foundation", "Framing Plans", "Sections", "Details", "Schedules"]
+        },
+        "MEP": {
+            "prefix": "M", 
+            "count": 35,
+            "types": ["HVAC", "Plumbing", "Electrical", "Fire Protection"]
+        },
+        "Civil": {
+            "prefix": "C", 
+            "count": 15,
+            "types": ["Site Plan", "Grading", "Utilities", "Details"]
+        },
+        "Landscape": {
+            "prefix": "L", 
+            "count": 10,
+            "types": ["Layout", "Planting", "Irrigation", "Details"]
+        }
+    }
+    
+    # Get discipline data
+    info = discipline_info.get(discipline, discipline_info["Architectural"])
+    prefix = info["prefix"]
+    count = info["count"]
+    types = info["types"]
+    
+    # Generate drawings
+    for i in range(1, count + 1):
+        # Determine drawing type
+        drawing_type = types[min(i // 5, len(types) - 1)]
+        
+        # Create drawing number with discipline prefix
+        number = f"{prefix}{i:02d}"
+        
+        # Generate title based on number and type
+        if i <= 5:
+            title = f"General {drawing_type}"
+        elif drawing_type == "Floor Plans" or drawing_type == "Framing Plans":
+            floor = ((i - 5) % 20) + 1
+            title = f"Level {floor} {drawing_type.rstrip('s')}"
+        else:
+            title = f"{drawing_type} {((i - 5) % 10) + 1}"
+        
+        # Create realistic revision history
+        current_rev = random.randint(0, 4)
+        
+        # Only include superseded drawings if not filtering for current only
+        if current_rev > 0 and not current_only:
+            # Add previous revisions
+            for rev in range(current_rev):
+                rev_date = today - timedelta(days=random.randint(30, 365))
+                drawing_data.append({
+                    "number": number,
+                    "title": title,
+                    "discipline": discipline,
+                    "type": drawing_type,
+                    "revision": rev,
+                    "date": rev_date.strftime("%Y-%m-%d"),
+                    "status": "Superseded",
+                    "size": random.choice(["ARCH D", "ARCH E"]),
+                    "is_current": False
+                })
+        
+        # Add current revision
+        drawing_data.append({
+            "number": number,
+            "title": title,
+            "discipline": discipline,
+            "type": drawing_type,
+            "revision": current_rev,
+            "date": (today - timedelta(days=random.randint(0, 60))).strftime("%Y-%m-%d"),
+            "status": random.choice(["Issued for Construction", "Issued for Bid", "Issued for Permit", "Issued for Review"]),
+            "size": random.choice(["ARCH D", "ARCH E"]),
+            "is_current": True
+        })
+    
+    return drawing_data
+
 def load_pdf_sample(sample_name: str = "contract") -> bytes:
     """
     Load a sample PDF file.

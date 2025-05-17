@@ -991,8 +991,10 @@ def render_forecasting():
     
     # Add vertical line for current date
     if current_month < total_duration_months:
+        # Get current date from the dataframe 
+        current_date_str = df.loc[current_month, "month"].strftime('%Y-%m-%d')
         scenario_fig.add_vline(
-            x=current_date,
+            x=current_date_str,
             line_dash="dash",
             line_color="gray",
             annotation_text="Current Date",

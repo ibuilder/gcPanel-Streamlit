@@ -6,9 +6,12 @@ This module provides PDF viewing capabilities using PDF.js.
 
 import streamlit as st
 import base64
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Callable
 import os
 import uuid
+import pandas as pd
+from datetime import datetime, timedelta
+import random
 
 class PDFViewer:
     """PDF viewer component using PDF.js."""
@@ -635,10 +638,56 @@ def render_pdf_viewer():
     st.title("Document Viewer")
     
     # Create tabs for different document types
-    tabs = st.tabs(["Contracts", "Submittals", "RFIs", "Upload Document"])
+    tabs = st.tabs(["Drawings", "Contracts", "Submittals", "RFIs", "Upload Document"])
+    
+    # Drawings tab
+    with tabs[0]:
+        st.header("Construction Drawings")
+        
+        # Create sections for different drawing types
+        drawing_types = ["Architectural", "Structural", "MEP", "Civil", "Landscape"]
+        drawing_col1, drawing_col2 = st.columns(2)
+        
+        with drawing_col1:
+            selected_drawing_type = st.selectbox("Drawing Discipline", drawing_types)
+        
+        with drawing_col2:
+            st.write(" ")
+            st.write(" ")
+            show_current_only = st.checkbox("Show current drawings only", value=True)
+        
+        # Generate sample drawing sets based on discipline
+        drawings = generate_drawing_set(selected_drawing_type, show_current_only)
+        
+        # Display drawings in a table
+        drawing_df = pd.DataFrame(drawings)
+        
+        # Style the dataframe
+        if not drawing_df.empty:
+            # Add view button column
+            styled_df = drawing_df.copy()
+            
+            # Display the table
+            st.dataframe(
+                styled_df[["number", "title", "revision", "date", "status"]], 
+                use_container_width=True,
+                hide_index=True
+            )
+            
+            # Display selected drawing
+            selected_drawing = st.selectbox("Select Drawing to View", drawing_df["number"] + " - " + drawing_df["title"])
+            if selected_drawing:
+                selected_index = selected_drawing.split(" - ")[0]
+                drawing_data = drawing_df[drawing_df["number"] == selected_index].iloc[0]
+                
+                st.markdown(f"### {selected_drawing} (Rev. {drawing_data['revision']})")
+                st.markdown(f"**Status:** {drawing_data['status']} | **Date:** {drawing_data['date']} | **Sheet Size:** {drawing_data['size']}")
+                
+                drawing_pdf = load_pdf_sample("drawing")
+                PDFViewer.advanced_pdf_viewer(pdf_bytes=drawing_pdf, enable_annotation=True)
     
     # Contracts tab
-    with tabs[0]:
+    with tabs[1]:
         st.header("Contract Documents")
         
         # Sample contract document

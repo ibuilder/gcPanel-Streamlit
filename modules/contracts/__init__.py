@@ -43,54 +43,7 @@ def render_contracts():
 def render_contract_list():
     """Render the contracts listing and details section"""
     
-    # Header with Create Contract button
-    col1, col2, col3 = st.columns([2, 1, 1])
-    
-    with col1:
-        st.header("Project Contracts")
-    
-    with col3:
-        if st.button("Create New Contract", type="primary", key="create_contract_btn", use_container_width=True):
-            st.session_state.show_contract_form = True
-            st.session_state.edit_contract_id = None
-    
-    # Contract creation/edit form
-    if st.session_state.get("show_contract_form", False):
-        # Get contract data if editing
-        contract_to_edit = None
-        if st.session_state.get("edit_contract_id"):
-            contract_to_edit = next((c for c in contracts if c.get("id") == st.session_state.get("edit_contract_id")), None)
-        
-        # Use the enhanced form component
-        form_submitted, form_data = contract_form(
-            is_edit=st.session_state.get("edit_contract_id") is not None,
-            contract_data=contract_to_edit
-        )
-        
-        if form_submitted and form_data:
-            # In a real app, this would save to database
-            
-            # Update or create contract
-            if st.session_state.get("edit_contract_id"):
-                # Update existing contract
-                for i, contract in enumerate(contracts):
-                    if contract["id"] == st.session_state.get("edit_contract_id"):
-                        contracts[i].update(form_data)
-                        break
-                st.success("Contract updated successfully!")
-            else:
-                # Add new contract to the list
-                contracts.insert(0, form_data)  # Add to beginning of list
-                st.success("Contract created successfully!")
-            
-            # Reset form state
-            st.session_state.show_contract_form = False
-            st.session_state.edit_contract_id = None
-            
-            # Force rerender
-            st.rerun()
-    
-    # Sample data for contracts
+    # Sample data for contracts - define first to avoid reference before definition
     contracts = [
         {
             "id": f"CT-{2025}-{i:03d}",
@@ -289,8 +242,56 @@ def render_contract_list():
         pending_changes = sum(c["pending_changes"] for c in filtered_contracts)
         st.metric("Pending Changes", f"${pending_changes:,.2f}")
     
-    # Display contracts in a table
-    st.subheader("Contract List")
+    # Header with Create Contract button
+    col1, col2, col3 = st.columns([2, 1, 1])
+    
+    with col1:
+        st.subheader("Contract List")
+    
+    with col3:
+        if st.button("Create New Contract", type="primary", key="create_contract_btn", use_container_width=True):
+            st.session_state.show_contract_form = True
+            st.session_state.edit_contract_id = None
+    
+    # Contract creation/edit form
+    if st.session_state.get("show_contract_form", False):
+        # Get contract data if editing
+        contract_to_edit = None
+        if st.session_state.get("edit_contract_id"):
+            contract_to_edit = next((c for c in filtered_contracts if c.get("id") == st.session_state.get("edit_contract_id")), None)
+        
+        # Use the enhanced form component
+        form_submitted, form_data = contract_form(
+            is_edit=st.session_state.get("edit_contract_id") is not None,
+            contract_data=contract_to_edit
+        )
+        
+        if form_submitted and form_data:
+            # In a real app, this would save to database
+            
+            # Update or create contract
+            if st.session_state.get("edit_contract_id"):
+                # Update existing contract
+                for i, contract in enumerate(contracts):
+                    if contract["id"] == st.session_state.get("edit_contract_id"):
+                        contracts[i].update(form_data)
+                        break
+                st.success("Contract updated successfully!")
+            else:
+                # Add new contract to the list
+                new_contract = form_data
+                new_contract["id"] = f"CT-{2025}-{len(contracts) + 1:03d}"
+                contracts.insert(0, new_contract)  # Add to beginning of list
+                st.success("Contract created successfully!")
+            
+            # Reset form state
+            st.session_state.show_contract_form = False
+            st.session_state.edit_contract_id = None
+            
+            # Force rerender
+            st.rerun()
+            
+    # Display contracts
     
     for contract in filtered_contracts:
         # Set status color
@@ -342,6 +343,21 @@ def render_contract_list():
             st.markdown(f"**Name:** {contract['contact_name']}")
             st.markdown(f"**Email:** {contract['contact_email']}")
             st.markdown(f"**Phone:** {contract['contact_phone']}")
+            
+            # Action buttons
+            action_col1, action_col2, action_col3 = st.columns(3)
+            
+            with action_col1:
+                if st.button("Edit Contract", key=f"edit_contract_{contract['id']}"):
+                    st.session_state.edit_contract_id = contract["id"]
+                    st.session_state.show_contract_form = True
+                    st.rerun()
+                    
+            with action_col2:
+                st.button("Create Change Order", key=f"new_co_{contract['id']}")
+                
+            with action_col3:
+                st.button("Create Payment App", key=f"new_pa_{contract['id']}")
             
             # Progress visualization
             st.markdown("### Contract Progress")

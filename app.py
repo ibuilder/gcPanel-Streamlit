@@ -18,6 +18,7 @@ from modules.project_information import render_project_information
 from modules.pdf_viewer.pdf_viewer import render_pdf_viewer
 from modules.bim_viewer.ifc_viewer import render_bim_viewer
 from modules.field_operations import render_field_operations
+from modules.scheduling import render_scheduling
 
 # Import components
 from components.simple_breadcrumbs import simple_breadcrumbs, get_breadcrumbs_for_page
@@ -375,6 +376,8 @@ def main():
             # Add cost management module rendering here
             st.header("Cost Management")
             st.info("Cost Management module under development")
+        elif current_menu == "Schedule":
+            render_scheduling()
         elif current_menu == "Closeout":
             # Add closeout module rendering here
             st.header("Closeout")

@@ -218,21 +218,21 @@ def render_notification_settings():
     st.markdown('<div class="dashboard-card" style="margin-top: 1rem;">', unsafe_allow_html=True)
     st.markdown("### In-App Notifications")
     
-    in_app_notifications = st.checkbox("Enable in-app notifications", value=True)
+    in_app_notifications = st.checkbox("Enable in-app notifications", value=True, key="enable_in_app_notif")
     
     if in_app_notifications:
         st.write("Select which notifications to receive within the app:")
         
         col1, col2 = st.columns(2)
         with col1:
-            st.checkbox("RFI responses", value=True)
-            st.checkbox("Submittal status changes", value=True)
-            st.checkbox("Document uploads", value=True)
+            st.checkbox("RFI responses", value=True, key="notif_rfi_responses")
+            st.checkbox("Submittal status changes", value=True, key="notif_submittal_status")
+            st.checkbox("Document uploads", value=True, key="notif_document_uploads")
         
         with col2:
-            st.checkbox("Task assignments", value=True)
-            st.checkbox("Project status changes", value=True)
-            st.checkbox("Meeting reminders", value=True)
+            st.checkbox("Task assignments", value=True, key="notif_task_assignments")
+            st.checkbox("Project status changes", value=True, key="notif_project_status")
+            st.checkbox("Meeting reminders", value=True, key="notif_meeting_reminders")
     
     desktop_notifications = st.checkbox("Enable desktop notifications", value=False)
     

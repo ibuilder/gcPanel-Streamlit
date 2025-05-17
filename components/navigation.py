@@ -87,51 +87,58 @@ def render_navigation():
         module_display_name = module_info['display_name'] if module_info else current_module.replace('_', ' ').title()
         module_icon = module_info.get('icon', 'folder') if module_info else 'folder'
         
-        # Render the modern navigation UI
+        # Render the modern navigation UI with better styling
         st.markdown(f"""
-        <div class="card" style="margin-bottom: 20px; padding: 16px;">
+        <div class="card" style="margin-bottom: 20px; padding: 16px; background: linear-gradient(to right, rgba(25, 118, 210, 0.05), rgba(25, 118, 210, 0.02));">
             <div class="breadcrumb">
                 <div class="breadcrumb-item">
-                    <a href="#" id="back-to-home">
-                        <span class="material-icons" style="font-size: 16px; vertical-align: bottom;">home</span> Dashboard
+                    <a href="#" id="back-to-home" style="display: flex; align-items: center; gap: 6px;">
+                        <span class="material-icons" style="font-size: 16px;">home</span> 
+                        <span>Dashboard</span>
                     </a>
                 </div>
                 <div class="breadcrumb-item">
-                    <a href="#" id="back-to-section">
-                        <span class="material-icons" style="font-size: 16px; vertical-align: bottom;">folder</span>
-                        {section_display_name}
+                    <a href="#" id="back-to-section" style="display: flex; align-items: center; gap: 6px;">
+                        <span class="material-icons" style="font-size: 16px;">folder</span>
+                        <span>{section_display_name}</span>
                     </a>
                 </div>
-                <div class="breadcrumb-item">
-                    <span class="material-icons" style="font-size: 16px; vertical-align: bottom;">{module_icon}</span>
-                    {module_display_name}
+                <div class="breadcrumb-item" style="display: flex; align-items: center; gap: 6px;">
+                    <span class="material-icons" style="font-size: 16px;">{module_icon}</span>
+                    <span>{module_display_name}</span>
                 </div>
             </div>
             
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                <h2 style="font-size: 22px; margin: 0; font-weight: 500;">{module_display_name}</h2>
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-top: 15px;">
+                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                    <div style="background-color: var(--primary-color); width: 36px; height: 36px; border-radius: 8px;
+                             display: flex; align-items: center; justify-content: center; margin-right: 16px;">
+                        <span class="material-icons" style="color: white; font-size: 20px;">{module_icon}</span>
+                    </div>
+                    <h2 style="font-size: 22px; margin: 0; font-weight: 500; color: var(--text-primary);">{module_display_name}</h2>
+                </div>
                 
-                <div style="display: flex; gap: 8px;">
-                    <div class="status-pill {('active' if current_view == 'list' else '')}" 
+                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                    <div class="status-pill" 
                         style="background-color: {('var(--primary-color)' if current_view == 'list' else 'rgba(255, 255, 255, 0.05)')};
                                color: {('white' if current_view == 'list' else 'var(--text-secondary)')};
-                               cursor: pointer;"
+                               cursor: pointer; box-shadow: {('0 2px 8px rgba(25, 118, 210, 0.4)' if current_view == 'list' else 'none')};"
                         id="list-view-tab">
                         <span class="material-icons" style="font-size: 14px; margin-right: 4px;">view_list</span> 
                         List
                     </div>
-                    <div class="status-pill {('active' if current_view == 'view' else '')}" 
+                    <div class="status-pill" 
                         style="background-color: {('var(--primary-color)' if current_view == 'view' else 'rgba(255, 255, 255, 0.05)')};
                                color: {('white' if current_view == 'view' else 'var(--text-secondary)')};
-                               cursor: pointer;"
+                               cursor: pointer; box-shadow: {('0 2px 8px rgba(25, 118, 210, 0.4)' if current_view == 'view' else 'none')};"
                         id="detail-view-tab">
                         <span class="material-icons" style="font-size: 14px; margin-right: 4px;">visibility</span> 
                         Details
                     </div>
-                    <div class="status-pill {('active' if current_view == 'form' else '')}" 
+                    <div class="status-pill" 
                         style="background-color: {('var(--primary-color)' if current_view == 'form' else 'rgba(255, 255, 255, 0.05)')};
                                color: {('white' if current_view == 'form' else 'var(--text-secondary)')};
-                               cursor: pointer;"
+                               cursor: pointer; box-shadow: {('0 2px 8px rgba(25, 118, 210, 0.4)' if current_view == 'form' else 'none')};"
                         id="form-view-tab">
                         <span class="material-icons" style="font-size: 14px; margin-right: 4px;">edit</span> 
                         Form

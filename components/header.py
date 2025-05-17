@@ -102,50 +102,76 @@ def render_header():
         
         # Render the header
         if st.session_state.authenticated:
-            # Set up three columns for the header
-            logo_col, spacer_col, controls_col = st.columns([3, 5, 2])
+            # Create clean columns layout for header
+            left_col, middle_col, right_col = st.columns([1, 3, 1])
             
-            with logo_col:
-                # Display project logo and name
-                st.markdown(f"""
-                <div style="display: flex; align-items: center; padding: 10px 0;">
-                    <span class="material-icons" style="margin-right: 10px; font-size: 24px;">{project_icon}</span>
-                    <h2 style="font-size: 20px; font-weight: 600; margin: 0;">{project_name}</h2>
+            # Logo and project name
+            with left_col:
+                st.write(f"""
+                <div style="display: flex; align-items: center; height: 60px;">
+                    <div style="background-color: var(--primary-color); width: 40px; height: 40px; border-radius: 8px;
+                             display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                        <span class="material-icons" style="color: white; font-size: 24px;">{project_icon}</span>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 600; margin: 0; line-height: 1.2;">{project_name}</h2>
+                        <div style="font-size: 12px; color: var(--text-secondary);">Construction Management</div>
+                    </div>
                 </div>
                 """, unsafe_allow_html=True)
+            
+            # User controls in right column
+            with right_col:
+                # Create a single row for theme toggle, user info, and logout
+                theme_toggle_col, user_col, logout_col = st.columns([5, 10, 2])
                 
-            with controls_col:
-                # User controls (theme toggle and user info)
-                st.markdown(f"""
-                <div style="display: flex; justify-content: flex-end; align-items: center; gap: 16px; padding: 10px 0;">
-                    <div style="cursor: pointer; display: flex; align-items: center; background: rgba(255, 255, 255, 0.1); 
-                              border-radius: 20px; padding: 4px 10px; font-size: 13px;" id="theme-toggle">
-                        <span class="material-icons" style="font-size: 16px; margin-right: 5px;">{theme_icon}</span>
-                        {theme_text}
-                    </div>
-                    
-                    <div style="display: flex; align-items: center; gap: 8px; padding: 4px 10px; 
-                              background: rgba(0, 0, 0, 0.2); border-radius: 20px;">
+                # Theme toggle button
+                with theme_toggle_col:
+                    if st.button(f"{theme_icon}", key="theme_toggle_btn", help=f"Switch to {theme_text} theme"):
+                        st.session_state.theme = 'light' if st.session_state.theme == 'dark' else 'dark'
+                        st.rerun()
+                
+                # User info display
+                with user_col:
+                    st.write(f"""
+                    <div style="background-color: rgba(255, 255, 255, 0.05); border-radius: 20px; padding: 6px 12px; 
+                             display: flex; align-items: center; gap: 8px; width: fit-content; margin-left: auto;">
                         <span class="material-icons" style="font-size: 18px;">account_circle</span>
-                        <span style="font-size: 14px; font-weight: 500;">{username}</span>
+                        <span style="font-size: 14px;">{username}</span>
                     </div>
+                    """, unsafe_allow_html=True)
+                
+                # Logout button
+                with logout_col:
+                    if st.button("", key="logout_btn", help="Log out from your account"):
+                        logout_user()
+                        
+                    # Add styled logout icon
+                    st.markdown("""
+                    <style>
+                    /* Style for logout button */
+                    [data-testid="baseButton-secondary"]:has(div[data-testid="StyledLinkIconContainer"]) {
+                        color: var(--error-color);
+                        height: 36px;
+                        width: 36px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        position: relative;
+                    }
                     
-                    <div style="cursor: pointer; color: #f44336; padding: 3px; font-size: 20px; border-radius: 50%; 
-                              display: flex; align-items: center; justify-content: center;" id="logout-btn">
-                        <span class="material-icons">logout</span>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
+                    /* Add logout icon */
+                    [data-testid="baseButton-secondary"]:has(div[data-testid="StyledLinkIconContainer"])::before {
+                        content: "logout";
+                        font-family: "Material Icons";
+                        position: absolute;
+                        font-size: 20px;
+                    }
+                    </style>
+                    """, unsafe_allow_html=True)
             
-            # Hidden buttons for actual functionality
-            col1, col2 = st.columns([1, 1])
-            with col1:
-                if st.button("", key="theme_toggle_btn", help="Switch between dark and light theme"):
-                    st.session_state.theme = 'light' if st.session_state.theme == 'dark' else 'dark'
-                    st.rerun()
-            with col2:
-                if st.button("", key="logout_btn", help="Log out from your account"):
-                    logout_user()
+            # Remove duplicate button functions since we're handling them directly in the columns now
     
     # Apply theme based on selection
     if st.session_state.theme == 'light':

@@ -47,6 +47,8 @@ def login_component():
                         # Set default menu to Dashboard
                         st.session_state.menu = "Dashboard"
                         st.success(f"Welcome back, {user.full_name}!")
+                        # Force a page reload to show the dashboard
+                        st.rerun()
                         return True
                     else:
                         st.error("Invalid username or password")

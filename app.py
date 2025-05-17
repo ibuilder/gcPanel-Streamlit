@@ -66,9 +66,52 @@ def local_css():
             background-color: {bg_color};
             color: {text_color};
         }}
-        /* Button styling */
+        
+        /* Sidebar styling */
+        section[data-testid="stSidebar"] {{
+            background-color: #f8fafc !important;
+            border-right: 1px solid #e2e8f0;
+        }}
+        
+        /* Navigation list styling */
+        .nav-list {{
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 1rem;
+        }}
+        
+        .nav-item {{
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: {text_color};
+            border-radius: 4px;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+        }}
+        
+        .nav-item:hover {{
+            background-color: rgba(30, 58, 138, 0.05);
+        }}
+        
+        .nav-item.active {{
+            background-color: rgba(30, 58, 138, 0.1);
+            border-left: 3px solid {primary_color};
+            font-weight: 600;
+        }}
+        
+        .nav-icon {{
+            display: inline-block;
+            width: 24px;
+            margin-right: 8px;
+            text-align: center;
+        }}
+        
+        /* Other button styling */
         .stButton button {{
-            background-color: {secondary_color} !important;
+            background-color: {primary_color} !important;
             color: #ecf0f1 !important;
             border: none !important;
             border-radius: 4px !important;
@@ -77,24 +120,11 @@ def local_css():
             margin: 0.25rem 0 !important;
             transition: all 0.2s !important;
         }}
+        
         .stButton button:hover {{
-            background-color: {secondary_color} !important;
+            background-color: {primary_color} !important;
+            opacity: 0.9;
             box-shadow: 0 3px 5px rgba(0,0,0,0.2) !important;
-        }}
-        
-        /* Navigation button styling */
-        .nav-button {{
-            background-color: transparent !important;
-            color: {text_color} !important;
-            border-left: 3px solid transparent !important;
-            text-align: left !important;
-            font-weight: 400 !important;
-        }}
-        
-        .nav-button.active {{
-            background-color: rgba(30, 58, 138, 0.1) !important;
-            border-left: 3px solid {primary_color} !important;
-            font-weight: 600 !important;
         }}
         /* Form input styling */
         .stTextInput input, .stNumberInput input, .stDateInput input, 

@@ -11,5 +11,6 @@ dependencies = [
     "pypdf2>=3.0.1",
     "reportlab>=4.4.1",
     "sqlalchemy>=2.0.41",
+    "streamlit-elements>=0.1.0",
     "streamlit>=1.45.1",
 ]

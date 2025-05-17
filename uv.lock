@@ -689,6 +689,7 @@ dependencies = [
     { name = "reportlab" },
     { name = "sqlalchemy" },
     { name = "streamlit" },
+    { name = "streamlit-elements" },
 ]
 
 [package.metadata]
@@ -701,6 +702,7 @@ requires-dist = [
     { name = "reportlab", specifier = ">=4.4.1" },
     { name = "sqlalchemy", specifier = ">=2.0.41" },
     { name = "streamlit", specifier = ">=1.45.1" },
+    { name = "streamlit-elements", specifier = ">=0.1.0" },
 ]
 
 [[package]]
@@ -884,6 +886,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f0/46/9b3f73886f82d27849ce1e7a74ae7c39f5323e46da0b6e8847ad4c25f44c/streamlit-1.45.1.tar.gz", hash = "sha256:e37d56c0af5240dbc240976880e81366689c290a559376417246f9b3f51b4217", size = 9463953 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/13/e6/69fcbae3dd2fcb2f54283a7cbe03c8b944b79997f1b526984f91d4796a02/streamlit-1.45.1-py3-none-any.whl", hash = "sha256:9ab6951585e9444672dd650850f81767b01bba5d87c8dac9bc2e1c859d6cc254", size = 9856294 },
+]
+
+[[package]]
+name = "streamlit-elements"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "streamlit" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8d/53/6ecfba409b61cdf246d4138bd9c1bef4b79a03fbeeee513ab0c7d43f18cb/streamlit-elements-0.1.0.tar.gz", hash = "sha256:5f9f116f22df3ce4a8636b1dee7c2fd3dc3cb0c66267fd28c3e0314aa1d303a7", size = 6649428 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1f/0d/eecce69faeb4aec152f4036afe8a0f4f67b0af4fe0ff709243591ad2533d/streamlit_elements-0.1.0-py3-none-any.whl", hash = "sha256:593c4b88c399c55879aa76f7f42970f30106f66acaa4baada6338ae5571790df", size = 7833353 },
 ]
 
 [[package]]

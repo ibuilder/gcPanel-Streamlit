@@ -14,38 +14,51 @@ def render_sidebar():
         
         st.markdown('<hr style="margin: 0.5rem 0; border-color: rgba(255,255,255,0.1);">', unsafe_allow_html=True)
         
-        # Project selection
-        st.markdown('<h3 style="color: #ffffff; font-size: 16px; margin-top: 1rem;">Project Selection</h3>', unsafe_allow_html=True)
+        # Project Selection
+        project_col1, project_col2 = st.columns([3, 1])
         
-        # In a real application, we would fetch projects from the database
-        # For demonstration, we'll use a static list
-        projects = ["Highland Tower Development", "Riverfront Mall Renovation", "Metro Station Expansion"]
-        selected_project = st.selectbox(
-            "Select Project",
-            projects,
-            index=0 if 'current_project' not in st.session_state else projects.index(st.session_state.current_project),
-            key="project_selector"
-        )
+        with project_col1:
+            # In a real application, we would fetch projects from the database
+            # For demonstration, we'll use a static list
+            projects = ["Highland Tower Development", "Riverfront Mall Renovation", "Metro Station Expansion"]
+            selected_project = st.selectbox(
+                "Select Project",
+                projects,
+                index=0 if 'current_project' not in st.session_state else projects.index(st.session_state.current_project),
+                key="project_selector",
+                label_visibility="collapsed"
+            )
         
-        # Select button with improved styling
-        if st.button("Load Project", key="load_project_btn") or 'current_project' not in st.session_state:
-            st.session_state.current_project = selected_project
-            st.rerun()
-            
-        # Project quick info
+        with project_col2:
+            # Select button with improved styling - aligned with the dropdown
+            if st.button("Load", key="load_project_btn") or 'current_project' not in st.session_state:
+                st.session_state.current_project = selected_project
+                st.rerun()
+                
+        # Project quick info with status indicators
         if 'current_project' in st.session_state:
-            st.markdown(f"""
-            <div style="background-color: rgba(255,255,255,0.05); padding: 8px; border-radius: 4px; margin-top: 10px;">
-                <p style="color: #ffffff; margin: 0; font-weight: bold;">{st.session_state.current_project}</p>
-                <p style="color: #cccccc; margin: 0; font-size: 12px;">Status: Active</p>
-                <p style="color: #cccccc; margin: 0; font-size: 12px;">Completion: 42%</p>
-            </div>
-            """, unsafe_allow_html=True)
+            # Add some project metrics for quick reference
+            metrics_col1, metrics_col2 = st.columns(2)
+            with metrics_col1:
+                st.markdown("""
+                <div style="text-align: center; background-color: rgba(30, 136, 229, 0.1); padding: 8px; border-radius: 4px;">
+                    <div style="font-size: 18px; font-weight: bold; color: #1e88e5;">42%</div>
+                    <div style="font-size: 11px; color: #cccccc;">Complete</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            with metrics_col2:
+                st.markdown("""
+                <div style="text-align: center; background-color: rgba(76, 175, 80, 0.1); padding: 8px; border-radius: 4px;">
+                    <div style="font-size: 18px; font-weight: bold; color: #43a047;">$2.4M</div>
+                    <div style="font-size: 11px; color: #cccccc;">Budget</div>
+                </div>
+                """, unsafe_allow_html=True)
         
-        st.markdown("---")
+        st.markdown('<hr style="margin: 0.5rem 0; border-color: rgba(255,255,255,0.1);">', unsafe_allow_html=True)
         
-        # Module navigation
-        st.markdown('<h3 style="color: #ffffff; font-size: 16px; margin-top: 0.5rem;">Modules</h3>', unsafe_allow_html=True)
+        # Module quick navigation
+        st.markdown('<h3 style="color: #ffffff; font-size: 16px; margin-top: 0.5rem;">Quick Navigation</h3>', unsafe_allow_html=True)
         
         # Icons for the modules (feather icons SVG codes)
         icons = {
@@ -64,19 +77,62 @@ def render_sidebar():
             'users': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
             'help-circle': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
             'upload': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>',
-            'folder': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>'
+            'folder': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>',
+            'eye': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>',
+            'camera': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>',
+            'alert-triangle': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+            'file-minus': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="15" y2="15"></line></svg>',
+            'home': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
+            'git-branch': '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>'
         }
+
+        # Create quick access buttons - uses flex layout for better organization
+        st.markdown("""
+        <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px;">
+        """, unsafe_allow_html=True)
         
-        # Define default modules to show in sidebar
-        default_modules = {
-            'preconstruction': {
-                'display_name': 'Preconstruction',
-                'icon': 'building',
-                'modules': [
-                    {'name': 'bid_packages', 'display_name': 'Bid Packages', 'icon': 'package'},
-                    {'name': 'qualified_bidders', 'display_name': 'Qualified Bidders', 'icon': 'users'}
-                ]
-            },
+        # Most commonly used modules
+        quick_access_modules = [
+            {'section': 'engineering', 'module': 'submittals', 'icon': 'upload', 'label': 'Submittals'},
+            {'section': 'engineering', 'module': 'rfi', 'icon': 'help-circle', 'label': 'RFIs'},
+            {'section': 'field', 'module': 'daily_reports', 'icon': 'clipboard', 'label': 'Daily Reports'},
+            {'section': 'cost', 'module': 'budget', 'icon': 'dollar-sign', 'label': 'Budget'}
+        ]
+        
+        for i, module in enumerate(quick_access_modules):
+            is_active = (st.session_state.get('current_section') == module['section'] and 
+                         st.session_state.get('current_module') == module['module'])
+            
+            # Determine button style based on active state
+            button_bg = "rgba(30, 136, 229, 0.2)" if is_active else "rgba(255, 255, 255, 0.05)"
+            button_border = "1px solid #1e88e5" if is_active else "1px solid rgba(255, 255, 255, 0.1)"
+            button_color = "#1e88e5" if is_active else "#ffffff"
+            icon = icons.get(module['icon'], '')
+            
+            st.markdown(f"""
+            <button id="quick_access_{i}" style="background-color: {button_bg}; border: {button_border}; border-radius: 4px; 
+                    color: {button_color}; padding: 8px 12px; cursor: pointer; min-width: calc(50% - 5px); display: flex; 
+                    align-items: center; justify-content: center; gap: 5px;">
+                {icon} {module['label']}
+            </button>
+            """, unsafe_allow_html=True)
+            
+            # Hidden button to handle click
+            col1, col2 = st.columns([1, 1])
+            with col1 if i % 2 == 0 else col2:
+                if st.button("", key=f"quick_{module['section']}_{module['module']}"):
+                    st.session_state.current_section = module['section']
+                    st.session_state.current_module = module['module']
+                    st.session_state.current_view = "list"
+                    st.rerun()
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+        
+        # List of modules by categories (direct selection without expanders)
+        st.markdown('<h3 style="color: #ffffff; font-size: 16px; margin-top: 1rem;">All Modules</h3>', unsafe_allow_html=True)
+        
+        # Define categories with their modules
+        module_categories = {
             'engineering': {
                 'display_name': 'Engineering',
                 'icon': 'clipboard',
@@ -94,12 +150,12 @@ def render_sidebar():
                     {'name': 'photo_log', 'display_name': 'Photo Log', 'icon': 'camera'}
                 ]
             },
-            'safety': {
-                'display_name': 'Safety',
-                'icon': 'shield',
+            'cost': {
+                'display_name': 'Cost',
+                'icon': 'dollar-sign',
                 'modules': [
-                    {'name': 'observations', 'display_name': 'Safety Observations', 'icon': 'eye'},
-                    {'name': 'incidents', 'display_name': 'Incident Reports', 'icon': 'alert-triangle'}
+                    {'name': 'budget', 'display_name': 'Budget', 'icon': 'dollar-sign'},
+                    {'name': 'change_orders', 'display_name': 'Change Orders', 'icon': 'git-branch'}
                 ]
             },
             'contracts': {
@@ -110,67 +166,66 @@ def render_sidebar():
                     {'name': 'subcontracts', 'display_name': 'Subcontracts', 'icon': 'file-minus'}
                 ]
             },
-            'cost': {
-                'display_name': 'Cost',
-                'icon': 'dollar-sign',
+            'preconstruction': {
+                'display_name': 'Preconstruction',
+                'icon': 'building',
                 'modules': [
-                    {'name': 'budget', 'display_name': 'Budget', 'icon': 'dollar-sign'},
-                    {'name': 'change_orders', 'display_name': 'Change Orders', 'icon': 'git-branch'}
+                    {'name': 'bid_packages', 'display_name': 'Bid Packages', 'icon': 'package'},
+                    {'name': 'qualified_bidders', 'display_name': 'Qualified Bidders', 'icon': 'users'}
+                ]
+            },
+            'safety': {
+                'display_name': 'Safety',
+                'icon': 'shield',
+                'modules': [
+                    {'name': 'observations', 'display_name': 'Safety Observations', 'icon': 'eye'},
+                    {'name': 'incidents', 'display_name': 'Incident Reports', 'icon': 'alert-triangle'}
                 ]
             }
         }
         
-        # Try to get modules from session state, fall back to default modules
-        modules = st.session_state.get('modules', default_modules)
-        if not modules:
-            modules = default_modules
-        
-        # Display sections as expanders with icons
-        for section_name, section_info in modules.items():
-            section_icon = icons.get(section_info['icon'], '')
-            is_current = st.session_state.get('current_section') == section_name
+        # Display each category with its modules
+        for category_name, category_info in module_categories.items():
+            # Category header with icon
+            category_icon = icons.get(category_info['icon'], '')
+            st.markdown(f"""
+            <div style="display: flex; align-items: center; margin-top: 15px; margin-bottom: 5px; padding-bottom: 3px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                {category_icon} <span style="margin-left: 5px; font-weight: 600; color: #ffffff;">{category_info['display_name']}</span>
+            </div>
+            """, unsafe_allow_html=True)
             
-            expander_label = f"{section_icon} {section_info['display_name']}"
+            # Create columns for the modules (2 per row)
+            modules_list = category_info['modules']
+            rows = [modules_list[i:i+2] for i in range(0, len(modules_list), 2)]
             
-            # Create a styled expander header
-            if is_current:
-                expander_style = "background-color: rgba(30, 136, 229, 0.2); border-left: 3px solid #1e88e5;"
-            else:
-                expander_style = "background-color: rgba(255, 255, 255, 0.05);"
-                
-            with st.expander(section_info['display_name'], expanded=is_current):
-                # Display modules as buttons
-                for module in section_info['modules']:
-                    module_icon = icons.get(module['icon'], '')
-                    is_current_module = is_current and st.session_state.get('current_module') == module['name']
-                    
-                    # Style the button based on whether it's the active module
-                    if is_current_module:
-                        button_style = "color: #1e88e5; font-weight: bold;"
-                        prefix = "• "
-                    else:
-                        button_style = "color: #ffffff;"
-                        prefix = ""
+            for row in rows:
+                cols = st.columns(len(row))
+                for i, module in enumerate(row):
+                    with cols[i]:
+                        module_icon = icons.get(module['icon'], '')
+                        is_current = (category_name == st.session_state.get('current_section') and 
+                                     module['name'] == st.session_state.get('current_module'))
                         
-                    # Create a styled button using markdown
-                    module_html = f"""
-                    <div style="cursor: pointer; padding: 4px 10px; margin: 2px 0; border-radius: 4px; {button_style}" 
-                         id="module_{section_name}_{module['name']}_btn">
-                        {module_icon} {prefix}{module['display_name']}
-                    </div>
-                    """
-                    
-                    # Use a container for the clickable area
-                    module_container = st.container()
-                    module_container.markdown(module_html, unsafe_allow_html=True)
-                    
-                    # Handle click with a small button
-                    if st.button("Select", key=f"module_{section_name}_{module['name']}", 
-                                 help=f"Open {module['display_name']}"):
-                        st.session_state.current_section = section_name
-                        st.session_state.current_module = module['name']
-                        st.session_state.current_view = "list"  # Default to list view
-                        st.rerun()
+                        # Style based on current selection
+                        bg_color = "rgba(30, 136, 229, 0.2)" if is_current else "rgba(255, 255, 255, 0.05)"
+                        border = "1px solid #1e88e5" if is_current else "none"
+                        
+                        # Create module card
+                        st.markdown(f"""
+                        <div style="background-color: {bg_color}; border: {border}; border-radius: 4px; padding: 8px; 
+                                cursor: pointer; margin-bottom: 5px;" id="module_card_{category_name}_{module['name']}">
+                            <div style="display: flex; align-items: center;">
+                                {module_icon} <span style="margin-left: 5px; color: #ffffff;">{module['display_name']}</span>
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        # Hidden button for the click functionality
+                        if st.button("", key=f"module_{category_name}_{module['name']}"):
+                            st.session_state.current_section = category_name
+                            st.session_state.current_module = module['name']
+                            st.session_state.current_view = "list"
+                            st.rerun()
         
         st.markdown("---")
         

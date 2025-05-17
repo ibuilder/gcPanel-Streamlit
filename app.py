@@ -23,6 +23,7 @@ from modules.safety import render_safety
 from modules.contracts import render_contracts
 from modules.cost_management import render_cost_management
 from modules.closeout import render_closeout
+from modules.engineering import render_engineering
 
 # Import components
 from components.simple_breadcrumbs import simple_breadcrumbs, get_breadcrumbs_for_page
@@ -363,9 +364,7 @@ def main():
         elif current_menu == "BIM":
             render_bim_viewer()
         elif current_menu == "Engineering":
-            # Add engineering module rendering here
-            st.header("Engineering")
-            st.info("Engineering module under development")
+            render_engineering()
         elif current_menu == "Field Operations":
             render_field_operations()
         elif current_menu == "Safety":

@@ -12,6 +12,9 @@ import random
 import plotly.express as px
 import plotly.graph_objects as go
 
+# Import form components
+from components.contracts_forms import contract_form, change_order_form
+
 def render_contracts():
     """Render the contracts module"""
     
@@ -40,7 +43,52 @@ def render_contracts():
 def render_contract_list():
     """Render the contracts listing and details section"""
     
-    st.header("Project Contracts")
+    # Header with Create Contract button
+    col1, col2, col3 = st.columns([2, 1, 1])
+    
+    with col1:
+        st.header("Project Contracts")
+    
+    with col3:
+        if st.button("Create New Contract", type="primary", key="create_contract_btn", use_container_width=True):
+            st.session_state.show_contract_form = True
+            st.session_state.edit_contract_id = None
+    
+    # Contract creation/edit form
+    if st.session_state.get("show_contract_form", False):
+        # Get contract data if editing
+        contract_to_edit = None
+        if st.session_state.get("edit_contract_id"):
+            contract_to_edit = next((c for c in contracts if c.get("id") == st.session_state.get("edit_contract_id")), None)
+        
+        # Use the enhanced form component
+        form_submitted, form_data = contract_form(
+            is_edit=st.session_state.get("edit_contract_id") is not None,
+            contract_data=contract_to_edit
+        )
+        
+        if form_submitted and form_data:
+            # In a real app, this would save to database
+            
+            # Update or create contract
+            if st.session_state.get("edit_contract_id"):
+                # Update existing contract
+                for i, contract in enumerate(contracts):
+                    if contract["id"] == st.session_state.get("edit_contract_id"):
+                        contracts[i].update(form_data)
+                        break
+                st.success("Contract updated successfully!")
+            else:
+                # Add new contract to the list
+                contracts.insert(0, form_data)  # Add to beginning of list
+                st.success("Contract created successfully!")
+            
+            # Reset form state
+            st.session_state.show_contract_form = False
+            st.session_state.edit_contract_id = None
+            
+            # Force rerender
+            st.rerun()
     
     # Sample data for contracts
     contracts = [

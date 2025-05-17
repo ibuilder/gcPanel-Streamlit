@@ -26,6 +26,13 @@ from components.engineering import (
     rfi_list_component, rfi_details_component
 )
 
+# Import module renderers
+from modules.dashboard import render_dashboard
+from modules.field_operations import render_field_operations
+from modules.safety import render_safety
+from modules.contracts import render_contracts
+from modules.cost_management import render_cost_management
+
 # Page configuration
 st.set_page_config(
     page_title="gcPanel Dashboard",

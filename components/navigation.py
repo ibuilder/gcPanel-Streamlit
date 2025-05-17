@@ -87,62 +87,60 @@ def render_navigation():
         module_display_name = module_info['display_name'] if module_info else current_module.replace('_', ' ').title()
         module_icon = module_info.get('icon', 'folder') if module_info else 'folder'
         
-        # Render the modern navigation UI with better styling
+        # Render the modern navigation UI with Bootswatch Superhero theme styling
         st.markdown(f"""
-        <div class="card" style="margin-bottom: 20px; padding: 16px; background: linear-gradient(to right, rgba(25, 118, 210, 0.05), rgba(25, 118, 210, 0.02));">
-            <div class="breadcrumb">
-                <div class="breadcrumb-item">
-                    <a href="#" id="back-to-home" style="display: flex; align-items: center; gap: 6px;">
-                        <span class="material-icons" style="font-size: 16px;">home</span> 
-                        <span>Dashboard</span>
-                    </a>
-                </div>
-                <div class="breadcrumb-item">
-                    <a href="#" id="back-to-section" style="display: flex; align-items: center; gap: 6px;">
-                        <span class="material-icons" style="font-size: 16px;">folder</span>
-                        <span>{section_display_name}</span>
-                    </a>
-                </div>
-                <div class="breadcrumb-item" style="display: flex; align-items: center; gap: 6px;">
-                    <span class="material-icons" style="font-size: 16px;">{module_icon}</span>
-                    <span>{module_display_name}</span>
-                </div>
-            </div>
+        <div class="card bg-secondary" style="margin-bottom: 20px; padding: 16px; border-radius: 0.25rem;">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item">
+                        <a href="#" id="back-to-home" class="d-flex align-items-center">
+                            <span class="material-icons" style="font-size: 16px; margin-right: 4px;">home</span> 
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="#" id="back-to-section" class="d-flex align-items-center">
+                            <span class="material-icons" style="font-size: 16px; margin-right: 4px;">folder</span>
+                            {section_display_name}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <div class="d-flex align-items-center">
+                            <span class="material-icons" style="font-size: 16px; margin-right: 4px;">{module_icon}</span>
+                            {module_display_name}
+                        </div>
+                    </li>
+                </ol>
+            </nav>
             
-            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-top: 15px;">
-                <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                    <div style="background-color: var(--primary-color); width: 36px; height: 36px; border-radius: 8px;
-                             display: flex; align-items: center; justify-content: center; margin-right: 16px;">
-                        <span class="material-icons" style="color: white; font-size: 20px;">{module_icon}</span>
+            <div class="d-flex flex-wrap justify-content-between align-items-center mt-3">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="bg-primary d-flex align-items-center justify-content-center" 
+                         style="width: 36px; height: 36px; border-radius: 4px; margin-right: 16px;">
+                        <span class="material-icons text-white" style="font-size: 20px;">{module_icon}</span>
                     </div>
-                    <h2 style="font-size: 22px; margin: 0; font-weight: 500; color: var(--text-primary);">{module_display_name}</h2>
+                    <h4 class="m-0">{module_display_name}</h4>
                 </div>
                 
-                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-                    <div class="status-pill" 
-                        style="background-color: {('var(--primary-color)' if current_view == 'list' else 'rgba(255, 255, 255, 0.05)')};
-                               color: {('white' if current_view == 'list' else 'var(--text-secondary)')};
-                               cursor: pointer; box-shadow: {('0 2px 8px rgba(25, 118, 210, 0.4)' if current_view == 'list' else 'none')};"
-                        id="list-view-tab">
-                        <span class="material-icons" style="font-size: 14px; margin-right: 4px;">view_list</span> 
+                <div class="btn-group mb-2" role="group" aria-label="View options">
+                    <button type="button" 
+                            class="btn {('btn-primary' if current_view == 'list' else 'btn-secondary')}" 
+                            id="list-view-tab">
+                        <span class="material-icons" style="font-size: 14px; vertical-align: middle;">view_list</span> 
                         List
-                    </div>
-                    <div class="status-pill" 
-                        style="background-color: {('var(--primary-color)' if current_view == 'view' else 'rgba(255, 255, 255, 0.05)')};
-                               color: {('white' if current_view == 'view' else 'var(--text-secondary)')};
-                               cursor: pointer; box-shadow: {('0 2px 8px rgba(25, 118, 210, 0.4)' if current_view == 'view' else 'none')};"
-                        id="detail-view-tab">
-                        <span class="material-icons" style="font-size: 14px; margin-right: 4px;">visibility</span> 
+                    </button>
+                    <button type="button" 
+                            class="btn {('btn-primary' if current_view == 'view' else 'btn-secondary')}" 
+                            id="detail-view-tab">
+                        <span class="material-icons" style="font-size: 14px; vertical-align: middle;">visibility</span> 
                         Details
-                    </div>
-                    <div class="status-pill" 
-                        style="background-color: {('var(--primary-color)' if current_view == 'form' else 'rgba(255, 255, 255, 0.05)')};
-                               color: {('white' if current_view == 'form' else 'var(--text-secondary)')};
-                               cursor: pointer; box-shadow: {('0 2px 8px rgba(25, 118, 210, 0.4)' if current_view == 'form' else 'none')};"
-                        id="form-view-tab">
-                        <span class="material-icons" style="font-size: 14px; margin-right: 4px;">edit</span> 
+                    </button>
+                    <button type="button" 
+                            class="btn {('btn-primary' if current_view == 'form' else 'btn-secondary')}" 
+                            id="form-view-tab">
+                        <span class="material-icons" style="font-size: 14px; vertical-align: middle;">edit</span> 
                         Form
-                    </div>
+                    </button>
                 </div>
             </div>
         </div>

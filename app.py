@@ -88,11 +88,10 @@ else:
                 # Import custom components
                 from components.custom_elements import dashboard_card, progress_bar, info_box, status_pill, modal_dialog
                 
-                # Material Icon link for icons
+                # Additional dashboard-specific styling
                 st.markdown("""
-                <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
                 <style>
-                    /* Dashboard specific styling */
+                    /* Dashboard specific styling with Bootswatch integration */
                     .dashboard-header {
                         margin-bottom: 20px;
                     }
@@ -106,6 +105,62 @@ else:
                         width: 100%;
                         border-radius: 8px;
                         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    }
+                    
+                    /* Activity card styling with Bootswatch integration */
+                    .activity-card {
+                        background-color: #4E5D6C;
+                        border-radius: 0.25rem;
+                        padding: 0;
+                        overflow: hidden;
+                        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    }
+                    
+                    .activity-item {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 12px 16px;
+                        border-bottom: 1px solid rgba(255,255,255,0.1);
+                    }
+                    
+                    .activity-item:last-child {
+                        border-bottom: none;
+                    }
+                    
+                    .activity-text {
+                        flex: 1;
+                        margin-right: 15px;
+                        color: #fff;
+                    }
+                    
+                    /* Override Streamlit's CSS for better compatibility with Bootswatch */
+                    .stApp {
+                        background-color: #2B3E50 !important;
+                    }
+                    
+                    h1, h2, h3, h4, h5, h6 {
+                        color: #fff !important;
+                    }
+                    
+                    .stButton > button {
+                        background-color: #DF691A !important;
+                        color: #fff !important;
+                        border: none !important;
+                        border-radius: 0.25rem !important;
+                    }
+                    
+                    .stButton > button:hover {
+                        background-color: #B15315 !important;
+                    }
+                    
+                    /* Primary buttons */
+                    .stButton > [kind="primary"] {
+                        background-color: #5CB85C !important;
+                    }
+                    
+                    .stButton > [kind="primary"]:hover {
+                        background-color: #4CAE4C !important;
                     }
                 </style>
                 """, unsafe_allow_html=True)

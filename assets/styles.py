@@ -515,10 +515,12 @@ def apply_styles():
     </style>
     """, unsafe_allow_html=True)
     
-    # Add Material Design Icons
+    # Add Material Design Icons and Bootswatch Superhero Theme
     st.markdown("""
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/superhero/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     """, unsafe_allow_html=True)
     
     # Apply theme-specific styling

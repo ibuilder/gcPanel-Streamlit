@@ -17,28 +17,28 @@ def render_sidebar():
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         """, unsafe_allow_html=True)
         
-        # Logo and title area with professional styling
+        # Logo and title area with Bootswatch Superhero styling
         st.markdown("""
-        <div style="display: flex; align-items: center; padding: 10px 0 20px 0; margin-bottom: 10px; border-bottom: 1px solid var(--divider-color);">
-            <div style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; 
-                      background-color: var(--primary-color); border-radius: 8px; margin-right: 15px;">
-                <span class="material-icons" style="font-size: 24px; color: white;">construction</span>
+        <div class="d-flex align-items-center p-3 mb-3 border-bottom">
+            <div class="d-flex align-items-center justify-content-center bg-primary rounded" 
+                 style="width: 40px; height: 40px; margin-right: 15px;">
+                <span class="material-icons text-white" style="font-size: 24px;">construction</span>
             </div>
             <div>
-                <h1 style="margin: 0; padding: 0; color: var(--text-primary); font-size: 22px; font-weight: 600;">gcPanel</h1>
-                <p style="margin: 0; padding: 0; color: var(--text-secondary); font-size: 12px;">Construction Management</p>
+                <h1 class="m-0 p-0 text-white" style="font-size: 22px; font-weight: 600;">gcPanel</h1>
+                <p class="m-0 p-0 text-secondary" style="font-size: 12px;">Construction Management</p>
             </div>
         </div>
         """, unsafe_allow_html=True)
         
-        # Project Selection with modern styling
+        # Project Selection with Bootswatch Superhero styling
         st.markdown("""
-        <div style="background-color: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; margin-bottom: 20px; 
-                  border: 1px solid var(--divider-color); box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                <span class="material-icons" style="color: var(--primary-color); margin-right: 8px; font-size: 20px;">apartment</span>
-                <span style="font-weight: 500; color: var(--text-primary); font-size: 16px;">Project Selection</span>
+        <div class="card bg-secondary mb-3">
+            <div class="card-header d-flex align-items-center">
+                <span class="material-icons text-primary me-2" style="font-size: 20px;">apartment</span>
+                <span class="fw-bold">Project Selection</span>
             </div>
+            <div class="card-body">
         """, unsafe_allow_html=True)
         
         # List of projects - would normally come from a database
@@ -61,33 +61,36 @@ def render_sidebar():
                 st.session_state.current_project = selected_project
                 st.rerun()
                 
-        # Close the project card container
-        st.markdown('</div>', unsafe_allow_html=True)
+        # Close the project card container with proper Bootstrap structure
+        st.markdown('</div></div>', unsafe_allow_html=True)
         
         # Project Quick Metrics Grid
         if 'current_project' in st.session_state:
-            # Current project info card
+            # Current project info card with Bootswatch Superhero styling
             st.markdown(f"""
-            <div style="background-color: rgba(30, 136, 229, 0.1); padding: 10px; border-radius: 4px; 
-                     margin-bottom: 15px; border-left: 3px solid #1e88e5;">
-                <div style="font-weight: 600; color: white;">{st.session_state.current_project}</div>
-                <div style="color: #aaa; font-size: 12px;">Active Project</div>
+            <div class="alert alert-primary d-flex flex-column mb-3">
+                <div class="fw-bold">{st.session_state.current_project}</div>
+                <div class="text-light small">Active Project</div>
             </div>
             """, unsafe_allow_html=True)
             
             # Project statistics in a 2-column grid
             proj_col1, proj_col2 = st.columns(2)
             with proj_col1:
-                # Completion percentage
+                # Project metrics with Bootswatch Superhero styling
                 st.markdown("""
-                <div class="project-metric">
-                    <div class="project-metric-title">Completion</div>
-                    <div class="project-metric-value" style="color: #1e88e5;">42%</div>
+                <div class="card bg-dark text-white mb-2">
+                    <div class="card-body p-2">
+                        <div class="small text-muted">Completion</div>
+                        <div class="h5 text-info">42%</div>
+                    </div>
                 </div>
                 
-                <div class="project-metric">
-                    <div class="project-metric-title">RFIs</div>
-                    <div class="project-metric-value" style="color: #ff9800;">12</div>
+                <div class="card bg-dark text-white mb-2">
+                    <div class="card-body p-2">
+                        <div class="small text-muted">RFIs</div>
+                        <div class="h5 text-warning">12</div>
+                    </div>
                 </div>
                 """, unsafe_allow_html=True)
                 

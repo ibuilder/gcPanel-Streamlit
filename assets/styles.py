@@ -435,8 +435,11 @@ def apply_styles():
             color: var(--text-secondary);
         }
         
-        /* Styles for data inputs */
-        input, textarea, select, .stTextInput input, .stTextArea textarea, .stSelectbox select {
+        /* Styles for data inputs in dark mode */
+        input, textarea, select, 
+        .stTextInput > div[data-baseweb="base-input"] > div > input,
+        .stTextArea > div[data-baseweb="textarea"] > textarea,
+        .stSelectbox div[role="combobox"] input {
             background-color: rgba(255, 255, 255, 0.05) !important;
             border: 1px solid var(--divider-color) !important;
             border-radius: 6px !important;
@@ -445,6 +448,42 @@ def apply_styles():
             transition: all 0.2s ease;
         }
         
+        /* Fix for select boxes */
+        .stSelectbox div[data-baseweb="select"] {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border-radius: 6px !important;
+        }
+        
+        .stSelectbox div[role="listbox"] {
+            background-color: var(--card-bg) !important;
+            border: 1px solid var(--divider-color) !important;
+        }
+        
+        .stSelectbox div[role="option"] {
+            color: var(--text-primary) !important;
+        }
+        
+        .stSelectbox div[role="option"]:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        /* Button styles for dark theme */
+        .stButton button {
+            background-color: rgba(255, 255, 255, 0.08) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        /* Primary buttons */
+        .stButton [kind="primary"] {
+            background-color: var(--primary-color) !important;
+            color: white !important;
+        }
+        
+        .stButton [kind="primary"]:hover {
+            background-color: var(--primary-light) !important;
+        }
+        
+        /* Focus states */
         input:focus, textarea:focus, select:focus, 
         .stTextInput input:focus, .stTextArea textarea:focus, .stSelectbox select:focus {
             border-color: var(--primary-color) !important;

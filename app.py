@@ -154,30 +154,68 @@ else:
                 with activity_col:
                     st.markdown('<div class="dashboard-section"><h3>Recent Activity</h3></div>', unsafe_allow_html=True)
                     
-                    # Activity items with status pills
-                    st.markdown('<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">'
-                                '<span>Submittal #102 - HVAC Equipment</span>', unsafe_allow_html=True)
+                    # Activity items with status pills and better styling
+                    st.markdown('<div class="activity-card">', unsafe_allow_html=True)
+                    
+                    # Activity item row 1
+                    st.markdown('<div class="activity-item">'
+                                '<div class="activity-text">Submittal #102 - HVAC Equipment</div>'
+                                '<div class="activity-status">', unsafe_allow_html=True)
                     status_pill("approved")
-                    st.markdown('</div>', unsafe_allow_html=True)
+                    st.markdown('</div></div>', unsafe_allow_html=True)
                     
-                    st.markdown('<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">'
-                                '<span>RFI #45 - Foundation Details</span>', unsafe_allow_html=True)
+                    # Activity item row 2
+                    st.markdown('<div class="activity-item">'
+                                '<div class="activity-text">RFI #45 - Foundation Details</div>'
+                                '<div class="activity-status">', unsafe_allow_html=True)
                     status_pill("pending")
-                    st.markdown('</div>', unsafe_allow_html=True)
+                    st.markdown('</div></div>', unsafe_allow_html=True)
                     
-                    st.markdown('<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">'
-                                '<span>Daily Report - May 16, 2025</span>', unsafe_allow_html=True)
+                    # Activity item row 3
+                    st.markdown('<div class="activity-item">'
+                                '<div class="activity-text">Daily Report - May 16, 2025</div>'
+                                '<div class="activity-status">', unsafe_allow_html=True)
                     status_pill("complete")
-                    st.markdown('</div>', unsafe_allow_html=True)
+                    st.markdown('</div></div>', unsafe_allow_html=True)
                     
-                    st.markdown('<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">'
-                                '<span>Change Order #8 - Site Utilities</span>', unsafe_allow_html=True)
+                    # Activity item row 4
+                    st.markdown('<div class="activity-item">'
+                                '<div class="activity-text">Change Order #8 - Site Utilities</div>'
+                                '<div class="activity-status">', unsafe_allow_html=True)
                     status_pill("revise")
+                    st.markdown('</div></div>', unsafe_allow_html=True)
+                    
                     st.markdown('</div>', unsafe_allow_html=True)
                     
-                    # Info box for announcements
-                    info_box("The project team meeting is scheduled for May 20, 2025 at 10:00 AM. Please prepare your progress reports.", 
-                            "info", True, "announcement")
+                    # Meeting announcement with view details modal
+                    st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
+                    
+                    # Use modal for meeting details
+                    modal_dialog(
+                        "Project Team Meeting",
+                        """
+                        <div style="padding: 15px 0;">
+                            <p><strong>Date:</strong> May 20, 2025</p>
+                            <p><strong>Time:</strong> 10:00 AM - 12:00 PM</p>
+                            <p><strong>Location:</strong> Main Conference Room & Virtual</p>
+                            <p><strong>Agenda:</strong></p>
+                            <ul>
+                                <li>Progress updates from team leaders</li>
+                                <li>Review of critical path items</li>
+                                <li>Discussion of pending RFIs and submittals</li>
+                                <li>Budget review</li>
+                            </ul>
+                            <p><strong>Required Preparation:</strong> Please bring your updated progress reports and be prepared to discuss any blockers or risks.</p>
+                        </div>
+                        """,
+                        "View Meeting Details",
+                        "event",
+                        "meeting_modal"
+                    )
+                    
+                    # Regular info box for quick notice
+                    info_box("The project team meeting is scheduled for May 20, 2025 at 10:00 AM.", 
+                            "info", False, "announcement")
                 
                 with photo_col:
                     st.markdown('<div class="dashboard-section"><h3>Site Photos</h3></div>', unsafe_allow_html=True)

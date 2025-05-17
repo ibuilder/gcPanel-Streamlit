@@ -3,88 +3,235 @@ import streamlit as st
 def apply_styles():
     """Apply custom styles to the application"""
     
-    # Custom CSS
-    st.markdown("""
-    <style>
-        /* Main container styles */
-        .main .block-container {
-            padding-top: 1rem;
-            padding-bottom: 1rem;
-        }
-        
-        /* Header styles */
-        header {
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        /* Footer styles */
-        footer {
-            border-top: 1px solid #e9ecef;
-            padding-top: 1rem;
-            margin-top: 2rem;
-        }
-        
-        /* Improve spacing in forms */
-        .stForm {
-            background-color: #f8f9fa;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            border: 1px solid #e9ecef;
-        }
-        
-        /* Improve button styling */
-        .stButton button {
-            border-radius: 0.25rem;
-            font-weight: 500;
-        }
-        
-        /* Add some spacing to metrics */
-        .stMetric {
-            background-color: #f8f9fa;
-            padding: 0.5rem;
-            border-radius: 0.25rem;
-            border: 1px solid #e9ecef;
-        }
-        
-        /* Style dataframes */
-        .dataframe {
-            border-collapse: collapse;
-            margin: 1rem 0;
-            width: 100%;
-        }
-        
-        .dataframe th {
-            background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
-            padding: 0.5rem;
-            text-align: left;
-        }
-        
-        .dataframe td {
-            border: 1px solid #e9ecef;
-            padding: 0.5rem;
-        }
-        
-        /* Improve tabs styling */
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 1rem;
-        }
-        
-        .stTabs [data-baseweb="tab"] {
-            height: 3rem;
-            white-space: nowrap;
-            padding: 0 1rem;
-            border: 1px solid #e9ecef;
-            border-radius: 0.25rem 0.25rem 0 0;
-        }
-        
-        .stTabs [aria-selected="true"] {
-            background-color: #f8f9fa;
-            border-bottom: 2px solid #2E86C1;
-        }
-    </style>
-    """, unsafe_allow_html=True)
+    # Try to load custom CSS file first
+    try:
+        with open('assets/custom.css', 'r') as f:
+            custom_css = f.read()
+            st.markdown(f'<style>{custom_css}</style>', unsafe_allow_html=True)
+    except Exception:
+        # Fall back to inline styles if file isn't available
+        st.markdown("""
+        <style>
+            /* Main color variables */
+            :root {
+                --primary-color: #1e88e5;
+                --secondary-color: #43a047;
+                --accent-color: #ff9800;
+                --background-color: #f5f7fa;
+                --sidebar-bg: #2c3e50;
+                --sidebar-text: #ecf0f1;
+                --card-bg: white;
+                --text-color: #333;
+                --border-color: #e0e0e0;
+                --success-color: #4caf50;
+                --warning-color: #ff9800;
+                --danger-color: #f44336;
+                --info-color: #2196f3;
+            }
+            
+            /* Main container styles */
+            .main .block-container {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            
+            /* Sidebar styling - enhanced for construction dashboard */
+            section[data-testid="stSidebar"] {
+                background-color: var(--sidebar-bg);
+                border-right: 1px solid var(--border-color);
+            }
+            
+            section[data-testid="stSidebar"] .block-container {
+                padding-top: 2rem;
+            }
+            
+            /* Make sidebar text white */
+            section[data-testid="stSidebar"] h1, 
+            section[data-testid="stSidebar"] h2, 
+            section[data-testid="stSidebar"] h3,
+            section[data-testid="stSidebar"] .stSubheader,
+            section[data-testid="stSidebar"] p {
+                color: var(--sidebar-text) !important;
+            }
+            
+            section[data-testid="stSidebar"] button {
+                border: none;
+                border-radius: 0;
+                text-align: left;
+                padding: 0.5rem 1rem;
+                margin: 0.2rem 0;
+                transition: background-color 0.3s;
+                color: var(--sidebar-text);
+                width: 100%;
+            }
+            
+            section[data-testid="stSidebar"] button:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+            
+            /* Sidebar divider */
+            section[data-testid="stSidebar"] hr {
+                margin: 1rem 0;
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+            
+            /* Sidebar expander styling */
+            section[data-testid="stSidebar"] [data-testid="stExpander"] {
+                border: none;
+                background-color: rgba(255, 255, 255, 0.05);
+                margin-bottom: 0.5rem;
+            }
+            
+            section[data-testid="stSidebar"] [data-testid="stExpander"] summary {
+                padding: 0.5rem 1rem;
+                color: var(--sidebar-text);
+                font-weight: 500;
+            }
+            
+            /* Header styles */
+            header {
+                background-color: transparent !important;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            /* Footer styles */
+            footer {
+                border-top: 1px solid var(--border-color);
+                padding-top: 1rem;
+                margin-top: 2rem;
+                text-align: center;
+                color: #666;
+                font-size: 0.8rem;
+            }
+            
+            /* Improve spacing in forms */
+            .stForm {
+                background-color: var(--card-bg);
+                padding: 1.5rem;
+                border-radius: 8px;
+                border: none;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                margin-bottom: 1rem;
+            }
+            
+            /* Improve button styling */
+            .stButton button {
+                border-radius: 4px;
+                font-weight: 500;
+                padding: 0.5rem 1rem;
+                transition: all 0.3s;
+            }
+            
+            .stButton button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            
+            /* Add some spacing to metrics */
+            [data-testid="stMetric"] {
+                background-color: var(--card-bg);
+                padding: 1rem;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+            
+            [data-testid="stMetricLabel"] {
+                font-weight: 500;
+            }
+            
+            [data-testid="stMetricValue"] {
+                font-size: 2rem;
+                font-weight: 700;
+                color: var(--primary-color);
+            }
+            
+            /* Style dataframes */
+            .stDataFrame {
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+            
+            .stDataFrame th {
+                background-color: #f5f7fa;
+                font-weight: 600;
+                padding: 10px 15px;
+            }
+            
+            .stDataFrame td {
+                border: 1px solid var(--border-color);
+                padding: 8px 12px;
+            }
+            
+            /* Improve tabs styling */
+            .stTabs [data-baseweb="tab-list"] {
+                gap: 1rem;
+            }
+            
+            .stTabs [data-baseweb="tab"] {
+                height: 3rem;
+                white-space: nowrap;
+                padding: 0 1rem;
+                border: 1px solid #e9ecef;
+                border-radius: 0.25rem 0.25rem 0 0;
+                font-weight: 500;
+            }
+            
+            .stTabs [aria-selected="true"] {
+                background-color: var(--primary-color);
+                color: white;
+                border-bottom: none;
+            }
+            
+            /* Section headers */
+            .section-header {
+                position: relative;
+                margin-bottom: 1.5rem;
+                padding-bottom: 0.5rem;
+            }
+            
+            .section-header::after {
+                content: '';
+                position: absolute;
+                left: 0;
+                bottom: 0;
+                height: 3px;
+                width: 50px;
+                background-color: var(--primary-color);
+            }
+            
+            /* Status badges */
+            .status-badge {
+                display: inline-block;
+                padding: 0.25rem 0.5rem;
+                border-radius: 12px;
+                font-size: 0.8rem;
+                font-weight: 500;
+            }
+            
+            .status-badge.approved {
+                background-color: rgba(76, 175, 80, 0.2);
+                color: #2e7d32;
+            }
+            
+            .status-badge.pending {
+                background-color: rgba(33, 150, 243, 0.2);
+                color: #1565c0;
+            }
+            
+            .status-badge.rejected {
+                background-color: rgba(244, 67, 54, 0.2);
+                color: #c62828;
+            }
+            
+            .status-badge.revise {
+                background-color: rgba(255, 152, 0, 0.2);
+                color: #ef6c00;
+            }
+        </style>
+        """, unsafe_allow_html=True)
 
 def apply_theme():
     """Apply theme settings (alternative to config.toml)"""

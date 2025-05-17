@@ -3,11 +3,23 @@ gcPanel Construction Management Dashboard
 
 This is the main application file for the gcPanel Construction Management
 Dashboard, a comprehensive project management tool for construction projects.
+Featuring advanced modules for document management, BIM integration, and more.
 """
 
 import streamlit as st
 import os
+import pandas as pd
 from datetime import datetime
+
+# Import modules
+from modules.dashboard import render_dashboard
+from modules.settings import render_settings
+from modules.project_information import render_project_information
+from modules.pdf_viewer.pdf_viewer import render_pdf_viewer
+from modules.bim_viewer.ifc_viewer import render_bim_viewer
+
+# Import components
+from components.breadcrumbs import breadcrumbs, get_breadcrumbs_for_page
 
 # Initialize core application
 from core import initialize_application

@@ -1,0 +1,107 @@
+
+Welcome, Admin User
+Role: admin
+
+Navigation
+📊 Dashboard
+<li class="nav-item " 
+        onclick="handleNavClick('Projects')" 
+        id="nav-projects">
+        <span class="nav-icon">🏗️</span>
+        Projects
+    </li>
+
+    <li class="nav-item " 
+        onclick="handleNavClick('Engineering')" 
+        id="nav-engineering">
+        <span class="nav-icon">📐</span>
+        Engineering
+    </li>
+
+    <li class="nav-item " 
+        onclick="handleNavClick('Field Operations')" 
+        id="nav-field-operations">
+        <span class="nav-icon">👷</span>
+        Field Operations
+    </li>
+
+    <li class="nav-item " 
+        onclick="handleNavClick('Safety')" 
+        id="nav-safety">
+        <span class="nav-icon">⚠️</span>
+        Safety
+    </li>
+
+    <li class="nav-item " 
+        onclick="handleNavClick('Contracts')" 
+        id="nav-contracts">
+        <span class="nav-icon">📝</span>
+        Contracts
+    </li>
+
+    <li class="nav-item " 
+        onclick="handleNavClick('Cost Management')" 
+        id="nav-cost-management">
+        <span class="nav-icon">💰</span>
+        Cost Management
+    </li>
+
+    <li class="nav-item " 
+        onclick="handleNavClick('BIM')" 
+        id="nav-bim">
+        <span class="nav-icon">🏢</span>
+        BIM
+    </li>
+
+    <li class="nav-item " 
+        onclick="handleNavClick('Resources')" 
+        id="nav-resources">
+        <span class="nav-icon">🔧</span>
+        Resources
+    </li>
+
+    <li class="nav-item " 
+        onclick="handleNavClick('Closeout')" 
+        id="nav-closeout">
+        <span class="nav-icon">✅</span>
+        Closeout
+    </li>
+
+    <li class="nav-item " 
+        onclick="handleNavClick('Settings')" 
+        id="nav-settings">
+        <span class="nav-icon">⚙️</span>
+        Settings
+    </li>
+
+    <li class="nav-item " 
+        onclick="handleNavClick('Profile')" 
+        id="nav-profile">
+        <span class="nav-icon">👤</span>
+        Profile
+    </li>
+    </ul>
+
+Missing Submit Button
+
+This form has no submit button, which means that user interactions will never be sent to your Streamlit app.
+
+To create a submit button, use the st.form_submit_button() function.
+
+For more information, refer to the documentation for forms.
+
+gcPanel Construction Management Dashboard
+May 17, 2025
+TypeError: FormMixin.form_submit_button() got an unexpected keyword argument 'label_visibility'
+Traceback:
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 121, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 645, in code_to_exec
+    exec(code, module.__dict__)
+File "/home/runner/workspace/app.py", line 332, in <module>
+    submitted = st.form_submit_button("Submit", type="primary", label_visibility="collapsed")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/metrics_util.py", line 444, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

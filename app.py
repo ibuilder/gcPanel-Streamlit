@@ -48,7 +48,7 @@ def local_css():
     # Light theme colors by default
     bg_color = "#ffffff"
     text_color = "#2c3e50"
-    primary_color = "#4caf50"
+    primary_color = "#1e3a8a"
     secondary_color = "#2a9fd6"
     accent_color = "#26a69a"
     
@@ -230,110 +230,74 @@ with st.sidebar:
         "Profile": "👤"
     }
     
-    # Custom CSS for the sidebar menu
+    # Add custom styling for the radio buttons
     st.markdown("""
     <style>
-    .nav-list {
-        list-style-type: none;
-        padding: 0;
-        margin: 0 0 15px 0;
+    div.row-widget.stRadio > div {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
     }
     
-    .nav-item {
+    div.row-widget.stRadio > div > label {
         padding: 10px 15px;
-        border-radius: 4px;
-        margin-bottom: 5px;
+        border-radius: 5px;
+        background-color: #f8f9fa;
+        border: none;
+        box-shadow: none;
+        color: #2c3e50;
         cursor: pointer;
         transition: all 0.2s;
-        background-color: #f8f9fa;
-        color: #2c3e50;
+        display: flex;
+        align-items: center;
     }
     
-    .nav-item:hover {
+    div.row-widget.stRadio > div [data-testid="stMarkdownContainer"] p {
+        margin-bottom: 0;
+    }
+    
+    div.row-widget.stRadio > div > label:hover {
         background-color: #e9ecef;
     }
     
-    .nav-item.active {
-        background-color: #4caf50;
-        color: white;
-        font-weight: 500;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    div.row-widget.stRadio > div > label[data-baseweb="radio"] > div:first-child {
+        background-color: transparent;
     }
     
-    .nav-icon {
-        margin-right: 10px;
-        display: inline-block;
+    div.row-widget.stRadio > div > label[data-baseweb="radio"][aria-checked="true"] {
+        background-color: #1e3a8a;
+        color: white;
+        font-weight: 500;
+    }
+    
+    /* Hide the actual radio button while preserving functionality */
+    div.row-widget.stRadio > div > label > div:first-child {
+        display: none;
     }
     </style>
     """, unsafe_allow_html=True)
     
-    # Create the navigation list
-    nav_html = '<ul class="nav-list">'
+    # Create radio options with icons
+    options = [f"{icon} {name}" for name, icon in menu_items.items()]
     
-    # Add each menu item
-    for menu_name, menu_icon in menu_items.items():
-        is_active = st.session_state.menu == menu_name
-        active_class = "active" if is_active else ""
-        
-        nav_html += f"""
-        <li class="nav-item {active_class}" 
-            onclick="handleNavClick('{menu_name}')" 
-            id="nav-{menu_name.replace(' ', '-').lower()}">
-            <span class="nav-icon">{menu_icon}</span>
-            {menu_name}
-        </li>
-        """
+    # Get the index of the current menu
+    current_menu = st.session_state.menu
+    current_index = list(menu_items.keys()).index(current_menu) if current_menu in menu_items else 0
     
-    nav_html += '</ul>'
+    # Create the radio buttons
+    selected_option = st.radio(
+        "Navigation",
+        options,
+        index=current_index,
+        label_visibility="collapsed"
+    )
     
-    # Display the navigation
-    st.markdown(nav_html, unsafe_allow_html=True)
+    # Extract the menu name (remove the emoji)
+    selected_menu = selected_option.split(" ", 1)[1] if " " in selected_option else selected_option
     
-    # JavaScript for handling navigation clicks
-    st.markdown("""
-    <script>
-        function handleNavClick(menuName) {
-            // Set a cookie to store the selected menu
-            document.cookie = `selected_menu=${menuName};path=/`;
-            
-            // Reload the page to apply the navigation
-            window.location.reload();
-        }
-        
-        // Check for URL parameters on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get the cookie value
-            const getCookie = (name) => {
-                const value = `; ${document.cookie}`;
-                const parts = value.split(`; ${name}=`);
-                if (parts.length === 2) return parts.pop().split(';').shift();
-            };
-            
-            // If there's a selected_menu cookie, highlight that menu item
-            const selectedMenu = getCookie('selected_menu');
-            if (selectedMenu) {
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-                
-                const navItem = document.getElementById(`nav-${selectedMenu.replace(' ', '-').toLowerCase()}`);
-                if (navItem) {
-                    navItem.classList.add('active');
-                }
-            }
-        });
-    </script>
-    """, unsafe_allow_html=True)
-    
-    # Hidden form for menu selection handling
-    # This is needed because JavaScript can't directly trigger Streamlit
-    with st.form(key="menu_form", clear_on_submit=True):
-        menu_selection = st.text_input("Menu", value="", key="menu_selection", label_visibility="collapsed")
-        submitted = st.form_submit_button("Submit", type="primary", label_visibility="collapsed")
-        
-    # Handle form submission
-    if submitted and menu_selection:
-        st.session_state.menu = menu_selection
+    # Update the menu selection if it changed
+    if selected_menu != st.session_state.menu:
+        st.session_state.menu = selected_menu
         st.rerun()
     
     if st.button("Logout"):

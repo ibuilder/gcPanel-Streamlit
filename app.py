@@ -52,12 +52,12 @@ if not hasattr(st.session_state, 'app_initialized'):
 # Setup theme
 def local_css():
     """Apply custom CSS for theming"""
-    # Light theme colors by default
-    bg_color = "#ffffff"
-    text_color = "#2c3e50"
-    primary_color = "#1e3a8a"
-    secondary_color = "#2a9fd6"
-    accent_color = "#1e3a8a"
+    # Light theme colors by default - matching lighter modern dashboard style
+    bg_color = "#f9fafb"
+    text_color = "#313a46"
+    primary_color = "#3e79f7"
+    secondary_color = "#6c757d"
+    accent_color = "#3e79f7"
     
     # Apply CSS
     st.markdown(f"""
@@ -65,12 +65,14 @@ def local_css():
         .stApp {{
             background-color: {bg_color};
             color: {text_color};
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         }}
         
-        /* Sidebar styling */
+        /* Sidebar styling - like Hyper SaaS */
         section[data-testid="stSidebar"] {{
-            background-color: #f8fafc !important;
-            border-right: 1px solid #e2e8f0;
+            background-color: #ffffff !important;
+            border-right: 1px solid #eef2f7;
+            box-shadow: 0 0 24px rgba(0, 0, 0, 0.03);
         }}
         
         /* Navigation list styling */
@@ -81,44 +83,66 @@ def local_css():
         }}
         
         .nav-item {{
-            padding: 0.5rem 0.75rem;
-            margin-bottom: 0.25rem;
+            padding: 0.6rem 0.85rem;
+            margin-bottom: 0.35rem;
+            margin-left: 0.5rem;
+            margin-right: 0.5rem;
             display: flex;
             align-items: center;
             cursor: pointer;
-            color: {text_color};
-            border-radius: 4px;
+            color: #6c757d;
+            border-radius: 5px;
             text-decoration: none;
-            border-left: 3px solid transparent;
+            transition: all 0.15s ease;
+            font-size: 0.95rem;
         }}
         
         .nav-item:hover {{
-            background-color: rgba(30, 58, 138, 0.05);
+            background-color: rgba(62, 121, 247, 0.08);
+            color: {primary_color};
         }}
         
         .nav-item.active {{
-            background-color: rgba(30, 58, 138, 0.1);
-            border-left: 3px solid {primary_color};
-            font-weight: 600;
+            background-color: rgba(62, 121, 247, 0.1);
+            color: {primary_color};
+            font-weight: 500;
         }}
         
         .nav-icon {{
             display: inline-block;
-            width: 24px;
-            margin-right: 8px;
+            width: 22px;
+            margin-right: 10px;
             text-align: center;
+            font-size: 18px;
         }}
         
-        /* Other button styling */
+        /* Card styling like Hyper SaaS */
+        .dashboard-card {{
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0 0 24px rgba(0, 0, 0, 0.04);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #eef2f7;
+            transition: transform 0.2s;
+        }}
+        
+        .dashboard-card:hover {{
+            transform: translateY(-4px);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.07);
+        }}
+        
+        /* Button styling */
         .stButton button {{
             background-color: {primary_color} !important;
-            color: #ecf0f1 !important;
+            color: #ffffff !important;
             border: none !important;
             border-radius: 4px !important;
             padding: 0.5rem 1rem !important;
             font-weight: 500 !important;
             margin: 0.25rem 0 !important;
             transition: all 0.2s !important;
+            box-shadow: 0 2px 6px rgba(62, 121, 247, 0.2) !important;
         }}
         
         .stButton button:hover {{

@@ -22,6 +22,7 @@ from modules.scheduling import render_scheduling
 from modules.safety import render_safety
 from modules.contracts import render_contracts
 from modules.cost_management import render_cost_management
+from modules.closeout import render_closeout
 
 # Import components
 from components.simple_breadcrumbs import simple_breadcrumbs, get_breadcrumbs_for_page
@@ -376,9 +377,7 @@ def main():
         elif current_menu == "Schedule":
             render_scheduling()
         elif current_menu == "Closeout":
-            # Add closeout module rendering here
-            st.header("Closeout")
-            st.info("Closeout module under development")
+            render_closeout()
         elif current_menu == "Settings":
             render_settings()
         else:

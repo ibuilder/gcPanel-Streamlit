@@ -77,9 +77,9 @@ def local_css():
         /* Form input styling */
         .stTextInput input, .stNumberInput input, .stDateInput input, 
         .stSelectbox select, .stTextArea textarea {{
-            background-color: #2c3e50 !important;
-            color: #ecf0f1 !important;
-            border: 1px solid #4a6572 !important;
+            background-color: #f8f9fa !important;
+            color: #2c3e50 !important;
+            border: 1px solid #ced4da !important;
             border-radius: 4px !important;
         }}
         .stTextInput > div, .stNumberInput > div, 
@@ -89,8 +89,8 @@ def local_css():
         }}
         /* Select box specific styling */
         .stSelectbox > div > div > div {{
-            background-color: #2c3e50 !important;
-            color: #ecf0f1 !important;
+            background-color: #f8f9fa !important;
+            color: #2c3e50 !important;
         }}
         /* Tab styling */
         .stTabs [data-baseweb="tab-list"] {{

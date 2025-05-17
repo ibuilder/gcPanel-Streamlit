@@ -165,7 +165,7 @@ def render_sidebar():
                 """, unsafe_allow_html=True)
                 
                 # Hidden button that triggers the navigation
-                if st.button("", key=f"quick_btn_{module['section']}_{module['name']}"):
+                if st.button("", key=f"quick_btn_{module['section']}_{module['module']}"):
                     st.session_state.current_section = module['section']
                     st.session_state.current_module = module['module']
                     st.session_state.current_view = "list"

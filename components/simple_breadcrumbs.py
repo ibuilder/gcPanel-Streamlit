@@ -58,19 +58,18 @@ def get_breadcrumbs_for_page(page: str) -> List[Dict[str, Any]]:
     elif page == "Project Information":
         breadcrumb_items.append({"label": "Project Information", "path": "Project Information"})
         
-    elif page == "Documents":
-        breadcrumb_items.append({"label": "Documents", "path": "Documents"})
+    elif page == "Engineering & Documents" or page.startswith("Engineering & Documents"):
+        breadcrumb_items.append({"label": "Engineering & Documents", "path": "Engineering & Documents"})
         
+        if page == "Engineering & Documents/RFIs":
+            breadcrumb_items.append({"label": "RFIs", "path": "Engineering & Documents/RFIs"})
+        elif page == "Engineering & Documents/Submittals":
+            breadcrumb_items.append({"label": "Submittals", "path": "Engineering & Documents/Submittals"})
+        elif page == "Engineering & Documents/Drawings":
+            breadcrumb_items.append({"label": "Drawings", "path": "Engineering & Documents/Drawings"})
+            
     elif page == "BIM":
         breadcrumb_items.append({"label": "BIM", "path": "BIM"})
-        
-    elif page.startswith("Engineering"):
-        breadcrumb_items.append({"label": "Engineering", "path": "Engineering"})
-        
-        if page == "Engineering/RFIs":
-            breadcrumb_items.append({"label": "RFIs", "path": "Engineering/RFIs"})
-        elif page == "Engineering/Submittals":
-            breadcrumb_items.append({"label": "Submittals", "path": "Engineering/Submittals"})
             
     elif page.startswith("Field Operations"):
         breadcrumb_items.append({"label": "Field Operations", "path": "Field Operations"})

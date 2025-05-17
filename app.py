@@ -358,12 +358,15 @@ def main():
             render_dashboard()
         elif current_menu == "Project Information":
             render_project_information()
-        elif current_menu == "Documents":
-            render_pdf_viewer()
+        elif current_menu == "Engineering & Documents":
+            # Create tabs for Engineering and Documents
+            eng_tab1, eng_tab2 = st.tabs(["Engineering", "Documents"])
+            with eng_tab1:
+                render_engineering()
+            with eng_tab2:
+                render_pdf_viewer()
         elif current_menu == "BIM":
             render_bim_viewer()
-        elif current_menu == "Engineering":
-            render_engineering()
         elif current_menu == "Field Operations":
             render_field_operations()
         elif current_menu == "Safety":

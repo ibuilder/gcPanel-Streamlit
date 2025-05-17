@@ -45,21 +45,12 @@ if not hasattr(st.session_state, 'app_initialized'):
 # Setup theme
 def local_css():
     """Apply custom CSS for theming"""
-    # Define theme colors
-    if st.session_state.get('theme', 'dark') == 'light':
-        # Light theme
-        bg_color = "#f8f9fa"
-        text_color = "#495057"
-        primary_color = "#1b5e20"
-        secondary_color = "#4caf50"
-        accent_color = "#26a69a"
-    else:
-        # Dark theme (Bootswatch Superhero inspired)
-        bg_color = "#222b3c"
-        text_color = "#e9ecef"
-        primary_color = "#4caf50"
-        secondary_color = "#2a9fd6"
-        accent_color = "#26a69a"
+    # Bootswatch Superhero inspired theme
+    bg_color = "#222b3c"
+    text_color = "#e9ecef"
+    primary_color = "#4caf50"
+    secondary_color = "#2a9fd6"
+    accent_color = "#26a69a"
     
     # Apply CSS
     st.markdown(f"""
@@ -122,11 +113,7 @@ with title_col1:
     current_date = datetime.now().strftime("%B %d, %Y")
     st.markdown(f"<div>{current_date}</div>", unsafe_allow_html=True)
 
-# Apply theme toggle in sidebar
-with st.sidebar:
-    theme = st.radio("Theme:", ("Dark", "Light"), horizontal=True, 
-                     index=0 if st.session_state.get('theme', 'dark') == 'dark' else 1)
-    st.session_state.theme = theme.lower()
+# No theme toggle - using Superhero theme consistently
 
 # Authentication check
 if not check_authentication():
@@ -260,8 +247,6 @@ elif menu == "Settings":
         st.subheader("General Settings")
         company_name = st.text_input("Company Name", "Your Construction Company")
         logo_upload = st.file_uploader("Upload Company Logo", type=["png", "jpg", "jpeg"])
-        
-        theme_option = st.selectbox("Default Theme", ["Dark", "Light"], index=0 if st.session_state.get('theme', 'dark') == 'dark' else 1)
         
         if st.button("Save Settings"):
             st.success("Settings saved successfully!")

@@ -28,8 +28,54 @@ def render_sidebar():
         # Module navigation
         st.subheader("Modules")
         
-        # Get sections and modules from session state
-        modules = st.session_state.get('modules', {})
+        # Define default modules to show in sidebar
+        default_modules = {
+            'preconstruction': {
+                'display_name': 'Preconstruction',
+                'icon': 'building',
+                'modules': [
+                    {'name': 'bid_packages', 'display_name': 'Bid Packages', 'icon': 'package'},
+                    {'name': 'qualified_bidders', 'display_name': 'Qualified Bidders', 'icon': 'users'}
+                ]
+            },
+            'engineering': {
+                'display_name': 'Engineering',
+                'icon': 'clipboard',
+                'modules': [
+                    {'name': 'rfi', 'display_name': 'RFIs', 'icon': 'help-circle'},
+                    {'name': 'file_explorer', 'display_name': 'Document Library', 'icon': 'folder'}
+                ]
+            },
+            'field': {
+                'display_name': 'Field',
+                'icon': 'hard-hat',
+                'modules': [
+                    {'name': 'daily_reports', 'display_name': 'Daily Reports', 'icon': 'clipboard'},
+                    {'name': 'photo_log', 'display_name': 'Photo Log', 'icon': 'camera'}
+                ]
+            },
+            'safety': {
+                'display_name': 'Safety',
+                'icon': 'shield',
+                'modules': [
+                    {'name': 'observations', 'display_name': 'Safety Observations', 'icon': 'eye'},
+                    {'name': 'incidents', 'display_name': 'Incident Reports', 'icon': 'alert-triangle'}
+                ]
+            },
+            'contracts': {
+                'display_name': 'Contracts',
+                'icon': 'file-text',
+                'modules': [
+                    {'name': 'prime_contract', 'display_name': 'Prime Contract', 'icon': 'file-text'},
+                    {'name': 'subcontracts', 'display_name': 'Subcontracts', 'icon': 'file-minus'}
+                ]
+            }
+        }
+        
+        # Try to get modules from session state, fall back to default modules
+        modules = st.session_state.get('modules', default_modules)
+        if not modules:
+            modules = default_modules
         
         # Display sections as expanders
         for section_name, section_info in modules.items():

@@ -1,303 +1,297 @@
+"""
+gcPanel Construction Management Dashboard
+
+This is the main application file for the gcPanel Construction Management
+Dashboard, a comprehensive project management tool for construction projects.
+"""
+
 import streamlit as st
 import os
-import importlib
-from components.header import render_header
-from components.navigation import render_navigation
-from components.sidebar import render_sidebar
-from components.footer import render_footer
-from utils.auth import check_authentication, initialize_auth
-from utils.database import initialize_db
-from utils.module_loader import load_modules
-from assets.styles import apply_styles
+from datetime import datetime
 
-# App configuration
+# Initialize core application
+from core import initialize_application
+
+# Import components
+from components.auth import (
+    login_component, register_component, check_authentication,
+    logout, user_profile_component
+)
+from components.project import (
+    project_list_component, project_details_component,
+    project_create_component
+)
+from components.engineering import (
+    submittals_list_component, submittal_details_component,
+    rfi_list_component, rfi_details_component
+)
+
+# Page configuration
 st.set_page_config(
-    page_title="gcPanel - Construction Management Dashboard",
+    page_title="gcPanel Dashboard",
     page_icon="🏗️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Apply custom styles
-apply_styles()
+# Initialize application
+if not hasattr(st.session_state, 'app_initialized'):
+    if initialize_application():
+        st.session_state.app_initialized = True
+    else:
+        st.error("Failed to initialize application")
+        st.stop()
 
-# Initialize authentication
-initialize_auth()
+# Setup theme
+def local_css():
+    """Apply custom CSS for theming"""
+    # Define theme colors
+    if st.session_state.get('theme', 'dark') == 'light':
+        # Light theme
+        bg_color = "#f8f9fa"
+        text_color = "#495057"
+        primary_color = "#1b5e20"
+        secondary_color = "#4caf50"
+        accent_color = "#26a69a"
+    else:
+        # Dark theme (Bootswatch Superhero inspired)
+        bg_color = "#222b3c"
+        text_color = "#e9ecef"
+        primary_color = "#4caf50"
+        secondary_color = "#2a9fd6"
+        accent_color = "#26a69a"
+    
+    # Apply CSS
+    st.markdown(f"""
+    <style>
+        .stApp {{
+            background-color: {bg_color};
+            color: {text_color};
+        }}
+        .stButton button {{
+            background-color: {primary_color};
+            color: white;
+        }}
+        .stTextInput, .stNumberInput, .stDateInput, .stSelectbox, .stTextArea {{
+            border-radius: 4px;
+        }}
+        .stTabs [data-baseweb="tab-list"] {{
+            gap: 8px;
+        }}
+        .stTabs [data-baseweb="tab"] {{
+            padding: 8px 16px;
+            border-radius: 4px 4px 0 0;
+        }}
+        /* Enhanced dashboard cards */
+        .dashboard-card {{
+            background-color: {bg_color};
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid {secondary_color}40;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }}
+        /* Main title */
+        .main-title {{
+            color: {primary_color};
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }}
+        /* Counter styles */
+        .counter-value {{
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: {accent_color};
+        }}
+        .counter-label {{
+            font-size: 0.9rem;
+            color: {text_color}90;
+            text-transform: uppercase;
+        }}
+    </style>
+    """, unsafe_allow_html=True)
 
-# Initialize database connection
-initialize_db()
+# Apply CSS theme
+local_css()
 
-# Initialize session state variables if they don't exist
-if 'authenticated' not in st.session_state:
-    st.session_state.authenticated = False
-if 'user_role' not in st.session_state:
-    st.session_state.user_role = None
-if 'current_section' not in st.session_state:
-    st.session_state.current_section = None
-if 'current_module' not in st.session_state:
-    st.session_state.current_module = None
-if 'current_view' not in st.session_state:
-    st.session_state.current_view = "list"  # Default view (list, view, form)
+# Title and main header
+title_col1, title_col2 = st.columns([3, 1])
+with title_col1:
+    st.markdown('<div class="main-title">gcPanel Construction Management Dashboard</div>', unsafe_allow_html=True)
+    current_date = datetime.now().strftime("%B %d, %Y")
+    st.markdown(f"<div>{current_date}</div>", unsafe_allow_html=True)
 
-# Reset demo mode flag
-st.session_state.demo_mode = False
-
-# Always refresh modules on startup to ensure they're properly loaded
-st.session_state.modules = load_modules()
+# Apply theme toggle in sidebar
+with st.sidebar:
+    theme = st.radio("Theme:", ("Dark", "Light"), horizontal=True, 
+                     index=0 if st.session_state.get('theme', 'dark') == 'dark' else 1)
+    st.session_state.theme = theme.lower()
 
 # Authentication check
-if not st.session_state.authenticated:
-    check_authentication()
-else:
-    # Render the application components
-    render_header()
-    
-    # Main content area - streamlined layout
-    with st.container():
-        # Render sidebar (using Streamlit's built-in sidebar)
-        with st.sidebar:
-            render_sidebar()
-        
-        # Main content area with navigation and module content
-        with st.container():
-            # Improved navigation bar
-            render_navigation()
-            
-            # Render the selected module content
-            if st.session_state.current_section and st.session_state.current_module:
-                try:
-                    module_path = f"modules.{st.session_state.current_section}.{st.session_state.current_module}"
-                    module = importlib.import_module(module_path)
-                    
-                    if st.session_state.current_view == "list":
-                        module.render_list()
-                    elif st.session_state.current_view == "view":
-                        module.render_view()
-                    elif st.session_state.current_view == "form":
-                        module.render_form()
-                    else:
-                        st.error("Invalid view selected")
-                except ModuleNotFoundError:
-                    st.error(f"Module {module_path} not found")
-                except Exception as e:
-                    st.error(f"Error loading module: {str(e)}")
-            else:
-                # Display dashboard homepage with enhanced components
-                st.title("gcPanel Dashboard")
-                
-                # Import custom components
-                from components.custom_elements import dashboard_card, progress_bar, info_box, status_pill, modal_dialog
-                
-                # Additional dashboard-specific styling
-                st.markdown("""
-                <style>
-                    /* Dashboard specific styling with Bootswatch integration */
-                    .dashboard-header {
-                        margin-bottom: 20px;
-                    }
-                    
-                    .dashboard-section {
-                        margin-bottom: 30px;
-                    }
-                    
-                    /* Ensure images have consistent dimensions */
-                    .dashboard-image {
-                        width: 100%;
-                        border-radius: 8px;
-                        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                    }
-                    
-                    /* Activity card styling with Bootswatch integration */
-                    .activity-card {
-                        background-color: #4E5D6C;
-                        border-radius: 0.25rem;
-                        padding: 0;
-                        overflow: hidden;
-                        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                    }
-                    
-                    .activity-item {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        padding: 12px 16px;
-                        border-bottom: 1px solid rgba(255,255,255,0.1);
-                    }
-                    
-                    .activity-item:last-child {
-                        border-bottom: none;
-                    }
-                    
-                    .activity-text {
-                        flex: 1;
-                        margin-right: 15px;
-                        color: #fff;
-                    }
-                    
-                    /* Override Streamlit's CSS for better compatibility with Bootswatch */
-                    .stApp {
-                        background-color: #2B3E50 !important;
-                    }
-                    
-                    h1, h2, h3, h4, h5, h6 {
-                        color: #fff !important;
-                    }
-                    
-                    .stButton > button {
-                        background-color: #DF691A !important;
-                        color: #fff !important;
-                        border: none !important;
-                        border-radius: 0.25rem !important;
-                    }
-                    
-                    .stButton > button:hover {
-                        background-color: #B15315 !important;
-                    }
-                    
-                    /* Primary buttons */
-                    .stButton > [kind="primary"] {
-                        background-color: #5CB85C !important;
-                    }
-                    
-                    .stButton > [kind="primary"]:hover {
-                        background-color: #4CAE4C !important;
-                    }
-                </style>
-                """, unsafe_allow_html=True)
-                
-                # Dashboard header with project overview
-                if 'current_project' in st.session_state:
-                    st.markdown(f"""
-                    <div class="dashboard-header">
-                        <h2>Project Overview: {st.session_state.current_project}</h2>
-                        <p style="color: #666;">Below is a summary of key metrics and recent activity for this project.</p>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                # Top metrics row (4 cards in a row)
-                cols = st.columns(4)
-                
-                with cols[0]:
-                    dashboard_card("Active Projects", "5", "2 in planning phase", "domain", "#1e88e5")
-                
-                with cols[1]:
-                    dashboard_card("Open RFIs", "12", "3 urgent", "help_outline", "#f44336")
-                
-                with cols[2]:
-                    dashboard_card("Pending Submittals", "8", "5 overdue", "description", "#ff9800")
-                
-                with cols[3]:
-                    dashboard_card("Budget Utilization", "$2.4M", "68% of total", "attach_money", "#43a047")
-                
-                # Project progress section
-                st.markdown('<div class="dashboard-section"><h3>Project Progress</h3></div>', unsafe_allow_html=True)
-                
-                # Progress bars in two columns
-                prog_col1, prog_col2 = st.columns(2)
-                
-                with prog_col1:
-                    progress_bar(68, 100, "Budget Progress", "#1e88e5")
-                    progress_bar(42, 100, "Schedule Completion", "#43a047")
-                
-                with prog_col2:
-                    progress_bar(92, 100, "Quality Score", "#ff9800")
-                    progress_bar(78, 100, "Documentation", "#9c27b0")
-                
-                # Recent activity and site photos
-                activity_col, photo_col = st.columns([3, 2])
-                
-                with activity_col:
-                    st.markdown('<div class="dashboard-section"><h3>Recent Activity</h3></div>', unsafe_allow_html=True)
-                    
-                    # Activity items with status pills and better styling
-                    st.markdown('<div class="activity-card">', unsafe_allow_html=True)
-                    
-                    # Activity item row 1
-                    st.markdown('<div class="activity-item">'
-                                '<div class="activity-text">Submittal #102 - HVAC Equipment</div>'
-                                '<div class="activity-status">', unsafe_allow_html=True)
-                    status_pill("approved")
-                    st.markdown('</div></div>', unsafe_allow_html=True)
-                    
-                    # Activity item row 2
-                    st.markdown('<div class="activity-item">'
-                                '<div class="activity-text">RFI #45 - Foundation Details</div>'
-                                '<div class="activity-status">', unsafe_allow_html=True)
-                    status_pill("pending")
-                    st.markdown('</div></div>', unsafe_allow_html=True)
-                    
-                    # Activity item row 3
-                    st.markdown('<div class="activity-item">'
-                                '<div class="activity-text">Daily Report - May 16, 2025</div>'
-                                '<div class="activity-status">', unsafe_allow_html=True)
-                    status_pill("complete")
-                    st.markdown('</div></div>', unsafe_allow_html=True)
-                    
-                    # Activity item row 4
-                    st.markdown('<div class="activity-item">'
-                                '<div class="activity-text">Change Order #8 - Site Utilities</div>'
-                                '<div class="activity-status">', unsafe_allow_html=True)
-                    status_pill("revise")
-                    st.markdown('</div></div>', unsafe_allow_html=True)
-                    
-                    st.markdown('</div>', unsafe_allow_html=True)
-                    
-                    # Meeting announcement with view details modal
-                    st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
-                    
-                    # Use modal for meeting details
-                    modal_dialog(
-                        "Project Team Meeting",
-                        """
-                        <div style="padding: 15px 0;">
-                            <p><strong>Date:</strong> May 20, 2025</p>
-                            <p><strong>Time:</strong> 10:00 AM - 12:00 PM</p>
-                            <p><strong>Location:</strong> Main Conference Room & Virtual</p>
-                            <p><strong>Agenda:</strong></p>
-                            <ul>
-                                <li>Progress updates from team leaders</li>
-                                <li>Review of critical path items</li>
-                                <li>Discussion of pending RFIs and submittals</li>
-                                <li>Budget review</li>
-                            </ul>
-                            <p><strong>Required Preparation:</strong> Please bring your updated progress reports and be prepared to discuss any blockers or risks.</p>
-                        </div>
-                        """,
-                        "View Meeting Details",
-                        "event",
-                        "meeting_modal"
-                    )
-                    
-                    # Regular info box for quick notice
-                    info_box("The project team meeting is scheduled for May 20, 2025 at 10:00 AM.", 
-                            "info", False, "announcement")
-                
-                with photo_col:
-                    st.markdown('<div class="dashboard-section"><h3>Site Photos</h3></div>', unsafe_allow_html=True)
-                    
-                    # Site photo with better styling
-                    st.markdown("""
-                    <img src="https://pixabay.com/get/g9f0f096f46d0d28520ae0a9a4b0d21826da014234b3817602a97ab8e49a66e97f590ed7492657c0a12df3ec17fb129eeb4afbeed9ab0173cd54afee551d2cf09_1280.jpg" 
-                         class="dashboard-image" alt="Construction Site">
-                    <p style="font-size: 12px; color: #666; text-align: center; margin-top: 5px;">
-                        Latest site photo - May 16, 2025
-                    </p>
-                    """, unsafe_allow_html=True)
-                
-                # Welcome information at the bottom
-                st.markdown('<div class="dashboard-section"><h3>Getting Started</h3></div>', unsafe_allow_html=True)
-                
-                info_box("""
-                <p><strong>Welcome to gcPanel</strong> - your comprehensive construction management dashboard.</p>
-                <p>Use the sidebar navigation to access different modules:</p>
-                <ul>
-                    <li><strong>Engineering:</strong> Manage RFIs, submittals, and document library</li>
-                    <li><strong>Field:</strong> Daily reports and photo logs</li>
-                    <li><strong>Cost:</strong> Budget tracking and change orders</li>
-                    <li><strong>Contracts:</strong> Prime contract and subcontract management</li>
-                </ul>
-                <p>Select a module from the sidebar or use the quick access buttons to get started.</p>
-                """, "success", False, "welcome")
+if not check_authentication():
+    # Show login/register tabs if not authenticated
+    login_tab, register_tab = st.tabs(["Login", "Register"])
+    with login_tab:
+        login_component()
+    with register_tab:
+        register_component()
+    st.stop()
 
-    # Render footer
-    render_footer()
+# User greeting in sidebar
+with st.sidebar:
+    st.markdown(f"### Welcome, {st.session_state.user.full_name}")
+    st.markdown(f"**Role:** {', '.join([role.name for role in st.session_state.user.roles])}")
+    
+    # Navigation
+    st.markdown("## Navigation")
+    
+    menu = st.radio("", [
+        "Dashboard", 
+        "Projects", 
+        "Engineering",
+        "Field Operations",
+        "Cost Management",
+        "Settings",
+        "Profile"
+    ])
+    
+    if st.button("Logout"):
+        logout()
+        st.rerun()
+
+# Main content based on navigation
+if menu == "Dashboard":
+    st.header("Dashboard")
+    st.write("Welcome to gcPanel Construction Management Dashboard")
+    
+    # Project stats
+    st.subheader("Project Overview")
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.markdown('<div class="dashboard-card">'
+                   '<div class="counter-value">12</div>'
+                   '<div class="counter-label">Active Projects</div>'
+                   '</div>', unsafe_allow_html=True)
+    with col2:
+        st.markdown('<div class="dashboard-card">'
+                   '<div class="counter-value">45</div>'
+                   '<div class="counter-label">Open RFIs</div>'
+                   '</div>', unsafe_allow_html=True)
+    with col3:
+        st.markdown('<div class="dashboard-card">'
+                   '<div class="counter-value">28</div>'
+                   '<div class="counter-label">Pending Submittals</div>'
+                   '</div>', unsafe_allow_html=True)
+    with col4:
+        st.markdown('<div class="dashboard-card">'
+                   '<div class="counter-value">8</div>'
+                   '<div class="counter-label">Overdue Tasks</div>'
+                   '</div>', unsafe_allow_html=True)
+    
+    # Recent activity
+    st.subheader("Recent Activity")
+    
+    # Placeholder for recent activity feed
+    activities = [
+        {"type": "RFI", "project": "Highland Tower", "description": "RFI #123 was answered", "time": "2 hours ago"},
+        {"type": "Submittal", "project": "City Center", "description": "Submittal #45 was approved", "time": "Yesterday"},
+        {"type": "Project", "project": "Riverside Apartments", "description": "New milestone added", "time": "2 days ago"},
+        {"type": "Task", "project": "Highland Tower", "description": "Task assigned to John Smith", "time": "3 days ago"}
+    ]
+    
+    for activity in activities:
+        st.markdown(f"**{activity['type']}** - {activity['project']}: {activity['description']} · {activity['time']}")
+
+elif menu == "Projects":
+    # Project sub-navigation
+    project_action = st.sidebar.radio("Project Actions", ["View Projects", "Create Project"])
+    
+    if project_action == "View Projects":
+        if "selected_project_code" in st.session_state:
+            project_details_component()
+        else:
+            project_list_component()
+    elif project_action == "Create Project":
+        project_create_component()
+
+elif menu == "Engineering":
+    # Engineering sub-navigation
+    engineering_tab = st.sidebar.radio("Engineering Documents", ["Submittals", "RFIs"])
+    
+    if engineering_tab == "Submittals":
+        if "selected_submittal_id" in st.session_state:
+            submittal_details_component()
+        elif "create_submittal_project_id" in st.session_state:
+            st.warning("Submittal creation form not yet implemented")
+            if st.button("Back to Submittals"):
+                del st.session_state.create_submittal_project_id
+                st.rerun()
+        else:
+            submittals_list_component()
+    
+    elif engineering_tab == "RFIs":
+        if "selected_rfi_id" in st.session_state:
+            rfi_details_component()
+        elif "create_rfi_project_id" in st.session_state:
+            st.warning("RFI creation form not yet implemented")
+            if st.button("Back to RFIs"):
+                del st.session_state.create_rfi_project_id
+                st.rerun()
+        else:
+            rfi_list_component()
+
+elif menu == "Field Operations":
+    st.header("Field Operations")
+    st.info("Field Operations module is under development")
+
+elif menu == "Cost Management":
+    st.header("Cost Management")
+    st.info("Cost Management module is under development")
+
+elif menu == "Settings":
+    st.header("Settings")
+    
+    # Settings tabs
+    settings_tab = st.radio("Settings", ["General", "Users", "Permissions"])
+    
+    if settings_tab == "General":
+        st.subheader("General Settings")
+        company_name = st.text_input("Company Name", "Your Construction Company")
+        logo_upload = st.file_uploader("Upload Company Logo", type=["png", "jpg", "jpeg"])
+        
+        theme_option = st.selectbox("Default Theme", ["Dark", "Light"], index=0 if st.session_state.get('theme', 'dark') == 'dark' else 1)
+        
+        if st.button("Save Settings"):
+            st.success("Settings saved successfully!")
+    
+    elif settings_tab == "Users":
+        st.subheader("User Management")
+        st.info("User management interface is under development")
+    
+    elif settings_tab == "Permissions":
+        st.subheader("Role Permissions")
+        st.info("Role permissions interface is under development")
+
+elif menu == "Profile":
+    user_profile_component()
+
+# Clear navigation state if we've changed main menu
+if menu == "Projects" and "selected_project_code" in st.session_state:
+    # Keep project selection state only in project section
+    pass
+elif menu != "Projects" and "selected_project_code" in st.session_state:
+    del st.session_state.selected_project_code
+
+if menu == "Engineering" and "selected_submittal_id" in st.session_state:
+    # Keep submittal selection state only in engineering section
+    pass
+elif menu != "Engineering" and "selected_submittal_id" in st.session_state:
+    del st.session_state.selected_submittal_id
+
+if menu == "Engineering" and "selected_rfi_id" in st.session_state:
+    # Keep RFI selection state only in engineering section
+    pass
+elif menu != "Engineering" and "selected_rfi_id" in st.session_state:
+    del st.session_state.selected_rfi_id

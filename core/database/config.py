@@ -7,7 +7,7 @@ This module handles database connection and session management.
 import os
 import logging
 from contextlib import contextmanager
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
@@ -46,7 +46,7 @@ def init_db():
         
         # Test connection
         with get_db_session() as db:
-            db.execute("SELECT 1")
+            db.execute(text("SELECT 1"))
             logger.info("SQLite database connection successful")
             
         return True

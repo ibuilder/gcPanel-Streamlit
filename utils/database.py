@@ -60,6 +60,20 @@ def initialize_db():
                 )
             '''))
             
+            # Modules table (using SQLite syntax) - Create the table first before inserting data
+            conn.execute(text('''
+                CREATE TABLE IF NOT EXISTS modules (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    section_id INTEGER REFERENCES sections(id),
+                    name VARCHAR(100) NOT NULL,
+                    display_name VARCHAR(100) NOT NULL,
+                    icon VARCHAR(50),
+                    sort_order INTEGER,
+                    enabled BOOLEAN DEFAULT 1,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            '''))
+            
             # Check if default sections exist, if not add them
             result = conn.execute(text("SELECT COUNT(*) FROM sections"))
             count = result.scalar()
@@ -145,20 +159,6 @@ def initialize_db():
                             "sort_order": module[4]
                         }
                     )
-            
-            # Modules table (using SQLite syntax)
-            conn.execute(text('''
-                CREATE TABLE IF NOT EXISTS modules (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    section_id INTEGER REFERENCES sections(id),
-                    name VARCHAR(100) NOT NULL,
-                    display_name VARCHAR(100) NOT NULL,
-                    icon VARCHAR(50),
-                    sort_order INTEGER,
-                    enabled BOOLEAN DEFAULT TRUE,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            '''))
             
             # Users table (using SQLite syntax)
             conn.execute(text('''

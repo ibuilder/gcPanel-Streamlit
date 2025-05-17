@@ -38,6 +38,10 @@ if 'current_module' not in st.session_state:
     st.session_state.current_module = None
 if 'current_view' not in st.session_state:
     st.session_state.current_view = "list"  # Default view (list, view, form)
+
+# Reset demo mode flag
+st.session_state.demo_mode = False
+
 # Always refresh modules on startup to ensure they're properly loaded
 st.session_state.modules = load_modules()
 

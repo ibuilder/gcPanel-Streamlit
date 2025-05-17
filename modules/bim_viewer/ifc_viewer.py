@@ -6,6 +6,7 @@ This module provides 3D BIM viewing capabilities using IFC.js.
 
 import streamlit as st
 import base64
+import pandas as pd
 from typing import Optional, Dict, Any, List
 import os
 import uuid

@@ -95,16 +95,20 @@ def render_sidebar():
                 """, unsafe_allow_html=True)
                 
             with proj_col2:
-                # Budget metrics
+                # Budget metrics with Bootswatch Superhero styling
                 st.markdown("""
-                <div class="project-metric">
-                    <div class="project-metric-title">Budget</div>
-                    <div class="project-metric-value" style="color: #43a047;">$2.4M</div>
+                <div class="card bg-dark text-white mb-2">
+                    <div class="card-body p-2">
+                        <div class="small text-muted">Budget</div>
+                        <div class="h5 text-success">$2.4M</div>
+                    </div>
                 </div>
                 
-                <div class="project-metric">
-                    <div class="project-metric-title">Submittals</div>
-                    <div class="project-metric-value" style="color: #9c27b0;">8</div>
+                <div class="card bg-dark text-white mb-2">
+                    <div class="card-body p-2">
+                        <div class="small text-muted">Submittals</div>
+                        <div class="h5 text-primary">8</div>
+                    </div>
                 </div>
                 """, unsafe_allow_html=True)
         
@@ -127,8 +131,8 @@ def render_sidebar():
         </style>
         """, unsafe_allow_html=True)
                     
-        # Modules organized by category
-        st.markdown('<div class="sidebar-section-title">Modules</div>', unsafe_allow_html=True)
+        # Modules organized by category with Bootswatch Superhero styling
+        st.markdown('<h5 class="mt-4 mb-3 text-uppercase fw-bold text-light">Modules</h5>', unsafe_allow_html=True)
         
         # Define categories with their modules
         module_categories = {
@@ -187,11 +191,12 @@ def render_sidebar():
         for category_name, category_info in module_categories.items():
             is_current_category = category_name == st.session_state.get('current_section')
             
-            # Create a modern nav item for the category
+            # Create a nav item with Bootswatch Superhero styling
             st.markdown(f"""
-            <div class="sidebar-nav-item {('active' if is_current_category else '')}" id="category-{category_name}">
-                <span class="material-icons">{category_info['icon']}</span>
-                <span style="flex: 1;">{category_info['display_name']}</span>
+            <div class="list-group-item list-group-item-action d-flex align-items-center {('bg-primary' if is_current_category else 'bg-secondary')}" 
+                 id="category-{category_name}">
+                <span class="material-icons me-2">{category_info['icon']}</span>
+                <span class="flex-grow-1">{category_info['display_name']}</span>
                 <span class="material-icons">{'expand_less' if is_current_category else 'expand_more'}</span>
             </div>
             """, unsafe_allow_html=True)
@@ -224,12 +229,13 @@ def render_sidebar():
                     is_current_module = (is_current_category and 
                                          module['name'] == st.session_state.get('current_module'))
                     
-                    # Modern module button with proper styling
+                    # Module button with Bootswatch Superhero styling
                     st.markdown(f"""
-                    <div class="sidebar-nav-item {('active' if is_current_module else '')}"
-                        style="margin-left: 15px;" id="module-{category_name}-{module['name']}">
-                        <span class="material-icons" style="font-size: 18px;">{module['icon']}</span>
-                        <span style="flex: 1;">{module['display_name']}</span>
+                    <div class="list-group-item list-group-item-action d-flex align-items-center {('active' if is_current_module else '')}"
+                        style="margin-left: 15px; padding: 8px 15px; background-color: {('var(--bs-primary)' if is_current_module else '#4E5D6C')};" 
+                        id="module-{category_name}-{module['name']}">
+                        <span class="material-icons me-2" style="font-size: 18px;">{module['icon']}</span>
+                        <span class="small">{module['display_name']}</span>
                     </div>
                     """, unsafe_allow_html=True)
                     

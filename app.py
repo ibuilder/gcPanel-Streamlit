@@ -337,8 +337,7 @@ def main():
     initialize_session_state()
     
     # Initialize database and authentication
-    if initialize_application():
-        st.info("Application initialized successfully")
+    initialize_application()
     
     # Render sidebar
     render_sidebar()

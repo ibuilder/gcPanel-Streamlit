@@ -233,11 +233,20 @@ def render_sidebar():
         for category_name, category_info in module_categories.items():
             is_current_category = category_name == st.session_state.get('current_section')
             
-            # Create a button for the category that's actually clickable
+            # Create a modern nav item for the category
+            st.markdown(f"""
+            <div class="sidebar-nav-item {('active' if is_current_category else '')}" id="category-{category_name}">
+                <span class="material-icons">{category_info['icon']}</span>
+                <span style="flex: 1;">{category_info['display_name']}</span>
+                <span class="material-icons">{'expand_less' if is_current_category else 'expand_more'}</span>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Hidden button for category click handling
             if st.button(
-                f"{category_info['display_name']}",
+                "",
                 key=f"category_btn_{category_name}",
-                use_container_width=True
+                help=f"Toggle {category_info['display_name']}"
             ):
                 # Toggle the category
                 if is_current_category:
@@ -251,40 +260,6 @@ def render_sidebar():
                     st.session_state.current_view = "list"
                     st.rerun()
             
-            # Apply custom styling with HTML/CSS for the category button
-            st.markdown(f"""
-            <style>
-            /* Style for category button "{category_name}" */
-            div[data-testid="stButton"] button[kind="secondaryFormSubmit"][aria-label="{category_info['display_name']}"]:not(.clicked) {{
-                background-color: {'rgba(30, 136, 229, 0.2)' if is_current_category else 'rgba(100, 100, 100, 0.1)'};
-                border: none;
-                text-align: left;
-                font-weight: 500;
-                padding: 10px 12px;
-                margin: 2px 0;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }}
-            
-            /* Add icon before text */
-            div[data-testid="stButton"] button[kind="secondaryFormSubmit"][aria-label="{category_info['display_name']}"]:before {{
-                font-family: "Material Icons";
-                content: "{category_info['icon']}";
-                margin-right: 10px;
-                font-size: 20px;
-            }}
-            
-            /* Add expand icon after text */
-            div[data-testid="stButton"] button[kind="secondaryFormSubmit"][aria-label="{category_info['display_name']}"]:after {{
-                font-family: "Material Icons";
-                content: "{'expand_less' if is_current_category else 'expand_more'}";
-                margin-left: 10px;
-                font-size: 20px;
-            }}
-            </style>
-            """, unsafe_allow_html=True)
-            
             # Display the modules for this category
             if is_current_category:
                 st.markdown(f"""
@@ -295,35 +270,25 @@ def render_sidebar():
                     is_current_module = (is_current_category and 
                                          module['name'] == st.session_state.get('current_module'))
                     
-                    # Single combined button with styled appearance
-                    col1, col2 = st.columns([9, 1])  # Adjust column widths as needed
-                    
-                    with col1:
-                        if st.button(
-                            f"{module['display_name']}",
-                            key=f"module_btn_{category_name}_{module['name']}",
-                            use_container_width=True
-                        ):
-                            st.session_state.current_section = category_name
-                            st.session_state.current_module = module['name'] 
-                            st.session_state.current_view = "list"
-                            st.rerun()
-                            
-                    # Apply custom styling with HTML/CSS
+                    # Modern module button with proper styling
                     st.markdown(f"""
-                    <style>
-                    /* Style for the module button "{module['name']}" */
-                    div[data-testid="stButton"] button[kind="secondaryFormSubmit"][aria-label="{module['display_name']}"]:not(.clicked) {{
-                        background-color: {('rgba(30, 136, 229, 0.2)' if is_current_module else 'rgba(255, 255, 255, 0.05)')};
-                        border: none;
-                        text-align: left;
-                        padding: 8px 12px;
-                        margin: 2px 0;
-                        display: flex;
-                        align-items: center;
-                    }}
-                    </style>
+                    <div class="sidebar-nav-item {('active' if is_current_module else '')}"
+                        style="margin-left: 15px;" id="module-{category_name}-{module['name']}">
+                        <span class="material-icons" style="font-size: 18px;">{module['icon']}</span>
+                        <span style="flex: 1;">{module['display_name']}</span>
+                    </div>
                     """, unsafe_allow_html=True)
+                    
+                    # Hidden button for functional behavior
+                    if st.button(
+                        "",
+                        key=f"module_btn_{category_name}_{module['name']}",
+                        help=f"Open {module['display_name']}"
+                    ):
+                        st.session_state.current_section = category_name
+                        st.session_state.current_module = module['name'] 
+                        st.session_state.current_view = "list"
+                        st.rerun()
                 
                 st.markdown("</div>", unsafe_allow_html=True)
             

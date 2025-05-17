@@ -102,30 +102,40 @@ def render_header():
         
         # Render the header
         if st.session_state.authenticated:
-            st.markdown(f"""
-            <div class="header-container">
-                <div class="header-logo">
+            # Set up three columns for the header
+            logo_col, spacer_col, controls_col = st.columns([3, 5, 2])
+            
+            with logo_col:
+                # Display project logo and name
+                st.markdown(f"""
+                <div style="display: flex; align-items: center; padding: 10px 0;">
                     <span class="material-icons" style="margin-right: 10px; font-size: 24px;">{project_icon}</span>
-                    <h2>{project_name}</h2>
+                    <h2 style="font-size: 20px; font-weight: 600; margin: 0;">{project_name}</h2>
                 </div>
+                """, unsafe_allow_html=True)
                 
-                <div class="header-controls">
-                    <div class="theme-toggle" id="theme-toggle" title="Toggle light/dark theme">
+            with controls_col:
+                # User controls (theme toggle and user info)
+                st.markdown(f"""
+                <div style="display: flex; justify-content: flex-end; align-items: center; gap: 16px; padding: 10px 0;">
+                    <div style="cursor: pointer; display: flex; align-items: center; background: rgba(255, 255, 255, 0.1); 
+                              border-radius: 20px; padding: 4px 10px; font-size: 13px;" id="theme-toggle">
                         <span class="material-icons" style="font-size: 16px; margin-right: 5px;">{theme_icon}</span>
                         {theme_text}
                     </div>
                     
-                    <div class="user-info">
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 4px 10px; 
+                              background: rgba(0, 0, 0, 0.2); border-radius: 20px;">
                         <span class="material-icons" style="font-size: 18px;">account_circle</span>
                         <span style="font-size: 14px; font-weight: 500;">{username}</span>
                     </div>
                     
-                    <div class="logout-btn" id="logout-btn" title="Logout">
+                    <div style="cursor: pointer; color: #f44336; padding: 3px; font-size: 20px; border-radius: 50%; 
+                              display: flex; align-items: center; justify-content: center;" id="logout-btn">
                         <span class="material-icons">logout</span>
                     </div>
                 </div>
-            </div>
-            """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
             
             # Hidden buttons for actual functionality
             col1, col2 = st.columns([1, 1])

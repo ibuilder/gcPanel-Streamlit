@@ -3,235 +3,479 @@ import streamlit as st
 def apply_styles():
     """Apply custom styles to the application"""
     
-    # Try to load custom CSS file first
-    try:
-        with open('assets/custom.css', 'r') as f:
-            custom_css = f.read()
-            st.markdown(f'<style>{custom_css}</style>', unsafe_allow_html=True)
-    except Exception:
-        # Fall back to inline styles if file isn't available
-        st.markdown("""
-        <style>
-            /* Main color variables */
-            :root {
-                --primary-color: #1e88e5;
-                --secondary-color: #43a047;
-                --accent-color: #ff9800;
-                --background-color: #f5f7fa;
-                --sidebar-bg: #2c3e50;
-                --sidebar-text: #ecf0f1;
-                --card-bg: white;
-                --text-color: #333;
-                --border-color: #e0e0e0;
-                --success-color: #4caf50;
-                --warning-color: #ff9800;
-                --danger-color: #f44336;
-                --info-color: #2196f3;
-            }
+    # Inline styles for a more professional and modern look
+    st.markdown("""
+    <style>
+        /* Modern color scheme for construction management */
+        :root {
+            --primary-color: #1976d2;
+            --primary-light: #4791db;
+            --primary-dark: #115293;
+            --secondary-color: #388e3c;
+            --secondary-light: #5eae60;
+            --secondary-dark: #1b5e20;
+            --accent-color: #f57c00;
+            --accent-light: #ff9e40;
+            --accent-dark: #bb4d00;
+            --background-color: #121212;
+            --surface-color: #1e1e1e;
+            --error-color: #d32f2f;
+            --warning-color: #ffa000;
+            --info-color: #0288d1;
+            --success-color: #388e3c;
             
-            /* Main container styles */
-            .main .block-container {
-                padding-top: 1rem;
-                padding-bottom: 1rem;
-                max-width: 1200px;
-                margin: 0 auto;
-            }
+            /* Text colors */
+            --text-primary: rgba(255, 255, 255, 0.87);
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --text-disabled: rgba(255, 255, 255, 0.38);
             
-            /* Sidebar styling - enhanced for construction dashboard */
-            section[data-testid="stSidebar"] {
-                background-color: var(--sidebar-bg);
-                border-right: 1px solid var(--border-color);
-            }
+            /* UI elements */
+            --card-bg: #2d2d2d;
+            --sidebar-bg: #1a1a1a;
+            --sidebar-text: rgba(255, 255, 255, 0.87);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --divider-color: rgba(255, 255, 255, 0.12);
+            --shadow-color: rgba(0, 0, 0, 0.5);
             
-            section[data-testid="stSidebar"] .block-container {
-                padding-top: 2rem;
-            }
-            
-            /* Make sidebar text white */
-            section[data-testid="stSidebar"] h1, 
-            section[data-testid="stSidebar"] h2, 
-            section[data-testid="stSidebar"] h3,
-            section[data-testid="stSidebar"] .stSubheader,
-            section[data-testid="stSidebar"] p {
-                color: var(--sidebar-text) !important;
-            }
-            
-            section[data-testid="stSidebar"] button {
-                border: none;
-                border-radius: 0;
-                text-align: left;
-                padding: 0.5rem 1rem;
-                margin: 0.2rem 0;
-                transition: background-color 0.3s;
-                color: var(--sidebar-text);
-                width: 100%;
-            }
-            
-            section[data-testid="stSidebar"] button:hover {
-                background-color: rgba(255, 255, 255, 0.1);
-            }
-            
-            /* Sidebar divider */
-            section[data-testid="stSidebar"] hr {
-                margin: 1rem 0;
-                border-color: rgba(255, 255, 255, 0.1);
-            }
-            
-            /* Sidebar expander styling */
-            section[data-testid="stSidebar"] [data-testid="stExpander"] {
-                border: none;
-                background-color: rgba(255, 255, 255, 0.05);
-                margin-bottom: 0.5rem;
-            }
-            
-            section[data-testid="stSidebar"] [data-testid="stExpander"] summary {
-                padding: 0.5rem 1rem;
-                color: var(--sidebar-text);
-                font-weight: 500;
-            }
-            
-            /* Header styles */
-            header {
-                background-color: transparent !important;
-                border-bottom: 1px solid var(--border-color);
-            }
-            
-            /* Footer styles */
-            footer {
-                border-top: 1px solid var(--border-color);
-                padding-top: 1rem;
-                margin-top: 2rem;
-                text-align: center;
-                color: #666;
-                font-size: 0.8rem;
-            }
-            
-            /* Improve spacing in forms */
-            .stForm {
-                background-color: var(--card-bg);
-                padding: 1.5rem;
-                border-radius: 8px;
-                border: none;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                margin-bottom: 1rem;
-            }
-            
-            /* Improve button styling */
-            .stButton button {
-                border-radius: 4px;
-                font-weight: 500;
-                padding: 0.5rem 1rem;
-                transition: all 0.3s;
-            }
-            
-            .stButton button:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
-            
-            /* Add some spacing to metrics */
-            [data-testid="stMetric"] {
-                background-color: var(--card-bg);
-                padding: 1rem;
-                border-radius: 8px;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            }
-            
-            [data-testid="stMetricLabel"] {
-                font-weight: 500;
-            }
-            
-            [data-testid="stMetricValue"] {
-                font-size: 2rem;
-                font-weight: 700;
-                color: var(--primary-color);
-            }
-            
-            /* Style dataframes */
-            .stDataFrame {
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            }
-            
-            .stDataFrame th {
-                background-color: #f5f7fa;
-                font-weight: 600;
-                padding: 10px 15px;
-            }
-            
-            .stDataFrame td {
-                border: 1px solid var(--border-color);
-                padding: 8px 12px;
-            }
-            
-            /* Improve tabs styling */
-            .stTabs [data-baseweb="tab-list"] {
-                gap: 1rem;
-            }
-            
-            .stTabs [data-baseweb="tab"] {
-                height: 3rem;
-                white-space: nowrap;
-                padding: 0 1rem;
-                border: 1px solid #e9ecef;
-                border-radius: 0.25rem 0.25rem 0 0;
-                font-weight: 500;
-            }
-            
-            .stTabs [aria-selected="true"] {
-                background-color: var(--primary-color);
-                color: white;
-                border-bottom: none;
-            }
-            
-            /* Section headers */
-            .section-header {
-                position: relative;
-                margin-bottom: 1.5rem;
-                padding-bottom: 0.5rem;
-            }
-            
-            .section-header::after {
-                content: '';
-                position: absolute;
-                left: 0;
-                bottom: 0;
-                height: 3px;
-                width: 50px;
-                background-color: var(--primary-color);
-            }
-            
-            /* Status badges */
-            .status-badge {
-                display: inline-block;
-                padding: 0.25rem 0.5rem;
-                border-radius: 12px;
-                font-size: 0.8rem;
-                font-weight: 500;
-            }
-            
-            .status-badge.approved {
-                background-color: rgba(76, 175, 80, 0.2);
-                color: #2e7d32;
-            }
-            
-            .status-badge.pending {
-                background-color: rgba(33, 150, 243, 0.2);
-                color: #1565c0;
-            }
-            
-            .status-badge.rejected {
-                background-color: rgba(244, 67, 54, 0.2);
-                color: #c62828;
-            }
-            
-            .status-badge.revise {
-                background-color: rgba(255, 152, 0, 0.2);
-                color: #ef6c00;
-            }
-        </style>
-        """, unsafe_allow_html=True)
+            /* Status colors */
+            --status-approved: #4caf50;
+            --status-pending: #2196f3;
+            --status-rejected: #f44336;
+            --status-revise: #ff9800;
+        }
+        
+        /* Core app layout improvements */
+        .main .block-container {
+            padding-top: 1rem;
+            padding-bottom: 2rem;
+            max-width: 1400px;
+        }
+        
+        /* Make everything dark by default */
+        .stApp {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+        }
+                
+        /* Modernize header and make it sticky */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            background-color: var(--background-color) !important;
+            border-bottom: 1px solid var(--divider-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        /* Hide Streamlit branding */
+        #MainMenu, footer, header .decoration {
+            display: none !important;
+        }
+        
+        /* Professional sidebar styling */
+        section[data-testid="stSidebar"] {
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--divider-color);
+        }
+        
+        section[data-testid="stSidebar"] .block-container {
+            padding-top: 1rem;
+        }
+        
+        /* Navigation elements in sidebar */
+        .sidebar-nav-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            color: var(--sidebar-text);
+            text-decoration: none;
+        }
+        
+        .sidebar-nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+        
+        .sidebar-nav-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .sidebar-nav-item .material-icons {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        
+        /* Modern card design */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            border: 1px solid var(--divider-color);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px var(--shadow-color);
+        }
+        
+        .card-header {
+            border-bottom: 1px solid var(--divider-color);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .card-subtitle {
+            color: var(--text-secondary);
+            margin-top: 4px;
+            font-size: 14px;
+        }
+        
+        /* Dashboard metric cards */
+        .metric-card {
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(45, 45, 45, 0.8) 100%);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--divider-color);
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background-color: var(--primary-color);
+        }
+        
+        .metric-card.secondary::before {
+            background-color: var(--secondary-color);
+        }
+        
+        .metric-card.accent::before {
+            background-color: var(--accent-color);
+        }
+        
+        .metric-card.info::before {
+            background-color: var(--info-color);
+        }
+        
+        .metric-value {
+            font-size: 26px;
+            font-weight: 700;
+            margin: 8px 0;
+            color: var(--text-primary);
+        }
+        
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .metric-subtext {
+            color: var(--text-secondary);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Modern buttons */
+        .stButton button {
+            border-radius: 6px;
+            font-weight: 500;
+            padding: 8px 16px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            border: none;
+        }
+        
+        .stButton button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Primary action button */
+        .primary-button {
+            background-color: var(--primary-color) !important;
+            color: white !important;
+        }
+        
+        /* Secondary action button */
+        .secondary-button {
+            background-color: transparent !important;
+            border: 1px solid var(--primary-color) !important;
+            color: var(--primary-color) !important;
+        }
+        
+        /* Status pills/badges with modern design */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .status-pill-icon {
+            margin-right: 6px;
+            font-size: 14px;
+        }
+        
+        .status-approved {
+            background-color: rgba(76, 175, 80, 0.15);
+            color: var(--status-approved);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        
+        .status-pending {
+            background-color: rgba(33, 150, 243, 0.15);
+            color: var(--status-pending);
+            border: 1px solid rgba(33, 150, 243, 0.3);
+        }
+        
+        .status-rejected {
+            background-color: rgba(244, 67, 54, 0.15);
+            color: var(--status-rejected);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+        
+        .status-revise {
+            background-color: rgba(255, 152, 0, 0.15);
+            color: var(--status-revise);
+            border: 1px solid rgba(255, 152, 0, 0.3);
+        }
+        
+        /* Modern data tables */
+        .styled-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px var(--shadow-color);
+            margin: 16px 0;
+        }
+        
+        .styled-table thead tr {
+            background-color: rgba(25, 118, 210, 0.1);
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        .styled-table th {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--divider-color);
+            color: var(--primary-color);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .styled-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--divider-color);
+            font-size: 14px;
+        }
+        
+        .styled-table tbody tr {
+            transition: all 0.2s ease;
+        }
+        
+        .styled-table tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .styled-table tbody tr:last-of-type td {
+            border-bottom: none;
+        }
+        
+        /* Progress bar styling */
+        .modern-progress-container {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            height: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .modern-progress-bar {
+            height: 100%;
+            border-radius: 8px;
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            transition: width 0.5s ease;
+        }
+        
+        .modern-progress-bar.success {
+            background: linear-gradient(90deg, var(--success-color) 0%, var(--secondary-light) 100%);
+        }
+        
+        .modern-progress-bar.warning {
+            background: linear-gradient(90deg, var(--warning-color) 0%, var(--accent-light) 100%);
+        }
+        
+        .modern-progress-bar.danger {
+            background: linear-gradient(90deg, var(--error-color) 0%, #f44336 100%);
+        }
+        
+        /* Activity feed styling */
+        .activity-feed {
+            margin: 20px 0;
+        }
+        
+        .activity-item {
+            display: flex;
+            margin-bottom: 16px;
+            position: relative;
+        }
+        
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(25, 118, 210, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: var(--primary-color);
+        }
+        
+        .activity-content {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--divider-color);
+        }
+        
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .activity-title {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .activity-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        /* Breadcrumb navigation */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            font-size: 14px;
+        }
+        
+        .breadcrumb-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .breadcrumb-item:not(:last-child)::after {
+            content: '›';
+            margin: 0 8px;
+            color: var(--text-secondary);
+        }
+        
+        .breadcrumb-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .breadcrumb-item a:hover {
+            color: var(--primary-light);
+            text-decoration: underline;
+        }
+        
+        .breadcrumb-item:last-child {
+            color: var(--text-secondary);
+        }
+        
+        /* Styles for data inputs */
+        input, textarea, select, .stTextInput input, .stTextArea textarea, .stSelectbox select {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid var(--divider-color) !important;
+            border-radius: 6px !important;
+            color: var(--text-primary) !important;
+            padding: 10px 14px !important;
+            transition: all 0.2s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus, 
+        .stTextInput input:focus, .stTextArea textarea:focus, .stSelectbox select:focus {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 1px var(--primary-color) !important;
+        }
+        
+        /* For light theme */
+        .light-mode {
+            /* Inverse color scheme */
+            --background-color: #f5f5f5;
+            --surface-color: #ffffff;
+            --card-bg: #ffffff;
+            --sidebar-bg: #1976d2;
+            --text-primary: rgba(0, 0, 0, 0.87);
+            --text-secondary: rgba(0, 0, 0, 0.6);
+            --text-disabled: rgba(0, 0, 0, 0.38);
+            --divider-color: rgba(0, 0, 0, 0.12);
+            --shadow-color: rgba(0, 0, 0, 0.2);
+        }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Add Material Design Icons
+    st.markdown("""
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    """, unsafe_allow_html=True)
+    
+    # Apply theme-specific class
+    if st.session_state.get('theme', 'dark') == 'light':
+        st.markdown('<style>.stApp { class="light-mode"; }</style>', unsafe_allow_html=True)
 
 def apply_theme():
     """Apply theme settings (alternative to config.toml)"""

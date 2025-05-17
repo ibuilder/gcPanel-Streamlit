@@ -87,26 +87,55 @@ def render_navigation():
         module_display_name = module_info['display_name'] if module_info else current_module.replace('_', ' ').title()
         module_icon = module_info.get('icon', 'folder') if module_info else 'folder'
         
-        # Render the navigation UI using HTML/CSS for better control
+        # Render the modern navigation UI
         st.markdown(f"""
-        <div class="nav-container">
-            <div class="breadcrumbs">
-                <a href="#" id="back-to-home"><span class="material-icons" style="font-size: 16px; vertical-align: bottom;">home</span> Home</a>
-                <span>/</span>
-                <a href="#" id="back-to-section">{section_display_name}</a>
-                <span>/</span>
-                <a href="#"><span class="material-icons" style="font-size: 16px; vertical-align: bottom;">{module_icon}</span> {module_display_name}</a>
+        <div class="card" style="margin-bottom: 20px; padding: 16px;">
+            <div class="breadcrumb">
+                <div class="breadcrumb-item">
+                    <a href="#" id="back-to-home">
+                        <span class="material-icons" style="font-size: 16px; vertical-align: bottom;">home</span> Dashboard
+                    </a>
+                </div>
+                <div class="breadcrumb-item">
+                    <a href="#" id="back-to-section">
+                        <span class="material-icons" style="font-size: 16px; vertical-align: bottom;">{category_info['icon']}</span>
+                        {section_display_name}
+                    </a>
+                </div>
+                <div class="breadcrumb-item">
+                    <span class="material-icons" style="font-size: 16px; vertical-align: bottom;">{module_icon}</span>
+                    {module_display_name}
+                </div>
             </div>
             
-            <div class="view-tabs">
-                <div class="view-tab {('active' if current_view == 'list' else '')}" id="list-view-tab">
-                    <span class="material-icons" style="font-size: 14px; vertical-align: text-top; margin-right: 3px;">view_list</span> List
-                </div>
-                <div class="view-tab {('active' if current_view == 'view' else '')}" id="detail-view-tab">
-                    <span class="material-icons" style="font-size: 14px; vertical-align: text-top; margin-right: 3px;">visibility</span> Details
-                </div>
-                <div class="view-tab {('active' if current_view == 'form' else '')}" id="form-view-tab">
-                    <span class="material-icons" style="font-size: 14px; vertical-align: text-top; margin-right: 3px;">edit</span> Form
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                <h2 style="font-size: 22px; margin: 0; font-weight: 500;">{module_display_name}</h2>
+                
+                <div style="display: flex; gap: 8px;">
+                    <div class="status-pill {('active' if current_view == 'list' else '')}" 
+                        style="background-color: {('var(--primary-color)' if current_view == 'list' else 'rgba(255, 255, 255, 0.05)')};
+                               color: {('white' if current_view == 'list' else 'var(--text-secondary)')};
+                               cursor: pointer;"
+                        id="list-view-tab">
+                        <span class="material-icons" style="font-size: 14px; margin-right: 4px;">view_list</span> 
+                        List
+                    </div>
+                    <div class="status-pill {('active' if current_view == 'view' else '')}" 
+                        style="background-color: {('var(--primary-color)' if current_view == 'view' else 'rgba(255, 255, 255, 0.05)')};
+                               color: {('white' if current_view == 'view' else 'var(--text-secondary)')};
+                               cursor: pointer;"
+                        id="detail-view-tab">
+                        <span class="material-icons" style="font-size: 14px; margin-right: 4px;">visibility</span> 
+                        Details
+                    </div>
+                    <div class="status-pill {('active' if current_view == 'form' else '')}" 
+                        style="background-color: {('var(--primary-color)' if current_view == 'form' else 'rgba(255, 255, 255, 0.05)')};
+                               color: {('white' if current_view == 'form' else 'var(--text-secondary)')};
+                               cursor: pointer;"
+                        id="form-view-tab">
+                        <span class="material-icons" style="font-size: 14px; margin-right: 4px;">edit</span> 
+                        Form
+                    </div>
                 </div>
             </div>
         </div>

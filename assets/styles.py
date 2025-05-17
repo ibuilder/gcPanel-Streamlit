@@ -17,25 +17,25 @@ def apply_styles():
             --accent-color: #f57c00;
             --accent-light: #ff9e40;
             --accent-dark: #bb4d00;
-            --background-color: #121212;
-            --surface-color: #1e1e1e;
+            --background-color: #f5f5f5;
+            --surface-color: #ffffff;
             --error-color: #d32f2f;
             --warning-color: #ffa000;
             --info-color: #0288d1;
             --success-color: #388e3c;
             
             /* Text colors */
-            --text-primary: rgba(255, 255, 255, 0.87);
-            --text-secondary: rgba(255, 255, 255, 0.6);
-            --text-disabled: rgba(255, 255, 255, 0.38);
+            --text-primary: rgba(0, 0, 0, 0.87);
+            --text-secondary: rgba(0, 0, 0, 0.6);
+            --text-disabled: rgba(0, 0, 0, 0.38);
             
             /* UI elements */
-            --card-bg: #2d2d2d;
-            --sidebar-bg: #1a1a1a;
-            --sidebar-text: rgba(255, 255, 255, 0.87);
-            --border-color: rgba(255, 255, 255, 0.12);
-            --divider-color: rgba(255, 255, 255, 0.12);
-            --shadow-color: rgba(0, 0, 0, 0.5);
+            --card-bg: #ffffff;
+            --sidebar-bg: #f0f0f0;
+            --sidebar-text: rgba(0, 0, 0, 0.87);
+            --border-color: rgba(0, 0, 0, 0.12);
+            --divider-color: rgba(0, 0, 0, 0.12);
+            --shadow-color: rgba(0, 0, 0, 0.2);
             
             /* Status colors */
             --status-approved: #4caf50;

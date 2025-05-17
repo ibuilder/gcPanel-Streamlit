@@ -45,9 +45,9 @@ if not hasattr(st.session_state, 'app_initialized'):
 # Setup theme
 def local_css():
     """Apply custom CSS for theming"""
-    # Bootswatch Superhero inspired theme
-    bg_color = "#222b3c"
-    text_color = "#e9ecef"
+    # Light theme colors by default
+    bg_color = "#ffffff"
+    text_color = "#2c3e50"
     primary_color = "#4caf50"
     secondary_color = "#2a9fd6"
     accent_color = "#26a69a"

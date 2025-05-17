@@ -69,6 +69,7 @@ def render_sidebar():
         menu_items = [
             {"label": "Dashboard", "icon": "dashboard"},
             {"label": "Project Information", "icon": "apartment"},
+            {"label": "Schedule", "icon": "calendar_today"},
             {"label": "Documents", "icon": "description"},
             {"label": "BIM", "icon": "view_in_ar"},
             {"label": "Engineering", "icon": "engineering"},

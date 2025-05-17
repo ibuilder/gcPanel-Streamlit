@@ -1,15 +1,15 @@
 """
-Breadcrumbs component for navigation.
+Custom breadcrumbs component for improved navigation.
 
 This module provides a breadcrumb trail to show the user's current location in the application.
 """
 
 import streamlit as st
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
-def breadcrumbs(items: List[Dict[str, Any]], current_page: str) -> None:
+def render_breadcrumbs(items: List[Dict[str, Any]], current_page: str) -> None:
     """
-    Display breadcrumb navigation trail.
+    Display enhanced breadcrumb navigation trail.
     
     Args:
         items: List of breadcrumb items, each with keys 'label' and 'path'
@@ -17,8 +17,10 @@ def breadcrumbs(items: List[Dict[str, Any]], current_page: str) -> None:
     """
     # Create the HTML for the breadcrumbs
     breadcrumbs_html = """
-    <nav aria-label="breadcrumb" style="margin-bottom: 20px;">
-        <ol class="breadcrumb" style="display: flex; list-style: none; padding: 0; margin: 0 0 1rem 0;">
+    <nav aria-label="breadcrumb" style="margin-bottom: 15px;">
+        <ol class="breadcrumb" style="display: flex; list-style: none; padding: 8px 15px; 
+                                    margin: 0 0 15px 0; background-color: #f8f9fa; 
+                                    border-radius: 5px; border: 1px solid #eee;">
     """
     
     # Add each breadcrumb item
@@ -29,19 +31,21 @@ def breadcrumbs(items: List[Dict[str, Any]], current_page: str) -> None:
         if is_current or is_last:
             # Current page or last item (active)
             breadcrumbs_html += f"""
-            <li class="breadcrumb-item active" style="color: #3e79f7;" aria-current="page">
+            <li class="breadcrumb-item active" style="color: #3e79f7; font-weight: 500;" aria-current="page">
                 {item.get('label')}
             </li>
             """
         else:
             # Clickable breadcrumb
             breadcrumbs_html += f"""
-            <li class="breadcrumb-item" style="margin-right: 5px; display: flex; align-items: center;">
+            <li class="breadcrumb-item" style="margin-right: 10px; display: flex; align-items: center;">
                 <a href="#" style="color: #6c757d; text-decoration: none;" 
                    onclick="parent.postMessage({{key: 'nav_to', value: '{item.get('path')}'}}, '*')">
                     {item.get('label')}
                 </a>
-                <span style="margin: 0 5px; color: #6c757d;">›</span>
+                <span style="margin: 0 5px; color: #6c757d;">
+                    <i class="material-icons" style="font-size: 16px;">chevron_right</i>
+                </span>
             </li>
             """
     

@@ -44,6 +44,8 @@ def login_component():
                         st.session_state.user = user
                         st.session_state.token = token
                         st.session_state.remember_me = remember
+                        # Set default menu to Dashboard
+                        st.session_state.menu = "Dashboard"
                         st.success(f"Welcome back, {user.full_name}!")
                         return True
                     else:

@@ -61,8 +61,8 @@ def local_css():
         }}
         /* Button styling */
         .stButton button {{
-            background-color: {primary_color} !important;
-            color: white !important;
+            background-color: {secondary_color} !important;
+            color: #ecf0f1 !important;
             border: none !important;
             border-radius: 4px !important;
             padding: 0.5rem 1rem !important;
@@ -210,7 +210,12 @@ with st.sidebar:
     # Navigation
     st.markdown("## Navigation")
     
-    menu = st.radio("", [
+    # Check if menu is in session state, if not initialize to Dashboard
+    if "menu" not in st.session_state:
+        st.session_state.menu = "Dashboard"
+        
+    # Create radio buttons for menu selection and update session state
+    selected = st.radio("", [
         "Dashboard", 
         "Projects", 
         "Engineering",
@@ -218,14 +223,19 @@ with st.sidebar:
         "Cost Management",
         "Settings",
         "Profile"
-    ])
+    ], index=["Dashboard", "Projects", "Engineering", "Field Operations", 
+              "Cost Management", "Settings", "Profile"].index(st.session_state.menu))
+    
+    # Update session state when menu selection changes
+    if selected != st.session_state.menu:
+        st.session_state.menu = selected
     
     if st.button("Logout"):
         logout()
         st.rerun()
 
 # Main content based on navigation
-if menu == "Dashboard":
+if st.session_state.menu == "Dashboard":
     st.header("Dashboard")
     st.write("Welcome to gcPanel Construction Management Dashboard")
     
@@ -268,7 +278,7 @@ if menu == "Dashboard":
     for activity in activities:
         st.markdown(f"**{activity['type']}** - {activity['project']}: {activity['description']} · {activity['time']}")
 
-elif menu == "Projects":
+elif st.session_state.menu == "Projects":
     # Project sub-navigation
     project_action = st.sidebar.radio("Project Actions", ["View Projects", "Create Project"])
     
@@ -280,7 +290,7 @@ elif menu == "Projects":
     elif project_action == "Create Project":
         project_create_component()
 
-elif menu == "Engineering":
+elif st.session_state.menu == "Engineering":
     # Engineering sub-navigation
     engineering_tab = st.sidebar.radio("Engineering Documents", ["Submittals", "RFIs"])
     

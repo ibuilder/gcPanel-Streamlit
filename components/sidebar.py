@@ -164,10 +164,9 @@ def render_sidebar():
                     module_container = st.container()
                     module_container.markdown(module_html, unsafe_allow_html=True)
                     
-                    # Handle click with a small empty button
-                    if st.button("", key=f"module_{section_name}_{module['name']}", 
-                                  help=f"Open {module['display_name']}",
-                                  style={"display": "none"}):  # Hidden button
+                    # Handle click with a small button
+                    if st.button("Select", key=f"module_{section_name}_{module['name']}", 
+                                 help=f"Open {module['display_name']}"):
                         st.session_state.current_section = section_name
                         st.session_state.current_module = module['name']
                         st.session_state.current_view = "list"  # Default to list view

@@ -1,0 +1,85 @@
+Highland Tower Development 
+{("dark_mode" if st.session_state.theme == 'light' else "light_mode")}
+{("Light" if st.session_state.theme == 'dark' else "Dark")}
+<div class="user-info">
+    <span class="material-icons" style="font-size: 18px;">account_circle</span>
+    <span style="font-size: 14px; font-weight: 500;">{st.session_state.username}</span>
+</div>
+
+<span class="material-icons" id="logout-btn" title="Logout">logout</span>
+
+gcPanel Dashboard
+Project Overview: Highland Tower Development
+Below is a summary of key metrics and recent activity for this project.
+
+Active Projects
+5
+2 in planning phase
+domain
+Open RFIs
+12
+3 urgent
+help_outline
+Pending Submittals
+8
+5 overdue
+description
+Budget Utilization
+$2.4M
+68% of total
+attach_money
+Project Progress
+Budget Progress
+0%
+68.0%
+100%
+Schedule Completion
+0%
+42.0%
+100%
+Quality Score
+0%
+92.0%
+100%
+Documentation
+0%
+78.0%
+100%
+Recent Activity
+Submittal #102 - HVAC Equipment
+Approved
+
+RFI #45 - Foundation Details
+Pending
+
+Daily Report - May 16, 2025
+Complete
+
+Change Order #8 - Site Utilities
+Revise
+
+info
+The project team meeting is scheduled for May 20, 2025 at 10:00 AM. Please prepare your progress reports.
+<span class="material-icons" style="cursor: pointer;" 
+      onclick="document.getElementById('info-box-announcement').style.display='none'">
+    close
+</span>
+
+Site Photos
+Construction Site
+
+Latest site photo - May 16, 2025
+
+Getting Started
+check_circle
+<p><strong>Welcome to gcPanel</strong> - your comprehensive construction management dashboard.</p>
+        <p>Use the sidebar navigation to access different modules:</p>
+        <ul>
+            <li><strong>Engineering:</strong> Manage RFIs, submittals, and document library</li>
+            <li><strong>Field:</strong> Daily reports and photo logs</li>
+            <li><strong>Cost:</strong> Budget tracking and change orders</li>
+            <li><strong>Contracts:</strong> Prime contract and subcontract management</li>
+        </ul>
+        <p>Select a module from the sidebar or use the quick access buttons to get started.</p>
+
+</div>

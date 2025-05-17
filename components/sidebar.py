@@ -164,8 +164,10 @@ def render_sidebar():
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # Hidden button that triggers the navigation
-                if st.button("", key=f"quick_btn_{module['section']}_{module['module']}"):
+                # Button with minimal text for navigation
+                button_container = st.container()
+                button_container.markdown('<div style="height: 0; visibility: hidden;">.</div>', unsafe_allow_html=True)
+                if button_container.button(module['label'], key=f"quick_btn_{module['section']}_{module['module']}"):
                     st.session_state.current_section = module['section']
                     st.session_state.current_module = module['module']
                     st.session_state.current_view = "list"
@@ -264,8 +266,10 @@ def render_sidebar():
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    # Hidden button for navigation
-                    if st.button("", key=f"module_btn_{category_name}_{module['name']}"):
+                    # Button for module navigation with minimal visual footprint
+                    button_container = st.container()
+                    button_container.markdown('<div style="height: 0; visibility: hidden;">.</div>', unsafe_allow_html=True)
+                    if button_container.button(module['display_name'], key=f"module_btn_{category_name}_{module['name']}"):
                         st.session_state.current_section = category_name
                         st.session_state.current_module = module['name'] 
                         st.session_state.current_view = "list"
@@ -273,8 +277,10 @@ def render_sidebar():
                 
                 st.markdown("</div>", unsafe_allow_html=True)
             
-            # Category toggle button
-            if st.button("", key=f"category_toggle_{category_name}"):
+            # Category toggle button with proper text
+            button_container = st.container()
+            button_container.markdown('<div style="height: 0; visibility: hidden;">.</div>', unsafe_allow_html=True)
+            if button_container.button(category_info['display_name'], key=f"category_toggle_{category_name}"):
                 if is_current_category:
                     # Already open, do nothing (let the module buttons work)
                     pass
@@ -286,39 +292,8 @@ def render_sidebar():
                     st.session_state.current_view = "list"
                     st.rerun()
         
-        st.markdown("---")
-        
-        # Administrator tools
-        if st.session_state.get('user_role') == 'administrator':
-            st.subheader("Administrator Tools")
-            
-            # Module upload
-            with st.expander("Upload Module"):
-                uploaded_file = st.file_uploader("Select Module ZIP file", type="zip")
-                
-                if uploaded_file is not None and st.button("Install Module"):
-                    success, message = upload_module(uploaded_file)
-                    if success:
-                        st.success(message)
-                        # Reload modules
-                        st.session_state.modules = None
-                        st.rerun()
-                    else:
-                        st.error(message)
-            
-            # User management (link to module)
-            if st.button("User Management"):
-                st.session_state.current_section = "settings"
-                st.session_state.current_module = "user_management"
-                st.session_state.current_view = "list"
-                st.rerun()
-            
-            # Database settings (link to module)
-            if st.button("Database Settings"):
-                st.session_state.current_section = "settings"
-                st.session_state.current_module = "database_settings"
-                st.session_state.current_view = "list"
-                st.rerun()
+        # End of sidebar - clean margin at the bottom
+        st.markdown('<div style="margin-top: 20px;"></div>', unsafe_allow_html=True)
         
         st.markdown("---")
         

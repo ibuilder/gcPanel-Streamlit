@@ -47,19 +47,25 @@ def render_header():
             # User info and logout - compact design
             if st.session_state.authenticated:
                 # Style for the header area
-                st.markdown("""
+                # Define variables for template
+                theme_icon = "dark_mode" if st.session_state.theme == 'light' else "light_mode"
+                theme_text = "Light" if st.session_state.theme == 'dark' else "Dark"
+                username = st.session_state.username
+                
+                # Apply styling and render with variables properly filled in
+                st.markdown(f"""
                 <style>
                 /* Compact user area */
-                .user-area {
+                .user-area {{
                     display: flex;
                     justify-content: flex-end;
                     align-items: center;
                     gap: 15px;
                     padding: 5px 0;
-                }
+                }}
                 
                 /* Theme toggle button */
-                .theme-toggle {
+                .theme-toggle {{
                     cursor: pointer;
                     display: flex;
                     align-items: center;
@@ -67,41 +73,41 @@ def render_header():
                     border-radius: 20px;
                     padding: 2px 8px;
                     font-size: 12px;
-                }
+                }}
                 
                 /* User info */
-                .user-info {
+                .user-info {{
                     display: flex;
                     align-items: center;
                     gap: 5px;
-                }
+                }}
                 
                 /* Logout button */
-                #logout-btn {
+                #logout-btn {{
                     cursor: pointer;
                     color: #f44336;
                     padding: 2px 5px;
                     font-size: 18px;
                     border-radius: 50%;
                     transition: background-color 0.3s;
-                }
+                }}
                 
-                #logout-btn:hover {
+                #logout-btn:hover {{
                     background-color: rgba(244, 67, 54, 0.1);
-                }
+                }}
                 </style>
                 
                 <div class="user-area">
                     <div class="theme-toggle" id="theme-toggle" title="Toggle light/dark theme">
                         <span class="material-icons" style="font-size: 14px; margin-right: 3px;">
-                            {("dark_mode" if st.session_state.theme == 'light' else "light_mode")}
+                            {theme_icon}
                         </span>
-                        {("Light" if st.session_state.theme == 'dark' else "Dark")}
+                        {theme_text}
                     </div>
                     
                     <div class="user-info">
                         <span class="material-icons" style="font-size: 18px;">account_circle</span>
-                        <span style="font-size: 14px; font-weight: 500;">{st.session_state.username}</span>
+                        <span style="font-size: 14px; font-weight: 500;">{username}</span>
                     </div>
                     
                     <span class="material-icons" id="logout-btn" title="Logout">logout</span>

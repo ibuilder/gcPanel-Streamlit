@@ -52,19 +52,18 @@ else:
     # Render the application components
     render_header()
     
-    # Main container for the app
+    # Main content area - streamlined layout
     with st.container():
-        # Two-column layout: sidebar and main content
-        col1, col2 = st.columns([1, 5])
-        
-        with col1:
+        # Render sidebar (using Streamlit's built-in sidebar)
+        with st.sidebar:
             render_sidebar()
         
-        with col2:
-            # Navigation bar
+        # Main content area with navigation and module content
+        with st.container():
+            # Improved navigation bar
             render_navigation()
             
-            # Render the selected module
+            # Render the selected module content
             if st.session_state.current_section and st.session_state.current_module:
                 try:
                     module_path = f"modules.{st.session_state.current_section}.{st.session_state.current_module}"

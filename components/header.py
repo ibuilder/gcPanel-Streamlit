@@ -13,95 +13,105 @@ def render_header():
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     """, unsafe_allow_html=True)
     
-    # Clean, modern header with proper alignment
+    # Modern header with improved layout and styling
     with st.container():
-        # Use 3 columns for better layout
-        col1, col2, col3 = st.columns([3, 5, 2])
+        # Add elevated header style
+        st.markdown("""
+        <style>
+        /* Header container styling */
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 5px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+        }
         
-        with col1:
-            # Clean title with project name if selected
-            if 'current_project' in st.session_state:
-                st.markdown(f"""
-                <div style="margin-top: 10px;">
-                    <h2 style="font-size: 18px; font-weight: 500; margin: 0;">
-                        <span class="material-icons" style="font-size: 18px; vertical-align: bottom; margin-right: 5px;">domain</span>
-                        {st.session_state.current_project}
-                    </h2>
-                </div>
-                """, unsafe_allow_html=True)
-            else:
-                st.markdown(f"""
-                <div style="margin-top: 10px;">
-                    <h2 style="font-size: 18px; font-weight: 500; margin: 0;">
-                        <span class="material-icons" style="font-size: 18px; vertical-align: bottom; margin-right: 5px;">dashboard</span>
-                        gcPanel Dashboard
-                    </h2>
-                </div>
-                """, unsafe_allow_html=True)
+        /* Logo and title styling */
+        .header-logo {
+            display: flex;
+            align-items: center;
+        }
         
-        with col2:
-            # Optional space for search or notifications in the future
-            pass
-            
-        with col3:
-            # User info and logout - compact design
-            if st.session_state.authenticated:
-                # Style for the header area
-                # Define variables for template
-                theme_icon = "dark_mode" if st.session_state.theme == 'light' else "light_mode"
-                theme_text = "Light" if st.session_state.theme == 'dark' else "Dark"
-                username = st.session_state.username
+        .header-logo h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-color, #ffffff);
+        }
+        
+        /* User controls area */
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        /* Theme toggle button */
+        .theme-toggle {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* User info */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+        }
+        
+        /* Logout button */
+        .logout-btn {
+            cursor: pointer;
+            color: #f44336;
+            padding: 3px;
+            font-size: 20px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logout-btn:hover {
+            background-color: rgba(244, 67, 54, 0.1);
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        # Define variables for template
+        theme_icon = "dark_mode" if st.session_state.theme == 'light' else "light_mode"
+        theme_text = "Light" if st.session_state.theme == 'dark' else "Dark"
+        project_name = st.session_state.get('current_project', 'gcPanel Dashboard')
+        project_icon = "domain" if 'current_project' in st.session_state else "dashboard"
+        username = st.session_state.get('username', '')
+        
+        # Render the header
+        if st.session_state.authenticated:
+            st.markdown(f"""
+            <div class="header-container">
+                <div class="header-logo">
+                    <span class="material-icons" style="margin-right: 10px; font-size: 24px;">{project_icon}</span>
+                    <h2>{project_name}</h2>
+                </div>
                 
-                # Apply styling and render with variables properly filled in
-                st.markdown(f"""
-                <style>
-                /* Compact user area */
-                .user-area {{
-                    display: flex;
-                    justify-content: flex-end;
-                    align-items: center;
-                    gap: 15px;
-                    padding: 5px 0;
-                }}
-                
-                /* Theme toggle button */
-                .theme-toggle {{
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    background: rgba(0,0,0,0.1);
-                    border-radius: 20px;
-                    padding: 2px 8px;
-                    font-size: 12px;
-                }}
-                
-                /* User info */
-                .user-info {{
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
-                }}
-                
-                /* Logout button */
-                #logout-btn {{
-                    cursor: pointer;
-                    color: #f44336;
-                    padding: 2px 5px;
-                    font-size: 18px;
-                    border-radius: 50%;
-                    transition: background-color 0.3s;
-                }}
-                
-                #logout-btn:hover {{
-                    background-color: rgba(244, 67, 54, 0.1);
-                }}
-                </style>
-                
-                <div class="user-area">
+                <div class="header-controls">
                     <div class="theme-toggle" id="theme-toggle" title="Toggle light/dark theme">
-                        <span class="material-icons" style="font-size: 14px; margin-right: 3px;">
-                            {theme_icon}
-                        </span>
+                        <span class="material-icons" style="font-size: 16px; margin-right: 5px;">{theme_icon}</span>
                         {theme_text}
                     </div>
                     
@@ -110,19 +120,22 @@ def render_header():
                         <span style="font-size: 14px; font-weight: 500;">{username}</span>
                     </div>
                     
-                    <span class="material-icons" id="logout-btn" title="Logout">logout</span>
+                    <div class="logout-btn" id="logout-btn" title="Logout">
+                        <span class="material-icons">logout</span>
+                    </div>
                 </div>
-                """, unsafe_allow_html=True)
-                
-                # Hidden buttons for actions
-                col_a, col_b = st.columns([1, 1])
-                with col_a:
-                    if st.button("", key="theme_toggle_btn", help="Switch between dark and light theme"):
-                        st.session_state.theme = 'light' if st.session_state.theme == 'dark' else 'dark'
-                        st.rerun()
-                with col_b:
-                    if st.button("", key="logout_btn", help="Log out from your account"):
-                        logout_user()
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Hidden buttons for actual functionality
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                if st.button("", key="theme_toggle_btn", help="Switch between dark and light theme"):
+                    st.session_state.theme = 'light' if st.session_state.theme == 'dark' else 'dark'
+                    st.rerun()
+            with col2:
+                if st.button("", key="logout_btn", help="Log out from your account"):
+                    logout_user()
     
     # Apply theme based on selection
     if st.session_state.theme == 'light':

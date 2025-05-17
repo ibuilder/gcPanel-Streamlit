@@ -233,18 +233,56 @@ def render_sidebar():
         for category_name, category_info in module_categories.items():
             is_current_category = category_name == st.session_state.get('current_section')
             
-            # Create the category header
+            # Create a button for the category that's actually clickable
+            if st.button(
+                f"{category_info['display_name']}",
+                key=f"category_btn_{category_name}",
+                use_container_width=True
+            ):
+                # Toggle the category
+                if is_current_category:
+                    # Already open, do nothing
+                    pass
+                else:
+                    # Open this category
+                    st.session_state.current_section = category_name
+                    # Select the first module by default
+                    st.session_state.current_module = category_info['modules'][0]['name']
+                    st.session_state.current_view = "list"
+                    st.rerun()
+            
+            # Apply custom styling with HTML/CSS for the category button
             st.markdown(f"""
-            <div class="module-category" style="margin-bottom: 5px; cursor: pointer;" id="category-{category_name}">
-                <div style="display: flex; align-items: center; justify-content: space-between; 
-                         padding: 8px; border-radius: 4px; background-color: {'rgba(30, 136, 229, 0.2)' if is_current_category else 'rgba(255, 255, 255, 0.05)'};">
-                    <div style="display: flex; align-items: center;">
-                        <span class="material-icons" style="margin-right: 8px;">{category_info['icon']}</span>
-                        <span style="font-weight: 500;">{category_info['display_name']}</span>
-                    </div>
-                    <span class="material-icons">{'expand_less' if is_current_category else 'expand_more'}</span>
-                </div>
-            </div>
+            <style>
+            /* Style for category button "{category_name}" */
+            div[data-testid="stButton"] button[kind="secondaryFormSubmit"][aria-label="{category_info['display_name']}"]:not(.clicked) {{
+                background-color: {'rgba(30, 136, 229, 0.2)' if is_current_category else 'rgba(100, 100, 100, 0.1)'};
+                border: none;
+                text-align: left;
+                font-weight: 500;
+                padding: 10px 12px;
+                margin: 2px 0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }}
+            
+            /* Add icon before text */
+            div[data-testid="stButton"] button[kind="secondaryFormSubmit"][aria-label="{category_info['display_name']}"]:before {{
+                font-family: "Material Icons";
+                content: "{category_info['icon']}";
+                margin-right: 10px;
+                font-size: 20px;
+            }}
+            
+            /* Add expand icon after text */
+            div[data-testid="stButton"] button[kind="secondaryFormSubmit"][aria-label="{category_info['display_name']}"]:after {{
+                font-family: "Material Icons";
+                content: "{'expand_less' if is_current_category else 'expand_more'}";
+                margin-left: 10px;
+                font-size: 20px;
+            }}
+            </style>
             """, unsafe_allow_html=True)
             
             # Display the modules for this category
@@ -257,23 +295,35 @@ def render_sidebar():
                     is_current_module = (is_current_category and 
                                          module['name'] == st.session_state.get('current_module'))
                     
-                    # Module item with material icon
-                    st.markdown(f"""
-                    <div class="module-card {('active' if is_current_module else '')}" 
-                         id="module-{category_name}-{module['name']}">
-                        <span class="material-icons module-card-icon">{module['icon']}</span>
-                        {module['display_name']}
-                    </div>
-                    """, unsafe_allow_html=True)
+                    # Single combined button with styled appearance
+                    col1, col2 = st.columns([9, 1])  # Adjust column widths as needed
                     
-                    # Button for module navigation with minimal visual footprint
-                    button_container = st.container()
-                    button_container.markdown('<div style="height: 0; visibility: hidden;">.</div>', unsafe_allow_html=True)
-                    if button_container.button(module['display_name'], key=f"module_btn_{category_name}_{module['name']}"):
-                        st.session_state.current_section = category_name
-                        st.session_state.current_module = module['name'] 
-                        st.session_state.current_view = "list"
-                        st.rerun()
+                    with col1:
+                        if st.button(
+                            f"{module['display_name']}",
+                            key=f"module_btn_{category_name}_{module['name']}",
+                            use_container_width=True
+                        ):
+                            st.session_state.current_section = category_name
+                            st.session_state.current_module = module['name'] 
+                            st.session_state.current_view = "list"
+                            st.rerun()
+                            
+                    # Apply custom styling with HTML/CSS
+                    st.markdown(f"""
+                    <style>
+                    /* Style for the module button "{module['name']}" */
+                    div[data-testid="stButton"] button[kind="secondaryFormSubmit"][aria-label="{module['display_name']}"]:not(.clicked) {{
+                        background-color: {('rgba(30, 136, 229, 0.2)' if is_current_module else 'rgba(255, 255, 255, 0.05)')};
+                        border: none;
+                        text-align: left;
+                        padding: 8px 12px;
+                        margin: 2px 0;
+                        display: flex;
+                        align-items: center;
+                    }}
+                    </style>
+                    """, unsafe_allow_html=True)
                 
                 st.markdown("</div>", unsafe_allow_html=True)
             

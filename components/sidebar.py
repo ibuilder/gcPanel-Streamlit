@@ -57,10 +57,10 @@ def render_sidebar():
         if 'menu' not in st.session_state:
             st.session_state.menu = "Dashboard"
             
-        # Main navigation items
+        # Main navigation items - single project focused
         nav_items = [
             {"id": "Dashboard", "icon": "dashboard", "label": "Dashboard"},
-            {"id": "Projects", "icon": "apartment", "label": "Projects"},
+            {"id": "Project Information", "icon": "apartment", "label": "Project Information"},
             {"id": "Engineering", "icon": "engineering", "label": "Engineering"},
             {"id": "Field Operations", "icon": "construction", "label": "Field Operations"},
             {"id": "Safety", "icon": "health_and_safety", "label": "Safety"},
@@ -68,7 +68,7 @@ def render_sidebar():
             {"id": "Cost Management", "icon": "attach_money", "label": "Cost Management"},
             {"id": "BIM", "icon": "view_in_ar", "label": "BIM"},
             {"id": "Closeout", "icon": "task_alt", "label": "Closeout"},
-            {"id": "Resources", "icon": "library_books", "label": "Resources"}
+            {"id": "Settings", "icon": "settings", "label": "Settings"}
         ]
         
         # Create navigation list

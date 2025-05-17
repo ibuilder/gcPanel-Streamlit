@@ -19,6 +19,7 @@ from modules.pdf_viewer.pdf_viewer import render_pdf_viewer
 from modules.bim_viewer.ifc_viewer import render_bim_viewer
 from modules.field_operations import render_field_operations
 from modules.scheduling import render_scheduling
+from modules.safety import render_safety
 
 # Import components
 from components.simple_breadcrumbs import simple_breadcrumbs, get_breadcrumbs_for_page
@@ -365,9 +366,7 @@ def main():
         elif current_menu == "Field Operations":
             render_field_operations()
         elif current_menu == "Safety":
-            # Add safety module rendering here
-            st.header("Safety")
-            st.info("Safety module under development")
+            render_safety()
         elif current_menu == "Contracts":
             # Add contracts module rendering here
             st.header("Contracts")

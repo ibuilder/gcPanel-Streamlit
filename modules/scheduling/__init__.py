@@ -174,24 +174,33 @@ def render_milestones():
     # Convert to the format needed for Plotly
     timeline_data = []
     for _, row in filtered_df.iterrows():
-        color = "green" if row['status'] == "Completed" else "blue" if row['status'] == "On Track" else "orange" if row['status'] == "At Risk" else "red"
+        # No need to include color in the data
         timeline_data.append(dict(
             Task=row['name'],
             Start=row['date'],
             Finish=row['date'] + timedelta(days=1),  # Make it a point by setting finish close to start
             Status=row['status'],
             Resource=row['owner'],
-            Description=row['description'],
-            color=color
+            Description=row['description']
         ))
     
     timeline_df = pd.DataFrame(timeline_data)
     
     # Create the milestone timeline chart
     if not timeline_df.empty:
+        # Define fixed colors based on status
+        colors = {
+            "Completed": "green",
+            "On Track": "blue",
+            "At Risk": "orange",
+            "Delayed": "red"
+        }
+        
+        status_colors = [colors.get(status, "blue") for status in timeline_df['Status'].tolist()]
+        
         fig = ff.create_gantt(
             timeline_df, 
-            colors=timeline_df['color'].tolist(),
+            colors=status_colors,
             index_col='Status',
             show_colorbar=True,
             group_tasks=True,

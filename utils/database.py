@@ -11,11 +11,18 @@ logging.basicConfig(level=logging.INFO)
 def initialize_db():
     """Initialize database connection and create tables if they don't exist"""
     try:
+        # Check if we're in demo mode
+        if 'demo_mode' in st.session_state and st.session_state.demo_mode:
+            logging.info("Running in demo mode - skipping database initialization")
+            return True
+            
         # Get database connection using SQLAlchemy for better compatibility with Supabase
         engine = get_sqlalchemy_engine()
         if not engine:
-            st.error("Could not connect to database. Please check your connection settings.")
-            return
+            # If database connection fails, enable demo mode
+            st.warning("⚠️ Database connection issue detected. Running in demo mode with local storage.")
+            st.session_state.demo_mode = True
+            return False
             
         # Create tables using SQLAlchemy
         with engine.connect() as conn:
@@ -89,9 +96,16 @@ def initialize_db():
             # Commit changes
             conn.commit()
         
-        st.success("Database initialized successfully")
+        logging.info("Database initialized successfully")
+        return True
     except Exception as e:
         st.error(f"Error initializing database: {str(e)}")
+        logging.error(f"Database initialization error: {str(e)}")
+        
+        # Enable demo mode on error
+        st.warning("⚠️ Database connection issue detected. Running in demo mode with local storage.")
+        st.session_state.demo_mode = True
+        return False
 
 def get_db_connection():
     """Get a connection to the database"""
@@ -174,36 +188,44 @@ def get_sqlalchemy_engine():
     if db_url.startswith('https://'):
         logging.error("Invalid database URL format - detected website URL instead of database connection string")
         st.error("Invalid database URL format. Please provide a PostgreSQL connection string.")
-        
-        # Show a form to get the correct database URL
-        with st.form("db_connection_fix_form"):
-            st.info("Please enter the PostgreSQL connection string from Supabase:")
-            st.markdown("""
-            To get the correct connection string:
-            1. Go to your Supabase project dashboard
-            2. Click on "Project Settings" in the left sidebar
-            3. Select "Database" 
-            4. Find and copy the "Connection string" in PostgreSQL format
-            """)
-            new_db_url = st.text_input("PostgreSQL Connection String:")
-            submitted = st.form_submit_button("Connect")
-            
-            if submitted and new_db_url:
-                # Update session state with the new URL
-                st.session_state.db_url = new_db_url
-                # Also update environment variable
-                os.environ['DATABASE_URL'] = new_db_url
-                st.success("Database connection established")
-                st.rerun()
+        # Fixed issue with duplicate form
         return None
     
     try:
         # Log attempt to create engine
         logging.info(f"Attempting to create SQLAlchemy engine")
         
+        # Handle special characters in password
+        from urllib.parse import quote_plus
+        
+        # Parse the connection string manually to handle @ in password
+        if '@' in db_url and 'postgres' in db_url:
+            try:
+                # Split into components
+                prefix = db_url.split('://')[0] + '://'
+                user_part = db_url.split('://')[1].split('@')[0]
+                host_part = '@' + db_url.split('://')[1].split('@', 1)[1]
+                
+                # Handle special characters in password
+                if ':' in user_part:
+                    username = user_part.split(':')[0]
+                    password = user_part.split(':', 1)[1]
+                    # URL encode the password to handle special characters
+                    encoded_password = quote_plus(password)
+                    user_part = f"{username}:{encoded_password}"
+                
+                # Reconstruct the URL
+                encoded_url = prefix + user_part + host_part
+                logging.info("Successfully encoded database URL")
+            except Exception as e:
+                logging.error(f"Error encoding database URL: {str(e)}")
+                encoded_url = db_url
+        else:
+            encoded_url = db_url
+        
         # Create engine for Supabase connection
         engine = create_engine(
-            db_url,
+            encoded_url,
             connect_args={
                 "sslmode": "require"
             }

@@ -78,42 +78,90 @@ def check_authentication():
     if st.session_state.authenticated:
         return True
     
-    st.title("gcPanel Login")
-    
-    # Create login/register tabs
-    tab1, tab2 = st.tabs(["Login", "Register"])
-    
-    with tab1:
-        with st.form("login_form"):
-            username = st.text_input("Username")
-            password = st.text_input("Password", type="password")
-            submit_button = st.form_submit_button("Login")
-            
-            if submit_button:
-                if authenticate_user(username, password):
-                    st.success("Login successful!")
+    # Check for demo mode
+    if 'demo_mode' in st.session_state and st.session_state.demo_mode:
+        st.title("gcPanel Login (Demo Mode)")
+        
+        # Demo mode message
+        st.info("⚠️ Running in demo mode with local storage. Your data will not be saved to a database.")
+        
+        # Create login/register tabs
+        tab1, tab2 = st.tabs(["Login", "Demo Login"])
+        
+        with tab1:
+            with st.form("login_form"):
+                username = st.text_input("Username")
+                password = st.text_input("Password", type="password")
+                submit_button = st.form_submit_button("Login")
+                
+                if submit_button:
+                    # In demo mode, accept any login
+                    if username and password:
+                        # Set session state for demo login
+                        st.session_state.authenticated = True
+                        st.session_state.user_id = 1
+                        st.session_state.username = username
+                        st.session_state.user_role = "administrator"
+                        st.session_state.session_token = "demo-token"
+                        
+                        st.success("Demo login successful!")
+                        st.rerun()
+                    else:
+                        st.error("Please enter username and password")
+        
+        with tab2:
+            with st.form("demo_login_form"):
+                st.write("Use quick login with demo credentials:")
+                demo_button = st.form_submit_button("Login as Admin")
+                
+                if demo_button:
+                    # Set session state for demo login
+                    st.session_state.authenticated = True
+                    st.session_state.user_id = 1
+                    st.session_state.username = "admin"
+                    st.session_state.user_role = "administrator"
+                    st.session_state.session_token = "demo-token"
+                    
+                    st.success("Demo login successful!")
                     st.rerun()
-                else:
-                    st.error("Invalid username or password")
-    
-    with tab2:
-        with st.form("register_form"):
-            new_username = st.text_input("Username")
-            new_email = st.text_input("Email")
-            new_password = st.text_input("Password", type="password")
-            confirm_password = st.text_input("Confirm Password", type="password")
-            
-            # In a real app, you'd check with an admin for role assignment
-            # For simplicity, we're defaulting new users to 'viewer'
-            register_button = st.form_submit_button("Register")
-            
-            if register_button:
-                if new_password != confirm_password:
-                    st.error("Passwords do not match")
-                elif register_user(new_username, new_email, new_password, "viewer"):
-                    st.success("Registration successful! Please login.")
-                else:
-                    st.error("Registration failed. Username or email may already be in use.")
+    else:
+        # Regular login process with database
+        st.title("gcPanel Login")
+        
+        # Create login/register tabs
+        tab1, tab2 = st.tabs(["Login", "Register"])
+        
+        with tab1:
+            with st.form("login_form"):
+                username = st.text_input("Username")
+                password = st.text_input("Password", type="password")
+                submit_button = st.form_submit_button("Login")
+                
+                if submit_button:
+                    if authenticate_user(username, password):
+                        st.success("Login successful!")
+                        st.rerun()
+                    else:
+                        st.error("Invalid username or password")
+        
+        with tab2:
+            with st.form("register_form"):
+                new_username = st.text_input("Username")
+                new_email = st.text_input("Email")
+                new_password = st.text_input("Password", type="password")
+                confirm_password = st.text_input("Confirm Password", type="password")
+                
+                # In a real app, you'd check with an admin for role assignment
+                # For simplicity, we're defaulting new users to 'viewer'
+                register_button = st.form_submit_button("Register")
+                
+                if register_button:
+                    if new_password != confirm_password:
+                        st.error("Passwords do not match")
+                    elif register_user(new_username, new_email, new_password, "viewer"):
+                        st.success("Registration successful! Please login.")
+                    else:
+                        st.error("Registration failed. Username or email may already be in use.")
     
     return False
 

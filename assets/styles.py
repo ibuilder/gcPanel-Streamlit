@@ -468,19 +468,28 @@ def apply_styles():
         }
         
         /* Button styles for dark theme */
-        .stButton button {
+        .stButton > button {
             background-color: rgba(255, 255, 255, 0.08) !important;
             color: var(--text-primary) !important;
+            border: 1px solid var(--divider-color) !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        .stButton > button:hover {
+            background-color: rgba(255, 255, 255, 0.12) !important;
+            border-color: var(--primary-color) !important;
         }
         
         /* Primary buttons */
-        .stButton [kind="primary"] {
+        .stButton > [kind="primary"] {
             background-color: var(--primary-color) !important;
             color: white !important;
+            border: none !important;
         }
         
-        .stButton [kind="primary"]:hover {
+        .stButton > [kind="primary"]:hover {
             background-color: var(--primary-light) !important;
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.4) !important;
         }
         
         /* Focus states */

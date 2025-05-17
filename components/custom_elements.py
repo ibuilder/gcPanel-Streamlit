@@ -352,7 +352,7 @@ def info_box(content, type="info", dismissible=False, key=None):
     color = colors.get(type, colors["info"])
     icon = icons.get(type, icons["info"])
     
-    # Use a more robust approach to get the background color (for dark mode compatibility)
+    # Create info box without any dismiss options to prevent raw HTML
     st.markdown(f"""
     <div id="info-box-{key}" style="
         background-color: rgba(0, 0, 0, 0.1);

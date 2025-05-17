@@ -86,7 +86,7 @@ else:
                 st.title("gcPanel Dashboard")
                 
                 # Import custom components
-                from components.custom_elements import dashboard_card, progress_bar, info_box, status_pill
+                from components.custom_elements import dashboard_card, progress_bar, info_box, status_pill, modal_dialog
                 
                 # Material Icon link for icons
                 st.markdown("""

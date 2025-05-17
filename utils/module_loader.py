@@ -29,12 +29,12 @@ def load_modules():
         for section_name, section_display_name, section_icon in sections:
             section_modules = []
             
-            # Get modules for this section
+            # Get modules for this section (using ? placeholder for SQLite)
             cursor.execute('''
                 SELECT m.name, m.display_name, m.icon
                 FROM modules m
                 JOIN sections s ON m.section_id = s.id
-                WHERE s.name = %s AND m.enabled = TRUE
+                WHERE s.name = ? AND m.enabled = 1
                 ORDER BY m.sort_order
             ''', (section_name,))
             
@@ -46,36 +46,39 @@ def load_modules():
                 module_package = importlib.import_module(module_path)
                 
                 # Check each Python file in the module directory
-                module_dir = os.path.dirname(module_package.__file__)
-                for filename in os.listdir(module_dir):
-                    if filename.endswith('.py') and not filename.startswith('__'):
-                        module_name = filename[:-3]  # Remove .py extension
-                        
-                        # Skip if module is already in database
-                        if any(m[0] == module_name for m in db_modules):
-                            continue
+                if hasattr(module_package, '__file__') and module_package.__file__ is not None:
+                    module_dir = os.path.dirname(module_package.__file__)
+                    for filename in os.listdir(module_dir):
+                        if filename.endswith('.py') and not filename.startswith('__'):
+                            module_name = filename[:-3]  # Remove .py extension
                             
-                        # Try to import module to get metadata
-                        try:
-                            module = importlib.import_module(f"{module_path}.{module_name}")
-                            display_name = getattr(module, 'MODULE_DISPLAY_NAME', module_name.replace('_', ' ').title())
-                            icon = getattr(module, 'MODULE_ICON', 'file')
-                            
-                            # Add to database
-                            cursor.execute('''
-                                INSERT INTO modules (section_id, name, display_name, icon, sort_order)
-                                SELECT id, %s, %s, %s, COALESCE(MAX(sort_order), 0) + 1
-                                FROM sections
-                                WHERE name = %s
-                                RETURNING id
-                            ''', (module_name, display_name, icon, section_name))
-                            
-                            module_id = cursor.fetchone()[0]
-                            db_modules.append((module_name, display_name, icon))
-                            
-                        except Exception as e:
-                            st.error(f"Error loading module {module_name}: {str(e)}")
-                
+                            # Skip if module is already in database
+                            if any(m[0] == module_name for m in db_modules):
+                                continue
+                                
+                            # Try to import module to get metadata
+                            try:
+                                module = importlib.import_module(f"{module_path}.{module_name}")
+                                display_name = getattr(module, 'MODULE_DISPLAY_NAME', module_name.replace('_', ' ').title())
+                                icon = getattr(module, 'MODULE_ICON', 'file')
+                                
+                                # Add to database (using ? placeholder for SQLite)
+                                cursor.execute('''
+                                    INSERT INTO modules (section_id, name, display_name, icon, sort_order)
+                                    SELECT id, ?, ?, ?, COALESCE(MAX(sort_order), 0) + 1
+                                    FROM sections
+                                    WHERE name = ?
+                                ''', (module_name, display_name, icon, section_name))
+                                
+                                # Get the last inserted row id
+                                module_id = cursor.lastrowid
+                                if isinstance(db_modules, list):
+                                    db_modules.append((module_name, display_name, icon))
+                                else:
+                                    db_modules = list(db_modules)
+                                    db_modules.append((module_name, display_name, icon))
+                            except Exception as e:
+                                st.error(f"Error loading module {module_name}: {str(e)}")
             except ModuleNotFoundError:
                 # Section directory doesn't exist, create it
                 os.makedirs(f"modules/{section_name}", exist_ok=True)

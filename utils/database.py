@@ -1,11 +1,19 @@
 import streamlit as st
 import os
-import psycopg2
-from sqlalchemy import create_engine, text
+import sqlite3
 import logging
+from sqlalchemy import create_engine, text
+from pathlib import Path
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
+
+# Create data directory if it doesn't exist
+data_dir = Path('data')
+data_dir.mkdir(exist_ok=True)
+
+# Set SQLite database path
+SQLITE_DB_PATH = 'data/gcpanel.db'
 
 # Define database setup function
 def initialize_db():
@@ -26,10 +34,10 @@ def initialize_db():
             
         # Create tables using SQLAlchemy
         with engine.connect() as conn:
-            # Project table
+            # Project table (using SQLite syntax)
             conn.execute(text('''
                 CREATE TABLE IF NOT EXISTS projects (
-                    id SERIAL PRIMARY KEY,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name VARCHAR(255) NOT NULL,
                     description TEXT,
                     start_date DATE,
@@ -40,10 +48,10 @@ def initialize_db():
                 )
             '''))
             
-            # Sections table
+            # Sections table (using SQLite syntax)
             conn.execute(text('''
                 CREATE TABLE IF NOT EXISTS sections (
-                    id SERIAL PRIMARY KEY,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name VARCHAR(100) NOT NULL,
                     display_name VARCHAR(100) NOT NULL,
                     icon VARCHAR(50),
@@ -79,16 +87,68 @@ def initialize_db():
                         {"name": section[0], "display_name": section[1], "icon": section[2], "sort_order": section[3]}
                     )
             
-            # Modules table
+            # Modules table (using SQLite syntax)
             conn.execute(text('''
                 CREATE TABLE IF NOT EXISTS modules (
-                    id SERIAL PRIMARY KEY,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
                     section_id INTEGER REFERENCES sections(id),
                     name VARCHAR(100) NOT NULL,
                     display_name VARCHAR(100) NOT NULL,
                     icon VARCHAR(50),
                     sort_order INTEGER,
                     enabled BOOLEAN DEFAULT TRUE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            '''))
+            
+            # Users table (using SQLite syntax)
+            conn.execute(text('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username VARCHAR(100) UNIQUE NOT NULL,
+                    email VARCHAR(100) UNIQUE NOT NULL,
+                    password_hash VARCHAR(255) NOT NULL,
+                    role VARCHAR(50) NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    last_login TIMESTAMP
+                )
+            '''))
+            
+            # Sessions table (using SQLite syntax)
+            conn.execute(text('''
+                CREATE TABLE IF NOT EXISTS sessions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER REFERENCES users(id),
+                    session_token VARCHAR(255) UNIQUE NOT NULL,
+                    expires_at TIMESTAMP NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            '''))
+            
+            # Bid packages table (using SQLite syntax)
+            conn.execute(text('''
+                CREATE TABLE IF NOT EXISTS bid_packages (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name VARCHAR(100) NOT NULL,
+                    description TEXT,
+                    issue_date DATE,
+                    due_date DATE,
+                    project_id INTEGER REFERENCES projects(id),
+                    status VARCHAR(50),
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            '''))
+            
+            # Qualified bidders table (using SQLite syntax)
+            conn.execute(text('''
+                CREATE TABLE IF NOT EXISTS qualified_bidders (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    company_name VARCHAR(100) NOT NULL,
+                    contact_name VARCHAR(100) NOT NULL,
+                    email VARCHAR(100),
+                    phone VARCHAR(50),
+                    specialty VARCHAR(100),
+                    qualification_status VARCHAR(50),
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             '''))
@@ -108,44 +168,19 @@ def initialize_db():
         return False
 
 def get_db_connection():
-    """Get a connection to the database"""
-    # Load database URL from environment or session state
-    db_url = os.environ.get('DATABASE_URL')
-    
-    # First try environment variable
-    if db_url:
-        st.session_state.db_url = db_url
-        # Log the URL for debugging (masked password)
-        try:
-            parts = db_url.split('@')
-            if len(parts) > 1:
-                masked_url = parts[0].split(':')[0] + ':****@' + parts[1]
-                logging.info(f"Using database URL: {masked_url}")
-        except Exception:
-            logging.info("Using database URL from environment (masked)")
-    # Then try session state
-    else:
-        db_url = st.session_state.get('db_url')
-    
-    if not db_url:
-        # If no connection string is available, show a form to collect it
-        st.warning("Database connection not configured")
-        with st.form("db_connection_form"):
-            new_db_url = st.text_input("Enter Supabase Database Connection URL:")
-            submitted = st.form_submit_button("Connect")
-            
-            if submitted and new_db_url:
-                st.session_state.db_url = new_db_url
-                st.success("Database connection established")
-                st.rerun()
+    """Get a connection to the local SQLite database"""
+    # Check if in demo mode
+    if 'demo_mode' in st.session_state and st.session_state.demo_mode:
+        logging.info("In demo mode - using local storage instead of database connection")
         return None
     
-    # Connect to the database
+    # Connect to the SQLite database
     try:
-        # Create SQLAlchemy engine and use that for better compatibility
+        # Get SQLAlchemy engine for SQLite
         engine = get_sqlalchemy_engine()
         if not engine:
-            st.error("Could not create database engine")
+            st.error("Could not create SQLite database engine")
+            st.session_state.demo_mode = True
             return None
             
         # Use SQLAlchemy to get a connection
@@ -153,107 +188,39 @@ def get_db_connection():
         
         # Log success 
         st.session_state.db_connected = True
-        logging.info("Database connection successful")
+        logging.info("SQLite database connection successful")
         return conn
     except Exception as e:
-        st.error(f"Error connecting to database: {str(e)}")
-        logging.error(f"Database connection error: {str(e)}")
-        # Clear the connection string if it's invalid
-        if 'db_url' in st.session_state:
-            del st.session_state.db_url
+        logging.error(f"SQLite database connection error: {str(e)}")
+        # Enable demo mode on error
+        st.session_state.demo_mode = True
         return None
 
 def get_sqlalchemy_engine():
-    """Get a SQLAlchemy engine for the database"""
-    # Try using DATABASE_URL from environment first
-    db_url = os.environ.get('DATABASE_URL')
-    if not db_url:
-        # Fall back to session state
-        db_url = st.session_state.get('db_url')
-    
-    if not db_url:
-        # Create a form to collect the database URL
-        st.warning("Database connection not configured")
-        with st.form("db_connection_form"):
-            new_db_url = st.text_input("Enter Supabase Database Connection URL:")
-            submitted = st.form_submit_button("Connect")
-            
-            if submitted and new_db_url:
-                st.session_state.db_url = new_db_url
-                st.success("Database connection established")
-                st.rerun()
-        return None
-    
-    # Don't use the SUPABASE_URL for database connections
-    if db_url.startswith('https://'):
-        logging.error("Invalid database URL format - detected website URL instead of database connection string")
-        st.error("Invalid database URL format. Please provide a PostgreSQL connection string.")
-        # Fixed issue with duplicate form
-        return None
-    
+    """Get a SQLAlchemy engine for the local SQLite database"""
     try:
-        # Log attempt to create engine
-        logging.info(f"Attempting to create SQLAlchemy engine")
+        # Create a SQLite database URL
+        sqlite_url = f"sqlite:///{SQLITE_DB_PATH}"
         
-        # Handle special characters in password
-        from urllib.parse import quote_plus
+        # Log the database connection
+        logging.info(f"Connecting to local SQLite database: {SQLITE_DB_PATH}")
         
-        # Parse the connection string manually to handle @ in password
-        if '@' in db_url and 'postgres' in db_url:
-            try:
-                # Split into components
-                prefix = db_url.split('://')[0] + '://'
-                user_part = db_url.split('://')[1].split('@')[0]
-                host_part = '@' + db_url.split('://')[1].split('@', 1)[1]
-                
-                # Handle special characters in password
-                if ':' in user_part:
-                    username = user_part.split(':')[0]
-                    password = user_part.split(':', 1)[1]
-                    # URL encode the password to handle special characters
-                    encoded_password = quote_plus(password)
-                    user_part = f"{username}:{encoded_password}"
-                
-                # Reconstruct the URL
-                encoded_url = prefix + user_part + host_part
-                logging.info("Successfully encoded database URL")
-            except Exception as e:
-                logging.error(f"Error encoding database URL: {str(e)}")
-                encoded_url = db_url
-        else:
-            encoded_url = db_url
-        
-        # Create engine for Supabase connection
-        engine = create_engine(
-            encoded_url,
-            connect_args={
-                "sslmode": "require"
-            }
-        )
+        # Create SQLAlchemy engine for SQLite
+        engine = create_engine(sqlite_url)
         
         # Test connection
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
             
-        logging.info("SQLAlchemy engine created successfully")
+        # Store connection info in session state
+        st.session_state.db_url = sqlite_url
+        
+        logging.info("SQLite database connection successful")
         return engine
     except Exception as e:
-        st.error(f"Error creating SQLAlchemy engine: {str(e)}")
-        logging.error(f"SQLAlchemy engine error: {str(e)}")
+        st.error(f"Error connecting to SQLite database: {str(e)}")
+        logging.error(f"SQLite database error: {str(e)}")
         
-        # Show a form to get the correct database URL
-        with st.form("db_connection_error_form"):
-            st.error(f"Database connection error: {str(e)}")
-            st.info("Please enter the correct PostgreSQL connection string from Supabase:")
-            new_db_url = st.text_input("PostgreSQL Connection String:")
-            submitted = st.form_submit_button("Connect")
-            
-            if submitted and new_db_url:
-                # Update session state with the new URL
-                st.session_state.db_url = new_db_url
-                # Also update environment variable
-                os.environ['DATABASE_URL'] = new_db_url
-                st.success("Database connection established")
-                st.rerun()
-        
+        # Enable demo mode on error
+        st.session_state.demo_mode = True
         return None

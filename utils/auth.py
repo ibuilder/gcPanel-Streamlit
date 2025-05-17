@@ -17,7 +17,7 @@ ROLE_PERMISSIONS = {
 def initialize_auth():
     """Initialize authentication tables in the database"""
     try:
-        # Use SQLAlchemy for better compatibility with Supabase
+        # Use SQLAlchemy for better compatibility with SQLite
         engine = get_sqlalchemy_engine()
         if not engine:
             st.error("Could not connect to database. Please check your connection settings.")
@@ -26,10 +26,10 @@ def initialize_auth():
         
         # Use SQLAlchemy to create tables and manage data
         with engine.connect() as conn:
-            # Create users table if it doesn't exist
+            # Create users table if it doesn't exist (using SQLite syntax)
             conn.execute(text('''
                 CREATE TABLE IF NOT EXISTS users (
-                    id SERIAL PRIMARY KEY,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
                     username VARCHAR(100) UNIQUE NOT NULL,
                     email VARCHAR(100) UNIQUE NOT NULL,
                     password_hash VARCHAR(255) NOT NULL,
@@ -39,10 +39,10 @@ def initialize_auth():
                 )
             '''))
             
-            # Create sessions table if it doesn't exist
+            # Create sessions table if it doesn't exist (using SQLite syntax)
             conn.execute(text('''
                 CREATE TABLE IF NOT EXISTS sessions (
-                    id SERIAL PRIMARY KEY,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_id INTEGER REFERENCES users(id),
                     session_token VARCHAR(255) UNIQUE NOT NULL,
                     expires_at TIMESTAMP NOT NULL,

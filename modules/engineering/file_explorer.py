@@ -18,10 +18,10 @@ def init_database():
             
         cursor = conn.cursor()
         
-        # Create folders table
+        # Create folders table (using SQLite syntax)
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS file_folders (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 parent_id INTEGER REFERENCES file_folders(id),
                 name VARCHAR(255) NOT NULL,
                 path VARCHAR(255) NOT NULL,
@@ -31,10 +31,10 @@ def init_database():
             )
         ''')
         
-        # Create files table
+        # Create files table (using SQLite syntax)
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS file_items (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 folder_id INTEGER REFERENCES file_folders(id),
                 name VARCHAR(255) NOT NULL,
                 file_type VARCHAR(50),
@@ -50,7 +50,7 @@ def init_database():
         cursor.execute("SELECT COUNT(*) FROM file_folders WHERE parent_id IS NULL")
         if cursor.fetchone()[0] == 0:
             cursor.execute(
-                "INSERT INTO file_folders (name, path, created_by) VALUES ('Root', '/', %s)",
+                "INSERT INTO file_folders (name, path, created_by) VALUES ('Root', '/', ?)",
                 (st.session_state.get('user_id'),)
             )
         

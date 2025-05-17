@@ -122,10 +122,32 @@ def get_user_by_token(token: str) -> User:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         user_id = int(payload.get("sub"))
         
-        # Get user from database
+        # Get user from database with eager loading of roles
+        from sqlalchemy.orm import joinedload
         with get_db_session() as db:
-            user = db.query(User).filter(User.id == user_id).first()
-            return user
+            user = db.query(User).options(joinedload(User.roles)).filter(User.id == user_id).first()
+            
+            if user:
+                # Create a detached copy of the user with roles already loaded
+                # to prevent DetachedInstanceError when accessing roles outside of the session
+                user_copy = User(
+                    id=user.id,
+                    username=user.username,
+                    email=user.email,
+                    password_hash=user.password_hash,
+                    first_name=user.first_name,
+                    last_name=user.last_name,
+                    status=user.status,
+                    created_at=user.created_at,
+                    updated_at=user.updated_at,
+                    is_active=user.is_active
+                )
+                
+                # Manually set roles (already loaded by joinedload)
+                user_copy._roles = list(user.roles)
+                
+                return user_copy
+            return None
     except jwt.PyJWTError as e:
         logger.warning(f"Invalid token: {str(e)}")
         return None

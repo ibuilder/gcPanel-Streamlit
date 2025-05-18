@@ -119,7 +119,7 @@ def main():
     # Main content area
     with st.container():
         # Get current menu selection
-        current_menu = st.session_state.get("menu", "Dashboard")
+        current_menu = st.session_state.get("current_menu", "Dashboard")
         
         # Get breadcrumbs for current page
         breadcrumb_items = get_breadcrumbs_for_page(current_menu)

@@ -370,8 +370,10 @@ def render_punch_list():
     
     # Add punch list item button
     st.divider()
-    if st.button("Add Punch List Item", type="primary", key="add_punch_btn"):
-        st.session_state.show_punch_form = True
+    col1, col2, col3 = st.columns([1, 3, 1])
+    with col1:
+        if st.button("Add Punch List Item", type="primary", key="add_punch_btn"):
+            st.session_state.show_punch_form = True
     
     # Punch list item form
     if st.session_state.get("show_punch_form", False):

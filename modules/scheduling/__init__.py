@@ -539,7 +539,7 @@ def render_gantt_chart():
         new_progress = st.slider("Progress (%)", 0.0, 100.0, current_progress, 5.0, key="update_task_progress")
     
     # Update button
-    if st.button("Update Progress", type="primary", key="update_progress_btn"):
+    if st.button("Update Progress", type="primary", key="update_gantt_progress_btn"):
         st.success(f"Task '{selected_task}' progress updated to {new_progress}%")
         st.rerun()
 

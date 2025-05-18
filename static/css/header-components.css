@@ -13,17 +13,46 @@ header {
     visibility: hidden;
 }
 
-/* Remove top spacing */
+/* Remove top spacing - more aggressive approach */
 .stApp {
-    margin-top: -80px !important;
+    margin-top: -120px !important;
 }
 
 div.appview-container {
-    margin-top: -80px !important;
+    margin-top: -120px !important;
 }
 
 section[data-testid="stSidebar"] {
-    margin-top: -80px !important;
+    margin-top: -120px !important;
+}
+
+/* Additional selectors to remove top space */
+.st-emotion-cache-ffhzg2 {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+.st-emotion-cache-1v0mbdj > span:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    height: 0 !important;
+}
+
+/* Target the empty space at the top */
+.st-emotion-cache-uf99v8 {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    height: 0 !important;
+}
+
+/* Hide any top elements that might be causing the space */
+[data-testid="stDecoration"], 
+[data-testid="stToolbar"],
+.st-emotion-cache-7ym5gk {
+    display: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    visibility: hidden !important;
 }
 
 /* Logo and project info container */

@@ -289,21 +289,29 @@ def create_sample_schedule_chart():
         yaxis=dict(title='Completion (%)', range=[0, 100])
     )
     
-    # Add vertical line for today
-    fig.add_shape(
-        type="line",
-        x0=date_strings[3], x1=date_strings[3],
-        y0=0, y1=100,
-        line=dict(color="#DB4437", width=2, dash="dash"),
+    # Add vertical line for today using update_layout with shapes
+    fig.update_layout(
+        shapes=[
+            dict(
+                type="line",
+                x0=date_strings[3], x1=date_strings[3],
+                y0=0, y1=100,
+                line=dict(color="#DB4437", width=2, dash="dash"),
+            )
+        ]
     )
     
-    # Add "Today" annotation
-    fig.add_annotation(
-        x=date_strings[3], y=100,
-        text="Today",
-        showarrow=False,
-        yshift=10,
-        font=dict(color="#DB4437")
+    # Add "Today" annotation using update_layout with annotations
+    fig.update_layout(
+        annotations=[
+            dict(
+                x=date_strings[3], y=100,
+                text="Today",
+                showarrow=False,
+                yshift=10,
+                font=dict(color="#DB4437")
+            )
+        ]
     )
     
     return fig

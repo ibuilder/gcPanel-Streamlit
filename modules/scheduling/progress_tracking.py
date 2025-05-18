@@ -81,15 +81,18 @@ def render_milestone_progress():
             st.markdown(f"<h4 style='color:{color};text-align:center;'>{progress}%</h4>", unsafe_allow_html=True)
             
         with col3:
-            task_id = 100 + i
-            if st.button("Edit Tasks", key=f"edit_tasks_{category.replace(' ', '_')}"):
+            # Ensure i is an integer before using it in calculations
+            task_id = 100 + (i if isinstance(i, int) else 0)
+            # Create a safe key by converting category to a string and replacing spaces
+            category_key = str(category).replace(' ', '_') if category else 'unknown'
+            if st.button("Edit Tasks", key=f"edit_tasks_{category_key}"):
                 st.session_state.show_task_edit = True
                 st.session_state.edit_task_id = task_id
                 st.session_state.edit_task_category = category
                 st.rerun()
         
         # Show tasks for the first few categories
-        if i < 3:  # Only show for first three categories
+        if isinstance(i, int) and i < 3:  # Only show for first three categories
             with st.expander(f"{category} Tasks"):
                 # Generate sample tasks based on the category
                 tasks = []
@@ -144,8 +147,9 @@ def render_milestone_progress():
                     return ''
                 
                 # Display the tasks table with styled status column
+                # Using map instead of applymap (which is deprecated)
                 st.dataframe(
-                    tasks_df.style.applymap(color_status, subset=['Status']),
+                    tasks_df.style.map(color_status, subset=['Status']),
                     hide_index=True,
                     use_container_width=True
                 )

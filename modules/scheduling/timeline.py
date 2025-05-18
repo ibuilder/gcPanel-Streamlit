@@ -110,4 +110,4 @@ def render_timeline():
         return ''
     
     # Display milestones
-    st.dataframe(milestone_df.style.applymap(color_status, subset=['Status']), hide_index=True, use_container_width=True)
+    st.dataframe(milestone_df.style.map(color_status, subset=['Status']), hide_index=True, use_container_width=True)

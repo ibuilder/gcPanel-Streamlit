@@ -2,13 +2,16 @@
 Field Operations module for the gcPanel Construction Management Dashboard.
 
 This module provides field operations management features including daily reports,
-quality control, and field inspection tracking.
+quality control, field inspection tracking, and delivery tracking.
 """
 
 import streamlit as st
 import pandas as pd
-from datetime import datetime, timedelta
+import plotly.express as px
+import plotly.graph_objects as go
+from datetime import datetime, timedelta, time
 import random
+import calendar
 
 def render_field_operations():
     """Render the field operations module"""
@@ -17,7 +20,7 @@ def render_field_operations():
     st.title("Field Operations")
     
     # Tab navigation for field operations sections
-    tab1, tab2, tab3 = st.tabs(["Daily Reports", "Quality Control", "Field Inspections"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Daily Reports", "Quality Control", "Field Inspections", "Delivery Tracking"])
     
     # Daily Reports Tab
     with tab1:
@@ -30,6 +33,10 @@ def render_field_operations():
     # Field Inspections Tab
     with tab3:
         render_field_inspections()
+        
+    # Delivery Tracking Tab
+    with tab4:
+        render_delivery_tracking()
 
 def render_daily_reports():
     """Render the daily reports section"""
@@ -277,6 +284,397 @@ def render_quality_control():
                 st.success("Quality control inspection submitted successfully!")
                 st.session_state.show_qc_form = False
                 st.rerun()
+
+def render_delivery_tracking():
+    """Render the delivery tracking section, integrated with procurement items"""
+    
+    # Header with button
+    col1, col2, col3 = st.columns([2, 1, 1])
+    
+    with col1:
+        st.header("Delivery Tracking")
+    
+    with col3:
+        if st.button("Add New Delivery", type="primary", key="add_delivery_btn"):
+            st.session_state.show_delivery_form = True
+    
+    # Date filters
+    view_col1, view_col2, view_col3 = st.columns(3)
+    with view_col1:
+        view_option = st.radio(
+            "View",
+            ["Calendar", "List"],
+            horizontal=True,
+            key="delivery_view_option"
+        )
+    
+    with view_col2:
+        # For calendar view, select month/year
+        if view_option == "Calendar":
+            selected_month = st.selectbox(
+                "Month",
+                list(range(1, 13)),
+                index=datetime.now().month - 1,
+                format_func=lambda x: calendar.month_name[x],
+                key="delivery_month"
+            )
+            
+    with view_col3:
+        if view_option == "Calendar":
+            selected_year = st.selectbox(
+                "Year",
+                list(range(datetime.now().year - 1, datetime.now().year + 3)),
+                index=1,  # Default to current year
+                key="delivery_year"
+            )
+        else:
+            # For list view, select date range
+            date_range = st.selectbox(
+                "Date Range",
+                ["Today", "This Week", "This Month", "Next 30 Days", "All"],
+                key="delivery_date_range"
+            )
+    
+    # Generate sample procurement items with delivery dates
+    # In a real application, this would come from the database
+    procurement_items = generate_sample_procurement_items()
+    
+    # Filter based on selected date range for list view
+    if view_option == "List":
+        st.subheader("Upcoming Deliveries")
+        filtered_items = filter_deliveries_by_date_range(procurement_items, date_range)
+        render_delivery_list(filtered_items)
+    else:
+        # Calendar view
+        st.subheader(f"Delivery Calendar - {calendar.month_name[selected_month]} {selected_year}")
+        render_delivery_calendar(procurement_items, selected_month, selected_year)
+    
+    # Delivery statistics
+    st.divider()
+    st.subheader("Delivery Statistics")
+    
+    # Calculate statistics
+    stats_col1, stats_col2, stats_col3, stats_col4 = st.columns(4)
+    
+    with stats_col1:
+        today_deliveries = len(procurement_items[procurement_items['delivery_date'].dt.date == datetime.now().date()])
+        st.metric("Today's Deliveries", today_deliveries)
+    
+    with stats_col2:
+        # Calculate this week's deliveries
+        today = datetime.now().date()
+        week_start = today - timedelta(days=today.weekday())
+        week_end = week_start + timedelta(days=6)
+        week_mask = (procurement_items['delivery_date'].dt.date >= week_start) & (procurement_items['delivery_date'].dt.date <= week_end)
+        week_deliveries = len(procurement_items[week_mask])
+        st.metric("This Week's Deliveries", week_deliveries)
+    
+    with stats_col3:
+        on_time_count = len(procurement_items[procurement_items['status'] == 'On Schedule'])
+        total_count = len(procurement_items)
+        on_time_pct = (on_time_count / total_count * 100) if total_count > 0 else 0
+        st.metric("On-Time Delivery Rate", f"{on_time_pct:.1f}%")
+    
+    with stats_col4:
+        critical_deliveries = len(procurement_items[procurement_items['priority'] == 'Critical'])
+        st.metric("Critical Deliveries", critical_deliveries)
+    
+    # Display form for adding new delivery if button was clicked
+    if st.session_state.get("show_delivery_form", False):
+        with st.form("delivery_form"):
+            st.subheader("Add New Delivery")
+            
+            form_col1, form_col2 = st.columns(2)
+            
+            with form_col1:
+                item_name = st.text_input("Item Name", "Curtain Wall Panels")
+                supplier = st.text_input("Supplier", "Acme Glass & Aluminum")
+                quantity = st.number_input("Quantity", min_value=1, value=10)
+                unit = st.selectbox(
+                    "Unit", 
+                    ["Each", "Pallets", "Truckloads", "Cubic Yards", "Tons", "Square Feet"],
+                    key="delivery_unit"
+                )
+            
+            with form_col2:
+                delivery_date = st.date_input("Delivery Date", datetime.now() + timedelta(days=7))
+                delivery_time = st.time_input("Delivery Time", time(9, 0))
+                priority = st.selectbox(
+                    "Priority", 
+                    ["Standard", "High", "Critical"],
+                    key="delivery_priority"
+                )
+                delivery_location = st.text_input("Delivery Location", "North Loading Dock")
+            
+            notes = st.text_area("Delivery Notes", "Call site superintendent 30 minutes prior to arrival.")
+            
+            # Associated schedule task selection
+            related_tasks = ["Foundation Work", "Structural Steel", "Curtain Wall Installation", "MEP Rough-In", "Interior Finishes"]
+            associated_task = st.selectbox("Associated Schedule Task", related_tasks)
+            
+            # Form submission buttons
+            submit_col1, submit_col2 = st.columns([1, 5])
+            with submit_col1:
+                submitted = st.form_submit_button("Save Delivery")
+            with submit_col2:
+                canceled = st.form_submit_button("Cancel")
+            
+            if submitted:
+                st.success(f"Delivery for '{item_name}' scheduled for {delivery_date.strftime('%Y-%m-%d')} at {delivery_time.strftime('%H:%M')}")
+                st.session_state.show_delivery_form = False
+                st.rerun()
+            
+            if canceled:
+                st.session_state.show_delivery_form = False
+                st.rerun()
+
+def filter_deliveries_by_date_range(deliveries_df, date_range):
+    """Filter deliveries based on date range selection"""
+    today = datetime.now().date()
+    
+    if date_range == "Today":
+        return deliveries_df[deliveries_df['delivery_date'].dt.date == today]
+    
+    elif date_range == "This Week":
+        week_start = today - timedelta(days=today.weekday())
+        week_end = week_start + timedelta(days=6)
+        return deliveries_df[(deliveries_df['delivery_date'].dt.date >= week_start) & 
+                             (deliveries_df['delivery_date'].dt.date <= week_end)]
+    
+    elif date_range == "This Month":
+        month_start = today.replace(day=1)
+        if today.month == 12:
+            month_end = today.replace(year=today.year+1, month=1, day=1) - timedelta(days=1)
+        else:
+            month_end = today.replace(month=today.month+1, day=1) - timedelta(days=1)
+        return deliveries_df[(deliveries_df['delivery_date'].dt.date >= month_start) & 
+                             (deliveries_df['delivery_date'].dt.date <= month_end)]
+    
+    elif date_range == "Next 30 Days":
+        end_date = today + timedelta(days=30)
+        return deliveries_df[(deliveries_df['delivery_date'].dt.date >= today) & 
+                             (deliveries_df['delivery_date'].dt.date <= end_date)]
+    
+    # "All" option - return everything
+    return deliveries_df
+
+def render_delivery_list(deliveries_df):
+    """Render deliveries in a list view"""
+    # Sort by date
+    deliveries_df = deliveries_df.sort_values('delivery_date')
+    
+    # Group by date
+    current_date = None
+    
+    if len(deliveries_df) == 0:
+        st.info("No deliveries found for the selected period.")
+        return
+    
+    for _, row in deliveries_df.iterrows():
+        delivery_date = row['delivery_date'].date()
+        
+        # Add date header when date changes
+        if current_date != delivery_date:
+            st.write(f"### {delivery_date.strftime('%A, %B %d, %Y')}")
+            current_date = delivery_date
+        
+        # Create a card for each delivery
+        with st.expander(f"{row['delivery_time'].strftime('%H:%M')} - {row['item_name']} ({row['quantity']} {row['unit']})"):
+            col1, col2 = st.columns([3, 2])
+            
+            with col1:
+                st.markdown(f"**Item:** {row['item_name']}")
+                st.markdown(f"**Supplier:** {row['supplier']}")
+                st.markdown(f"**Quantity:** {row['quantity']} {row['unit']}")
+                st.markdown(f"**Location:** {row['delivery_location']}")
+                
+            with col2:
+                st.markdown(f"**Time:** {row['delivery_time'].strftime('%H:%M')}")
+                st.markdown(f"**Priority:** {row['priority']}")
+                st.markdown(f"**Status:** {row['status']}")
+                st.markdown(f"**Task:** {row['related_task']}")
+            
+            if row['notes']:
+                st.markdown(f"**Notes:** {row['notes']}")
+            
+            # Action buttons
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.button("Mark as Received", key=f"receive_{row['id']}")
+            with col2:
+                st.button("Reschedule", key=f"reschedule_{row['id']}")
+            with col3:
+                st.button("View Details", key=f"details_{row['id']}")
+
+def render_delivery_calendar(deliveries_df, month, year):
+    """Render deliveries in a calendar view"""
+    # Get the calendar for the selected month/year
+    cal = calendar.monthcalendar(year, month)
+    
+    # Create a datetime object for the first day of the month
+    first_day = datetime(year, month, 1)
+    
+    # Get the number of days in the month
+    _, num_days = calendar.monthrange(year, month)
+    
+    # Create containers for each day in the calendar
+    days_in_week = 7
+    for week in cal:
+        cols = st.columns(days_in_week)
+        
+        # For each day in the week
+        for i, day in enumerate(week):
+            with cols[i]:
+                if day == 0:  # Day is outside the month
+                    st.markdown("", unsafe_allow_html=True)
+                else:
+                    # Create date for this calendar day
+                    day_date = datetime(year, month, day).date()
+                    
+                    # Check if today
+                    is_today = day_date == datetime.now().date()
+                    today_style = "background-color: #e6f3ff; border-radius: 5px; padding: 5px;" if is_today else ""
+                    
+                    # Get deliveries for this day
+                    day_deliveries = deliveries_df[deliveries_df['delivery_date'].dt.date == day_date]
+                    num_deliveries = len(day_deliveries)
+                    
+                    # Display the day with the number of deliveries
+                    if num_deliveries > 0:
+                        # Show day with deliveries count
+                        header_color = "#4CAF50" if num_deliveries > 0 else "#666666"
+                        st.markdown(f"""
+                            <div style="{today_style}">
+                                <div style="font-weight: bold; margin-bottom: 5px;">
+                                    <span style="float: left;">{day}</span>
+                                    <span style="float: right; background-color: {header_color}; color: white; border-radius: 50%; width: 25px; height: 25px; text-align: center; line-height: 25px;">{num_deliveries}</span>
+                                    <div style="clear: both;"></div>
+                                </div>
+                        """, unsafe_allow_html=True)
+                        
+                        # List the deliveries for this day (limit to 3 with "more" link)
+                        display_limit = 3
+                        for i, (_, delivery) in enumerate(day_deliveries.iterrows()):
+                            if i < display_limit:
+                                priority_color = {
+                                    "Critical": "#f44336",
+                                    "High": "#ff9800",
+                                    "Standard": "#4CAF50"
+                                }.get(delivery['priority'], "#4CAF50")
+                                
+                                st.markdown(f"""
+                                    <div style="font-size: 0.8em; margin-bottom: 3px; padding: 3px; border-left: 3px solid {priority_color};">
+                                        {delivery['delivery_time'].strftime('%H:%M')} - {delivery['item_name'][:15]}...
+                                    </div>
+                                """, unsafe_allow_html=True)
+                        
+                        if num_deliveries > display_limit:
+                            st.markdown(f"""
+                                <div style="font-size: 0.8em; color: #0066cc; cursor: pointer;">
+                                    + {num_deliveries - display_limit} more
+                                </div>
+                            """, unsafe_allow_html=True)
+                        
+                        st.markdown("</div>", unsafe_allow_html=True)
+                    else:
+                        # Just show the day number
+                        st.markdown(f"""
+                            <div style="{today_style}">
+                                <div style="font-weight: bold; margin-bottom: 5px; color: #666666;">
+                                    {day}
+                                </div>
+                            </div>
+                        """, unsafe_allow_html=True)
+
+def generate_sample_procurement_items():
+    """Generate sample procurement data with delivery dates for demonstration"""
+    # Define possible values for random generation
+    item_names = [
+        "Structural Steel", "Concrete Mix", "HVAC Equipment", "Electrical Panels",
+        "Roofing Materials", "Windows", "Elevator Equipment", "Drywall", "Tiles",
+        "Plumbing Fixtures", "Light Fixtures", "Flooring", "Exterior Cladding",
+        "Security Systems", "Fire Protection Equipment", "Insulation", "Paint",
+        "Interior Doors", "Exterior Doors", "Landscaping Materials"
+    ]
+    
+    suppliers = [
+        "ABC Construction Supply", "Highland Steel Co.", "Metro Building Materials",
+        "City Electrical Supply", "Acme Glass & Metal", "Quality HVAC Systems",
+        "Eagle Lumber", "Pro Interiors", "GlobalTech Systems", "Premium Fixtures Inc."
+    ]
+    
+    locations = [
+        "North Loading Dock", "South Entrance", "East Delivery Bay", 
+        "West Storage Area", "Main Entrance", "Basement Access",
+        "Tower Crane Drop Zone", "Material Storage Area A", "Material Storage Area B"
+    ]
+    
+    units = ["Each", "Pallets", "Truckloads", "Cubic Yards", "Tons", "Square Feet", "Linear Feet"]
+    
+    priorities = ["Standard", "Standard", "Standard", "High", "High", "Critical"]
+    
+    statuses = ["On Schedule", "On Schedule", "On Schedule", "Delayed", "Early"]
+    
+    tasks = [
+        "Foundation Work", "Structural Steel Erection", "Building Envelope", 
+        "MEP Rough-In", "Interior Framing", "Drywall and Finishes", 
+        "Exterior Finishes", "Site Work", "Final Inspections"
+    ]
+    
+    notes = [
+        "Call site superintendent 30 minutes prior to arrival.",
+        "Requires tower crane for unloading.",
+        "Delivery vehicle must be under 12 feet in height.",
+        "Requires escort to delivery location.",
+        "Materials to be inspected upon delivery.",
+        "Fragile materials - handle with care.",
+        "COO documentation required.",
+        "",  # Empty string for some items having no notes
+        "Delivery window: 7:00 AM - 11:00 AM only.",
+        "Weekend delivery surcharge applies."
+    ]
+    
+    # Create random dates for the next 60 days
+    start_date = datetime.now()
+    end_date = start_date + timedelta(days=60)
+    
+    # Generate sample data
+    data = []
+    for i in range(1, 51):  # 50 sample deliveries
+        # Generate random date and time
+        delivery_date = start_date + timedelta(days=random.randint(0, 60))
+        hour = random.randint(7, 16)  # Deliveries between 7 AM and 4 PM
+        minute = random.choice([0, 15, 30, 45])
+        delivery_time = time(hour, minute)
+        
+        # Random item data
+        item_name = random.choice(item_names)
+        supplier = random.choice(suppliers)
+        quantity = random.randint(1, 100)
+        unit = random.choice(units)
+        priority = random.choice(priorities)
+        status = random.choice(statuses)
+        location = random.choice(locations)
+        related_task = random.choice(tasks)
+        note = random.choice(notes)
+        
+        # Create entry
+        data.append({
+            'id': f"DEL-{2025}-{i:03d}",
+            'item_name': item_name,
+            'supplier': supplier,
+            'quantity': quantity,
+            'unit': unit,
+            'delivery_date': pd.Timestamp(delivery_date),
+            'delivery_time': delivery_time,
+            'priority': priority,
+            'status': status,
+            'delivery_location': location,
+            'related_task': related_task,
+            'notes': note
+        })
+    
+    return pd.DataFrame(data)
 
 def render_field_inspections():
     """Render the field inspections section"""

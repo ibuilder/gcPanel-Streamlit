@@ -92,17 +92,7 @@ def render_application():
         # Get breadcrumbs for current page
         breadcrumb_items = get_breadcrumbs_for_page(current_menu)
         
-        # Apply custom styling to remove white background and horizontal line
-        st.markdown("""
-        <style>
-        /* Remove white background and borders from the breadcrumbs/notifications area */
-        [data-testid="stHorizontalBlock"]:nth-of-type(2) {
-            background-color: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-        }
-        </style>
-        """, unsafe_allow_html=True)
+        # CSS is now loaded from external file (breadcrumbs.css)
         
         # Create a header row with breadcrumbs and notification center
         header_col1, header_col2 = st.columns([7, 3])

@@ -1,0 +1,46 @@
+/* Breadcrumbs and Notifications area styling */
+
+/* Remove white background and borders from the breadcrumbs/notifications area */
+[data-testid="stHorizontalBlock"]:nth-of-type(2) {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Breadcrumb styling */
+.breadcrumb-item {
+    color: #3e79f7;
+    font-weight: 500;
+}
+
+.breadcrumb-link {
+    color: #6c757d;
+    text-decoration: none;
+}
+
+.breadcrumb-separator {
+    text-align: center;
+    color: #6c757d;
+}
+
+/* Notification button styling */
+.notification-button {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.notification-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #f44336;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

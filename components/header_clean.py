@@ -11,23 +11,7 @@ def render_header():
     """
     Render a clean header with logo, project info, and right-aligned navigation.
     """
-    # Hide default Streamlit elements and remove all top spacing
-    st.markdown("""
-    <style>
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    .stApp {
-        margin-top: -80px !important;
-    }
-    div.appview-container {
-        margin-top: -80px !important;
-    }
-    section[data-testid="stSidebar"] {
-        margin-top: -80px !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+    # CSS is now loaded from external file in ui_manager.py
     
     # Menu options with icons
     menu_options = {
@@ -52,13 +36,13 @@ def render_header():
         # Logo and project info in first column
         with cols[0]:
             st.markdown("""
-            <div style="display: flex; align-items: center;">
-                <div style="margin-right: 20px;">
-                    <img src="gcpanel.png" alt="gcPanel Logo" style="max-height: 40px; width: auto;">
+            <div class="header-logo-container">
+                <div class="header-logo">
+                    <img src="gcpanel.png" alt="gcPanel Logo">
                 </div>
-                <div style="border-left: 1px solid #DADCE0; padding-left: 20px;">
-                    <p style="margin: 0; font-size: 14px; font-weight: 600; color: #5F6368;">Project</p>
-                    <p style="margin: 0; font-size: 16px; color: #3367D6; font-weight: 600;">Highland Tower Development</p>
+                <div class="header-project-info">
+                    <p class="header-project-label">Project</p>
+                    <p class="header-project-name">Highland Tower Development</p>
                 </div>
             </div>
             """, unsafe_allow_html=True)
@@ -85,5 +69,5 @@ def render_header():
     
     # Draw a separator line below the header
     st.markdown("""
-    <div style="height: 1px; background-color: #DADCE0; margin: 0 -1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05);"></div>
+    <div class="header-separator"></div>
     """, unsafe_allow_html=True)

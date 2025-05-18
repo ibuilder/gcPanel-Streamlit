@@ -1,0 +1,69 @@
+/* Header Components CSS */
+
+/* Hide default Streamlit elements */
+#MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+header {
+    visibility: hidden;
+}
+
+/* Remove top spacing */
+.stApp {
+    margin-top: -80px !important;
+}
+
+div.appview-container {
+    margin-top: -80px !important;
+}
+
+section[data-testid="stSidebar"] {
+    margin-top: -80px !important;
+}
+
+/* Logo and project info container */
+.header-logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.header-logo {
+    margin-right: 20px;
+}
+
+.header-logo img {
+    max-height: 40px;
+    width: auto;
+}
+
+.header-project-info {
+    border-left: 1px solid #DADCE0;
+    padding-left: 20px;
+}
+
+.header-project-label {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #5F6368;
+}
+
+.header-project-name {
+    margin: 0;
+    font-size: 16px;
+    color: #3367D6;
+    font-weight: 600;
+}
+
+/* Header separator line */
+.header-separator {
+    height: 1px;
+    background-color: #DADCE0;
+    margin: 0 -1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}

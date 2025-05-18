@@ -37,8 +37,8 @@ def render_header():
         with cols[0]:
             st.markdown("""
             <div class="header-logo-container">
-                <div class="header-logo">
-                    <img src="gcpanel.png" alt="gcPanel Logo">
+                <div class="header-logo text-logo">
+                    <span class="logo-text">gc<span class="logo-highlight">Panel</span></span>
                 </div>
                 <div class="header-project-info">
                     <p class="header-project-label">Project</p>

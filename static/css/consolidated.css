@@ -77,6 +77,26 @@ div[data-layout="wide"],
   width: 100%;
 }
 
+/* Text-based logo styling */
+.header-logo.text-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.header-logo .logo-text {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #2c3e50;
+  font-family: 'Inter', sans-serif;
+}
+
+.header-logo .logo-highlight {
+  color: #3e79f7;
+}
+
 /* Ensure dropdown is aligned to the right */
 div[data-testid="stSelectbox"] {
   display: flex !important;

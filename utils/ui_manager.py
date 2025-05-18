@@ -88,12 +88,85 @@ def load_html_component(file_path):
         return ""
 
 def render_notification_button():
-    """Render the notification button component."""
-    html_content = load_html_component("static/html/notification_button.html")
+    """Render the notification button component with icon only."""
+    # Add a custom icon-only notification button via HTML
+    html_content = """
+    <div class="notification-btn-container">
+        <button id="notificationBellBtn" class="notification-btn">
+            <i class="material-icons">notifications</i>
+            <div class="notification-badge">3</div>
+        </button>
+    </div>
+    
+    <style>
+    /* Hide the standard button completely */
+    button[kind="secondary"][data-testid="baseButton-secondary"] {
+        display: none !important;
+    }
+    
+    /* Style for the icon button */
+    .notification-btn-container {
+        display: flex;
+        justify-content: flex-end;
+    }
+    
+    .notification-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        position: relative;
+        padding: 8px;
+        border-radius: 50%;
+        transition: background-color 0.2s ease;
+    }
+    
+    .notification-btn:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    .notification-btn .material-icons {
+        font-size: 24px;
+        color: #3e79f7;
+    }
+    
+    .notification-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: #ff5b5b;
+        color: white;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        font-size: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    </style>
+    
+    <script>
+    // Set up click handler for notification button
+    document.addEventListener('DOMContentLoaded', function() {
+        const bellBtn = document.getElementById('notificationBellBtn');
+        if (bellBtn) {
+            bellBtn.addEventListener('click', function() {
+                // Find the hidden button and click it
+                const hiddenBtn = document.querySelector('button[kind="secondary"][data-testid="baseButton-secondary"]');
+                if (hiddenBtn) hiddenBtn.click();
+            });
+        }
+    });
+    </script>
+    """
+    
     st.markdown(html_content, unsafe_allow_html=True)
     
-    # Use a hidden button that will be triggered by JavaScript
-    return st.button("Notifications", key="show_notifications_btn")
+    # Keep the original button for functionality, but it will be hidden by CSS
+    return st.button("", key="show_notifications_btn")
 
 def set_page_config():
     """Set page configuration for the Streamlit app."""

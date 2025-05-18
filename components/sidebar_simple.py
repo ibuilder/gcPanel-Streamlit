@@ -1,66 +1,61 @@
 """
-Simplified sidebar navigation component for the gcPanel Construction Management Dashboard.
+Simple and efficient sidebar component for the gcPanel Construction Management Dashboard.
 """
 
 import streamlit as st
 
 def render_sidebar():
-    """Render the simplified sidebar navigation."""
+    """Render a simplified, efficient sidebar navigation."""
     
     with st.sidebar:
-        # Add logo and title
+        # Logo and header
         st.image("gcpanel.png", width=50)
         st.title("gcPanel")
         
-        # Project selection
+        # Project name
         st.markdown("### Project")
-        project_name = "Highland Tower Development"
-        st.markdown(f"**{project_name}**")
+        st.markdown("**Highland Tower Development**")
         
-        # Navigation
+        # Navigation section
         st.markdown("### Navigation")
         
-        # Create navigation buttons with custom styling
-        nav_style = """
-        <style>
-        div.stButton > button {
-            width: 100%;
-            text-align: left;
-            padding: 10px 15px;
-            margin: 2px 0;
-            border: none;
-            background-color: transparent;
-            color: #333;
-            font-size: 14px;
-        }
-        div.stButton > button:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-        </style>
-        """
-        st.markdown(nav_style, unsafe_allow_html=True)
+        # Simple navigation menu using radio buttons for efficiency
+        current = st.session_state.get("current_menu", "Dashboard")
         
-        # Navigation items with icons
-        nav_items = [
-            ("Dashboard", "📊 Dashboard"),
-            ("Project Information", "📋 Project Information"),
-            ("Schedule", "📅 Schedule"),
-            ("Safety", "⚠️ Safety"),
-            ("Contracts", "📝 Contracts"),
-            ("Cost Management", "💰 Cost Management"),
-            ("Engineering", "🔧 Engineering"), 
-            ("Field Operations", "🚧 Field Operations"),
-            ("Documents", "📄 Documents"),
-            ("BIM", "🏢 BIM Viewer"),
-            ("Closeout", "✅ Closeout"),
-            ("Settings", "⚙️ Settings")
-        ]
+        selected = st.radio(
+            "Navigation",
+            ["📊 Dashboard", "📋 Project Information", "📅 Schedule", 
+             "⚠️ Safety", "📝 Contracts", "💰 Cost Management", 
+             "🔧 Engineering", "🚧 Field Operations", "📄 Documents", 
+             "🏢 BIM Viewer", "✅ Closeout", "⚙️ Settings"],
+            index=["Dashboard", "Project Information", "Schedule", 
+                  "Safety", "Contracts", "Cost Management", 
+                  "Engineering", "Field Operations", "Documents", 
+                  "BIM", "Closeout", "Settings"].index(current),
+            label_visibility="collapsed"
+        )
         
-        # Create navigation buttons with icons
-        for menu_key, display_label in nav_items:
-            if st.button(display_label, key=f"nav_{menu_key.lower().replace(' ', '_')}"):
-                st.session_state.current_menu = menu_key
-                st.rerun()
+        # Map selection back to menu key
+        menu_map = {
+            "📊 Dashboard": "Dashboard",
+            "📋 Project Information": "Project Information",
+            "📅 Schedule": "Schedule",
+            "⚠️ Safety": "Safety",
+            "📝 Contracts": "Contracts",
+            "💰 Cost Management": "Cost Management",
+            "🔧 Engineering": "Engineering",
+            "🚧 Field Operations": "Field Operations",
+            "📄 Documents": "Documents",
+            "🏢 BIM Viewer": "BIM",
+            "✅ Closeout": "Closeout",
+            "⚙️ Settings": "Settings"
+        }
+        
+        # Update session state if selection changed
+        menu_key = menu_map[selected]
+        if menu_key != current:
+            st.session_state.current_menu = menu_key
+            st.rerun()
         
         # Footer
         st.markdown("---")

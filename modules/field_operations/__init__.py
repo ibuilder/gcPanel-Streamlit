@@ -34,7 +34,15 @@ def render_field_operations():
 def render_daily_reports():
     """Render the daily reports section"""
     
-    st.header("Daily Reports")
+    # Header with button
+    col1, col2, col3 = st.columns([2, 1, 1])
+    
+    with col1:
+        st.header("Daily Reports")
+    
+    with col3:
+        if st.button("Add New Daily Report", type="primary", key="add_daily_report_top"):
+            st.session_state.show_daily_report_form = True
     
     # Filters in columns
     col1, col2, col3 = st.columns(3)
@@ -116,10 +124,8 @@ def render_daily_reports():
             st.markdown(f"**Work Performed:** {row['work_performed']}")
             st.markdown(f"**Author:** {row['author']}")
     
-    # Add new report button
+    # Divider before form
     st.divider()
-    if st.button("Add New Daily Report", type="primary"):
-        st.session_state.show_daily_report_form = True
     
     # Display form if button was clicked
     if st.session_state.get("show_daily_report_form", False):
@@ -153,7 +159,15 @@ def render_daily_reports():
 def render_quality_control():
     """Render the quality control section"""
     
-    st.header("Quality Control")
+    # Header with button
+    col1, col2, col3 = st.columns([2, 1, 1])
+    
+    with col1:
+        st.header("Quality Control")
+    
+    with col3:
+        if st.button("Add New QC Inspection", type="primary", key="add_qc_inspection_top"):
+            st.session_state.show_qc_form = True
     
     # Sample data for quality control items
     qc_items = [
@@ -235,10 +249,8 @@ def render_quality_control():
     filtered_df_display = filtered_df.drop('status_priority', axis=1)
     st.dataframe(filtered_df_display, hide_index=True)
     
-    # Add new QC item button
+    # Divider before form
     st.divider()
-    if st.button("Add New QC Inspection", type="primary"):
-        st.session_state.show_qc_form = True
     
     # Display form if button was clicked
     if st.session_state.get("show_qc_form", False):

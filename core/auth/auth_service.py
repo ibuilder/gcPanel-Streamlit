@@ -17,10 +17,13 @@ from core.database.config import get_db_session
 # Set up logging
 logger = logging.getLogger(__name__)
 
-# JWT Configuration (should be moved to settings in production)
-JWT_SECRET = "your-secret-key-here"  # In production, use a secure environment variable
+# JWT Configuration
+import os
+# Get JWT secret from environment or use a default for development
+JWT_SECRET = os.environ.get("JWT_SECRET", "your-secret-key-here")
 JWT_ALGORITHM = "HS256"
-JWT_EXPIRATION_MINUTES = 60 * 24  # 24 hours
+JWT_EXPIRATION_MINUTES = 60 * 8  # 8 hours - shorter for better security
+JWT_REFRESH_EXPIRATION_DAYS = 7  # 7 days for refresh tokens
 
 def hash_password(password: str) -> str:
     """
@@ -50,62 +53,145 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     return bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
 
-def create_access_token(user_id: int, expires_delta: timedelta = None) -> str:
+def create_access_token(user_id: int, expires_delta: timedelta = None, token_type: str = "access") -> str:
     """
-    Create a JWT access token for user authentication.
+    Create a JWT token for user authentication.
     
     Args:
         user_id: User ID to encode in token
         expires_delta: Optional custom expiration time
+        token_type: Type of token ("access" or "refresh")
         
     Returns:
-        str: JWT access token
+        str: JWT token
     """
     if expires_delta is None:
-        expires_delta = timedelta(minutes=JWT_EXPIRATION_MINUTES)
+        if token_type == "refresh":
+            expires_delta = timedelta(days=JWT_REFRESH_EXPIRATION_DAYS)
+        else:
+            expires_delta = timedelta(minutes=JWT_EXPIRATION_MINUTES)
         
     expire = datetime.utcnow() + expires_delta
-    to_encode = {"sub": str(user_id), "exp": expire}
+    
+    # Add more claims for better security
+    jti = os.urandom(16).hex()  # Unique token ID
+    to_encode = {
+        "sub": str(user_id),
+        "exp": expire,
+        "iat": datetime.utcnow(),
+        "jti": jti,
+        "type": token_type
+    }
+    
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return encoded_jwt
 
-def authenticate_user(username: str, password: str) -> (User, str):
+def create_refresh_token(user_id: int) -> str:
     """
-    Authenticate a user with username and password.
+    Create a JWT refresh token for obtaining new access tokens.
     
     Args:
-        username: Username
-        password: Plain text password
+        user_id: User ID to encode in token
         
     Returns:
-        tuple: (User object if authenticated, access token) or (None, None)
+        str: JWT refresh token
+    """
+    return create_access_token(user_id, token_type="refresh")
+
+def authenticate_user(username: str, password: str, mfa_code: str = None) -> tuple:
+    """
+    Authenticate a user with username and password, with optional MFA.
+    
+    Args:
+        username: Username or email
+        password: Plain text password
+        mfa_code: Optional MFA verification code
+        
+    Returns:
+        tuple: (User, access_token, refresh_token, requires_mfa) or (None, None, None, False)
     """
     try:
         with get_db_session() as db:
-            user = db.query(User).filter(User.username == username).first()
+            # Check for user by username OR email for better UX
+            user = db.query(User).filter(
+                (User.username == username) | (User.email == username)
+            ).first()
             
             if not user:
                 logger.warning(f"Authentication failed: User {username} not found")
-                return None, None
+                return None, None, None, False
                 
             if user.status != UserStatus.ACTIVE:
                 logger.warning(f"Authentication failed: User {username} is {user.status.value}")
-                return None, None
+                return None, None, None, False
                 
+            # Verify password with constant-time comparison to prevent timing attacks
             if not verify_password(password, user.password_hash):
-                logger.warning(f"Authentication failed: Invalid password for user {username}")
-                return None, None
+                # Record failed login attempt
+                user.failed_login_attempts = (user.failed_login_attempts or 0) + 1
                 
-            # Authentication successful, create access token
+                # Lock account after too many failed attempts (configurable)
+                if user.failed_login_attempts >= 5:  # Threshold for account locking
+                    user.status = UserStatus.LOCKED
+                    user.locked_until = datetime.utcnow() + timedelta(minutes=30)  # Lock for 30 minutes
+                    logger.warning(f"User {username} account locked due to too many failed login attempts")
+                
+                db.commit()
+                logger.warning(f"Authentication failed: Invalid password for user {username}")
+                return None, None, None, False
+                
+            # Reset failed login attempts on successful password verification
+            if user.failed_login_attempts:
+                user.failed_login_attempts = 0
+                db.commit()
+            
+            # Handle MFA if enabled for user
+            if getattr(user, 'mfa_enabled', False) and not mfa_code:
+                logger.info(f"MFA required for user {username}")
+                return user, None, None, True
+                
+            # Verify MFA code if required
+            if getattr(user, 'mfa_enabled', False) and mfa_code:
+                if not verify_mfa_code(user, mfa_code):
+                    logger.warning(f"Authentication failed: Invalid MFA code for user {username}")
+                    return None, None, None, False
+            
+            # Authentication successful, create tokens
             access_token = create_access_token(user.id)
+            refresh_token = create_refresh_token(user.id)
+            
+            # Update last login time
+            user.last_login = datetime.utcnow()
+            db.commit()
+            
             logger.info(f"User {username} authenticated successfully")
-            return user, access_token
+            return user, access_token, refresh_token, False
     except SQLAlchemyError as e:
         logger.error(f"Database error during authentication: {str(e)}")
-        return None, None
+        return None, None, None, False
     except Exception as e:
         logger.error(f"Unexpected error during authentication: {str(e)}")
-        return None, None
+        return None, None, None, False
+
+def verify_mfa_code(user: User, mfa_code: str) -> bool:
+    """
+    Verify a multi-factor authentication code.
+    
+    Args:
+        user: User object
+        mfa_code: MFA verification code
+        
+    Returns:
+        bool: True if code is valid, False otherwise
+    """
+    # Placeholder for MFA verification logic
+    # In production, use a library like pyotp for TOTP implementation
+    # or integrate with external MFA providers
+    
+    # For development, we'll accept any 6-digit code
+    if mfa_code.isdigit() and len(mfa_code) == 6:
+        return True
+    return False
 
 def get_user_by_token(token: str) -> User:
     """

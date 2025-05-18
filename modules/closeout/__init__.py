@@ -12,6 +12,750 @@ import random
 import plotly.express as px
 import plotly.graph_objects as go
 
+def render_occupancy_permits():
+    """Render the occupancy permits section"""
+    
+    st.header("Occupancy Permits & Final Inspections")
+    
+    # Add button for creating new permit/inspection record
+    col1, col2, col3 = st.columns([1, 3, 1])
+    with col1:
+        if st.button("Add New Permit/Inspection", type="primary", key="add_permit_btn"):
+            st.session_state.show_permit_form = True
+    
+    # Sample permit data
+    permits = [
+        {
+            "id": "PER-2025-001",
+            "type": "Building Permit",
+            "authority": "City of Seattle Building Department",
+            "submission_date": datetime.now() - timedelta(days=90),
+            "inspection_date": datetime.now() - timedelta(days=15),
+            "status": "Approved",
+            "inspector": "John Wilson",
+            "conditions": "None",
+            "expiration_date": datetime.now() + timedelta(days=365),
+            "documents": ["Building_Permit.pdf", "Approval_Letter.pdf"],
+            "notes": "Final approval received"
+        },
+        {
+            "id": "PER-2025-002",
+            "type": "Electrical Inspection",
+            "authority": "Seattle Electrical Inspector",
+            "submission_date": datetime.now() - timedelta(days=60),
+            "inspection_date": datetime.now() - timedelta(days=10),
+            "status": "Approved with Conditions",
+            "inspector": "Sarah Johnson",
+            "conditions": "Emergency lighting needs to be recertified in 30 days",
+            "expiration_date": datetime.now() + timedelta(days=30),
+            "documents": ["Electrical_Inspection_Report.pdf"],
+            "notes": "Follow-up inspection scheduled"
+        },
+        {
+            "id": "PER-2025-003",
+            "type": "Fire Safety Inspection",
+            "authority": "Seattle Fire Department",
+            "submission_date": datetime.now() - timedelta(days=45),
+            "inspection_date": datetime.now() - timedelta(days=5),
+            "status": "Pending Corrections",
+            "inspector": "Robert Chen",
+            "conditions": "Sprinkler coverage in east stairwell needs adjustment",
+            "expiration_date": None,
+            "documents": ["Fire_Safety_Inspection_Report.pdf", "Correction_Notice.pdf"],
+            "notes": "Reinspection scheduled for next week"
+        },
+        {
+            "id": "PER-2025-004",
+            "type": "Elevator Certification",
+            "authority": "WA State Elevator Inspector",
+            "submission_date": datetime.now() - timedelta(days=30),
+            "inspection_date": datetime.now() - timedelta(days=2),
+            "status": "Scheduled",
+            "inspector": "Pending Assignment",
+            "conditions": "N/A",
+            "expiration_date": None,
+            "documents": ["Elevator_Permit_Application.pdf"],
+            "notes": "Initial inspection scheduled"
+        },
+        {
+            "id": "PER-2025-005",
+            "type": "Certificate of Occupancy",
+            "authority": "City of Seattle Building Department",
+            "submission_date": datetime.now() - timedelta(days=20),
+            "inspection_date": None,
+            "status": "Pending",
+            "inspector": "Pending Assignment",
+            "conditions": "All other inspections must be approved",
+            "expiration_date": None,
+            "documents": ["CO_Application.pdf"],
+            "notes": "Awaiting final inspections completion"
+        }
+    ]
+    
+    # Filters
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        status_filter = st.multiselect(
+            "Status",
+            ["Pending", "Scheduled", "Approved", "Approved with Conditions", "Pending Corrections", "Rejected"],
+            default=["Pending", "Scheduled", "Pending Corrections"],
+            key="permit_status_filter"
+        )
+    
+    with col2:
+        type_filter = st.multiselect(
+            "Permit Type",
+            list(set(permit["type"] for permit in permits)),
+            default=[],
+            key="permit_type_filter"
+        )
+    
+    with col3:
+        authority_filter = st.multiselect(
+            "Authority",
+            list(set(permit["authority"] for permit in permits)),
+            default=[],
+            key="permit_authority_filter"
+        )
+    
+    # Apply filters
+    filtered_permits = [permit for permit in permits if permit["status"] in status_filter]
+    
+    if type_filter:
+        filtered_permits = [permit for permit in filtered_permits if permit["type"] in type_filter]
+    
+    if authority_filter:
+        filtered_permits = [permit for permit in filtered_permits if permit["authority"] in authority_filter]
+    
+    # Permit metrics
+    metrics_col1, metrics_col2, metrics_col3, metrics_col4 = st.columns(4)
+    
+    with metrics_col1:
+        total_permits = len(permits)
+        st.metric("Total Permits", total_permits)
+    
+    with metrics_col2:
+        approved_permits = len([permit for permit in permits if permit["status"] in ["Approved", "Approved with Conditions"]])
+        approved_pct = (approved_permits / total_permits) * 100 if total_permits > 0 else 0
+        st.metric("Approved", f"{approved_permits} ({approved_pct:.1f}%)")
+    
+    with metrics_col3:
+        pending_permits = len([permit for permit in permits if permit["status"] in ["Pending", "Scheduled", "Pending Corrections"]])
+        st.metric("Pending", pending_permits)
+    
+    with metrics_col4:
+        co_status = next((permit["status"] for permit in permits if permit["type"] == "Certificate of Occupancy"), "Not Started")
+        st.metric("CO Status", co_status)
+    
+    # Permit list
+    st.subheader("Permits and Inspections")
+    
+    # Show permit list as cards
+    for permit in filtered_permits:
+        # Determine status color
+        if permit["status"] == "Approved":
+            status_color = "#28a745"  # Green
+        elif permit["status"] == "Approved with Conditions":
+            status_color = "#20c997"  # Teal
+        elif permit["status"] == "Pending":
+            status_color = "#6c757d"  # Gray
+        elif permit["status"] == "Scheduled":
+            status_color = "#17a2b8"  # Cyan
+        elif permit["status"] == "Pending Corrections":
+            status_color = "#ffc107"  # Yellow
+        else:  # Rejected
+            status_color = "#dc3545"  # Red
+        
+        # Create card
+        with st.expander(f"{permit['id']} - {permit['type']}", expanded=False):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown(f"**Authority:** {permit['authority']}")
+                st.markdown(f"**Submission Date:** {permit['submission_date'].strftime('%Y-%m-%d')}")
+                
+                if permit["inspection_date"]:
+                    st.markdown(f"**Inspection Date:** {permit['inspection_date'].strftime('%Y-%m-%d')}")
+                else:
+                    st.markdown("**Inspection Date:** Not scheduled")
+                
+                st.markdown(f"**Inspector:** {permit['inspector']}")
+            
+            with col2:
+                st.markdown(f"**Status:** <span style='color: {status_color}; font-weight: bold;'>{permit['status']}</span>", unsafe_allow_html=True)
+                
+                if permit["conditions"] and permit["conditions"] != "N/A" and permit["conditions"] != "None":
+                    st.markdown(f"**Conditions:** {permit['conditions']}")
+                
+                if permit["expiration_date"]:
+                    st.markdown(f"**Expiration Date:** {permit['expiration_date'].strftime('%Y-%m-%d')}")
+            
+            # Documents
+            if permit["documents"]:
+                st.markdown("**Documents:**")
+                for doc in permit["documents"]:
+                    st.markdown(f"- {doc}")
+            
+            # Notes
+            if permit["notes"]:
+                st.markdown(f"**Notes:** {permit['notes']}")
+            
+            # Action buttons
+            buttons_col1, buttons_col2, buttons_col3 = st.columns(3)
+            
+            with buttons_col1:
+                if permit["status"] in ["Pending", "Pending Corrections"]:
+                    st.button("Schedule Inspection", key=f"schedule_{permit['id']}")
+                elif permit["status"] == "Scheduled":
+                    st.button("Record Results", key=f"record_{permit['id']}")
+            
+            with buttons_col2:
+                st.button("Edit", key=f"edit_{permit['id']}")
+            
+            with buttons_col3:
+                st.button("Upload Document", key=f"upload_{permit['id']}")
+    
+    # Add permit form
+    if st.session_state.get("show_permit_form", False):
+        with st.form("permit_form"):
+            st.subheader("Add Permit/Inspection")
+            
+            form_col1, form_col2 = st.columns(2)
+            
+            with form_col1:
+                permit_type = st.selectbox(
+                    "Permit Type", 
+                    ["Building Permit", "Electrical Inspection", "Plumbing Inspection", 
+                     "Fire Safety Inspection", "Elevator Certification", "Certificate of Occupancy",
+                     "Mechanical Inspection", "Health Department Inspection", "Other"],
+                    key="new_permit_type"
+                )
+                
+                permit_authority = st.text_input("Authority", key="new_permit_authority")
+                permit_submission = st.date_input("Submission Date", datetime.now(), key="new_permit_submission")
+                
+                permit_inspection = st.date_input(
+                    "Inspection Date (if scheduled)", 
+                    None,
+                    key="new_permit_inspection"
+                )
+            
+            with form_col2:
+                permit_status = st.selectbox(
+                    "Status", 
+                    ["Pending", "Scheduled", "Approved", "Approved with Conditions", "Pending Corrections", "Rejected"],
+                    key="new_permit_status"
+                )
+                
+                permit_inspector = st.text_input("Inspector", key="new_permit_inspector")
+                permit_conditions = st.text_area("Conditions", key="new_permit_conditions")
+                
+                if permit_status in ["Approved", "Approved with Conditions"]:
+                    permit_expiration = st.date_input(
+                        "Expiration Date (if applicable)", 
+                        datetime.now() + timedelta(days=365),
+                        key="new_permit_expiration"
+                    )
+            
+            permit_notes = st.text_area("Notes", key="new_permit_notes")
+            
+            # Permit document upload
+            st.file_uploader("Upload Documents", accept_multiple_files=True, key="new_permit_docs")
+            
+            # Form submission
+            submit_col1, submit_col2 = st.columns([1, 5])
+            with submit_col1:
+                submit_permit = st.form_submit_button("Save")
+            with submit_col2:
+                cancel_permit = st.form_submit_button("Cancel")
+            
+            if submit_permit:
+                st.success("Permit added successfully")
+                st.session_state.show_permit_form = False
+                st.rerun()
+            
+            if cancel_permit:
+                st.session_state.show_permit_form = False
+                st.rerun()
+
+def render_owner_training():
+    """Render the owner training section"""
+    
+    st.header("Owner Training Documentation")
+    
+    # Add button for creating new training session
+    col1, col2, col3 = st.columns([1, 3, 1])
+    with col1:
+        if st.button("Add Training Session", type="primary", key="add_training_btn"):
+            st.session_state.show_training_form = True
+    
+    # Sample training sessions
+    training_sessions = [
+        {
+            "id": "TRN-2025-001",
+            "system": "HVAC Systems",
+            "trainer": "Johnson Controls",
+            "date": datetime.now() - timedelta(days=15),
+            "attendees": ["John Smith (Owner)", "Sarah Johnson (Building Manager)", "Technical Staff (3)"],
+            "location": "Mechanical Room & Conference Room A",
+            "duration": "4 hours",
+            "materials": ["HVAC_User_Manual.pdf", "Maintenance_Schedule.pdf"],
+            "videos": ["HVAC_Training_Session.mp4"],
+            "signed_off": True,
+            "notes": "Complete training provided on all HVAC systems"
+        },
+        {
+            "id": "TRN-2025-002",
+            "system": "Building Management System",
+            "trainer": "SmartBuild Technologies",
+            "date": datetime.now() - timedelta(days=10),
+            "attendees": ["Sarah Johnson (Building Manager)", "IT Staff (2)"],
+            "location": "Control Room & Online Session",
+            "duration": "8 hours",
+            "materials": ["BMS_Manual.pdf", "User_Guide.pdf", "Emergency_Procedures.pdf"],
+            "videos": ["BMS_Training_Part1.mp4", "BMS_Training_Part2.mp4"],
+            "signed_off": True,
+            "notes": "Follow-up session scheduled for advanced features"
+        },
+        {
+            "id": "TRN-2025-003",
+            "system": "Fire Alarm & Sprinkler Systems",
+            "trainer": "FireSafe Inc.",
+            "date": datetime.now() - timedelta(days=5),
+            "attendees": ["Sarah Johnson (Building Manager)", "Security Team (4)", "Maintenance Staff (2)"],
+            "location": "Throughout Building",
+            "duration": "6 hours",
+            "materials": ["Fire_Safety_Manual.pdf", "Evacuation_Procedures.pdf"],
+            "videos": ["Fire_System_Training.mp4"],
+            "signed_off": True,
+            "notes": "Complete training on all fire safety systems and procedures"
+        },
+        {
+            "id": "TRN-2025-004",
+            "system": "Elevator Systems",
+            "trainer": "Otis Elevator Co.",
+            "date": datetime.now() - timedelta(days=2),
+            "attendees": ["Maintenance Staff (3)"],
+            "location": "Elevator Machine Room",
+            "duration": "3 hours",
+            "materials": ["Elevator_Maintenance_Guide.pdf"],
+            "videos": [],
+            "signed_off": False,
+            "notes": "Basic maintenance training provided, sign-off pending documentation review"
+        },
+        {
+            "id": "TRN-2025-005",
+            "system": "Security Systems",
+            "trainer": "SecureView Systems",
+            "date": datetime.now() + timedelta(days=7),
+            "attendees": ["Security Team (4)", "Building Manager"],
+            "location": "Security Office",
+            "duration": "4 hours",
+            "materials": ["Security_System_Manual.pdf"],
+            "videos": [],
+            "signed_off": False,
+            "notes": "Session scheduled"
+        }
+    ]
+    
+    # Metrics
+    metrics_col1, metrics_col2, metrics_col3, metrics_col4 = st.columns(4)
+    
+    with metrics_col1:
+        total_sessions = len(training_sessions)
+        st.metric("Total Sessions", total_sessions)
+    
+    with metrics_col2:
+        completed_sessions = len([session for session in training_sessions if session["date"] < datetime.now()])
+        st.metric("Completed", completed_sessions)
+    
+    with metrics_col3:
+        signoff_sessions = len([session for session in training_sessions if session["signed_off"]])
+        signoff_pct = (signoff_sessions / completed_sessions) * 100 if completed_sessions > 0 else 0
+        st.metric("Signed Off", f"{signoff_sessions} ({signoff_pct:.1f}%)")
+    
+    with metrics_col4:
+        scheduled_sessions = len([session for session in training_sessions if session["date"] > datetime.now()])
+        st.metric("Scheduled", scheduled_sessions)
+    
+    # Training sessions list
+    st.subheader("Training Sessions")
+    
+    # Sort by date
+    training_sessions.sort(key=lambda x: x["date"], reverse=True)
+    
+    # Display sessions
+    for session in training_sessions:
+        # Determine status
+        if session["date"] > datetime.now():
+            status = "Scheduled"
+            status_color = "#17a2b8"  # Cyan
+        elif session["signed_off"]:
+            status = "Completed & Signed Off"
+            status_color = "#28a745"  # Green
+        else:
+            status = "Pending Sign-off"
+            status_color = "#ffc107"  # Yellow
+        
+        # Create card
+        with st.expander(f"{session['id']} - {session['system']}", expanded=False):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown(f"**Trainer:** {session['trainer']}")
+                st.markdown(f"**Date:** {session['date'].strftime('%Y-%m-%d')}")
+                st.markdown(f"**Location:** {session['location']}")
+                st.markdown(f"**Duration:** {session['duration']}")
+            
+            with col2:
+                st.markdown(f"**Status:** <span style='color: {status_color}; font-weight: bold;'>{status}</span>", unsafe_allow_html=True)
+                
+                attendees_str = ", ".join(session["attendees"])
+                st.markdown(f"**Attendees:** {attendees_str}")
+            
+            # Materials
+            if session["materials"]:
+                st.markdown("**Materials:**")
+                for material in session["materials"]:
+                    st.markdown(f"- {material}")
+            
+            # Videos
+            if session["videos"]:
+                st.markdown("**Video Recordings:**")
+                for video in session["videos"]:
+                    st.markdown(f"- {video}")
+            
+            # Notes
+            if session["notes"]:
+                st.markdown(f"**Notes:** {session['notes']}")
+            
+            # Action buttons
+            buttons_col1, buttons_col2, buttons_col3 = st.columns(3)
+            
+            with buttons_col1:
+                if session["date"] < datetime.now() and not session["signed_off"]:
+                    st.button("Sign Off Training", key=f"signoff_{session['id']}")
+            
+            with buttons_col2:
+                st.button("Edit", key=f"edit_training_{session['id']}")
+            
+            with buttons_col3:
+                if session["date"] < datetime.now():
+                    st.button("Upload Materials/Videos", key=f"upload_training_{session['id']}")
+    
+    # Add training form
+    if st.session_state.get("show_training_form", False):
+        with st.form("training_form"):
+            st.subheader("Add Training Session")
+            
+            form_col1, form_col2 = st.columns(2)
+            
+            with form_col1:
+                training_system = st.text_input("System/Equipment", key="new_training_system")
+                training_trainer = st.text_input("Trainer/Company", key="new_training_trainer")
+                training_date = st.date_input("Training Date", key="new_training_date")
+                training_duration = st.text_input("Duration", key="new_training_duration", placeholder="e.g., 4 hours")
+                training_location = st.text_input("Location", key="new_training_location")
+            
+            with form_col2:
+                training_attendees = st.text_area(
+                    "Attendees", 
+                    key="new_training_attendees",
+                    placeholder="Enter one attendee per line\nInclude role in parentheses"
+                )
+                training_notes = st.text_area("Notes", key="new_training_notes")
+                training_signoff = st.checkbox("Signed Off", key="new_training_signoff")
+            
+            # Upload materials
+            st.subheader("Upload Training Materials")
+            training_materials = st.file_uploader("Documents", accept_multiple_files=True, key="new_training_materials")
+            
+            st.subheader("Upload Training Videos")
+            training_videos = st.file_uploader("Videos", accept_multiple_files=True, key="new_training_videos", type=["mp4", "mov", "avi"])
+            
+            # Form submission
+            submit_col1, submit_col2 = st.columns([1, 5])
+            with submit_col1:
+                submit_training = st.form_submit_button("Save")
+            with submit_col2:
+                cancel_training = st.form_submit_button("Cancel")
+            
+            if submit_training:
+                st.success("Training session added successfully")
+                st.session_state.show_training_form = False
+                st.rerun()
+            
+            if cancel_training:
+                st.session_state.show_training_form = False
+                st.rerun()
+
+def render_financial_closeout():
+    """Render the financial closeout section"""
+    
+    st.header("Financial Close-out")
+    
+    # Add button for creating new financial document
+    col1, col2, col3 = st.columns([1, 3, 1])
+    with col1:
+        if st.button("Add Financial Document", type="primary", key="add_financial_btn"):
+            st.session_state.show_financial_form = True
+    
+    # Sample financial closeout data
+    financial_docs = [
+        {
+            "id": "FIN-2025-001",
+            "type": "Final Payment Application",
+            "amount": 2450000.0,
+            "date_submitted": datetime.now() - timedelta(days=30),
+            "status": "Approved",
+            "approved_by": "John Smith",
+            "approval_date": datetime.now() - timedelta(days=15),
+            "payment_date": datetime.now() - timedelta(days=7),
+            "documents": ["Final_Pay_App.pdf", "Supporting_Documentation.pdf"],
+            "notes": "Final payment approved by owner"
+        },
+        {
+            "id": "FIN-2025-002",
+            "type": "Retainage Release",
+            "amount": 912500.0,
+            "date_submitted": datetime.now() - timedelta(days=20),
+            "status": "Pending Approval",
+            "approved_by": None,
+            "approval_date": None,
+            "payment_date": None,
+            "documents": ["Retainage_Release_Request.pdf"],
+            "notes": "Awaiting owner review"
+        },
+        {
+            "id": "FIN-2025-003",
+            "type": "Final Lien Waiver - General Contractor",
+            "amount": None,
+            "date_submitted": datetime.now() - timedelta(days=15),
+            "status": "Submitted",
+            "approved_by": None,
+            "approval_date": None,
+            "payment_date": None,
+            "documents": ["GC_Final_Lien_Waiver.pdf"],
+            "notes": "Submitted with final payment application"
+        },
+        {
+            "id": "FIN-2025-004",
+            "type": "Final Lien Waiver - Electrical Sub",
+            "amount": None,
+            "date_submitted": datetime.now() - timedelta(days=14),
+            "status": "Submitted",
+            "approved_by": None,
+            "approval_date": None,
+            "payment_date": None,
+            "documents": ["Electrical_Final_Lien_Waiver.pdf"],
+            "notes": "Submitted with final payment application"
+        },
+        {
+            "id": "FIN-2025-005",
+            "type": "Final Lien Waiver - Mechanical Sub",
+            "amount": None,
+            "date_submitted": datetime.now() - timedelta(days=14),
+            "status": "Submitted",
+            "approved_by": None,
+            "approval_date": None,
+            "payment_date": None,
+            "documents": ["Mechanical_Final_Lien_Waiver.pdf"],
+            "notes": "Submitted with final payment application"
+        },
+        {
+            "id": "FIN-2025-006",
+            "type": "Final Lien Waiver - Plumbing Sub",
+            "amount": None,
+            "date_submitted": datetime.now() - timedelta(days=13),
+            "status": "Missing",
+            "approved_by": None,
+            "approval_date": None,
+            "payment_date": None,
+            "documents": [],
+            "notes": "Follow-up requested from subcontractor"
+        },
+        {
+            "id": "FIN-2025-007",
+            "type": "Consent of Surety",
+            "amount": None,
+            "date_submitted": datetime.now() - timedelta(days=10),
+            "status": "Submitted",
+            "approved_by": None,
+            "approval_date": None,
+            "payment_date": None,
+            "documents": ["Consent_of_Surety.pdf"],
+            "notes": "Bond release documentation"
+        }
+    ]
+    
+    # Filters
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        status_filter = st.multiselect(
+            "Status",
+            ["Pending", "Submitted", "Pending Approval", "Approved", "Rejected", "Missing"],
+            default=["Pending", "Submitted", "Pending Approval", "Missing"],
+            key="financial_status_filter"
+        )
+    
+    with col2:
+        type_filter = st.multiselect(
+            "Document Type",
+            list(set(doc["type"] for doc in financial_docs)),
+            default=[],
+            key="financial_type_filter"
+        )
+    
+    # Apply filters
+    filtered_docs = [doc for doc in financial_docs if doc["status"] in status_filter]
+    
+    if type_filter:
+        filtered_docs = [doc for doc in filtered_docs if doc["type"] in type_filter]
+    
+    # Financial metrics
+    metrics_col1, metrics_col2, metrics_col3, metrics_col4 = st.columns(4)
+    
+    with metrics_col1:
+        total_docs = len(financial_docs)
+        st.metric("Total Documents", total_docs)
+    
+    with metrics_col2:
+        total_payment = sum(doc["amount"] or 0 for doc in financial_docs if doc["status"] == "Approved")
+        st.metric("Total Approved", f"${total_payment:,.2f}")
+    
+    with metrics_col3:
+        lien_waivers = [doc for doc in financial_docs if "Lien Waiver" in doc["type"]]
+        missing_waivers = len([doc for doc in lien_waivers if doc["status"] == "Missing"])
+        waiver_count = f"{len(lien_waivers) - missing_waivers}/{len(lien_waivers)}"
+        st.metric("Lien Waivers Received", waiver_count)
+    
+    with metrics_col4:
+        retainage_status = next((doc["status"] for doc in financial_docs if doc["type"] == "Retainage Release"), "Not Started")
+        st.metric("Retainage Status", retainage_status)
+    
+    # Document list
+    st.subheader("Financial Documents")
+    
+    # Sort by date submitted
+    filtered_docs.sort(key=lambda x: x["date_submitted"], reverse=True)
+    
+    # Show document list
+    for doc in filtered_docs:
+        # Determine status color
+        if doc["status"] == "Approved":
+            status_color = "#28a745"  # Green
+        elif doc["status"] == "Submitted" or doc["status"] == "Pending Approval":
+            status_color = "#17a2b8"  # Cyan
+        elif doc["status"] == "Pending":
+            status_color = "#6c757d"  # Gray
+        elif doc["status"] == "Missing":
+            status_color = "#dc3545"  # Red
+        else:  # Rejected
+            status_color = "#dc3545"  # Red
+        
+        # Create card
+        with st.expander(f"{doc['id']} - {doc['type']}", expanded=False):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown(f"**Submitted Date:** {doc['date_submitted'].strftime('%Y-%m-%d')}")
+                
+                if doc["amount"] is not None:
+                    st.markdown(f"**Amount:** ${doc['amount']:,.2f}")
+                
+                if doc["approved_by"]:
+                    st.markdown(f"**Approved By:** {doc['approved_by']}")
+                
+                if doc["approval_date"]:
+                    st.markdown(f"**Approval Date:** {doc['approval_date'].strftime('%Y-%m-%d')}")
+                
+                if doc["payment_date"]:
+                    st.markdown(f"**Payment Date:** {doc['payment_date'].strftime('%Y-%m-%d')}")
+            
+            with col2:
+                st.markdown(f"**Status:** <span style='color: {status_color}; font-weight: bold;'>{doc['status']}</span>", unsafe_allow_html=True)
+                
+                # Documents
+                if doc["documents"]:
+                    st.markdown("**Documents:**")
+                    for document in doc["documents"]:
+                        st.markdown(f"- {document}")
+                else:
+                    st.markdown("**Documents:** None uploaded")
+                
+                # Notes
+                if doc["notes"]:
+                    st.markdown(f"**Notes:** {doc['notes']}")
+            
+            # Action buttons
+            buttons_col1, buttons_col2, buttons_col3 = st.columns(3)
+            
+            with buttons_col1:
+                if doc["status"] in ["Submitted", "Pending Approval"]:
+                    st.button("Approve", key=f"approve_{doc['id']}")
+                elif doc["status"] == "Missing":
+                    st.button("Upload", key=f"upload_missing_{doc['id']}")
+            
+            with buttons_col2:
+                st.button("Edit", key=f"edit_financial_{doc['id']}")
+            
+            with buttons_col3:
+                st.button("View Details", key=f"details_financial_{doc['id']}")
+    
+    # Add financial document form
+    if st.session_state.get("show_financial_form", False):
+        with st.form("financial_form"):
+            st.subheader("Add Financial Document")
+            
+            form_col1, form_col2 = st.columns(2)
+            
+            with form_col1:
+                doc_type = st.selectbox(
+                    "Document Type", 
+                    ["Final Payment Application", "Retainage Release", "Final Lien Waiver", 
+                     "Consent of Surety", "Release of Bonds", "Other"],
+                    key="new_doc_type"
+                )
+                
+                if doc_type in ["Final Payment Application", "Retainage Release"]:
+                    doc_amount = st.number_input("Amount ($)", min_value=0.0, value=0.0, key="new_doc_amount")
+                
+                doc_date = st.date_input("Submission Date", datetime.now(), key="new_doc_date")
+                doc_status = st.selectbox(
+                    "Status", 
+                    ["Pending", "Submitted", "Pending Approval", "Approved", "Rejected", "Missing"],
+                    key="new_doc_status"
+                )
+            
+            with form_col2:
+                if doc_status == "Approved":
+                    doc_approved_by = st.text_input("Approved By", key="new_doc_approved_by")
+                    doc_approval_date = st.date_input("Approval Date", datetime.now(), key="new_doc_approval_date")
+                    doc_payment_date = st.date_input("Payment Date", datetime.now(), key="new_doc_payment_date")
+                
+                doc_notes = st.text_area("Notes", key="new_doc_notes")
+            
+            # Document upload
+            st.file_uploader("Upload Documents", accept_multiple_files=True, key="new_doc_files")
+            
+            # Form submission
+            submit_col1, submit_col2 = st.columns([1, 5])
+            with submit_col1:
+                submit_doc = st.form_submit_button("Save")
+            with submit_col2:
+                cancel_doc = st.form_submit_button("Cancel")
+            
+            if submit_doc:
+                st.success("Financial document added successfully")
+                st.session_state.show_financial_form = False
+                st.rerun()
+            
+            if cancel_doc:
+                st.session_state.show_financial_form = False
+                st.rerun()
+
 def render_closeout():
     """Render the closeout module"""
     
@@ -19,22 +763,42 @@ def render_closeout():
     st.title("Project Closeout")
     
     # Tab navigation for closeout sections
-    tab1, tab2, tab3, tab4 = st.tabs(["Punch List", "Warranties", "O&M Manuals", "Final Documentation"])
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+        "Punch List", 
+        "Occupancy Permits", 
+        "Owner Training",
+        "Financial Close-out",
+        "Warranties", 
+        "O&M Manuals", 
+        "Final Documentation"
+    ])
     
     # Punch List Tab
     with tab1:
         render_punch_list()
     
-    # Warranties Tab
+    # Occupancy Permits Tab
     with tab2:
+        render_occupancy_permits()
+    
+    # Owner Training Tab
+    with tab3:
+        render_owner_training()
+    
+    # Financial Close-out Tab
+    with tab4:
+        render_financial_closeout()
+    
+    # Warranties Tab
+    with tab5:
         render_warranties()
     
     # O&M Manuals Tab
-    with tab3:
+    with tab6:
         render_om_manuals()
     
     # Final Documentation Tab
-    with tab4:
+    with tab7:
         render_final_documentation()
 
 def render_punch_list():

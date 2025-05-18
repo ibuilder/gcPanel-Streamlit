@@ -6,9 +6,11 @@ This module provides visualization and tracking of project progress by categorie
 
 import streamlit as st
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
 from datetime import datetime, timedelta
+
+# Import plotly libraries properly to avoid conflicts
+import plotly.express as px
+from plotly import graph_objects
 
 def render_milestone_progress():
     """Render the milestone progress view."""

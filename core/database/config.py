@@ -40,9 +40,17 @@ def init_db():
         if database_url.startswith("postgresql"):
             logger.info("Connecting to PostgreSQL database")
             
+            # Fix for URLs starting with 'postgres://' or 'postgresql://'
+            if database_url.startswith("postgresql://") or database_url.startswith("postgres://"):
+                # Already in the correct format for SQLAlchemy
+                fixed_url = database_url
+            else:
+                # Ensure URL is in the correct format
+                fixed_url = "postgresql://" + database_url.split("://")[-1]
+            
             # Connect to PostgreSQL
             engine = sa.create_engine(
-                database_url,
+                fixed_url,
                 pool_size=5,
                 max_overflow=10,
                 pool_timeout=30,

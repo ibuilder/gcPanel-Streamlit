@@ -224,7 +224,7 @@ def render_header_nav():
                 st.rerun()
         
         # Hidden button for notification center
-        show_notifications = st.button("Notifications", key="show_notifications_btn")
+        show_notifications = st.button("Notifications", key="header_notifications_btn")
         
         # Hide the actual button with CSS
         st.markdown("""

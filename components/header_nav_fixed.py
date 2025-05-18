@@ -195,7 +195,7 @@ def render_header_nav():
     st.markdown("""
     <div class="header-wrapper">
         <div class="gcpanel-logo">
-            <img src="static/img/gcpanel.png" alt="gcPanel Logo" width="150" onerror="this.onerror=null; this.src='gcpanel.png';">
+            <img src="gcpanel.png" alt="gcPanel Logo" style="max-height: 40px; width: auto;">
         </div>
         <div class="project-info">
             <p class="project-info-label">Project</p>

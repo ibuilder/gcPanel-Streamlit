@@ -31,8 +31,7 @@ from modules.mobile_companion import mobile_companion_page
 
 # Import components
 from components.action_buttons import render_action_buttons
-
-# Import components
+from components.action_bar import render_action_bar
 from components.simple_breadcrumbs import simple_breadcrumbs, get_breadcrumbs_for_page
 from components.header_nav_fixed import render_header_nav
 from components.notification_center import notification_center
@@ -52,7 +51,8 @@ def local_css():
         "static/css/optimized-ui.css",
         "static/css/console-fix.css",
         "static/css/buttons-fix.css",
-        "static/css/action-buttons.css"
+        "static/css/action-buttons.css",
+        "static/css/action-bar.css"
     ]
     
     for css_file in css_files:

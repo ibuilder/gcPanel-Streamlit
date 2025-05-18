@@ -2,24 +2,423 @@
 Project Scheduling module for the gcPanel Construction Management Dashboard.
 
 This module provides project scheduling features including Gantt charts,
-milestone tracking, and critical path analysis.
+milestone tracking, roadmap visualization, and resource management.
 """
 
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.figure_factory as ff
+import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import random
+
+# Initialize session state variables for this module
+def initialize_schedule_session_state():
+    """Initialize session state variables for the Schedule module"""
+    if 'show_milestone_form' not in st.session_state:
+        st.session_state.show_milestone_form = False
+        
+    if 'show_progress_update_form' not in st.session_state:
+        st.session_state.show_progress_update_form = False
+        
+    if 'show_allocation_form' not in st.session_state:
+        st.session_state.show_allocation_form = False
+        
+    if 'show_timeline_form' not in st.session_state:
+        st.session_state.show_timeline_form = False
+        
+    if 'show_task_edit' not in st.session_state:
+        st.session_state.show_task_edit = False
+        
+    if 'edit_task_id' not in st.session_state:
+        st.session_state.edit_task_id = None
+        
+    if 'edit_task_category' not in st.session_state:
+        st.session_state.edit_task_category = ""
 
 def render_scheduling():
     """Render the project scheduling module"""
     
+    # Initialize session state variables
+    initialize_schedule_session_state()
+    
     # Header
     st.title("Project Schedule")
     
+    # Action buttons at top
+    action_col1, action_col2, action_col3, action_col4 = st.columns(4)
+    with action_col1:
+        if st.button("➕ Add Milestone", type="primary", key="add_milestone_btn", use_container_width=True):
+            st.session_state.show_milestone_form = True
+    
+    with action_col2:
+        if st.button("📊 Update Progress", type="primary", key="update_progress_btn", use_container_width=True):
+            st.session_state.show_progress_update_form = True
+    
+    with action_col3:
+        if st.button("👥 Update Allocation", type="primary", key="update_allocation_btn", use_container_width=True):
+            st.session_state.show_allocation_form = True
+    
+    with action_col4:
+        if st.button("📅 Edit Timeline", type="primary", key="edit_timeline_btn", use_container_width=True):
+            st.session_state.show_timeline_form = True
+    
+    # Project Info
+    with st.container():
+        cols = st.columns([2, 1, 1])
+        with cols[0]:
+            st.markdown("**Project Value:** $45.5M | **Area:** 168,500 sq ft | **Timeline:** Jan 2025 - Dec 2025")
+        with cols[2]:
+            st.markdown("**Overall Progress:**")
+            overall_progress = 75  # Sample progress percentage
+            st.progress(overall_progress / 100)
+            st.markdown(f"**{overall_progress}% Complete**")
+            
+    # Forms (they will only display if their session state variable is True)
+    if st.session_state.get("show_milestone_form", False):
+        with st.form("milestone_form"):
+            st.subheader("Add New Milestone")
+            
+            form_col1, form_col2 = st.columns(2)
+            
+            with form_col1:
+                milestone_name = st.text_input("Milestone Name", key="new_milestone_name")
+                milestone_date = st.date_input("Target Date", key="new_milestone_date")
+                milestone_type = st.selectbox(
+                    "Milestone Type", 
+                    ["Project", "Engineering", "Construction", "Financial", "Regulatory", "Other"],
+                    key="new_milestone_type"
+                )
+            
+            with form_col2:
+                milestone_status = st.selectbox(
+                    "Status", 
+                    ["Not Started", "In Progress", "Complete", "At Risk", "Delayed"],
+                    key="new_milestone_status"
+                )
+                milestone_priority = st.selectbox(
+                    "Priority", 
+                    ["Low", "Medium", "High", "Critical"],
+                    key="new_milestone_priority"
+                )
+                milestone_owner = st.text_input("Owner", key="new_milestone_owner")
+            
+            milestone_description = st.text_area("Description", key="new_milestone_description")
+            
+            # Predecessor milestones
+            st.subheader("Predecessor Milestones")
+            st.multiselect(
+                "Select predecessors",
+                ["Design Approval", "Site Mobilization", "Foundation Complete", "Topping Out", "Building Dry-In"],
+                key="new_milestone_predecessors"
+            )
+            
+            # Form submission
+            submit_col1, submit_col2 = st.columns([1, 5])
+            with submit_col1:
+                submit_milestone = st.form_submit_button("Save")
+            with submit_col2:
+                cancel_milestone = st.form_submit_button("Cancel")
+            
+            if submit_milestone:
+                st.success(f"Milestone '{milestone_name}' added successfully")
+                st.session_state.show_milestone_form = False
+                st.rerun()
+            
+            if cancel_milestone:
+                st.session_state.show_milestone_form = False
+                st.rerun()
+    
+    # Update Progress Form
+    if st.session_state.get("show_progress_update_form", False):
+        with st.form("progress_update_form"):
+            st.subheader("Update Task Progress")
+            
+            # Sample tasks to update
+            tasks_to_update = [
+                {"Task": "Building Envelope", "Current Progress": 95, "ID": "task_1"},
+                {"Task": "MEP Systems", "Current Progress": 85, "ID": "task_2"},
+                {"Task": "Interior Finishes", "Current Progress": 60, "ID": "task_3"},
+                {"Task": "Commissioning", "Current Progress": 20, "ID": "task_4"},
+                {"Task": "Closeout", "Current Progress": 10, "ID": "task_5"}
+            ]
+            
+            # Create sliders for each task
+            for task in tasks_to_update:
+                st.slider(
+                    f"{task['Task']} Progress",
+                    0, 100, task["Current Progress"],
+                    key=f"progress_{task['ID']}"
+                )
+            
+            # Notes field
+            progress_notes = st.text_area("Update Notes", placeholder="Describe progress updates and any issues encountered", key="progress_notes")
+            
+            # Form submission
+            submit_col1, submit_col2 = st.columns([1, 5])
+            with submit_col1:
+                submit_progress = st.form_submit_button("Save")
+            with submit_col2:
+                cancel_progress = st.form_submit_button("Cancel")
+            
+            if submit_progress:
+                st.success("Progress updated successfully")
+                st.session_state.show_progress_update_form = False
+                st.rerun()
+            
+            if cancel_progress:
+                st.session_state.show_progress_update_form = False
+                st.rerun()
+    
+    # Update Allocation Form
+    if st.session_state.get("show_allocation_form", False):
+        with st.form("allocation_form"):
+            st.subheader("Update Resource Allocation")
+            
+            # Sample team members
+            team_members = [
+                "John Smith (Project Manager)",
+                "Sarah Johnson (Architect)",
+                "Mike Chen (Civil Engineer)",
+                "Emma Wilson (MEP Lead)",
+                "David Garcia (Superintendent)"
+            ]
+            
+            # Sample tasks for allocation
+            allocation_tasks = [
+                "Building Envelope",
+                "MEP Systems",
+                "Interior Finishes",
+                "Commissioning",
+                "Closeout Documentation"
+            ]
+            
+            # Create a multiselect for each task
+            for task in allocation_tasks:
+                st.multiselect(
+                    f"Team Members for {task}",
+                    team_members,
+                    key=f"allocation_{task.lower().replace(' ', '_')}"
+                )
+            
+            # Effort allocation
+            st.subheader("Effort Allocation (%)")
+            
+            effort_col1, effort_col2 = st.columns(2)
+            
+            with effort_col1:
+                for team_member in team_members[:3]:
+                    st.slider(
+                        team_member,
+                        0, 100, 20,
+                        key=f"effort_{team_member.split('(')[0].strip().lower().replace(' ', '_')}"
+                    )
+            
+            with effort_col2:
+                for team_member in team_members[3:]:
+                    st.slider(
+                        team_member,
+                        0, 100, 20,
+                        key=f"effort_{team_member.split('(')[0].strip().lower().replace(' ', '_')}"
+                    )
+            
+            # Notes
+            allocation_notes = st.text_area("Allocation Notes", key="allocation_notes")
+            
+            # Form submission
+            submit_col1, submit_col2 = st.columns([1, 5])
+            with submit_col1:
+                submit_allocation = st.form_submit_button("Save")
+            with submit_col2:
+                cancel_allocation = st.form_submit_button("Cancel")
+            
+            if submit_allocation:
+                st.success("Resource allocation updated successfully")
+                st.session_state.show_allocation_form = False
+                st.rerun()
+            
+            if cancel_allocation:
+                st.session_state.show_allocation_form = False
+                st.rerun()
+    
+    # Edit Timeline Form
+    if st.session_state.get("show_timeline_form", False):
+        with st.form("timeline_form"):
+            st.subheader("Edit Project Timeline")
+            
+            # Sample project phases to edit
+            timeline_phases = [
+                {"Phase": "Building Envelope", "Start": "2025-06-15", "End": "2025-08-30", "ID": "phase_1"},
+                {"Phase": "MEP Systems", "Start": "2025-07-01", "End": "2025-09-30", "ID": "phase_2"},
+                {"Phase": "Interior Finishes", "Start": "2025-08-15", "End": "2025-11-15", "ID": "phase_3"},
+                {"Phase": "Commissioning", "Start": "2025-10-15", "End": "2025-11-30", "ID": "phase_4"},
+                {"Phase": "Closeout", "Start": "2025-11-15", "End": "2025-12-31", "ID": "phase_5"}
+            ]
+            
+            for phase in timeline_phases:
+                st.markdown(f"**{phase['Phase']}**")
+                cols = st.columns(2)
+                
+                with cols[0]:
+                    start_date = st.date_input(
+                        "Start Date", 
+                        pd.to_datetime(phase["Start"]),
+                        key=f"start_{phase['ID']}"
+                    )
+                
+                with cols[1]:
+                    end_date = st.date_input(
+                        "End Date", 
+                        pd.to_datetime(phase["End"]),
+                        key=f"end_{phase['ID']}"
+                    )
+                
+                st.markdown("---")
+            
+            # Notes
+            timeline_notes = st.text_area("Timeline Update Notes", key="timeline_notes")
+            
+            # Form submission
+            submit_col1, submit_col2 = st.columns([1, 5])
+            with submit_col1:
+                submit_timeline = st.form_submit_button("Save")
+            with submit_col2:
+                cancel_timeline = st.form_submit_button("Cancel")
+            
+            if submit_timeline:
+                st.success("Timeline updated successfully")
+                st.session_state.show_timeline_form = False
+                st.rerun()
+            
+            if cancel_timeline:
+                st.session_state.show_timeline_form = False
+                st.rerun()
+                
+    # Task edit functionality
+    if st.session_state.get("show_task_edit", False):
+        task_id = st.session_state.get("edit_task_id", None)
+        task_category = st.session_state.get("edit_task_category", "")
+        task_data = None
+        
+        # In a real application, we would fetch task data from a database
+        # For this demo, we'll use sample data
+        if task_id:
+            task_data = {
+                "id": task_id,
+                "name": f"Task {task_id}",
+                "category": task_category,
+                "description": "Sample task description for demonstration purposes.",
+                "start_date": datetime.now() - timedelta(days=30),
+                "end_date": datetime.now() + timedelta(days=30),
+                "progress": 60,
+                "status": "In Progress",
+                "assigned_to": ["John Smith", "Sarah Johnson"],
+                "priority": "Medium",
+                "dependencies": ["Task 102", "Task 105"]
+            }
+        
+        with st.form("task_edit_form"):
+            st.subheader(f"Edit Task: {task_data['name'] if task_data else ''}")
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                task_name = st.text_input("Task Name", value=task_data['name'] if task_data else "", key="edit_task_name")
+                task_category_select = st.selectbox(
+                    "Category",
+                    ["Permits & Approvals", "Structural", "Building Envelope", "MEP Systems", 
+                     "Interior Finishes", "Life Safety", "External Areas", "Closeout Documentation"],
+                    index=0 if not task_data else ["Permits & Approvals", "Structural", "Building Envelope", "MEP Systems", 
+                                                  "Interior Finishes", "Life Safety", "External Areas", "Closeout Documentation"].index(task_data['category']),
+                    key="edit_task_category_select"
+                )
+                task_progress = st.slider(
+                    "Progress (%)", 
+                    0, 100, 
+                    value=task_data['progress'] if task_data else 0,
+                    key="edit_task_progress"
+                )
+                task_priority = st.selectbox(
+                    "Priority",
+                    ["Low", "Medium", "High", "Critical"],
+                    index=1 if not task_data else ["Low", "Medium", "High", "Critical"].index(task_data['priority']),
+                    key="edit_task_priority"
+                )
+            
+            with col2:
+                task_status = st.selectbox(
+                    "Status",
+                    ["Not Started", "In Progress", "On Hold", "Complete", "Cancelled"],
+                    index=1 if not task_data else ["Not Started", "In Progress", "On Hold", "Complete", "Cancelled"].index(task_data['status']),
+                    key="edit_task_status"
+                )
+                task_start = st.date_input(
+                    "Start Date",
+                    value=task_data['start_date'] if task_data else datetime.now(),
+                    key="edit_task_start"
+                )
+                task_end = st.date_input(
+                    "End Date",
+                    value=task_data['end_date'] if task_data else datetime.now() + timedelta(days=14),
+                    key="edit_task_end"
+                )
+                task_assigned = st.multiselect(
+                    "Assigned To",
+                    ["John Smith", "Sarah Johnson", "Mike Chen", "Emma Wilson", "David Garcia"],
+                    default=task_data['assigned_to'] if task_data else [],
+                    key="edit_task_assigned"
+                )
+            
+            task_description = st.text_area(
+                "Description",
+                value=task_data['description'] if task_data else "",
+                height=100,
+                key="edit_task_description"
+            )
+            
+            task_dependencies = st.multiselect(
+                "Dependencies",
+                ["Task 101", "Task 102", "Task 103", "Task 104", "Task 105", "Task 106"],
+                default=task_data['dependencies'] if task_data else [],
+                key="edit_task_dependencies"
+            )
+            
+            # Attachments
+            st.subheader("Attachments")
+            st.file_uploader("Add Attachments", accept_multiple_files=True, key="edit_task_attachments")
+            
+            if task_data:
+                st.markdown("**Current Attachments:**")
+                st.markdown("- Task_Specification.pdf")
+                st.markdown("- Requirements.docx")
+            
+            # Comments
+            st.subheader("Comments")
+            if task_data:
+                st.markdown("**John Smith** (2 days ago): Updated the task requirements based on owner feedback.")
+                st.markdown("**Sarah Johnson** (1 day ago): Coordinated with MEP team on system requirements.")
+            
+            new_comment = st.text_area("Add Comment", "", key="edit_task_comment")
+            
+            # Form buttons
+            button_col1, button_col2, button_col3 = st.columns([1, 1, 4])
+            with button_col1:
+                save_button = st.form_submit_button("Save Changes")
+            with button_col2:
+                cancel_button = st.form_submit_button("Cancel")
+            
+            if save_button:
+                st.success(f"Task '{task_name}' updated successfully!")
+                st.session_state.show_task_edit = False
+                st.rerun()
+            
+            if cancel_button:
+                st.session_state.show_task_edit = False
+                st.rerun()
+            
     # Tab navigation for scheduling sections
-    tab1, tab2, tab3 = st.tabs(["Gantt Chart", "Milestones", "Resources"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Gantt Chart", "Milestones", "Timeline", "Progress Tracking", "Resources"])
     
     # Gantt Chart Tab
     with tab1:
@@ -29,8 +428,16 @@ def render_scheduling():
     with tab2:
         render_milestones()
     
-    # Resources Tab
+    # Timeline Tab (from Roadmap)
     with tab3:
+        render_timeline()
+        
+    # Progress Tracking Tab (from Roadmap)
+    with tab4:
+        render_milestone_progress()
+        
+    # Resources Tab
+    with tab5:
         render_resources()
 
 def render_gantt_chart():

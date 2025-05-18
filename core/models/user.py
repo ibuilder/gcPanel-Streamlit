@@ -6,7 +6,8 @@ role-based access control (RBAC).
 """
 
 import enum
-from sqlalchemy import Column, String, ForeignKey, Table, Enum, Integer
+from datetime import datetime
+from sqlalchemy import Column, String, ForeignKey, Table, Enum, Integer, Boolean, DateTime
 from sqlalchemy.orm import relationship
 from core.models.base import BaseModel
 from core.database.config import Base
@@ -25,6 +26,7 @@ class UserStatus(enum.Enum):
     INACTIVE = "inactive"
     SUSPENDED = "suspended"
     PENDING = "pending"
+    LOCKED = "locked"  # Account locked due to failed login attempts
 
 class User(BaseModel):
     """
@@ -38,6 +40,13 @@ class User(BaseModel):
         last_name (str): User's last name
         status (UserStatus): Current user status
         roles (list): User's assigned roles
+        mfa_enabled (bool): Whether multi-factor authentication is enabled
+        mfa_secret (str): Secret key for MFA (encrypted)
+        failed_login_attempts (int): Number of consecutive failed login attempts
+        locked_until (datetime): When a locked account will be automatically unlocked
+        password_changed_at (datetime): When password was last changed
+        last_login (datetime): Last successful login time
+        last_active (datetime): Last activity time for session management
     """
     
     username = Column(String(50), unique=True, nullable=False, index=True)
@@ -46,6 +55,15 @@ class User(BaseModel):
     first_name = Column(String(50), nullable=True)
     last_name = Column(String(50), nullable=True)
     status = Column(Enum(UserStatus), default=UserStatus.ACTIVE, nullable=False)
+    
+    # Security enhancements
+    mfa_enabled = Column(Boolean, default=False, nullable=False)
+    mfa_secret = Column(String(255), nullable=True)
+    failed_login_attempts = Column(Integer, default=0, nullable=False)
+    locked_until = Column(DateTime, nullable=True)
+    password_changed_at = Column(DateTime, nullable=True)
+    last_login = Column(DateTime, nullable=True)
+    last_active = Column(DateTime, nullable=True)
     
     # Relationships
     roles = relationship("Role", secondary=user_roles, back_populates="users")

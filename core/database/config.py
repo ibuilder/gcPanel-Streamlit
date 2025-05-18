@@ -19,7 +19,13 @@ Base = declarative_base()
 
 # Database configuration
 DB_PATH = os.environ.get("DB_PATH", "data/gcpanel.db")
-SQLITE_URL = f"sqlite:///{DB_PATH}"
+DATABASE_URL = os.environ.get("DATABASE_URL")  # PostgreSQL connection URI
+
+# Connection pool configuration
+POOL_SIZE = int(os.environ.get("DB_POOL_SIZE", "10"))  # Default pool size
+MAX_OVERFLOW = int(os.environ.get("DB_MAX_OVERFLOW", "20"))  # Max extra connections
+POOL_TIMEOUT = int(os.environ.get("DB_POOL_TIMEOUT", "30"))  # Seconds to wait for connection
+POOL_RECYCLE = int(os.environ.get("DB_POOL_RECYCLE", "1800"))  # Seconds to recycle connection
 
 # Create engine and session factory
 engine = None
@@ -34,12 +40,30 @@ def init_db():
     global engine, Session
     
     try:
-        # Ensure data directory exists
-        os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-        
-        # Create engine with SQLite connection
-        logger.info(f"Connecting to local SQLite database: {DB_PATH}")
-        engine = create_engine(SQLITE_URL, connect_args={"check_same_thread": False})
+        # Determine which database to use
+        if DATABASE_URL:
+            # Use PostgreSQL if DATABASE_URL is provided
+            logger.info("Connecting to PostgreSQL database")
+            
+            # Create engine with connection pooling
+            engine = create_engine(
+                DATABASE_URL,
+                pool_size=POOL_SIZE,
+                max_overflow=MAX_OVERFLOW,
+                pool_timeout=POOL_TIMEOUT,
+                pool_recycle=POOL_RECYCLE,
+                pool_pre_ping=True  # Verify connections before use
+            )
+        else:
+            # Fallback to SQLite
+            SQLITE_URL = f"sqlite:///{DB_PATH}"
+            
+            # Ensure data directory exists
+            os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+            
+            # Create engine with SQLite connection
+            logger.info(f"Connecting to local SQLite database: {DB_PATH}")
+            engine = create_engine(SQLITE_URL, connect_args={"check_same_thread": False})
         
         # Create session factory
         Session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
@@ -47,7 +71,7 @@ def init_db():
         # Test connection
         with get_db_session() as db:
             db.execute(text("SELECT 1"))
-            logger.info("SQLite database connection successful")
+            logger.info("Database connection successful")
             
         return True
     except Exception as e:

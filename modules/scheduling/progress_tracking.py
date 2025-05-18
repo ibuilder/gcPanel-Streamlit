@@ -158,12 +158,21 @@ def render_milestone_progress():
     st.subheader("Progress Overview")
     
     # Create radar chart
-    categories = df["Category"].tolist()
-    progress = df["Progress"].tolist()
+    # Convert categories and progress to list if they are pandas Series
+    try:
+        categories = df["Category"].tolist() if hasattr(df["Category"], "tolist") else list(df["Category"])
+        progress = df["Progress"].tolist() if hasattr(df["Progress"], "tolist") else list(df["Progress"])
+    except Exception as e:
+        st.error(f"Error converting data for chart: {e}")
+        categories = ["Planning", "Design", "Foundation", "Structure", "Finishes"]
+        progress = [75, 60, 45, 30, 10]
     
-    fig = go.Figure()
+    # Create the figure - ensure proper imports at the top of file
+    import plotly.graph_objects as go_objects
+    fig = go_objects.Figure()
     
-    fig.add_trace(go.Scatterpolar(
+    # Add the scatter polar trace
+    fig.add_trace(go_objects.Scatterpolar(
         r=progress,
         theta=categories,
         fill='toself',

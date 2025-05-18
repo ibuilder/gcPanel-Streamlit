@@ -29,7 +29,7 @@ from modules.roadmap import render_roadmap
 
 # Import components
 from components.simple_breadcrumbs import simple_breadcrumbs, get_breadcrumbs_for_page
-from components.sidebar import render_sidebar, handle_navigation
+from components.sidebar_simple import render_sidebar
 from components.notification_center import notification_center
 from core.digital_signatures.signature import DigitalSignature
 
@@ -108,8 +108,7 @@ def main():
     # Initialize session state
     initialize_session_state()
     
-    # Process navigation button clicks
-    handle_navigation()
+    # Navigation is now handled by the sidebar component
     
     # Initialize database and authentication
     initialize_application()

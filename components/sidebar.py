@@ -77,7 +77,6 @@ def render_sidebar():
             {"label": "Safety", "icon": "health_and_safety"},
             {"label": "Contracts", "icon": "handshake"},
             {"label": "Cost Management", "icon": "paid"},
-            {"label": "Roadmap", "icon": "timeline"},
             {"label": "Closeout", "icon": "task_alt"},
             {"label": "Settings", "icon": "settings"}
         ]

@@ -430,10 +430,12 @@ def render_scheduling():
     
     # Timeline Tab (from Roadmap)
     with tab3:
+        from modules.scheduling.timeline import render_timeline
         render_timeline()
         
     # Progress Tracking Tab (from Roadmap)
     with tab4:
+        from modules.scheduling.progress_tracking import render_milestone_progress
         render_milestone_progress()
         
     # Resources Tab

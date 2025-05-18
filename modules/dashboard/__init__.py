@@ -7,6 +7,8 @@ This module renders the main dashboard with project overview, KPIs, and activity
 import streamlit as st
 import pandas as pd
 import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
 from datetime import datetime, timedelta
 
 def render_dashboard():
@@ -114,7 +116,7 @@ def render_dashboard():
         tab1, tab2, tab3 = st.tabs(["Schedule", "Budget", "Quality"])
         
         with tab1:
-            # Schedule chart
+            # Schedule chart - improved with Plotly
             schedule_data = {
                 'Task': ['Foundation', 'Structure', 'Envelope', 'MEP', 'Finishes', 'Commissioning'],
                 'Planned': [100, 80, 60, 40, 20, 5],
@@ -123,12 +125,31 @@ def render_dashboard():
             
             df_schedule = pd.DataFrame(schedule_data)
             
-            st.markdown("<div class='dashboard-card' style='padding: 1rem;'>", unsafe_allow_html=True)
-            st.bar_chart(df_schedule.set_index('Task'), height=300)
-            st.markdown("</div>", unsafe_allow_html=True)
+            # Using Plotly for better visualization and no warnings
+            fig = px.bar(
+                df_schedule, 
+                x='Task', 
+                y=['Planned', 'Actual'],
+                title='Schedule Progress by Task',
+                barmode='group',
+                labels={'value': 'Completion (%)', 'variable': 'Type'},
+                color_discrete_map={'Planned': '#3367D6', 'Actual': '#28a745'}
+            )
+            
+            # Improve layout and styling
+            fig.update_layout(
+                height=300,
+                margin=dict(l=10, r=10, t=40, b=10),
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                yaxis=dict(ticksuffix="%")
+            )
+            
+            # Use Streamlit container for clean display
+            with st.container():
+                st.plotly_chart(fig, use_container_width=True)
             
         with tab2:
-            # Budget chart
+            # Budget chart - improved with Plotly
             budget_data = {
                 'Category': ['Labor', 'Materials', 'Equipment', 'Subcontracts', 'General Conditions'],
                 'Budget': [2500000, 3200000, 1200000, 4500000, 800000],
@@ -137,12 +158,31 @@ def render_dashboard():
             
             df_budget = pd.DataFrame(budget_data)
             
-            st.markdown("<div class='dashboard-card' style='padding: 1rem;'>", unsafe_allow_html=True)
-            st.bar_chart(df_budget.set_index('Category'), height=300)
-            st.markdown("</div>", unsafe_allow_html=True)
+            # Using Plotly for better visualization
+            fig = px.bar(
+                df_budget, 
+                x='Category', 
+                y=['Budget', 'Actual'],
+                title='Budget vs. Actual by Category',
+                barmode='group',
+                labels={'value': 'Amount ($)', 'variable': 'Type'},
+                color_discrete_map={'Budget': '#3367D6', 'Actual': '#28a745'}
+            )
+            
+            # Format the Y-axis to show currency
+            fig.update_layout(
+                height=300,
+                margin=dict(l=10, r=10, t=40, b=10),
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                yaxis=dict(tickprefix="$", tickformat=",.0f")
+            )
+            
+            # Use Streamlit container for clean display
+            with st.container():
+                st.plotly_chart(fig, use_container_width=True)
             
         with tab3:
-            # Quality chart
+            # Quality chart - improved version using Plotly for better rendering
             quality_data = {
                 'Month': ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
                 'NCRs': [12, 8, 10, 7, 3],
@@ -151,9 +191,26 @@ def render_dashboard():
             
             df_quality = pd.DataFrame(quality_data)
             
-            st.markdown("<div class='dashboard-card' style='padding: 1rem;'>", unsafe_allow_html=True)
-            st.line_chart(df_quality.set_index('Month'), height=300)
-            st.markdown("</div>", unsafe_allow_html=True)
+            # Using Plotly Express for better control and no warnings
+            fig = px.line(
+                df_quality, 
+                x='Month', 
+                y=['NCRs', 'Inspections'],
+                title='Quality Metrics by Month',
+                markers=True,
+                labels={'value': 'Count', 'variable': 'Metric'}
+            )
+            
+            # Improve layout for better display
+            fig.update_layout(
+                height=300,
+                margin=dict(l=10, r=10, t=40, b=10),
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+            )
+            
+            # Container styling without raw HTML
+            with st.container():
+                st.plotly_chart(fig, use_container_width=True)
     
     with col_activity:
         st.subheader("Recent Activity")

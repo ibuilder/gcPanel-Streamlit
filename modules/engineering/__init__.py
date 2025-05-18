@@ -16,6 +16,7 @@ from enum import Enum, auto
 
 # Import form components
 from components.engineering_forms import rfi_form, submittal_form
+from modules.engineering.transmittals import render_transmittals
 
 # Enums for status types
 class SubmittalStatus(Enum):
@@ -34,6 +35,13 @@ class RfiStatus(Enum):
     ANSWERED = "Answered"
     CLOSED = "Closed"
     OVERDUE = "Overdue"
+    
+class TransmittalStatus(Enum):
+    DRAFT = "Draft"
+    SENT = "Sent" 
+    RECEIVED = "Received"
+    ACKNOWLEDGED = "Acknowledged"
+    COMPLETED = "Completed"
 
 def render_engineering():
     """Render the engineering module"""
@@ -42,7 +50,7 @@ def render_engineering():
     st.title("Engineering")
     
     # Tab navigation for engineering sections
-    tab1, tab2 = st.tabs(["RFIs", "Submittals"])
+    tab1, tab2, tab3 = st.tabs(["RFIs", "Submittals", "Transmittals"])
     
     # RFIs Tab
     with tab1:
@@ -51,6 +59,10 @@ def render_engineering():
     # Submittals Tab
     with tab2:
         render_submittals()
+        
+    # Transmittals Tab
+    with tab3:
+        render_transmittals()
 
 def render_rfis():
     """Render the RFIs (Requests for Information) section"""

@@ -249,10 +249,7 @@ def render_transmittals():
                     ),
                     "components": "Components",
                     "document_count": "Documents",
-                    "view": st.column_config.ButtonColumn(
-                        "Action",
-                        help="View transmittal details"
-                    )
+                    "view": "Action"
                 },
                 hide_index=True,
                 use_container_width=True

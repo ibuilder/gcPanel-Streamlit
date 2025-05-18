@@ -3,8 +3,8 @@ Documents module for the gcPanel Construction Management Dashboard.
 
 This module provides management for project documentation including:
 1. Current set of plans
-2. Ability to upload new documents
-3. Current set of submittals (viewable PDFs)
+2. Specifications
+3. Project documents (contract documents, permits, etc.)
 """
 
 import streamlit as st
@@ -24,15 +24,15 @@ def render_documents():
     st.title("Documents")
     
     # Create tabs for different document types
-    tab1, tab2, tab3 = st.tabs(["Construction Plans", "Submittals", "Project Documents"])
+    tab1, tab2, tab3 = st.tabs(["Construction Plans", "Specifications", "Project Documents"])
     
     # Construction Plans tab
     with tab1:
         render_plans()
     
-    # Submittals tab (viewable PDFs)
+    # Specifications tab
     with tab2:
-        render_submittal_pdfs()
+        render_specifications()
     
     # Project Documents tab
     with tab3:
@@ -176,7 +176,7 @@ def render_plans():
         display_plans = display_plans[cols]
         
         # Display the plans table with view buttons
-        st.dataframe(
+        clicked = st.dataframe(
             display_plans,
             column_config={
                 "name": "Drawing Name",
@@ -185,169 +185,218 @@ def render_plans():
                 "date": "Date",
                 "uploaded_by": "Uploaded By",
                 "size": "Size",
-                "action": st.column_config.ButtonColumn(
-                    "Action",
-                    help="View the document",
-                )
+                "action": "Action"
             },
-            hide_index=True
+            hide_index=True,
+            use_container_width=True
         )
         
-        # Handle view button clicks
-        if st.session_state.get("dataframe_clicked_row") and st.session_state.dataframe_clicked_row.get("action") == "View":
-            row_index = st.session_state.dataframe_clicked_row_index
-            selected_plan = plans[row_index]
-            
-            # Set the selected plan for viewing
-            st.session_state.selected_document_path = selected_plan["file_path"]
-            st.session_state.selected_document_name = selected_plan["name"]
-            
-            # Display the selected document
-            if st.session_state.get("selected_document_path"):
-                display_pdf_document(
-                    st.session_state.selected_document_path,
-                    st.session_state.selected_document_name
-                )
+        # Add separate view buttons for each plan
+        st.write("### View Plans")
+        for i, plan in enumerate(filtered_plans):
+            if st.button(f"View {plan['name']}", key=f"view_plan_{i}"):
+                # Set the selected plan for viewing
+                st.session_state.selected_document_path = plan["file_path"]
+                st.session_state.selected_document_name = plan["name"]
+                st.rerun()
+        
+        # Display the selected document
+        if st.session_state.get("selected_document_path"):
+            display_pdf_document(
+                st.session_state.selected_document_path,
+                st.session_state.selected_document_name
+            )
     else:
         st.info("No plans found matching the selected filters.")
 
-
-def render_submittal_pdfs():
-    """Render the Submittals PDFs section"""
+def render_specifications():
+    """Render the Specifications section"""
     
-    st.header("Submittal Documents")
+    st.header("Specifications")
     
-    # Sample submittal documents
-    submittal_docs = [
+    # Upload new specification section
+    st.subheader("Upload New Specification")
+    
+    upload_col1, upload_col2 = st.columns([3, 1])
+    
+    with upload_col1:
+        uploaded_file = st.file_uploader(
+            "Upload new specification section (PDF)",
+            type=["pdf"],
+            key="spec_uploader"
+        )
+    
+    with upload_col2:
+        spec_division = st.selectbox(
+            "Division",
+            [
+                "01 - General Requirements",
+                "02 - Existing Conditions",
+                "03 - Concrete",
+                "04 - Masonry",
+                "05 - Metals",
+                "06 - Wood, Plastics, and Composites",
+                "07 - Thermal and Moisture Protection",
+                "08 - Openings",
+                "09 - Finishes",
+                "10 - Specialties",
+                "11 - Equipment",
+                "12 - Furnishings",
+                "13 - Special Construction",
+                "14 - Conveying Equipment",
+                "21 - Fire Suppression",
+                "22 - Plumbing",
+                "23 - HVAC",
+                "26 - Electrical",
+                "27 - Communications",
+                "28 - Electronic Safety and Security",
+                "31 - Earthwork",
+                "32 - Exterior Improvements",
+                "33 - Utilities"
+            ],
+            key="spec_division"
+        )
+    
+    if uploaded_file and st.button("Save Specification", type="primary", key="save_spec_btn"):
+        # In a real app, this would save the file to storage
+        st.success(f"Specification '{uploaded_file.name}' uploaded successfully!")
+        st.session_state.uploaded_spec = None
+        st.rerun()
+    
+    # Display current specifications
+    st.subheader("Project Specifications")
+    
+    # Sample specifications data
+    specifications = [
         {
             "id": 1,
-            "number": "S-001",
-            "title": "Structural Steel Shop Drawings",
-            "spec_section": "05 12 00",
-            "status": "Approved",
-            "date_submitted": datetime(2025, 2, 5),
-            "file_path": "data/sample_pdfs/sample_submittal.pdf",
-            "size_mb": 5.2
+            "number": "03 30 00",
+            "title": "Cast-in-Place Concrete",
+            "division": "03 - Concrete",
+            "revision": "0",
+            "date": datetime(2025, 1, 10),
+            "file_path": "data/sample_pdfs/sample_specification.pdf",
+            "size_mb": 1.8
         },
         {
             "id": 2,
-            "number": "S-002",
-            "title": "Concrete Mix Design",
-            "spec_section": "03 30 00",
-            "status": "Approved as Noted",
-            "date_submitted": datetime(2025, 2, 10),
-            "file_path": "data/sample_pdfs/sample_submittal.pdf",
-            "size_mb": 3.7
+            "number": "04 20 00",
+            "title": "Unit Masonry",
+            "division": "04 - Masonry",
+            "revision": "0",
+            "date": datetime(2025, 1, 10),
+            "file_path": "data/sample_pdfs/sample_specification.pdf",
+            "size_mb": 2.2
         },
         {
             "id": 3,
-            "number": "S-003",
-            "title": "Curtain Wall System",
-            "spec_section": "08 44 13",
-            "status": "Revise and Resubmit",
-            "date_submitted": datetime(2025, 2, 15),
-            "file_path": "data/sample_pdfs/sample_submittal.pdf",
-            "size_mb": 8.1
+            "number": "05 12 00",
+            "title": "Structural Steel Framing",
+            "division": "05 - Metals",
+            "revision": "1",
+            "date": datetime(2025, 1, 15),
+            "file_path": "data/sample_pdfs/sample_specification.pdf",
+            "size_mb": 3.1
         },
         {
             "id": 4,
-            "number": "S-004",
-            "title": "HVAC Equipment",
-            "spec_section": "23 00 00",
-            "status": "Approved",
-            "date_submitted": datetime(2025, 2, 20),
-            "file_path": "data/sample_pdfs/sample_submittal.pdf",
-            "size_mb": 6.4
+            "number": "07 21 00",
+            "title": "Thermal Insulation",
+            "division": "07 - Thermal and Moisture Protection",
+            "revision": "0",
+            "date": datetime(2025, 1, 10),
+            "file_path": "data/sample_pdfs/sample_specification.pdf",
+            "size_mb": 1.5
         },
         {
             "id": 5,
-            "number": "S-005",
-            "title": "Electrical Fixtures",
-            "spec_section": "26 50 00",
-            "status": "Approved as Noted",
-            "date_submitted": datetime(2025, 2, 25),
-            "file_path": "data/sample_pdfs/sample_submittal.pdf",
-            "size_mb": 4.9
+            "number": "08 11 13",
+            "title": "Hollow Metal Doors and Frames",
+            "division": "08 - Openings",
+            "revision": "0",
+            "date": datetime(2025, 1, 10),
+            "file_path": "data/sample_pdfs/sample_specification.pdf",
+            "size_mb": 2.0
+        },
+        {
+            "id": 6,
+            "number": "09 91 23",
+            "title": "Interior Painting",
+            "division": "09 - Finishes",
+            "revision": "0",
+            "date": datetime(2025, 1, 10),
+            "file_path": "data/sample_pdfs/sample_specification.pdf",
+            "size_mb": 1.7
+        },
+        {
+            "id": 7,
+            "number": "22 14 00",
+            "title": "Facility Storm Drainage",
+            "division": "22 - Plumbing",
+            "revision": "0",
+            "date": datetime(2025, 1, 10),
+            "file_path": "data/sample_pdfs/sample_specification.pdf",
+            "size_mb": 2.3
+        },
+        {
+            "id": 8,
+            "number": "26 05 00",
+            "title": "Common Work Results for Electrical",
+            "division": "26 - Electrical",
+            "revision": "1",
+            "date": datetime(2025, 1, 15),
+            "file_path": "data/sample_pdfs/sample_specification.pdf",
+            "size_mb": 3.5
         }
     ]
     
-    # Filters
-    status_filter = st.multiselect(
-        "Filter by Status",
-        list(set(doc["status"] for doc in submittal_docs)),
-        default=[],
-        key="submittal_docs_status_filter"
-    )
+    # Group specifications by division
+    divisions = {}
+    for spec in specifications:
+        if spec["division"] not in divisions:
+            divisions[spec["division"]] = []
+        divisions[spec["division"]].append(spec)
     
-    # Apply filters
-    filtered_docs = submittal_docs
-    if status_filter:
-        filtered_docs = [doc for doc in filtered_docs if doc["status"] in status_filter]
+    # Display specifications by division
+    for division, specs in sorted(divisions.items()):
+        with st.expander(division, expanded=True):
+            # Create DataFrame for this division
+            df = pd.DataFrame(specs)
+            df["date"] = df["date"].dt.strftime("%Y-%m-%d")
+            df["size"] = df["size_mb"].apply(lambda x: f"{x:.1f} MB")
+            
+            # Format for display
+            display_df = df[["number", "title", "revision", "date", "size"]]
+            
+            # Display the table
+            st.dataframe(
+                display_df,
+                column_config={
+                    "number": "Section",
+                    "title": "Title",
+                    "revision": "Rev",
+                    "date": "Date",
+                    "size": "Size"
+                },
+                hide_index=True,
+                use_container_width=True
+            )
+            
+            # Add view buttons for each specification
+            cols = st.columns(len(specs))
+            for i, (col, spec) in enumerate(zip(cols, specs)):
+                with col:
+                    if st.button(f"View {spec['number']}", key=f"view_spec_{spec['id']}"):
+                        st.session_state.selected_document_path = spec["file_path"]
+                        st.session_state.selected_document_name = f"{spec['number']} - {spec['title']}"
+                        st.rerun()
     
-    # Convert to DataFrame for display
-    docs_df = pd.DataFrame(filtered_docs)
-    
-    # Format for display
-    if not docs_df.empty:
-        display_docs = docs_df.copy()
-        display_docs["date_submitted"] = display_docs["date_submitted"].dt.strftime("%Y-%m-%d")
-        display_docs["size"] = display_docs["size_mb"].apply(lambda x: f"{x:.1f} MB")
-        display_docs["action"] = "View"
-        
-        # Drop unnecessary columns for display
-        display_docs = display_docs.drop(columns=["id", "file_path", "size_mb"])
-        
-        # Reorder columns
-        cols = ["number", "title", "spec_section", "status", "date_submitted", "size", "action"]
-        display_docs = display_docs[cols]
-        
-        # Create a color map for status
-        status_colors = {
-            "Approved": "#38d39f",
-            "Approved as Noted": "#f9c851",
-            "Revise and Resubmit": "#ff5b5b",
-            "Rejected": "#dc3545"
-        }
-        
-        # Display the submittal documents table with view buttons
-        st.dataframe(
-            display_docs,
-            column_config={
-                "number": "Submittal #",
-                "title": "Title",
-                "spec_section": "Spec Section",
-                "status": st.column_config.TextColumn(
-                    "Status",
-                    help="Approval status of the submittal",
-                    width="medium",
-                ),
-                "date_submitted": "Date Submitted",
-                "size": "Size",
-                "action": st.column_config.ButtonColumn(
-                    "Action",
-                    help="View the document",
-                )
-            },
-            hide_index=True
+    # Display the selected document
+    if st.session_state.get("selected_document_path"):
+        display_pdf_document(
+            st.session_state.selected_document_path,
+            st.session_state.selected_document_name
         )
-        
-        # Handle view button clicks
-        if st.session_state.get("dataframe_clicked_row") and st.session_state.dataframe_clicked_row.get("action") == "View":
-            row_index = st.session_state.dataframe_clicked_row_index
-            selected_doc = submittal_docs[row_index]
-            
-            # Set the selected document for viewing
-            st.session_state.selected_document_path = selected_doc["file_path"]
-            st.session_state.selected_document_name = f"{selected_doc['number']} - {selected_doc['title']}"
-            
-            # Display the selected document
-            if st.session_state.get("selected_document_path"):
-                display_pdf_document(
-                    st.session_state.selected_document_path,
-                    st.session_state.selected_document_name
-                )
-    else:
-        st.info("No submittal documents found matching the selected filters.")
 
 
 def render_project_documents():
@@ -373,7 +422,6 @@ def render_project_documents():
             [
                 "Contract Documents",
                 "Project Manual",
-                "Specifications",
                 "Permits",
                 "Meeting Minutes",
                 "Correspondence",
@@ -406,7 +454,7 @@ def render_project_documents():
         {
             "id": 2,
             "name": "Technical Specifications.pdf",
-            "category": "Specifications",
+            "category": "Project Manual",
             "date": datetime(2025, 1, 8),
             "uploaded_by": "Maria Garcia",
             "file_path": "data/sample_pdfs/sample_document.pdf",
@@ -471,16 +519,15 @@ def render_project_documents():
         display_docs = docs_df.copy()
         display_docs["date"] = display_docs["date"].dt.strftime("%Y-%m-%d")
         display_docs["size"] = display_docs["size_mb"].apply(lambda x: f"{x:.1f} MB")
-        display_docs["action"] = "View"
         
         # Drop unnecessary columns for display
         display_docs = display_docs.drop(columns=["id", "file_path", "size_mb"])
         
         # Reorder columns
-        cols = ["name", "category", "date", "uploaded_by", "size", "action"]
+        cols = ["name", "category", "date", "uploaded_by", "size"]
         display_docs = display_docs[cols]
         
-        # Display the documents table with view buttons
+        # Display the documents table
         st.dataframe(
             display_docs,
             column_config={
@@ -488,29 +535,28 @@ def render_project_documents():
                 "category": "Category",
                 "date": "Date",
                 "uploaded_by": "Uploaded By",
-                "size": "Size",
-                "action": st.column_config.ButtonColumn(
-                    "Action",
-                    help="View the document",
-                )
+                "size": "Size"
             },
-            hide_index=True
+            hide_index=True,
+            use_container_width=True
         )
         
-        # Handle view button clicks
-        if st.session_state.get("dataframe_clicked_row") and st.session_state.dataframe_clicked_row.get("action") == "View":
-            row_index = st.session_state.dataframe_clicked_row_index
-            selected_doc = documents[row_index]
-            
-            # Set the selected document for viewing
-            st.session_state.selected_document_path = selected_doc["file_path"]
-            st.session_state.selected_document_name = selected_doc["name"]
-            
-            # Display the selected document
-            if st.session_state.get("selected_document_path"):
-                display_pdf_document(
-                    st.session_state.selected_document_path,
-                    st.session_state.selected_document_name
-                )
+        # Add view buttons for each document
+        st.write("### View Documents")
+        doc_cols = st.columns(3)
+        for i, doc in enumerate(filtered_documents):
+            col_index = i % 3
+            with doc_cols[col_index]:
+                if st.button(f"View {doc['name']}", key=f"view_doc_{doc['id']}"):
+                    st.session_state.selected_document_path = doc["file_path"]
+                    st.session_state.selected_document_name = doc["name"]
+                    st.rerun()
+        
+        # Display the selected document
+        if st.session_state.get("selected_document_path"):
+            display_pdf_document(
+                st.session_state.selected_document_path,
+                st.session_state.selected_document_name
+            )
     else:
         st.info("No documents found matching the selected filters.")

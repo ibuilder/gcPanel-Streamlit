@@ -11,7 +11,12 @@ from datetime import datetime, timedelta
 import random
 from enum import Enum
 
-from modules.engineering import TransmittalStatus
+class TransmittalStatus(Enum):
+    DRAFT = "Draft"
+    SENT = "Sent" 
+    RECEIVED = "Received"
+    ACKNOWLEDGED = "Acknowledged"
+    COMPLETED = "Completed"
 
 
 def render_transmittals():

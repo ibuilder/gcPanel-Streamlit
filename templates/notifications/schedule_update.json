@@ -1,0 +1,4 @@
+{
+  "subject": "Schedule Update: {project_name}",
+  "body": "Hello {first_name},<br><br>The schedule for project '{project_name}' has been updated.<br><br>Key changes:<br>{changes}<br><br>You can view the updated schedule here: {schedule_link}<br><br>The gcPanel Team"
+}

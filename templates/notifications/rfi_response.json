@@ -1,0 +1,4 @@
+{
+  "subject": "RFI Response: {rfi_number}",
+  "body": "Hello {first_name},<br><br>A response has been provided for RFI #{rfi_number}: {rfi_subject}.<br><br>Response: {response_text}<br><br>You can view the RFI here: {rfi_link}<br><br>The gcPanel Team"
+}

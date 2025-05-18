@@ -1,48 +1,47 @@
 """
-Core package initialization.
+Core module initialization for gcPanel.
 
-This module initializes the core application package.
+This module initializes core services for the application.
 """
 
 import logging
+import os
+from datetime import datetime
 
-# Set up root logger
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(levelname)s:%(name)s:%(message)s"
-)
-
-# Initialize package
-from core.database.config import init_db, create_tables
-from core.auth.auth_service import initialize_auth
+# Setup logging
+logger = logging.getLogger(__name__)
 
 def initialize_application():
-    """
-    Initialize the application.
+    """Initialize core application services."""
+    logger.info("Initializing core application services")
     
-    This function sets up the database connection, creates tables,
-    and initializes the authentication system.
-    
-    Returns:
-        bool: True if initialization was successful, False otherwise
-    """
     # Initialize database
-    if not init_db():
-        logging.error("Database initialization failed")
-        return False
-        
-    # Create tables
-    if not create_tables():
-        logging.error("Database table creation failed")
-        return False
-    
-    # Initialize authentication
     try:
-        initialize_auth()
-        logging.info("Authentication initialized successfully")
+        from core.database.config import init_db
+        init_db()
     except Exception as e:
-        logging.error(f"Authentication initialization failed: {str(e)}")
-        return False
+        logger.error(f"Database initialization failed: {str(e)}")
     
-    logging.info("Database initialized successfully")
-    return True
+    # Initialize notification system
+    try:
+        from utils.notifications import initialize_notification_system
+        initialize_notification_system()
+    except Exception as e:
+        logger.error(f"Notification system initialization failed: {str(e)}")
+    
+    # Initialize CDN if available
+    try:
+        from utils.cdn_manager import initialize_cdn
+        initialize_cdn()
+    except Exception as e:
+        logger.error(f"CDN initialization failed: {str(e)}")
+    
+    # Initialize documentation system if available
+    try:
+        from utils.documentation import initialize_documentation
+        initialize_documentation()
+    except Exception as e:
+        logger.error(f"Documentation system initialization failed: {str(e)}")
+    
+    # Log application startup
+    logger.info(f"Application initialized at {datetime.now().isoformat()}")

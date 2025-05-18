@@ -7,7 +7,7 @@ within the application.
 
 import streamlit as st
 import datetime
-from utils.notifications import get_user_notifications, mark_notification_as_read
+from utils.notifications import get_unread_notifications, get_recent_notifications, mark_notification_read
 
 def notification_center():
     """
@@ -48,7 +48,10 @@ def notification_center():
         include_read = st.checkbox("Include Read", False, key="include_read_notifications")
     
     # Get user notifications
-    notifications = get_user_notifications(user_id, limit=50, include_read=include_read)
+    if include_read:
+        notifications = get_recent_notifications(user_id, limit=50)
+    else:
+        notifications = get_unread_notifications(user_id)
     
     # Apply filters
     filtered_notifications = []
@@ -96,7 +99,7 @@ def notification_center():
                 for notification in filtered_notifications:
                     notification_id = notification.get("id", "")
                     if notification_id:
-                        mark_notification_as_read(notification_id)
+                        mark_notification_read(notification_id)
                 st.success("All notifications marked as read.")
                 st.rerun()
         
@@ -187,7 +190,7 @@ def render_notification(notification):
     with col1:
         if not read:
             if st.button("Mark as Read", key=f"read_{notification.get('id', id(notification))}"):
-                mark_notification_as_read(notification.get("id", ""))
+                mark_notification_read(notification.get("id", ""))
                 st.success("Notification marked as read.")
                 st.rerun()
     
@@ -207,7 +210,7 @@ def notification_indicator():
     user_id = st.session_state.get("user_id", "current_user")
     
     # Get unread notifications count
-    notifications = get_user_notifications(user_id, limit=10, include_read=False)
+    notifications = get_unread_notifications(user_id)
     unread_count = len(notifications)
     
     # Create the indicator

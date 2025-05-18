@@ -1,0 +1,4 @@
+{
+  "subject": "Document Approved: {document_name}",
+  "body": "Hello {first_name},<br><br>The document '{document_name}' has been approved by {approver_name}.<br><br>You can view the document here: {document_link}<br><br>The gcPanel Team"
+}

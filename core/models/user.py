@@ -1,76 +1,54 @@
 """
-User models for authentication and authorization.
+User models for gcPanel.
 
-This module defines the User and Role models for authentication and 
-role-based access control (RBAC).
+This module provides database models for user authentication and roles.
 """
 
 import enum
-from datetime import datetime
-from sqlalchemy import Column, String, ForeignKey, Table, Enum, Integer, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, Enum, Table, ForeignKey
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from core.models.base import BaseModel
 from core.database.config import Base
 
-# Many-to-many relationship between users and roles
+# Define the association table for user-role many-to-many relationship
 user_roles = Table(
-    'user_roles',
+    "user_roles",
     Base.metadata,
-    Column('user_id', Integer, ForeignKey('user.id'), primary_key=True),
-    Column('role_id', Integer, ForeignKey('role.id'), primary_key=True)
+    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column("role_id", Integer, ForeignKey("roles.id"), primary_key=True)
 )
 
 class UserStatus(enum.Enum):
-    """User status enumeration"""
+    """User status enum."""
     ACTIVE = "active"
     INACTIVE = "inactive"
     SUSPENDED = "suspended"
     PENDING = "pending"
-    LOCKED = "locked"  # Account locked due to failed login attempts
 
 class User(BaseModel):
-    """
-    User model for authentication and permissions.
+    """User model for authentication and user information."""
     
-    Attributes:
-        username (str): Unique username for login
-        email (str): User email address
-        password_hash (str): Hashed password (not stored in plaintext)
-        first_name (str): User's first name
-        last_name (str): User's last name
-        status (UserStatus): Current user status
-        roles (list): User's assigned roles
-        mfa_enabled (bool): Whether multi-factor authentication is enabled
-        mfa_secret (str): Secret key for MFA (encrypted)
-        failed_login_attempts (int): Number of consecutive failed login attempts
-        locked_until (datetime): When a locked account will be automatically unlocked
-        password_changed_at (datetime): When password was last changed
-        last_login (datetime): Last successful login time
-        last_active (datetime): Last activity time for session management
-    """
+    __tablename__ = "users"
     
-    username = Column(String(50), unique=True, nullable=False, index=True)
-    email = Column(String(100), unique=True, nullable=False, index=True)
+    username = Column(String(50), unique=True, nullable=False)
+    email = Column(String(255), unique=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
-    first_name = Column(String(50), nullable=True)
-    last_name = Column(String(50), nullable=True)
-    status = Column(Enum(UserStatus), default=UserStatus.ACTIVE, nullable=False)
-    
-    # Security enhancements
-    mfa_enabled = Column(Boolean, default=False, nullable=False)
-    mfa_secret = Column(String(255), nullable=True)
-    failed_login_attempts = Column(Integer, default=0, nullable=False)
-    locked_until = Column(DateTime, nullable=True)
-    password_changed_at = Column(DateTime, nullable=True)
-    last_login = Column(DateTime, nullable=True)
-    last_active = Column(DateTime, nullable=True)
+    first_name = Column(String(100), nullable=True)
+    last_name = Column(String(100), nullable=True)
+    phone_number = Column(String(20), nullable=True)
+    is_active = Column(Boolean, default=True)
+    status = Column(Enum(UserStatus), default=UserStatus.ACTIVE)
+    failed_login_attempts = Column(Integer, default=0)
     
     # Relationships
     roles = relationship("Role", secondary=user_roles, back_populates="users")
+    notifications = relationship("Notification", back_populates="user")
     
-    @property
+    @hybrid_property
     def full_name(self):
-        """Get user's full name"""
+        """Get the user's full name."""
         if self.first_name and self.last_name:
             return f"{self.first_name} {self.last_name}"
         elif self.first_name:
@@ -81,44 +59,88 @@ class User(BaseModel):
     
     def has_role(self, role_name):
         """
-        Check if user has a specific role.
+        Check if the user has a specific role.
         
         Args:
-            role_name (str): Role name to check
+            role_name: The name of the role to check
             
         Returns:
-            bool: True if user has role, False otherwise
+            bool: True if user has the role, False otherwise
         """
         return any(role.name == role_name for role in self.roles)
     
-    def has_any_role(self, role_names):
+    def to_dict(self, include_password=False):
         """
-        Check if user has any of the specified roles.
+        Convert user to dictionary.
         
         Args:
-            role_names (list): List of role names to check
+            include_password: Whether to include password hash in result
             
         Returns:
-            bool: True if user has any role, False otherwise
+            dict: Dictionary representation of user
         """
-        return any(role.name in role_names for role in self.roles)
+        user_dict = super().to_dict()
+        
+        # Add computed properties
+        user_dict["full_name"] = self.full_name
+        
+        # Add roles
+        user_dict["roles"] = [role.name for role in self.roles]
+        
+        # Remove password hash unless explicitly requested
+        if not include_password and "password_hash" in user_dict:
+            del user_dict["password_hash"]
+        
+        return user_dict
 
 class Role(BaseModel):
-    """
-    Role model for permission management.
+    """Role model for user permissions."""
     
-    Attributes:
-        name (str): Unique role name (e.g., 'admin', 'editor')
-        description (str): Role description
-        users (list): Users assigned to this role
-    """
+    __tablename__ = "roles"
     
-    name = Column(String(50), unique=True, nullable=False, index=True)
+    name = Column(String(50), unique=True, nullable=False)
     description = Column(String(255), nullable=True)
     
     # Relationships
     users = relationship("User", secondary=user_roles, back_populates="roles")
     
-    def __repr__(self):
-        """String representation of role"""
-        return f"<Role name={self.name}>"
+    def to_dict(self):
+        """
+        Convert role to dictionary.
+        
+        Returns:
+            dict: Dictionary representation of role
+        """
+        return super().to_dict()
+
+class UserProfile(BaseModel):
+    """User profile model for additional user information."""
+    
+    __tablename__ = "user_profiles"
+    
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
+    timezone = Column(String(50), default="UTC")
+    avatar = Column(String(255), nullable=True)
+    bio = Column(String(500), nullable=True)
+    company = Column(String(100), nullable=True)
+    job_title = Column(String(100), nullable=True)
+    
+    # Notification preferences
+    email_notifications = Column(Boolean, default=True)
+    sms_notifications = Column(Boolean, default=False)
+    
+    # UI preferences
+    theme = Column(String(20), default="light")
+    sidebar_collapsed = Column(Boolean, default=False)
+    
+    # Relationships
+    user = relationship("User", backref="profile")
+    
+    def to_dict(self):
+        """
+        Convert profile to dictionary.
+        
+        Returns:
+            dict: Dictionary representation of profile
+        """
+        return super().to_dict()

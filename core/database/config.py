@@ -1,140 +1,112 @@
 """
-Database configuration module.
+Database configuration for gcPanel.
 
-This module handles database connection and session management.
+This module provides database connection and session management.
 """
 
 import os
 import logging
-from contextlib import contextmanager
-from sqlalchemy import create_engine, text
+import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
+from contextlib import contextmanager
 
 # Setup logging
 logger = logging.getLogger(__name__)
 
-# Create declarative base for models
+# Base class for all models
 Base = declarative_base()
 
-# Database configuration
-DB_PATH = os.environ.get("DB_PATH", "data/gcpanel.db")
-DATABASE_URL = os.environ.get("DATABASE_URL")  # PostgreSQL connection URI
-
-# Connection pool configuration
-POOL_SIZE = int(os.environ.get("DB_POOL_SIZE", "10"))  # Default pool size
-MAX_OVERFLOW = int(os.environ.get("DB_MAX_OVERFLOW", "20"))  # Max extra connections
-POOL_TIMEOUT = int(os.environ.get("DB_POOL_TIMEOUT", "30"))  # Seconds to wait for connection
-POOL_RECYCLE = int(os.environ.get("DB_POOL_RECYCLE", "1800"))  # Seconds to recycle connection
-
-# Create engine and session factory
-engine = None
+# Global session factory
 Session = None
+engine = None
 
 def init_db():
-    """
-    Initialize database connection and session factory.
+    """Initialize database connection."""
+    global Session, engine
     
-    This function should be called at application startup.
-    """
-    global engine, Session
+    # Get database URL from environment
+    database_url = os.environ.get("DATABASE_URL", "")
+    
+    if not database_url:
+        # Fallback to SQLite
+        db_path = os.environ.get("DB_PATH", "data/gcpanel.db")
+        database_url = f"sqlite:///{db_path}"
+        
+        # Ensure directory exists for SQLite
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
     
     try:
-        # Determine which database to use
-        if DATABASE_URL:
-            # Use PostgreSQL if DATABASE_URL is provided
+        if database_url.startswith("postgresql"):
             logger.info("Connecting to PostgreSQL database")
             
-            # Create engine with connection pooling
-            engine = create_engine(
-                DATABASE_URL,
-                pool_size=POOL_SIZE,
-                max_overflow=MAX_OVERFLOW,
-                pool_timeout=POOL_TIMEOUT,
-                pool_recycle=POOL_RECYCLE,
-                pool_pre_ping=True  # Verify connections before use
+            # Connect to PostgreSQL
+            engine = sa.create_engine(
+                database_url,
+                pool_size=5,
+                max_overflow=10,
+                pool_timeout=30,
+                pool_recycle=1800,
+                echo=False
             )
         else:
-            # Fallback to SQLite
-            SQLITE_URL = f"sqlite:///{DB_PATH}"
+            logger.info("Connecting to SQLite database")
             
-            # Ensure data directory exists
-            os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-            
-            # Create engine with SQLite connection
-            logger.info(f"Connecting to local SQLite database: {DB_PATH}")
-            engine = create_engine(SQLITE_URL, connect_args={"check_same_thread": False})
+            # Connect to SQLite
+            engine = sa.create_engine(
+                database_url,
+                connect_args={"check_same_thread": False},
+                echo=False
+            )
         
         # Create session factory
-        Session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+        Session = scoped_session(sessionmaker(
+            autocommit=False,
+            autoflush=False,
+            bind=engine
+        ))
+        
+        # Initialize models
+        from core.models import initialize_models
+        initialize_models()
         
         # Test connection
-        with get_db_session() as db:
-            db.execute(text("SELECT 1"))
-            logger.info("Database connection successful")
-            
+        engine.connect()
+        logger.info("Database connection successful")
+        
         return True
+    
     except Exception as e:
         logger.error(f"Database initialization error: {str(e)}")
         return False
 
+def create_tables():
+    """Create all tables that don't exist yet."""
+    if engine is None:
+        init_db()
+    
+    Base.metadata.create_all(bind=engine)
+    logger.info("Database tables created")
+
 @contextmanager
 def get_db_session():
-    """
-    Get a database session using context manager.
-    
-    Usage:
-        with get_db_session() as db:
-            result = db.query(Model).all()
-            
-    Returns:
-        SQLAlchemy session
-    """
+    """Get a database session."""
     if Session is None:
         init_db()
-        
+    
     session = Session()
     try:
         yield session
+        session.commit()
     except Exception as e:
-        logger.error(f"Session error: {str(e)}")
         session.rollback()
-        raise
+        raise e
     finally:
         session.close()
 
-def create_tables():
-    """
-    Create all database tables defined in models.
+def get_engine():
+    """Get SQLAlchemy engine."""
+    if engine is None:
+        init_db()
     
-    This function should be called after all models are imported.
-    """
-    try:
-        # Import all models to ensure they're registered with Base
-        from core.models import base
-        from core.models import user
-        from core.models import project
-        from core.models import engineering
-        from core.models import config
-        
-        # Create tables
-        Base.metadata.create_all(bind=engine)
-        logger.info("Database tables created successfully")
-        return True
-    except Exception as e:
-        logger.error(f"Error creating database tables: {str(e)}")
-        return False
-
-def drop_tables():
-    """
-    Drop all database tables.
-    
-    WARNING: This will delete all data! Use with caution.
-    """
-    try:
-        Base.metadata.drop_all(bind=engine)
-        logger.info("Database tables dropped successfully")
-        return True
-    except Exception as e:
-        logger.error(f"Error dropping database tables: {str(e)}")
-        return False
+    return engine

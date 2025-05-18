@@ -8,7 +8,7 @@ Featuring advanced modules for document management, BIM integration, and more.
 
 import streamlit as st
 from utils.ui_manager import set_page_config
-from app_manager import initialize_session_state, render_application
+import app_manager
 
 def main():
     """Main application entry point."""
@@ -16,10 +16,10 @@ def main():
     set_page_config()
     
     # Initialize session state variables
-    initialize_session_state()
+    app_manager.initialize_session_state()
     
     # Render the main application
-    render_application()
+    app_manager.render_application()
 
 if __name__ == "__main__":
     main()

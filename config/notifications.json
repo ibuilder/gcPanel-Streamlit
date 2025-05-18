@@ -1,0 +1,46 @@
+{
+  "channels": {
+    "in_app": {
+      "enabled": true
+    },
+    "email": {
+      "enabled": false,
+      "from_email": "noreply@example.com",
+      "smtp_server": "smtp.example.com",
+      "smtp_port": 587,
+      "smtp_use_tls": true,
+      "smtp_username": "",
+      "smtp_password": ""
+    },
+    "sms": {
+      "enabled": false,
+      "twilio_account_sid": "",
+      "twilio_auth_token": "",
+      "twilio_phone_number": ""
+    }
+  },
+  "notification_levels": {
+    "info": [
+      "in_app"
+    ],
+    "warning": [
+      "in_app",
+      "email"
+    ],
+    "critical": [
+      "in_app",
+      "email",
+      "sms"
+    ],
+    "success": [
+      "in_app"
+    ]
+  },
+  "user_preferences": {
+    "default": {
+      "in_app": true,
+      "email": true,
+      "sms": false
+    }
+  }
+}

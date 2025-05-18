@@ -1,401 +1,552 @@
 """
-Notification utilities for gcPanel Construction Management Dashboard.
+Notification utilities for gcPanel.
 
-This module provides notification capabilities for the application, including
-email and SMS notifications for delivery status updates and other important events.
+This module provides functions for sending notifications
+via email and SMS for various application events.
 """
 
 import os
-from datetime import datetime
-from enum import Enum
 import logging
 import json
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from datetime import datetime
+import threading
+from twilio.rest import Client
 
 # Setup logging
 logger = logging.getLogger(__name__)
 
-class NotificationType(Enum):
-    """Types of notifications that can be sent"""
-    DELIVERY_SCHEDULED = "delivery_scheduled"
-    DELIVERY_CONFIRMED = "delivery_confirmed"
-    DELIVERY_DELAYED = "delivery_delayed"
-    DELIVERY_CANCELED = "delivery_canceled"
-    DELIVERY_ARRIVED = "delivery_arrived"
-    DELIVERY_INCOMPLETE = "delivery_incomplete"
-    DELIVERY_REMINDER = "delivery_reminder"
-    GENERAL_ANNOUNCEMENT = "general_announcement"
+# Constants
+NOTIFICATION_CONFIG_FILE = "config/notifications.json"
+NOTIFICATION_TEMPLATES_DIR = "templates/notifications"
 
-class NotificationPriority(Enum):
-    """Notification priority levels"""
-    LOW = "low"
-    NORMAL = "normal"
-    HIGH = "high"
+# Notification Types
+class NotificationType:
+    INFO = "info"
+    WARNING = "warning"
     CRITICAL = "critical"
+    SUCCESS = "success"
 
-class NotificationMethod(Enum):
-    """Methods for sending notifications"""
+# Notification Channels
+class NotificationChannel:
+    IN_APP = "in_app"
     EMAIL = "email"
     SMS = "sms"
-    IN_APP = "in_app"
-    ALL = "all"
 
-def send_notification(
-    recipient, 
-    subject, 
-    message, 
-    notification_type=NotificationType.GENERAL_ANNOUNCEMENT,
-    priority=NotificationPriority.NORMAL,
-    method=NotificationMethod.IN_APP,
-    metadata=None
-):
+def ensure_dirs_exist():
+    """Ensure notification directories exist."""
+    os.makedirs(os.path.dirname(NOTIFICATION_CONFIG_FILE), exist_ok=True)
+    os.makedirs(NOTIFICATION_TEMPLATES_DIR, exist_ok=True)
+
+def load_notification_config():
     """
-    Send a notification to the specified recipient
+    Load notification configuration.
     
-    Args:
-        recipient (str or list): Email address, phone number, or user ID
-        subject (str): Notification subject
-        message (str): Notification content
-        notification_type (NotificationType): Type of notification
-        priority (NotificationPriority): Priority level
-        method (NotificationMethod): Delivery method
-        metadata (dict): Additional data to include with the notification
-        
     Returns:
-        bool: True if notification was sent successfully
+        dict: Notification configuration
     """
-    try:
-        # Create notification record
-        notification_record = {
-            "recipient": recipient,
-            "subject": subject,
-            "message": message,
-            "type": notification_type.value,
-            "priority": priority.value,
-            "method": method.value,
-            "metadata": metadata or {},
-            "timestamp": datetime.now().isoformat(),
-            "status": "pending"
+    ensure_dirs_exist()
+    
+    if not os.path.exists(NOTIFICATION_CONFIG_FILE):
+        # Create default config
+        default_config = {
+            "channels": {
+                "in_app": {
+                    "enabled": True
+                },
+                "email": {
+                    "enabled": False,
+                    "from_email": "noreply@example.com",
+                    "smtp_server": "smtp.example.com",
+                    "smtp_port": 587,
+                    "smtp_use_tls": True,
+                    "smtp_username": "",
+                    "smtp_password": ""
+                },
+                "sms": {
+                    "enabled": False,
+                    "twilio_account_sid": "",
+                    "twilio_auth_token": "",
+                    "twilio_phone_number": ""
+                }
+            },
+            "notification_levels": {
+                "info": ["in_app"],
+                "warning": ["in_app", "email"],
+                "critical": ["in_app", "email", "sms"],
+                "success": ["in_app"]
+            },
+            "user_preferences": {
+                "default": {
+                    "in_app": True,
+                    "email": True,
+                    "sms": False
+                }
+            }
         }
         
-        # Log the notification for auditing purposes
-        logger.info(f"Sending notification: {json.dumps(notification_record)}")
+        with open(NOTIFICATION_CONFIG_FILE, 'w') as f:
+            json.dump(default_config, f, indent=2)
         
-        # In-app notifications are always stored
-        if method in [NotificationMethod.IN_APP, NotificationMethod.ALL]:
-            store_in_app_notification(notification_record)
-        
-        # Send via the appropriate channel(s)
-        if method in [NotificationMethod.EMAIL, NotificationMethod.ALL]:
-            success = send_email_notification(notification_record)
-        
-        if method in [NotificationMethod.SMS, NotificationMethod.ALL]:
-            success = send_sms_notification(notification_record)
-        
-        # Update notification status
-        notification_record["status"] = "sent" if success else "failed"
-        
-        return success
-        
+        return default_config
+    
+    try:
+        with open(NOTIFICATION_CONFIG_FILE, 'r') as f:
+            return json.load(f)
     except Exception as e:
-        logger.error(f"Error sending notification: {str(e)}")
-        return False
+        logger.error(f"Error loading notification config: {str(e)}")
+        return {}
 
-def store_in_app_notification(notification):
+def save_notification_config(config):
     """
-    Store an in-app notification for later retrieval
+    Save notification configuration.
     
     Args:
-        notification (dict): Notification data to store
-        
-    Returns:
-        bool: True if notification was stored successfully
+        config: Notification configuration to save
     """
-    try:
-        # In a production environment, this would store to a database
-        # For now, we'll just store to a file to simulate the functionality
-        
-        # Create notifications directory if it doesn't exist
-        os.makedirs("data/notifications", exist_ok=True)
-        
-        # Write to a notification log file
-        recipient_id = notification["recipient"]
-        if isinstance(recipient_id, list):
-            recipient_id = "_".join(recipient_id)
-        
-        notification_id = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{recipient_id}"
-        
-        with open(f"data/notifications/{notification_id}.json", "w") as f:
-            json.dump(notification, f)
-        
-        return True
-        
-    except Exception as e:
-        logger.error(f"Error storing in-app notification: {str(e)}")
-        return False
-
-def send_email_notification(notification):
-    """
-    Send an email notification
+    ensure_dirs_exist()
     
-    In a production environment, this would use a real email service.
-    For now, we'll just simulate the functionality.
+    with open(NOTIFICATION_CONFIG_FILE, 'w') as f:
+        json.dump(config, f, indent=2)
+
+def get_template(template_name):
+    """
+    Get a notification template.
     
     Args:
-        notification (dict): Notification data to send
+        template_name: Name of the template
         
     Returns:
-        bool: True if notification was sent successfully
+        dict: Template with subject and body
+    """
+    template_file = os.path.join(NOTIFICATION_TEMPLATES_DIR, f"{template_name}.json")
+    
+    if not os.path.exists(template_file):
+        # Create a default template
+        default_template = {
+            "subject": "Notification from gcPanel",
+            "body": "This is a notification from gcPanel."
+        }
+        
+        with open(template_file, 'w') as f:
+            json.dump(default_template, f, indent=2)
+        
+        return default_template
+    
+    try:
+        with open(template_file, 'r') as f:
+            return json.load(f)
+    except Exception as e:
+        logger.error(f"Error loading template {template_name}: {str(e)}")
+        return {
+            "subject": "Notification from gcPanel",
+            "body": "This is a notification from gcPanel."
+        }
+
+def format_template(template, context):
+    """
+    Format a template with context variables.
+    
+    Args:
+        template: Template dict with subject and body
+        context: Dict of variables to substitute
+        
+    Returns:
+        dict: Formatted template
+    """
+    subject = template.get("subject", "")
+    body = template.get("body", "")
+    
+    # Simple string formatting
+    for key, value in context.items():
+        placeholder = f"{{{key}}}"
+        subject = subject.replace(placeholder, str(value))
+        body = body.replace(placeholder, str(value))
+    
+    return {
+        "subject": subject,
+        "body": body
+    }
+
+def send_in_app_notification(user_id, subject, body, notification_type=NotificationType.INFO):
+    """
+    Send an in-app notification.
+    
+    Args:
+        user_id: ID of the user to notify
+        subject: Notification subject
+        body: Notification body
+        notification_type: Type of notification
+        
+    Returns:
+        bool: True if successful, False otherwise
     """
     try:
-        recipient = notification["recipient"]
-        subject = notification["subject"]
-        message = notification["message"]
+        from core.database.config import get_db_session
+        from core.models.notification import Notification
         
-        # In a production environment, this would use SMTP or an email service API
-        logger.info(f"SIMULATION: Sending email to {recipient} with subject '{subject}'")
+        with get_db_session() as session:
+            notification = Notification(
+                user_id=user_id,
+                subject=subject,
+                body=body,
+                notification_type=notification_type,
+                created_at=datetime.utcnow(),
+                is_read=False
+            )
+            
+            session.add(notification)
+            session.commit()
+            
+            return True
+    
+    except Exception as e:
+        logger.error(f"Error sending in-app notification: {str(e)}")
+        return False
+
+def send_email_notification(to_email, subject, body):
+    """
+    Send an email notification.
+    
+    Args:
+        to_email: Recipient email address
+        subject: Email subject
+        body: Email body (HTML)
         
-        # Simulated success
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    config = load_notification_config()
+    email_config = config.get("channels", {}).get("email", {})
+    
+    if not email_config.get("enabled", False):
+        logger.warning("Email notifications are disabled")
+        return False
+    
+    try:
+        # Create message
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"] = email_config.get("from_email", "noreply@example.com")
+        msg["To"] = to_email
+        
+        # Attach HTML content
+        msg.attach(MIMEText(body, "html"))
+        
+        # Send email
+        with smtplib.SMTP(
+            email_config.get("smtp_server"),
+            email_config.get("smtp_port", 587)
+        ) as server:
+            if email_config.get("smtp_use_tls", True):
+                server.starttls()
+            
+            if email_config.get("smtp_username") and email_config.get("smtp_password"):
+                server.login(
+                    email_config.get("smtp_username"),
+                    email_config.get("smtp_password")
+                )
+            
+            server.send_message(msg)
+        
         return True
-        
+    
     except Exception as e:
         logger.error(f"Error sending email notification: {str(e)}")
         return False
 
-def send_sms_notification(notification):
+def send_sms_notification(to_phone, message):
     """
-    Send an SMS notification using Twilio
+    Send an SMS notification using Twilio.
     
     Args:
-        notification (dict): Notification data to send
+        to_phone: Recipient phone number
+        message: SMS message
         
     Returns:
-        bool: True if notification was sent successfully
+        bool: True if successful, False otherwise
     """
+    config = load_notification_config()
+    sms_config = config.get("channels", {}).get("sms", {})
+    
+    if not sms_config.get("enabled", False):
+        logger.warning("SMS notifications are disabled")
+        return False
+    
+    # Get Twilio credentials
+    account_sid = sms_config.get("twilio_account_sid") or os.environ.get("TWILIO_ACCOUNT_SID")
+    auth_token = sms_config.get("twilio_auth_token") or os.environ.get("TWILIO_AUTH_TOKEN")
+    from_phone = sms_config.get("twilio_phone_number") or os.environ.get("TWILIO_PHONE_NUMBER")
+    
+    if not all([account_sid, auth_token, from_phone]):
+        logger.error("Missing Twilio credentials")
+        return False
+    
     try:
-        from twilio.rest import Client
-        
-        # Get Twilio credentials from environment
-        account_sid = os.environ.get("TWILIO_ACCOUNT_SID")
-        auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
-        from_number = os.environ.get("TWILIO_PHONE_NUMBER")
-        
-        # Check if Twilio credentials are available
-        if not all([account_sid, auth_token, from_number]):
-            logger.warning("Twilio credentials not configured. SMS notification not sent.")
-            return False
-        
-        recipient = notification["recipient"]
-        message = notification["message"]
-        
         # Initialize Twilio client
         client = Client(account_sid, auth_token)
         
-        # Send message
-        sms = client.messages.create(
+        # Send SMS
+        message = client.messages.create(
             body=message,
-            from_=from_number,
-            to=recipient
+            from_=from_phone,
+            to=to_phone
         )
         
-        logger.info(f"SMS sent with SID: {sms.sid}")
+        logger.info(f"SMS sent with SID: {message.sid}")
         return True
-        
-    except ImportError:
-        logger.error("Twilio package not installed. SMS notification not sent.")
-        return False
+    
     except Exception as e:
         logger.error(f"Error sending SMS notification: {str(e)}")
         return False
 
-def get_user_notifications(user_id, limit=10, include_read=False):
+def send_notification(
+    user_id, 
+    template_name, 
+    context=None, 
+    notification_type=NotificationType.INFO,
+    channels=None
+):
     """
-    Get notifications for a specific user
+    Send a notification to a user through configured channels.
     
     Args:
-        user_id (str): User ID to retrieve notifications for
-        limit (int): Maximum number of notifications to return
-        include_read (bool): Whether to include notifications marked as read
+        user_id: ID of the user to notify
+        template_name: Name of the notification template
+        context: Dict of variables to substitute in the template
+        notification_type: Type of notification
+        channels: List of channels to use (defaults to configured channels for the notification type)
         
     Returns:
-        list: List of notification objects
+        dict: Results by channel
     """
-    # In a production environment, this would query a database
-    # For now, we'll read from notification files to simulate the functionality
+    if context is None:
+        context = {}
     
+    config = load_notification_config()
+    
+    # Get user
     try:
-        notifications = []
+        from core.database.config import get_db_session
+        from core.models.user import User
         
-        # Create notifications directory if it doesn't exist
-        os.makedirs("data/notifications", exist_ok=True)
-        
-        # Check all notification files
-        for filename in os.listdir("data/notifications"):
-            if not filename.endswith(".json"):
-                continue
-                
-            filepath = os.path.join("data/notifications", filename)
+        with get_db_session() as session:
+            user = session.query(User).filter(User.id == user_id).first()
             
-            try:
-                with open(filepath, "r") as f:
-                    notification = json.load(f)
-                    
-                recipient = notification.get("recipient")
-                
-                # Filter by user_id
-                if recipient == user_id or (isinstance(recipient, list) and user_id in recipient):
-                    # Check read status if needed
-                    if include_read or not notification.get("read", False):
-                        notifications.append(notification)
-            except Exception as e:
-                logger.error(f"Error reading notification file {filepath}: {str(e)}")
-        
-        # Sort by timestamp (newest first) and limit
-        notifications.sort(key=lambda n: n.get("timestamp", ""), reverse=True)
-        return notifications[:limit]
-        
+            if not user:
+                logger.error(f"User not found: {user_id}")
+                return {channel: False for channel in ["in_app", "email", "sms"]}
+    
     except Exception as e:
-        logger.error(f"Error retrieving notifications: {str(e)}")
-        return []
+        logger.error(f"Error getting user: {str(e)}")
+        return {channel: False for channel in ["in_app", "email", "sms"]}
+    
+    # Get template
+    template = get_template(template_name)
+    formatted = format_template(template, context)
+    
+    # Determine channels to use
+    if channels is None:
+        channels = config.get("notification_levels", {}).get(notification_type, ["in_app"])
+    
+    # Check user preferences
+    user_preferences = config.get("user_preferences", {}).get(str(user_id), config.get("user_preferences", {}).get("default", {}))
+    
+    # Send notifications
+    results = {}
+    
+    def send_notifications_async():
+        if "in_app" in channels and user_preferences.get("in_app", True):
+            results["in_app"] = send_in_app_notification(
+                user_id,
+                formatted["subject"],
+                formatted["body"],
+                notification_type
+            )
+        
+        if "email" in channels and user_preferences.get("email", True) and user.email:
+            results["email"] = send_email_notification(
+                user.email,
+                formatted["subject"],
+                formatted["body"]
+            )
+        
+        if "sms" in channels and user_preferences.get("sms", False) and user.phone_number:
+            # Truncate message for SMS (160 chars)
+            sms_message = formatted["subject"] + ": " + formatted["body"]
+            if len(sms_message) > 160:
+                sms_message = sms_message[:157] + "..."
+                
+            results["sms"] = send_sms_notification(
+                user.phone_number,
+                sms_message
+            )
+    
+    # Run notifications in a separate thread to not block the main thread
+    thread = threading.Thread(target=send_notifications_async)
+    thread.daemon = True
+    thread.start()
+    
+    return results
 
-def mark_notification_as_read(notification_id):
+def mark_notification_read(notification_id):
     """
-    Mark a notification as read
+    Mark an in-app notification as read.
     
     Args:
-        notification_id (str): ID of the notification to mark as read
+        notification_id: ID of the notification
         
     Returns:
-        bool: True if notification was marked as read successfully
+        bool: True if successful, False otherwise
     """
     try:
-        filepath = os.path.join("data/notifications", f"{notification_id}.json")
+        from core.database.config import get_db_session
+        from core.models.notification import Notification
         
-        if not os.path.exists(filepath):
-            logger.warning(f"Notification file not found: {filepath}")
+        with get_db_session() as session:
+            notification = session.query(Notification).filter(Notification.id == notification_id).first()
+            
+            if notification:
+                notification.is_read = True
+                notification.read_at = datetime.utcnow()
+                session.commit()
+                return True
+            
             return False
-            
-        with open(filepath, "r") as f:
-            notification = json.load(f)
-            
-        notification["read"] = True
-        
-        with open(filepath, "w") as f:
-            json.dump(notification, f)
-            
-        return True
-        
+    
     except Exception as e:
         logger.error(f"Error marking notification as read: {str(e)}")
         return False
 
-def send_delivery_notification(
-    delivery_data, 
-    notification_type, 
-    recipients=None, 
-    additional_message=None,
-    methods=None
-):
+def get_unread_notifications(user_id):
     """
-    Send a notification about a delivery status change
+    Get unread in-app notifications for a user.
     
     Args:
-        delivery_data (dict): Delivery information
-        notification_type (NotificationType): Type of notification to send
-        recipients (list): List of recipient IDs/contact info (if None, uses default contacts)
-        additional_message (str): Additional message to include
-        methods (list): List of notification methods to use
+        user_id: ID of the user
         
     Returns:
-        bool: True if notification was sent successfully
+        list: Unread notifications
     """
-    # Create a human-readable message based on notification type
-    item_name = delivery_data.get("item_name", "Unknown item")
-    delivery_date = delivery_data.get("delivery_date", "Unknown date")
+    try:
+        from core.database.config import get_db_session
+        from core.models.notification import Notification
+        
+        with get_db_session() as session:
+            notifications = session.query(Notification).\
+                filter(Notification.user_id == user_id, Notification.is_read == False).\
+                order_by(Notification.created_at.desc()).\
+                all()
+            
+            return [n.to_dict() for n in notifications]
     
-    # Format date if it's a timestamp object
-    if hasattr(delivery_date, "strftime"):
-        delivery_date = delivery_date.strftime("%Y-%m-%d")
+    except Exception as e:
+        logger.error(f"Error getting unread notifications: {str(e)}")
+        return []
+
+def get_recent_notifications(user_id, limit=10):
+    """
+    Get recent notifications for a user.
     
-    supplier = delivery_data.get("supplier", "Unknown supplier")
-    quantity = delivery_data.get("quantity", "")
-    unit = delivery_data.get("unit", "")
-    location = delivery_data.get("delivery_location", "the site")
+    Args:
+        user_id: ID of the user
+        limit: Maximum number of notifications to return
+        
+    Returns:
+        list: Recent notifications
+    """
+    try:
+        from core.database.config import get_db_session
+        from core.models.notification import Notification
+        
+        with get_db_session() as session:
+            notifications = session.query(Notification).\
+                filter(Notification.user_id == user_id).\
+                order_by(Notification.created_at.desc()).\
+                limit(limit).\
+                all()
+            
+            return [n.to_dict() for n in notifications]
     
-    # Create a quantity string if both quantity and unit are present
-    quantity_str = f"{quantity} {unit}" if quantity and unit else ""
+    except Exception as e:
+        logger.error(f"Error getting recent notifications: {str(e)}")
+        return []
+
+def initialize_notification_system():
+    """Initialize the notification system."""
+    ensure_dirs_exist()
+    load_notification_config()
     
-    # Create the base message
-    base_message = f"Delivery update for {item_name}"
-    if quantity_str:
-        base_message += f" ({quantity_str})"
-    base_message += f" from {supplier}."
+    # Create notification model if it doesn't exist
+    try:
+        from core.models.notification import Notification
+        logger.info("Notification model initialized")
+    except ImportError:
+        logger.warning("Notification model not available")
     
-    # Add specific message based on notification type
-    if notification_type == NotificationType.DELIVERY_SCHEDULED:
-        subject = f"Delivery Scheduled: {item_name}"
-        message = f"{base_message} Scheduled for delivery on {delivery_date} to {location}."
-        priority = NotificationPriority.NORMAL
+    # Create default templates
+    create_default_templates()
+
+# Convenience functions for specific modules
+def send_delivery_notification(user_id, delivery_data):
+    """
+    Send a notification for a delivery.
     
-    elif notification_type == NotificationType.DELIVERY_CONFIRMED:
-        subject = f"Delivery Confirmed: {item_name}"
-        message = f"{base_message} Supplier has confirmed delivery for {delivery_date} to {location}."
-        priority = NotificationPriority.NORMAL
+    Args:
+        user_id: ID of the user to notify
+        delivery_data: Dict containing delivery information
+        
+    Returns:
+        dict: Results by channel
+    """
+    context = {
+        "delivery_id": delivery_data.get("id", ""),
+        "delivery_name": delivery_data.get("name", "Unknown Delivery"),
+        "delivery_date": delivery_data.get("date", ""),
+        "supplier": delivery_data.get("supplier", ""),
+        "location": delivery_data.get("location", "")
+    }
     
-    elif notification_type == NotificationType.DELIVERY_DELAYED:
-        subject = f"Delivery Delayed: {item_name}"
-        message = f"{base_message} Delivery has been delayed and will not arrive on {delivery_date} as scheduled."
-        priority = NotificationPriority.HIGH
+    return send_notification(
+        user_id=user_id,
+        template_name="delivery_notification",
+        context=context,
+        notification_type=NotificationType.INFO,
+        channels=["in_app", "email"]
+    )
+
+def create_default_templates():
+    """Create default notification templates."""
+    templates = {
+        "welcome": {
+            "subject": "Welcome to gcPanel!",
+            "body": "Hello {first_name},<br><br>Welcome to gcPanel, your comprehensive construction management platform. We're excited to have you on board!<br><br>The gcPanel Team"
+        },
+        "password_reset": {
+            "subject": "Password Reset Request",
+            "body": "Hello {first_name},<br><br>You have requested a password reset. Please use the following link to reset your password:<br><br>{reset_link}<br><br>If you did not request this reset, please ignore this email.<br><br>The gcPanel Team"
+        },
+        "document_approved": {
+            "subject": "Document Approved: {document_name}",
+            "body": "Hello {first_name},<br><br>The document '{document_name}' has been approved by {approver_name}.<br><br>You can view the document here: {document_link}<br><br>The gcPanel Team"
+        },
+        "rfi_response": {
+            "subject": "RFI Response: {rfi_number}",
+            "body": "Hello {first_name},<br><br>A response has been provided for RFI #{rfi_number}: {rfi_subject}.<br><br>Response: {response_text}<br><br>You can view the RFI here: {rfi_link}<br><br>The gcPanel Team"
+        },
+        "schedule_update": {
+            "subject": "Schedule Update: {project_name}",
+            "body": "Hello {first_name},<br><br>The schedule for project '{project_name}' has been updated.<br><br>Key changes:<br>{changes}<br><br>You can view the updated schedule here: {schedule_link}<br><br>The gcPanel Team"
+        }
+    }
     
-    elif notification_type == NotificationType.DELIVERY_CANCELED:
-        subject = f"Delivery Canceled: {item_name}"
-        message = f"{base_message} Delivery scheduled for {delivery_date} has been canceled."
-        priority = NotificationPriority.HIGH
+    ensure_dirs_exist()
     
-    elif notification_type == NotificationType.DELIVERY_ARRIVED:
-        subject = f"Delivery Arrived: {item_name}"
-        message = f"{base_message} Has arrived at {location}."
-        priority = NotificationPriority.NORMAL
-    
-    elif notification_type == NotificationType.DELIVERY_INCOMPLETE:
-        subject = f"Incomplete Delivery: {item_name}"
-        message = f"{base_message} Delivered to {location} but is incomplete or damaged."
-        priority = NotificationPriority.HIGH
-    
-    elif notification_type == NotificationType.DELIVERY_REMINDER:
-        subject = f"Delivery Reminder: {item_name}"
-        message = f"{base_message} Scheduled to arrive tomorrow at {location}."
-        priority = NotificationPriority.LOW
-    
-    else:
-        subject = f"Delivery Update: {item_name}"
-        message = base_message
-        priority = NotificationPriority.NORMAL
-    
-    # Add any additional message
-    if additional_message:
-        message += f" {additional_message}"
-    
-    # Set default recipients if none provided
-    if not recipients:
-        # In a real app, this would come from user roles in the database
-        recipients = ["project_manager", "site_superintendent", "procurement_manager"]
-    
-    # Set default methods if none provided
-    if not methods:
-        methods = [NotificationMethod.IN_APP]
-    
-    # Send notifications by each specified method
-    success = True
-    for method in methods:
-        result = send_notification(
-            recipient=recipients,
-            subject=subject,
-            message=message,
-            notification_type=notification_type,
-            priority=priority,
-            method=method,
-            metadata=delivery_data
-        )
-        success = success and result
-    
-    return success
+    for name, template in templates.items():
+        template_file = os.path.join(NOTIFICATION_TEMPLATES_DIR, f"{name}.json")
+        
+        if not os.path.exists(template_file):
+            with open(template_file, 'w') as f:
+                json.dump(template, f, indent=2)

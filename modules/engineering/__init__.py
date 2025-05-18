@@ -53,9 +53,78 @@ def render_engineering():
 def render_rfis():
     """Render the RFIs (Requests for Information) section"""
     
-    st.header("Requests for Information (RFIs)")
+    # Header with Create RFI button at the top
+    col1, col2, col3 = st.columns([2, 1, 1])
     
-    # Sample data for RFIs
+    with col1:
+        st.header("Requests for Information (RFIs)")
+    
+    with col3:
+        if st.button("Create New RFI", type="primary", key="create_new_rfi_button", use_container_width=True):
+            st.session_state.show_rfi_form = True
+            st.session_state.edit_rfi_id = None
+    
+    # RFI creation/edit form
+    if st.session_state.get("show_rfi_form", False):
+        # Get RFI data if editing
+        rfi_to_edit = None
+        if st.session_state.get("edit_rfi_id"):
+            rfi_to_edit = next((rfi for rfi in rfis if rfi.get("id") == st.session_state.get("edit_rfi_id")), None)
+        
+        # Use the enhanced form component
+        form_submitted, form_data = rfi_form(
+            is_edit=st.session_state.get("edit_rfi_id") is not None,
+            rfi_data=rfi_to_edit
+        )
+        
+        if form_submitted and form_data:
+            # In a real app, this would save to database
+            
+            # Update or create RFI
+            if st.session_state.get("edit_rfi_id"):
+                # Update existing RFI
+                for i, rfi in enumerate(rfis):
+                    if rfi["id"] == st.session_state.get("edit_rfi_id"):
+                        # Preserve ID and other metadata
+                        form_data["id"] = rfi["id"]
+                        form_data["number"] = rfi["number"]
+                        form_data["submitted_date"] = datetime.now()
+                        rfis[i].update(form_data)
+                        break
+                st.success("RFI updated successfully!")
+            else:
+                # Add new RFI to the list
+                new_rfi = {
+                    "id": f"RFI-{len(rfis) + 1:03d}",
+                    "number": len(rfis) + 1,
+                    "title": form_data["title"],
+                    "description": form_data["description"],
+                    "discipline": form_data["discipline"],
+                    "location": form_data["location"],
+                    "submitted_by": form_data["submitted_by"],
+                    "submitted_date": datetime.now(),
+                    "due_date": form_data["due_date"],
+                    "status": form_data["status"],
+                    "responsible": form_data["responsible"],
+                    "response": None,
+                    "response_date": None,
+                    "closed_date": None,
+                    "attachments": len(form_data.get("attachments", [])),
+                    "cost_impact": form_data["cost_impact"],
+                    "schedule_impact": form_data["schedule_impact"],
+                    "priority": form_data["priority"]
+                }
+                rfis.insert(0, new_rfi)  # Add to beginning of list
+                st.success(f"RFI {form_data['status'].lower()} successfully!")
+            
+            # Reset form state
+            st.session_state.show_rfi_form = False
+            st.session_state.edit_rfi_id = None
+            
+            # Force rerender
+            st.rerun()
+            
+    # Define sample data
     disciplines = [
         "Architectural", "Structural", "Mechanical", "Electrical", "Plumbing", 
         "Civil", "Landscape", "Fire Protection", "Technology", "Other"

@@ -63,46 +63,173 @@ div[data-layout="wide"],
   margin-top: 0 !important;
 }
 
-/* ===== HEADER STYLES ===== */
-/* Header container styling */
-[data-testid="stHorizontalBlock"].header-container {
-  background-color: white !important;
-  margin-top: 0 !important;
-  padding: 10px 20px !important;
-  border-bottom: 1px solid #DADCE0;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+/* ===== PROFESSIONAL HEADER STYLES ===== */
+/* Main header container */
+.pro-header-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background-color: white;
+  padding: 12px 24px;
   width: 100%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  position: relative;
+  z-index: 100;
 }
 
-/* Text-based logo styling */
-.header-logo.text-logo {
+/* Left section with project info */
+.pro-header-left {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 30%;
 }
 
-.header-logo .logo-text {
+.pro-project-label {
+  font-size: 12px;
+  color: #6B7280;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.pro-project-name {
+  font-size: 16px;
+  color: #374151;
+  font-weight: 600;
+}
+
+/* Center section with logo */
+.pro-header-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40%;
+}
+
+.pro-logo {
   font-size: 24px;
   font-weight: 700;
   letter-spacing: -0.5px;
   color: #2c3e50;
-  font-family: 'Inter', sans-serif;
 }
 
-.header-logo .logo-highlight {
+.pro-logo-highlight {
   color: #3e79f7;
 }
 
-/* Ensure dropdown is aligned to the right */
-div[data-testid="stSelectbox"] {
-  display: flex !important;
-  justify-content: flex-end !important;
-  padding-top: 10px !important;
-  margin-bottom: 0 !important;
+/* Right section with menu */
+.pro-header-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 30%;
+}
+
+.pro-menu-selected {
+  display: flex;
+  align-items: center;
+  background-color: #F0F7FF;
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+  color: #3e79f7;
+  font-weight: 500;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.pro-menu-selected:hover {
+  background-color: #E1EFFE;
+}
+
+.pro-menu-icon {
+  margin-right: 8px;
+}
+
+.pro-menu-text {
+  margin-right: 8px;
+}
+
+.pro-menu-arrow {
+  font-size: 12px;
+  color: #6B7280;
+}
+
+/* Secondary navigation bar */
+.pro-secondary-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 24px;
+  background-color: #F9FAFB;
+  border-bottom: 1px solid #E5E7EB;
+  margin-bottom: 1rem;
+}
+
+/* Breadcrumbs */
+.pro-breadcrumbs {
+  display: flex;
+  align-items: center;
+}
+
+.pro-breadcrumb-item {
+  color: #6B7280;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.pro-breadcrumb-item:hover {
+  color: #3e79f7;
+  text-decoration: underline;
+}
+
+.pro-breadcrumb-separator {
+  margin: 0 8px;
+  color: #9CA3AF;
+}
+
+.pro-breadcrumb-current {
+  color: #374151;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Notification area */
+.pro-notification-area {
+  position: relative;
+  cursor: pointer;
+}
+
+.pro-notification-icon {
+  font-size: 20px;
+  color: #6B7280;
+}
+
+.pro-notification-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #EF4444;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* Hide the native Streamlit dropdown while keeping it functional */
+div[data-testid="stSelectbox"].pro-menu-dropdown {
+  position: absolute !important;
+  opacity: 0 !important;
+  width: 200px !important;
+  height: 50px !important;
+  z-index: 5 !important;
+  right: 24px !important;
+  top: 12px !important;
 }
 
 /* Style the dropdown */

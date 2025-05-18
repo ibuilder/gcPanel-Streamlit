@@ -9,7 +9,7 @@ import streamlit as st
 
 def render_header():
     """
-    Render a clean header with logo, project info, and right-aligned navigation.
+    Render a professional header with centered logo, project info, and navigation.
     """
     # CSS is now loaded from external file in ui_manager.py
     
@@ -29,45 +29,81 @@ def render_header():
         "⚙️ Settings": "Settings"
     }
     
-    # Create a container for the header
-    with st.container():
-        cols = st.columns([7, 3])
-        
-        # Logo and project info in first column
-        with cols[0]:
-            st.markdown("""
-            <div class="header-logo-container">
-                <div class="header-logo text-logo">
-                    <span class="logo-text">gc<span class="logo-highlight">Panel</span></span>
-                </div>
-                <div class="header-project-info">
-                    <p class="header-project-label">Project</p>
-                    <p class="header-project-name">Highland Tower Development</p>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        # Navigation dropdown in second column (right-aligned)
-        with cols[1]:
-            # Get currently selected menu value from session state
-            current_menu = st.session_state.get("current_menu", "Dashboard")
-            current_display_menu = next((k for k, v in menu_options.items() if v == current_menu), list(menu_options.keys())[0])
-            
-            # Create the dropdown with right alignment
-            selected = st.selectbox(
-                "Navigation",
-                options=list(menu_options.keys()),
-                index=list(menu_options.keys()).index(current_display_menu),
-                label_visibility="collapsed",
-                key="header_nav_dropdown"
-            )
-            
-            # Update the session state when a new menu item is selected
-            if menu_options[selected] != current_menu:
-                st.session_state.current_menu = menu_options[selected]
-                st.rerun()
+    # Get currently selected menu value from session state
+    current_menu = st.session_state.get("current_menu", "Dashboard")
     
-    # Draw a separator line below the header
+    # Get icon for current menu
+    current_icon = ""
+    for k, v in menu_options.items():
+        if v == current_menu:
+            current_icon = k.split(" ")[0]
+            break
+    
+    # Create main header container
     st.markdown("""
-    <div class="header-separator"></div>
+    <div class="pro-header-container">
+        <div class="pro-header-left">
+            <div class="pro-project-label">Project</div>
+            <div class="pro-project-name">Highland Tower Development</div>
+        </div>
+        
+        <div class="pro-header-center">
+            <div class="pro-logo">gc<span class="pro-logo-highlight">Panel</span></div>
+        </div>
+        
+        <div class="pro-header-right">
+            <div class="pro-menu-selected">
+                <span class="pro-menu-icon">{}</span>
+                <span class="pro-menu-text">{}</span>
+                <span class="pro-menu-arrow">▼</span>
+            </div>
+        </div>
+    </div>
+    """.format(current_icon, current_menu), unsafe_allow_html=True)
+    
+    # Navigation dropdown (hidden but functional)
+    # Add a CSS class to help target this specific dropdown
+    st.markdown("""
+    <style>
+    /* Target this specific dropdown */
+    div[data-testid="stSelectbox"]:has(select#header_nav_dropdown) {
+        position: absolute !important;
+        opacity: 0 !important;
+        width: 200px !important;
+        height: 50px !important;
+        z-index: 5 !important;
+        right: 24px !important;
+        top: 12px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 1, 3])
+    with col3:
+        selected = st.selectbox(
+            "Navigation",
+            options=list(menu_options.keys()),
+            index=list(menu_options.values()).index(current_menu),
+            label_visibility="collapsed",
+            key="header_nav_dropdown",
+        )
+        
+        # Update the session state when a new menu item is selected
+        if menu_options[selected] != current_menu:
+            st.session_state.current_menu = menu_options[selected]
+            st.rerun()
+    
+    # Secondary navigation bar with breadcrumbs
+    st.markdown(f"""
+    <div class="pro-secondary-nav">
+        <div class="pro-breadcrumbs">
+            <a href="#" class="pro-breadcrumb-item">Home</a>
+            <span class="pro-breadcrumb-separator">›</span>
+            <span class="pro-breadcrumb-current">{current_menu}</span>
+        </div>
+        <div class="pro-notification-area">
+            <span class="pro-notification-icon">🔔</span>
+            <span class="pro-notification-badge">3</span>
+        </div>
+    </div>
     """, unsafe_allow_html=True)

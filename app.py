@@ -25,6 +25,7 @@ from modules.cost_management import render_cost_management
 from modules.closeout import render_closeout
 from modules.engineering import render_engineering
 from modules.documents import render_documents
+from modules.roadmap import render_roadmap
 
 # Import components
 from components.simple_breadcrumbs import simple_breadcrumbs, get_breadcrumbs_for_page
@@ -375,6 +376,8 @@ def main():
             render_cost_management()
         elif current_menu == "Schedule":
             render_scheduling()
+        elif current_menu == "Roadmap":
+            render_roadmap()
         elif current_menu == "Closeout":
             render_closeout()
         elif current_menu == "Settings":

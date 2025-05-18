@@ -23,6 +23,62 @@ def render_occupancy_permits():
         if st.button("Add New Permit/Inspection", type="primary", key="add_permit_btn"):
             st.session_state.show_permit_form = True
     
+    # Add progress visualization
+    progress_col1, progress_col2 = st.columns([1, 3])
+    with progress_col1:
+        st.markdown("### Overall Progress")
+    with progress_col2:
+        # Calculate progress percentage based on permit statuses
+        approved_count = 2  # From our sample data
+        total_count = 5     # From our sample data
+        progress_pct = (approved_count / total_count) * 100
+        
+        # Display progress bar
+        st.progress(progress_pct)
+        st.markdown(f"**{progress_pct:.1f}% Complete** ({approved_count}/{total_count} permits approved)")
+    
+    # Add status visualization
+    st.markdown("### Permit Status Overview")
+    
+    # Create sample data for the status chart
+    status_data = {
+        "Status": ["Approved", "Approved with Conditions", "Pending", "Scheduled", "Pending Corrections"],
+        "Count": [1, 1, 1, 1, 1]
+    }
+    status_df = pd.DataFrame(status_data)
+    
+    # Define colors for the status chart
+    status_colors = {
+        "Approved": "#28a745",
+        "Approved with Conditions": "#20c997",
+        "Pending": "#6c757d",
+        "Scheduled": "#17a2b8",
+        "Pending Corrections": "#ffc107",
+        "Rejected": "#dc3545"
+    }
+    
+    # Create status chart
+    fig = px.bar(
+        status_df, 
+        x="Status", 
+        y="Count",
+        color="Status",
+        color_discrete_map=status_colors,
+        title="Permit Status Distribution"
+    )
+    
+    fig.update_layout(
+        height=300,
+        margin=dict(l=20, r=20, t=40, b=20),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        xaxis_title="",
+        yaxis_title="Number of Permits",
+        showlegend=False
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
+    
     # Sample permit data
     permits = [
         {

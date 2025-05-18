@@ -550,7 +550,16 @@ def render_rfis():
 def render_submittals():
     """Render the submittals section"""
     
-    st.header("Submittals")
+    # Header with Create Submittal button at the top
+    col1, col2, col3 = st.columns([2, 1, 1])
+    
+    with col1:
+        st.header("Submittals")
+    
+    with col3:
+        if st.button("Create New Submittal", type="primary", key="create_submittal_btn_top", use_container_width=True):
+            st.session_state.show_submittal_form = True
+            st.session_state.edit_submittal_id = None
     
     # Sample data for submittals
     specification_sections = [

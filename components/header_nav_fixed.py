@@ -212,11 +212,12 @@ def render_header_nav():
         <style>
         /* Move this specific dropdown to the target location */
         [data-testid="stSelectbox"] {
-            position: absolute;
-            top: 15px;
+            position: fixed;
+            top: 35px; 
             right: 20px;
             width: 200px;
-            z-index: 1000;
+            z-index: 999;
+            background-color: white;
         }
         </style>
         """, unsafe_allow_html=True)

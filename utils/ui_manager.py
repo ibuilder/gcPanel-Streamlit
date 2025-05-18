@@ -37,7 +37,8 @@ def load_external_resources():
         "static/css/buttons-fix.css",
         "static/css/action-buttons.css",
         "static/css/action-bar.css",
-        "static/css/notification_styles.css"
+        "static/css/notification_styles.css",
+        "static/css/header-fix.css"
     ]
     
     for css_file in css_files:

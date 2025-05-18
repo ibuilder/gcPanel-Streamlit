@@ -1,0 +1,85 @@
+/* Header styling fixes */
+
+/* Header container */
+.header-wrapper {
+    position: relative;
+    background-color: white;
+    margin: 0;
+    padding: 15px 0;
+    border-bottom: 1px solid #DADCE0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    width: 100%;
+    z-index: 1000;
+}
+
+/* Logo and project info */
+.gcpanel-logo {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 5px 10px;
+}
+
+.gcpanel-logo img {
+    max-height: 40px;
+    width: auto;
+}
+
+.project-info {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 20px;
+    border-left: 1px solid #DADCE0;
+    padding-left: 20px;
+}
+
+.project-info-label {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #5F6368;
+}
+
+.project-name {
+    margin: 0;
+    font-size: 16px;
+    color: #3367D6;
+    font-weight: 600;
+}
+
+/* Navigation dropdown positioning */
+.stSelectbox {
+    position: fixed !important;
+    top: 25px !important;
+    right: 20px !important;
+    width: 200px !important;
+    z-index: 1001 !important;
+    background-color: white !important;
+}
+
+/* Make sure dropdown is visible */
+div[data-testid="stSelectbox"] {
+    display: block !important;
+    visibility: visible !important;
+    position: fixed !important;
+    top: 25px !important;
+    right: 20px !important;
+    width: 200px !important;
+    z-index: 1001 !important;
+    background-color: white !important;
+}
+
+/* Dropdown list styling */
+div[role="listbox"] {
+    border-radius: 6px;
+    border: 1px solid #e1e4e8;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+div[role="option"] {
+    padding: 8px 12px;
+    transition: background-color 0.2s;
+}
+
+div[role="option"]:hover {
+    background-color: rgba(51, 103, 214, 0.1);
+}

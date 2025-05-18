@@ -32,27 +32,30 @@ def render_bim_viewer():
         index=default_index
     )
     
-    # Load the IFC.js viewer
-    st.markdown("""
+    # Create a model URL
+    model_url = f"/static/models/{selected_ifc}"
+    
+    # Load the IFC.js viewer with proper string formatting
+    iframe_html = f"""
     <div style="width: 100%; height: 600px; position: relative; background-color: #f5f5f5; border-radius: 8px; overflow: hidden;">
         <canvas id="three-canvas" style="width: 100%; height: 100%;"></canvas>
     </div>
     
     <script type="importmap">
-    {
-        "imports": {
+    {{
+        "imports": {{
             "three": "https://unpkg.com/three@0.154.0/build/three.module.js",
             "three/addons/": "https://unpkg.com/three@0.154.0/examples/jsm/",
             "web-ifc-three": "https://unpkg.com/web-ifc-three@0.0.126/dist/web-ifc-three.esm.js",
             "web-ifc": "https://unpkg.com/web-ifc@0.0.46/dist/web-ifc-api.js"
-        }
-    }
+        }}
+    }}
     </script>
     
     <script type="module">
         import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { IFCLoader } from 'web-ifc-three/IFCLoader';
+        import {{ OrbitControls }} from 'three/addons/controls/OrbitControls.js';
+        import {{ IFCLoader }} from 'web-ifc-three/IFCLoader';
         
         // Set up scene
         const canvas = document.getElementById('three-canvas');
@@ -66,7 +69,7 @@ def render_bim_viewer():
         camera.position.x = 10;
         
         // Set up renderer
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+        const renderer = new THREE.WebGLRenderer({{ canvas: canvas, antialias: true }});
         renderer.setSize(canvas.clientWidth, canvas.clientHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         
@@ -88,8 +91,8 @@ def render_bim_viewer():
         ifcLoader.ifcManager.setWasmPath('https://unpkg.com/web-ifc@0.0.46/');
         
         // Load IFC file
-        const url = '/static/models/{0}';
-        ifcLoader.load(url, (ifcModel) => {
+        const url = '{model_url}';
+        ifcLoader.load(url, (ifcModel) => {{
             scene.add(ifcModel);
             
             // Fit camera to model
@@ -106,25 +109,28 @@ def render_bim_viewer():
             
             controls.target.set(center.x, center.y, center.z);
             controls.update();
-        });
+        }});
         
         // Handle window resize
-        window.addEventListener('resize', () => {
+        window.addEventListener('resize', () => {{
             camera.aspect = canvas.clientWidth / canvas.clientHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-        });
+        }});
         
         // Animation loop
-        function animate() {
+        function animate() {{
             requestAnimationFrame(animate);
             controls.update();
             renderer.render(scene, camera);
-        }
+        }}
         
         animate();
     </script>
-    """.format(selected_ifc), unsafe_allow_html=True)
+    """
+    
+    # Render the HTML
+    st.markdown(iframe_html, unsafe_allow_html=True)
     
     # Display model information
     st.subheader("Model Information")

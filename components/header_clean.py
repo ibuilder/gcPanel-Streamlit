@@ -83,16 +83,8 @@ def render_header():
     # Display a divider
     st.divider()
     
-    # Breadcrumb and notification row
-    col1, col2 = st.columns([11, 1])
-    
-    with col1:
-        # Simple breadcrumb
-        st.markdown(f'<span style="color: #3b82f6;">[Home](#)</span> > {current_menu}', unsafe_allow_html=True)
-    
-    with col2:
-        # Fixed notification button (single instance, right-aligned)
-        st.markdown(
-            f'<div style="text-align: right;"><span style="position: relative; font-size: 1.2rem;">🔔<span style="position: absolute; top: -8px; right: -8px; background-color: #ef4444; color: white; border-radius: 50%; font-size: 0.7rem; padding: 2px 5px;">3</span></span></div>',
-            unsafe_allow_html=True
-        )
+    # Only show notification in the header
+    st.markdown(
+        f'<div style="text-align: right; margin-right: 15px;"><span style="position: relative; font-size: 1.2rem;">🔔<span style="position: absolute; top: -8px; right: -8px; background-color: #ef4444; color: white; border-radius: 50%; font-size: 0.7rem; padding: 2px 5px;">3</span></span></div>',
+        unsafe_allow_html=True
+    )

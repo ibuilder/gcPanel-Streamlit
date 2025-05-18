@@ -16,7 +16,8 @@ from modules.dashboard import render_dashboard
 from modules.settings import render_settings
 from modules.project_information import render_project_information
 from modules.pdf_viewer.pdf_viewer import render_pdf_viewer
-from modules.bim_viewer.basic_viewer import render_basic_bim_viewer as render_bim_viewer
+from modules.bim_viewer.basic_viewer import render_basic_bim_viewer
+from modules.bim_viewer.advanced_viewer import render_advanced_bim_viewer
 from modules.field_operations import render_field_operations
 from modules.scheduling import render_scheduling
 from modules.safety import render_safety
@@ -307,7 +308,14 @@ def main():
         elif current_menu == "Documents":
             render_documents()
         elif current_menu == "BIM":
-            render_bim_viewer()
+            # Create tabs for different BIM viewer options
+            bim_tab1, bim_tab2 = st.tabs(["Basic Viewer", "3D Viewer"])
+            
+            with bim_tab1:
+                render_basic_bim_viewer()
+            
+            with bim_tab2:
+                render_advanced_bim_viewer()
         elif current_menu == "Field Operations":
             render_field_operations()
         elif current_menu == "Safety":

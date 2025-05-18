@@ -95,10 +95,10 @@ def initialize_session_state():
 def main():
     """Main application entry point."""
     
-    # Set page configuration
+    # Set page configuration with new favicon
     st.set_page_config(
         page_title="gcPanel Construction Dashboard",
-        page_icon="🏗️",
+        page_icon="static/images/favicon.svg",
         layout="wide",
         initial_sidebar_state="expanded"
     )
@@ -114,9 +114,9 @@ def main():
     # Initialize database and authentication
     initialize_application()
     
-    # Direct sidebar navigation without any custom components
-    st.sidebar.image("gcpanel.png", width=100)
-    st.sidebar.title("gcPanel")
+    # Direct sidebar navigation with new logo
+    st.sidebar.image("static/images/gcpanel-logo.svg", width=200)
+    # No need for title text since it's already in the logo
     
     st.sidebar.markdown("### Project")
     st.sidebar.markdown("**Highland Tower Development**")

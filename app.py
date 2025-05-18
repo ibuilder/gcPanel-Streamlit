@@ -44,7 +44,9 @@ def local_css():
     css_files = [
         "static/css/main.css", 
         "static/css/notifications.css",
-        "static/css/enhanced-theme.css"
+        "static/css/enhanced-theme.css",
+        "static/css/optimized-ui.css",
+        "static/css/console-fix.css"
     ]
     
     for css_file in css_files:

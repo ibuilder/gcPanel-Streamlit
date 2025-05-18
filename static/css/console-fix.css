@@ -1,0 +1,202 @@
+/* Console warning fixes and UI enhancements for gcPanel */
+
+/* Fix for "Scale bindings" warning */
+[data-testid="stVegaLiteChart"] > div > div > div {
+  width: 100% !important;
+}
+
+/* Fix for Infinity values in chart extents */
+[data-testid="stVegaLiteChart"] {
+  min-height: 200px;
+}
+
+/* Remove extraneous margins and padding */
+.stApp {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.main .block-container {
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* Hide error messages and warnings in the UI */
+.element-container:has(div.stException) {
+  display: none !important;
+}
+
+/* Streamlined card style */
+.dashboard-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eaeaea;
+}
+
+/* Priority focus task highlighting */
+.priority-task {
+  border-left: 4px solid #ff5b5b;
+  padding-left: 12px;
+}
+
+/* Badge styling */
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-success {
+  background-color: #38d39f20;
+  color: #38d39f;
+}
+
+.badge-warning {
+  background-color: #f9c85120;
+  color: #f9c851;
+}
+
+.badge-danger {
+  background-color: #ff5b5b20;
+  color: #ff5b5b;
+}
+
+.badge-info {
+  background-color: #3e79f720;
+  color: #3e79f7;
+}
+
+/* Progress indicators */
+.progress-circle {
+  position: relative;
+  height: 60px;
+  width: 60px;
+  border-radius: 50%;
+  background: conic-gradient(#3e79f7 0% var(--percent), #f0f0f0 var(--percent) 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.progress-circle::before {
+  content: "";
+  position: absolute;
+  height: 44px;
+  width: 44px;
+  border-radius: 50%;
+  background-color: white;
+}
+
+.progress-circle span {
+  position: relative;
+  font-size: 16px;
+  font-weight: 600;
+  color: #3e79f7;
+}
+
+/* Status indicators */
+.status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.status-indicator.active {
+  background-color: #38d39f;
+}
+
+.status-indicator.warning {
+  background-color: #f9c851;
+}
+
+.status-indicator.danger {
+  background-color: #ff5b5b;
+}
+
+.status-indicator.neutral {
+  background-color: #6c757d;
+}
+
+/* Streamlit core elements improvements */
+/* Buttons */
+button[kind="primary"] {
+  background-color: #3e79f7 !important;
+  border-color: #3e79f7 !important;
+}
+
+button[kind="secondary"] {
+  color: #3e79f7 !important;
+  border-color: #3e79f7 !important;
+}
+
+/* Inputs */
+[data-baseweb="input"] {
+  border-radius: 6px !important;
+}
+
+/* Tabs */
+[data-baseweb="tab"] {
+  font-weight: 500 !important;
+}
+
+[data-baseweb="tab"][aria-selected="true"] {
+  color: #3e79f7 !important;
+  font-weight: 600 !important;
+}
+
+/* Performance optimizations */
+img, svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .dashboard-card {
+    padding: 15px;
+  }
+}
+
+/* Target and remove console debug messages in Replit iframe */
+#consoleDebug, .console-debug-messages {
+  display: none !important;
+}
+
+/* Fix for Streamlit header */
+[data-testid="stHeader"] {
+  visibility: hidden;
+  height: 0;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Fix for Streamlit toolbar */
+header[data-testid="stToolbar"] {
+  visibility: hidden;
+  height: 0;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Reduce the impact of Vega-Lite warnings */
+.vega-embed .vg-tooltip {
+  display: none !important;
+}
+
+/* Streamlined footer */
+.footer {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #eaeaea;
+  color: #6c757d;
+  font-size: 12px;
+  text-align: center;
+}

@@ -1,0 +1,419 @@
+/* Optimized UI for gcPanel Application 
+   Focusing on efficiency and usability while maintaining a clean look */
+
+/* Global Typography Improvements */
+body, html, .stApp {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #202124;
+    line-height: 1.5;
+}
+
+/* Custom Colors */
+:root {
+    --primary: #3367D6;
+    --primary-light: #8AB4F8;
+    --primary-dark: #2A56C2;
+    --accent: #4285F4;
+    --success: #0F9D58;
+    --warning: #F4B400;
+    --error: #DB4437;
+    --gray-100: #F8F9FA;
+    --gray-200: #E8EAED;
+    --gray-300: #DADCE0;
+    --gray-500: #5F6368;
+    --gray-700: #3C4043;
+    --gray-900: #202124;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    --card-shadow-hover: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+
+/* Layout and Structure */
+.main .block-container {
+    max-width: 1400px;
+    padding: 0 20px 20px 20px !important;
+    margin: 0 auto;
+}
+
+/* Card Styling */
+div.css-1r6slb0.e1tzin5v2 {
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid var(--gray-300);
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.2s ease;
+}
+
+div.css-1r6slb0.e1tzin5v2:hover {
+    box-shadow: var(--card-shadow-hover);
+}
+
+/* Dashboard Metrics */
+.dashboard-metric {
+    padding: 20px;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: var(--card-shadow);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--gray-300);
+}
+
+.dashboard-metric-value {
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--primary);
+    line-height: 1.2;
+    margin-bottom: 5px;
+}
+
+.dashboard-metric-label {
+    font-size: 14px;
+    color: var(--gray-500);
+    margin-bottom: 15px;
+}
+
+/* Progress Bars */
+[data-testid="stProgress"] {
+    height: 8px !important;
+    border-radius: 4px !important;
+}
+
+[data-testid="stProgress"] > div {
+    background-color: var(--primary) !important;
+}
+
+/* Tabs Styling */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 0;
+    border-bottom: 1px solid var(--gray-300);
+}
+
+.stTabs [data-baseweb="tab"] {
+    padding: 10px 20px;
+    border-radius: 4px 4px 0 0;
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.stTabs [data-baseweb="tab"][aria-selected="true"] {
+    background-color: white;
+    color: var(--primary);
+    font-weight: 600;
+    border-bottom: 2px solid var(--primary);
+}
+
+.stTabs [data-baseweb="tab-panel"] {
+    padding: 20px 5px;
+}
+
+/* Buttons */
+.stButton > button {
+    background-color: var(--primary);
+    color: white;
+    font-weight: 500;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.stButton > button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Secondary Button Style */
+.secondary-button > button {
+    background-color: white;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+}
+
+.secondary-button > button:hover {
+    background-color: rgba(51, 103, 214, 0.05);
+}
+
+/* Forms and Inputs */
+div[data-baseweb="input"], 
+div[data-baseweb="textarea"], 
+div[data-baseweb="select"], 
+div[data-baseweb="checkbox"] {
+    margin-bottom: 15px;
+}
+
+[data-baseweb="input"] input, 
+[data-baseweb="textarea"] textarea {
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid var(--gray-300);
+    padding: 8px 12px;
+    transition: all 0.2s ease;
+}
+
+[data-baseweb="input"] input:focus, 
+[data-baseweb="textarea"] textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(51, 103, 214, 0.2);
+}
+
+/* Tables */
+div.stDataFrame {
+    padding: 0;
+}
+
+div.stDataFrame table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    width: 100%;
+    margin-bottom: 20px;
+    box-shadow: var(--card-shadow);
+}
+
+div.stDataFrame thead tr:first-child {
+    background-color: var(--gray-100);
+}
+
+div.stDataFrame th {
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    color: var(--gray-700);
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--gray-300);
+}
+
+div.stDataFrame td {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--gray-300);
+    font-size: 14px;
+}
+
+div.stDataFrame tr:hover {
+    background-color: rgba(66, 133, 244, 0.05);
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.status-badge.success {
+    background-color: rgba(15, 157, 88, 0.1);
+    color: var(--success);
+}
+
+.status-badge.warning {
+    background-color: rgba(244, 180, 0, 0.1);
+    color: var(--warning);
+}
+
+.status-badge.error {
+    background-color: rgba(219, 68, 55, 0.1);
+    color: var(--error);
+}
+
+.status-badge.info {
+    background-color: rgba(66, 133, 244, 0.1);
+    color: var(--accent);
+}
+
+/* Dashboard Section Headings */
+h2, h3 {
+    color: var(--gray-900);
+    font-weight: 600;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    position: relative;
+}
+
+h2:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background-color: var(--primary);
+    border-radius: 3px;
+}
+
+/* Activity Feed */
+.activity-item {
+    padding: 15px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: flex-start;
+}
+
+.activity-icon {
+    margin-right: 12px;
+    color: var(--primary);
+    font-size: 20px;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-title {
+    font-weight: 500;
+    margin: 0 0 5px 0;
+}
+
+.activity-meta {
+    font-size: 12px;
+    color: var(--gray-500);
+}
+
+/* Expandable Sections */
+[data-testid="stExpander"] {
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+[data-testid="stExpander"] > div:first-child {
+    background-color: var(--gray-100);
+    padding: 15px;
+    font-weight: 500;
+}
+
+[data-testid="stExpander"] > div:last-child {
+    padding: 15px;
+}
+
+/* Tooltips */
+[data-tooltip]:hover:after {
+    background-color: var(--gray-900);
+    color: white;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 12px;
+    z-index: 1000;
+}
+
+/* Notifications */
+.notification {
+    display: flex;
+    align-items: flex-start;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    background-color: var(--gray-100);
+    border-left: 3px solid var(--primary);
+}
+
+.notification-icon {
+    margin-right: 12px;
+    font-size: 20px;
+    color: var(--primary);
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-title {
+    font-weight: 500;
+    margin: 0 0 5px 0;
+}
+
+.notification-message {
+    margin: 0;
+    color: var(--gray-700);
+}
+
+/* Section Cards */
+.section-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid var(--gray-300);
+}
+
+.section-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.section-card-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.section-card-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* BIM Viewer specific enhancements */
+#ifc-viewer-container {
+    border-radius: 8px !important;
+    box-shadow: var(--card-shadow) !important;
+    overflow: hidden !important;
+}
+
+.viewer-tool-button {
+    background-color: white !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
+    border: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.viewer-tool-button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .dashboard-metric-value {
+        font-size: 28px;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main .block-container {
+        padding: 0 10px 10px 10px !important;
+    }
+    
+    .section-card {
+        padding: 15px;
+    }
+    
+    .dashboard-metric {
+        padding: 15px;
+    }
+}

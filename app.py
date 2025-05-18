@@ -442,113 +442,171 @@ def local_css():
         }}
         
         /* Notification Center */
-        .notification-center {{
-            position: absolute;
-            top: 50px;
-            right: 1rem;
-            width: 350px;
-            max-height: 500px;
-            overflow-y: auto;
+        .notification-center-container {{
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             border: 1px solid {border_color};
-            z-index: 1000;
-            padding: 0;
+            margin: 1rem 0;
+            overflow: hidden;
         }}
         
-        .notification-header {{
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .notification-center-header {{
+            background-color: {light_bg};
             padding: 1rem;
             border-bottom: 1px solid {border_color};
-            background-color: {light_bg};
         }}
         
-        .notification-title {{
-            font-weight: 600;
-            font-size: 1rem;
+        .notification-center-header h2 {{
             margin: 0;
+            font-size: 1.25rem;
+            color: {text_color};
+            display: flex;
+            align-items: center;
         }}
         
-        .notification-actions {{
-            display: flex;
-            gap: 0.5rem;
+        .notification-center-header h2 i {{
+            margin-right: 10px;
+            color: {primary_color};
+        }}
+        
+        .notification-empty {{
+            text-align: center;
+            padding: 2rem;
+            color: {text_muted};
+        }}
+        
+        .notification-empty i {{
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+            color: {border_color};
         }}
         
         .notification-list {{
-            padding: 0;
-            margin: 0;
-            list-style: none;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 0.5rem 1rem;
         }}
         
         .notification-item {{
             padding: 1rem;
-            border-bottom: 1px solid {border_color};
-            transition: background-color 0.15s ease;
+            margin-bottom: 0.75rem;
+            border-radius: 6px;
+            background-color: {light_bg};
+            border-left: 4px solid {border_color};
+            transition: transform 0.2s, box-shadow 0.2s;
         }}
         
         .notification-item:hover {{
-            background-color: rgba(0,0,0,0.01);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         }}
         
-        .notification-item:last-child {{
-            border-bottom: none;
+        .notification-item.unread {{
+            background-color: rgba(62, 121, 247, 0.05);
+        }}
+        
+        .notification-item.priority-high {{
+            border-left-color: {warning_color};
+        }}
+        
+        .notification-item.priority-critical {{
+            border-left-color: {danger_color};
         }}
         
         .notification-item-header {{
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 0.5rem;
         }}
         
         .notification-item-title {{
-            font-weight: 500;
-            margin: 0;
+            font-weight: 600;
+            color: {text_color};
+            display: flex;
+            align-items: center;
             font-size: 0.95rem;
         }}
         
+        .notification-item-title i {{
+            margin-right: 0.5rem;
+            color: {primary_color};
+        }}
+        
         .notification-item-time {{
+            font-size: 0.75rem;
             color: {text_muted};
-            font-size: 0.8rem;
         }}
         
         .notification-item-body {{
+            margin: 0.5rem 0;
             color: {text_color};
             font-size: 0.9rem;
-            margin-bottom: 0.5rem;
         }}
         
-        .notification-item-actions {{
+        .notification-item-footer {{
             display: flex;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+        }}
+        
+        .notification-item-type {{
+            color: {text_muted};
+            background-color: rgba(0,0,0,0.05);
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+        }}
+        
+        /* Notification button styling */
+        .notification-btn-container {{
+            position: relative;
+            display: inline-block;
+        }}
+        
+        .notification-btn {{
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border: 1px solid {border_color};
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            color: {text_color};
+        }}
+        
+        .notification-btn:hover {{
+            background-color: {light_bg};
+            border-color: {primary_color};
+            color: {primary_color};
+        }}
+        
+        .notification-btn i {{
+            margin-right: 0.5rem;
+            font-size: 1.1rem;
+            color: {primary_color};
         }}
         
         .notification-badge {{
             position: absolute;
             top: -5px;
             right: -5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 20px;
-            height: 20px;
-            padding: 0 6px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: white;
             background-color: {danger_color};
-            border-radius: 10px;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.75rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             border: 2px solid white;
-        }}
-        
-        .notification-empty {{
-            padding: 2rem 1rem;
-            text-align: center;
-            color: {text_muted};
-            font-style: italic;
+            font-weight: 600;
         }}
         
         /* Custom widget styling */

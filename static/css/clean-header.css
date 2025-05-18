@@ -1,9 +1,29 @@
 /* Clean Header CSS */
 
-/* Remove default Streamlit padding and margins */
+/* Remove ALL default Streamlit padding and margins */
 .main .block-container {
     padding-top: 0 !important;
+    padding-bottom: 0 !important;
     max-width: 100% !important;
+    margin-top: 0 !important;
+}
+
+/* Remove space at the top completely */
+.st-emotion-cache-z5fcl4 {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* Fix space in app container */
+[data-testid="stAppViewContainer"] {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* Additional top space fixes */
+.st-emotion-cache-10trblm {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
 }
 
 /* Fix header container styling */

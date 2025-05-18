@@ -11,12 +11,21 @@ def render_header():
     """
     Render a clean header with logo, project info, and right-aligned navigation.
     """
-    # Hide default Streamlit elements
+    # Hide default Streamlit elements and remove all top spacing
     st.markdown("""
     <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
+    .stApp {
+        margin-top: -80px !important;
+    }
+    div.appview-container {
+        margin-top: -80px !important;
+    }
+    section[data-testid="stSidebar"] {
+        margin-top: -80px !important;
+    }
     </style>
     """, unsafe_allow_html=True)
     

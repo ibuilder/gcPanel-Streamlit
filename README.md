@@ -1,42 +1,85 @@
 # gcPanel - Construction Management Dashboard
 
-gcPanel is a comprehensive web-based construction management dashboard built with Streamlit and Supabase. It provides a modular framework for managing construction projects with role-based access control and a wide range of modules designed for construction management processes.
+A comprehensive construction project management platform built with Streamlit, providing advanced visualization tools and workflow solutions for AEC professionals.
 
-![Construction Management Dashboard](https://pixabay.com/get/g3cfd2af0042cda0f537173d61cbd8a7ae0d48b14297c65a68dd9efb85198a4f77f365bf104fe039586f2d602de0204930ff2a6faead82b4fddf3415e29edf73b_1280.jpg)
+## Overview
 
-## Features
+gcPanel streamlines construction project management through an intuitive, data-driven interface. It integrates essential construction workflows—from preconstruction through closeout—with powerful data visualization and real-time analytics capabilities.
 
-- **Modular Architecture**: Each construction process is contained in its own module for easy maintenance and expansion
-- **Role-Based Access Control**: Different permission levels (administrator, editor, contributor, viewer)
-- **Supabase Database Integration**: Reliable and scalable PostgreSQL database backend
-- **Comprehensive Module Set**: Covers all aspects of construction management:
-  - Preconstruction
-  - Engineering
-  - Field Operations
-  - Safety
-  - Contracts
-  - Cost Management
-  - BIM/3D Models
-  - Closeout
-  - Resources
-  - Settings
-  - Reporting
+## Key Features
 
-## Installation
+### Comprehensive Project Management
+- **Dashboard Analytics**: Real-time KPIs and metrics on project performance
+- **Project Timeline Visualization**: Interactive Gantt charts for schedule tracking
+- **Cost Management**: Budget tracking, forecasting, and variance analysis
+- **Document Control**: Centralized repository for drawings, RFIs, and specifications
+- **BIM Integration**: 3D model visualization and data integration
+- **Field Operations**: Daily reports, quality control, and issue tracking
 
-### Prerequisites
+### Technical Highlights
+- **Modern Stack**: Built with Streamlit, Python, and SQLite (PostgreSQL-ready)
+- **Secure Authentication**: Role-based access control with JWT verification
+- **Responsive Design**: Mobile-friendly interface for field use
+- **Advanced Visualizations**: Interactive charts and data visualization
+- **Modular Architecture**: Easily extensible with additional modules
+- **API Integration**: Supports external service integration via RESTful APIs
 
-- Python 3.7+
-- Streamlit
-- Supabase account
+## Project Details
 
-### Setup
+### Highland Tower Development
+- $45.5M mixed-use development
+- 120 residential units and 8 retail spaces
+- 168,500 sq. ft across 15 stories above ground and 2 below
+- Advanced construction management system implementation
 
-1. Clone this repository:
-   ```
-   git clone https://github.com/yourusername/gcpanel.git
-   cd gcpanel
-   ```
+## Modules
 
-2. Install dependencies:
-   
+| Module | Description |
+|--------|-------------|
+| **Dashboard** | Project overview with key metrics and analytics |
+| **Project Information** | Central repository for project details and team information |
+| **Schedule** | Gantt charts, milestone tracking, and progress visualization |
+| **Safety** | Incident reports, safety metrics, and compliance tracking |
+| **Contracts** | Contract management, change orders, and procurement |
+| **Cost Management** | Budget tracking, forecasting, and financial reporting |
+| **Engineering** | Technical documentation, specifications, and calculations |
+| **Field Operations** | Daily reports, quality control, and issue tracking |
+| **Documents** | Document management with version control and approval workflows |
+| **BIM** | 3D model visualization and information extraction |
+| **Closeout** | Project closeout documentation and warranty management |
+
+## Implementation
+
+### Installation Requirements
+- Python 3.8+
+- Streamlit 1.24+
+- SQLAlchemy
+- Plotly and Pandas for data visualization
+- JWT for authentication
+
+### Database Configuration
+The platform supports both SQLite (local development) and PostgreSQL (production) databases through SQLAlchemy ORM.
+
+### Authentication
+Role-based access control with secure JWT implementation supports multiple user types:
+- Administrator
+- Project Manager
+- Field Supervisor
+- Subcontractor
+- Client/Owner
+
+## Future Roadmap
+
+- **Mobile App**: Native companion app for field data collection
+- **AI-Powered Analytics**: Predictive analytics for project risk assessment
+- **Advanced BIM Integration**: Deeper integration with Revit and other BIM tools
+- **Expanded Reporting**: Customizable reporting engine
+- **Multi-Project Portfolio Management**: Roll-up reporting across multiple projects
+
+## Screenshots
+
+*Insert screenshots of key interface elements*
+
+## License
+
+© 2025 gcPanel. All rights reserved.

@@ -1,0 +1,68 @@
+/* Clean Header CSS */
+
+/* Remove default Streamlit padding and margins */
+.main .block-container {
+    padding-top: 0 !important;
+    max-width: 100% !important;
+}
+
+/* Fix header container styling */
+[data-testid="stHorizontalBlock"] {
+    background-color: white !important;
+    margin-top: 0 !important;
+    padding: 10px 20px !important;
+    border-bottom: 1px solid #DADCE0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* Make the dropdown more compact */
+[data-testid="stSelectbox"] {
+    margin-bottom: 0 !important;
+}
+
+/* Ensure dropdown is visible */
+div[data-testid="stSelectbox"] {
+    display: flex !important;
+    justify-content: flex-end !important;
+    padding-top: 10px !important;
+}
+
+/* Make the selectbox label area smaller */
+div[data-testid="stSelectbox"] > div:first-child {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Fix spacing in the header elements */
+[data-testid="column"] {
+    padding: 0 !important;
+}
+
+/* Fix any lingering top space */
+.stApp {
+    margin-top: 0 !important;
+}
+
+/* Hide Streamlit menu and footer */
+#MainMenu, footer, header {
+    visibility: hidden !important;
+}
+
+/* Ensure dropdown is aligned to the right */
+div[data-testid="stSelectbox"] > div {
+    display: flex !important;
+    justify-content: flex-end !important;
+}
+
+/* Style the dropdown itself */
+select {
+    background-color: #f5f7fa !important;
+    border-radius: 6px !important;
+    border: 1px solid #e1e4e8 !important;
+    transition: all 0.2s !important;
+}
+
+select:hover {
+    border-color: #3367D6 !important;
+    box-shadow: 0 0 0 1px rgba(51, 103, 214, 0.5) !important;
+}

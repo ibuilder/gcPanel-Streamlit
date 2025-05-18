@@ -17,7 +17,7 @@ from utils.ui_manager import load_external_resources, render_notification_button
 # Import components
 from components.action_bar import render_action_bar
 from components.simple_breadcrumbs import simple_breadcrumbs, get_breadcrumbs_for_page
-from components.header_nav_fixed import render_header_nav
+from components.header_clean import render_header
 from components.notification_center import notification_center
 
 # Import modules
@@ -81,8 +81,8 @@ def render_application():
     from core import initialize_application
     initialize_application()
     
-    # Render the header navigation
-    render_header_nav()
+    # Render the header with right-aligned navigation
+    render_header()
     
     # Main content area
     with st.container():

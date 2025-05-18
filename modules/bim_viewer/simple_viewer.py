@@ -30,53 +30,40 @@ def render_simple_bim_viewer():
         index=default_index
     )
     
-    # Display static visualization
-    st.markdown("""
-    <div style="background-color: #f5f5f5; border-radius: 8px; padding: 20px; text-align: center; height: 400px;">
-        <h3 style="margin-bottom: 20px;">Highland Tower 3D Model</h3>
-        <div style="display: flex; justify-content: center;">
-            <svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
-                <!-- Base building shape -->
-                <rect x="100" y="200" width="200" height="80" fill="#ddd" stroke="#999" />
-                
-                <!-- Tower -->
-                <rect x="150" y="50" width="100" height="150" fill="#ccc" stroke="#999" />
-                
-                <!-- Windows -->
-                <rect x="160" y="70" width="20" height="20" fill="#aaddff" stroke="#999" />
-                <rect x="190" y="70" width="20" height="20" fill="#aaddff" stroke="#999" />
-                <rect x="220" y="70" width="20" height="20" fill="#aaddff" stroke="#999" />
-                
-                <rect x="160" y="100" width="20" height="20" fill="#aaddff" stroke="#999" />
-                <rect x="190" y="100" width="20" height="20" fill="#aaddff" stroke="#999" />
-                <rect x="220" y="100" width="20" height="20" fill="#aaddff" stroke="#999" />
-                
-                <rect x="160" y="130" width="20" height="20" fill="#aaddff" stroke="#999" />
-                <rect x="190" y="130" width="20" height="20" fill="#aaddff" stroke="#999" />
-                <rect x="220" y="130" width="20" height="20" fill="#aaddff" stroke="#999" />
-                
-                <rect x="160" y="160" width="20" height="20" fill="#aaddff" stroke="#999" />
-                <rect x="190" y="160" width="20" height="20" fill="#aaddff" stroke="#999" />
-                <rect x="220" y="160" width="20" height="20" fill="#aaddff" stroke="#999" />
-                
-                <!-- Entrance -->
-                <rect x="190" y="230" width="20" height="30" fill="#333" />
-                
-                <!-- Roof elements -->
-                <rect x="150" y="30" width="100" height="20" fill="#aaa" stroke="#999" />
-                
-                <!-- Text label -->
-                <text x="200" y="245" text-anchor="middle" font-family="Arial" font-size="10" fill="white">ENTRANCE</text>
-                
-                <!-- Building name -->
-                <text x="200" y="20" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold">Highland Tower</text>
-            </svg>
-        </div>
-        <div style="margin-top: 20px; color: #666;">
-            Selected model: {0}
-        </div>
-    </div>
-    """.format(selected_ifc), unsafe_allow_html=True)
+    # Display a header for the model
+    st.subheader(f"Building Model: {selected_ifc}")
+    
+    # Display a building image with Streamlit components instead of HTML/SVG
+    st.info("3D model visualization - Highland Tower")
+    
+    # Create a simple building representation with native Streamlit components
+    col1, col2, col3 = st.columns([1, 3, 1])
+    
+    with col2:
+        # Display an image placeholder using expander and progress bars for visualization
+        with st.expander("Building Structure", expanded=True):
+            st.markdown("### Highland Tower")
+            
+            # Display floor levels with progress bars
+            st.markdown("##### Floors")
+            st.progress(1.0, text="Penthouse")
+            st.progress(0.9, text="Floor 12-14")
+            st.progress(0.7, text="Floor 7-11")
+            st.progress(0.5, text="Floor 4-6")
+            st.progress(0.3, text="Floor 1-3")
+            st.progress(0.1, text="Lobby")
+            
+            # Show selected model
+            st.markdown(f"**Selected Model**: {selected_ifc}")
+            
+            # Display dimensions
+            st.markdown("##### Dimensions")
+            st.code("""
+            Width: 35m
+            Length: 40m
+            Height: 60m
+            Gross Area: 168,500 sq ft
+            """)
     
     # Display model controls
     col1, col2, col3 = st.columns(3)

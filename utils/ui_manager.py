@@ -27,23 +27,27 @@ def load_external_resources():
     
     This includes CSS, JavaScript, fonts, and other resources.
     """
-    # Load CSS files
-    css_files = [
-        "static/css/main.css", 
-        "static/css/notifications.css",
-        "static/css/enhanced-theme.css",
-        "static/css/optimized-ui.css",
-        "static/css/console-fix.css",
-        "static/css/buttons-fix.css",
-        "static/css/action-buttons.css",
-        "static/css/action-bar.css",
-        "static/css/notification_styles.css",
-        "static/css/clean-header.css",
-        "static/css/header-components.css",
-        "static/css/breadcrumbs.css",
-        "static/css/notification-center.css",
-        "static/css/space-fix.css"
-    ]
+    # Load CSS files - using consolidated CSS with fallback to individual files
+    if os.path.exists("static/css/consolidated.css"):
+        css_files = ["static/css/consolidated.css"]
+    else:
+        # Fallback to individual CSS files
+        css_files = [
+            "static/css/main.css", 
+            "static/css/notifications.css",
+            "static/css/enhanced-theme.css",
+            "static/css/optimized-ui.css",
+            "static/css/console-fix.css",
+            "static/css/buttons-fix.css",
+            "static/css/action-buttons.css",
+            "static/css/action-bar.css",
+            "static/css/notification_styles.css",
+            "static/css/clean-header.css",
+            "static/css/header-components.css",
+            "static/css/breadcrumbs.css",
+            "static/css/notification-center.css",
+            "static/css/space-fix.css"
+        ]
     
     for css_file in css_files:
         load_css_file(css_file)

@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 
 # Import plotly libraries properly to avoid conflicts
 import plotly.express as px
-from plotly import graph_objects
+import plotly.graph_objects as go
 
 def render_milestone_progress():
     """Render the milestone progress view."""
@@ -84,9 +84,11 @@ def render_milestone_progress():
             
         with col3:
             # Ensure i is an integer before using it in calculations
-            task_id = 100 + (i if isinstance(i, int) else 0)
-            # Create a safe key by converting category to a string and replacing spaces
-            category_key = str(category).replace(' ', '_') if category else 'unknown'
+            # Convert i to integer to avoid pandas Series issues
+            task_id = 100 + (int(i) if isinstance(i, (int, float)) else 0)
+            # Create a safe key by safely converting category to a string and replacing spaces
+            category_safe = category if isinstance(category, str) else str(category)
+            category_key = category_safe.replace(' ', '_') if category_safe else 'unknown'
             if st.button("Edit Tasks", key=f"edit_tasks_{category_key}"):
                 st.session_state.show_task_edit = True
                 st.session_state.edit_task_id = task_id
@@ -169,12 +171,11 @@ def render_milestone_progress():
         categories = ["Planning", "Design", "Foundation", "Structure", "Finishes"]
         progress = [75, 60, 45, 30, 10]
     
-    # Create the figure - ensure proper imports at the top of file
-    import plotly.graph_objects as go_objects
-    fig = go_objects.Figure()
+    # Create the figure using Plotly
+    fig = go.Figure()
     
     # Add the scatter polar trace
-    fig.add_trace(go_objects.Scatterpolar(
+    fig.add_trace(go.Scatterpolar(
         r=progress,
         theta=categories,
         fill='toself',

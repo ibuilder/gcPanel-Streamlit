@@ -30,31 +30,24 @@ def render_header():
     current_menu = st.session_state.get("current_menu", "Dashboard")
     
     # Create a three-column layout for the header
-    col1, col2, col3 = st.columns([1, 1, 1])
-    
-    with col2:
-        # Center the gcPanel logo with tower crane icon
-        st.markdown("""
-        <div style="text-align: center; padding-top: 10px;">
-            <span style="font-size: 24px; font-weight: 700;">
-                🏗️ gc<span style="color: #3b82f6;">Panel</span>
-            </span>
-        </div>
-        """, unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([5, 3, 2])
     
     with col1:
-        # Left aligned project info (switched positions with logo)
-        st.caption("Project")
-        st.write("Highland Tower Development")
+        # Logo and project name inline (left-aligned)
+        st.markdown("""
+        <div style="display: flex; align-items: center;">
+            <div style="margin-right: 15px;">
+                <span style="font-size: 24px; font-weight: 700;">🏗️ gc<span style="color: #3b82f6;">Panel</span></span>
+            </div>
+            <div>
+                <div style="font-size: 12px; color: #6b7280;">Project</div>
+                <div style="font-size: 16px; font-weight: 600;">Highland Tower Development</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col3:
         # Right aligned dropdown
-        st.markdown("""
-        <div style="text-align: right; padding-bottom: 5px;">
-            <span style="font-size: 14px; color: #6b7280;">Navigation</span>
-        </div>
-        """, unsafe_allow_html=True)
-        
         # Format options to include icons
         formatted_options = [f"{menu_options[k]['icon']} {menu_options[k]['label']}" for k in menu_options.keys()]
         
@@ -63,6 +56,12 @@ def render_header():
         
         # Find current menu's formatted option
         current_formatted = f"{menu_options[current_menu]['icon']} {menu_options[current_menu]['label']}"
+        
+        st.markdown("""
+        <div style="text-align: right; padding-bottom: 5px;">
+            <span style="font-size: 14px; color: #6b7280;">Navigation</span>
+        </div>
+        """, unsafe_allow_html=True)
         
         selected_formatted = st.selectbox(
             "Navigation",
@@ -93,13 +92,14 @@ def render_header():
         simple_breadcrumbs(breadcrumb_items)
     
     with brow_col2:
-        # Only show notification in the header
-        st.markdown(
-            f'<div style="text-align: right;"><span style="position: relative; font-size: 1.2rem;">🔔<span style="position: absolute; top: -8px; right: -8px; background-color: #ef4444; color: white; border-radius: 50%; font-size: 0.7rem; padding: 2px 5px;">3</span></span></div>',
+        # Notification bell with visible button
+        col = st.container()
+        col.markdown(
+            f'<div style="text-align: right; margin-right: 10px;"><span style="font-size: 1.2rem;">🔔<span style="position: absolute; margin-left: -8px; margin-top: -8px; background-color: #ef4444; color: white; border-radius: 50%; font-size: 0.7rem; padding: 2px 5px;">3</span></span></div>',
             unsafe_allow_html=True
         )
         
-        # Handle notification clicks
-        if st.button("", key="notification_button", help="View notifications"):
+        # Use a smaller invisible button to make it clickable
+        if col.button("Notifications", key="notif_button", help="View notifications"):
             st.session_state.show_notification_center = not st.session_state.get("show_notification_center", False)
             st.rerun()

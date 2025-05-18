@@ -28,16 +28,25 @@ def render_header_nav():
             padding: 10px 20px;
             background-color: white;
             border-bottom: 1px solid #DADCE0;
-            margin: 0 0 1rem 0;
+            margin: 0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             position: sticky;
             top: 0;
             z-index: 1000;
+            width: 100%;
         }
         
         /* Fix for Streamlit's extra space */
         .block-container {
             padding-top: 0 !important;
+            max-width: 100% !important;
+        }
+        
+        /* Remove extra padding from the main area */
+        .main .block-container {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+            padding-bottom: 1rem !important;
         }
         
         .header-left {
@@ -117,6 +126,33 @@ def render_header_nav():
         /* Override Streamlit's default selectbox styling */
         div[data-testid="stSelectbox"] {
             margin-bottom: 0 !important;
+        }
+        
+        div[data-testid="stSelectbox"] div[data-baseweb="select"] {
+            background-color: #f5f7fa;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+            transition: all 0.2s;
+        }
+        
+        div[data-testid="stSelectbox"] div[data-baseweb="select"]:hover {
+            border-color: #3367D6;
+            box-shadow: 0 0 0 1px rgba(51, 103, 214, 0.5);
+        }
+        
+        div[data-testid="stSelectbox"] div[role="listbox"] {
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        div[data-testid="stSelectbox"] div[role="option"] {
+            padding: 8px 12px;
+            transition: background-color 0.2s;
+        }
+        
+        div[data-testid="stSelectbox"] div[role="option"]:hover {
+            background-color: rgba(51, 103, 214, 0.1);
         }
         
         div[data-testid="stImage"] img {

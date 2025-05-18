@@ -929,14 +929,9 @@ def render_submittals():
             with buttons_col3:
                 st.button("View Attachments", key=f"attach_subm_{submittal['id']}")
     
-    # Create Submittal button with action buttons in a row
+    # Add divider before form
     st.divider()
     col1, col2, col3 = st.columns([1, 1, 2])
-    with col1:
-        if st.button("Create New Submittal", type="primary", key="create_submittal_btn", use_container_width=True):
-            # Initialize form state
-            st.session_state.show_submittal_form = True
-            st.session_state.edit_submittal_id = None
     
     # Submittal creation/edit form
     if st.session_state.get("show_submittal_form", False):

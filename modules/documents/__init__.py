@@ -42,39 +42,58 @@ def render_documents():
 def render_plans():
     """Render the Construction Plans section"""
     
-    st.header("Construction Plans")
+    # Header with Upload button
+    col1, col2, col3 = st.columns([2, 1, 1])
     
-    # Upload new plans
-    st.subheader("Upload New Plans")
+    with col1:
+        st.header("Construction Plans")
     
-    upload_col1, upload_col2 = st.columns([3, 1])
+    with col3:
+        if st.button("Upload New Plans", type="primary", key="upload_plans_top"):
+            st.session_state.show_plans_upload = True
     
-    with upload_col1:
-        uploaded_file = st.file_uploader(
-            "Upload new construction plans (PDF)",
-            type=["pdf"],
-            key="plan_uploader"
-        )
+    # Display upload form based on session state
+    if st.session_state.get("show_plans_upload", False):
+        st.subheader("Upload New Plans")
+        upload_col1, upload_col2 = st.columns([3, 1])
+        
+        with upload_col1:
+            uploaded_file = st.file_uploader(
+                "Upload new construction plans (PDF)",
+                type=["pdf"],
+                key="plan_uploader"
+            )
+        
+        with upload_col2:
+            plan_category = st.selectbox(
+                "Plan Category",
+                [
+                    "Architectural",
+                    "Structural",
+                    "Mechanical",
+                    "Electrical",
+                    "Plumbing",
+                    "Civil",
+                    "Fire Protection",
+                    "Landscape"
+                ],
+                key="plan_category"
+            )
+            
+            # Add buttons for submission and cancel
+            if st.button("Submit", type="primary", key="submit_plan_upload"):
+                if uploaded_file:
+                    st.success("Plan uploaded successfully!")
+                    st.session_state.show_plans_upload = False
+                    st.rerun()
+                else:
+                    st.error("Please select a file to upload")
+                    
+            if st.button("Cancel", key="cancel_plan_upload"):
+                st.session_state.show_plans_upload = False
+                st.rerun()
     
-    with upload_col2:
-        plan_category = st.selectbox(
-            "Plan Category",
-            [
-                "Architectural",
-                "Structural",
-                "Mechanical",
-                "Electrical",
-                "Plumbing",
-                "Civil",
-                "Fire Protection",
-                "Landscape"
-            ],
-            key="plan_category"
-        )
-    
-    if uploaded_file and st.button("Save Plan", type="primary", key="save_plan_btn"):
-        # In a real app, this would save the file to storage
-        st.success(f"Plan '{uploaded_file.name}' uploaded successfully!")
+    # Plans list section continues below
         st.session_state.uploaded_plan = None
         st.rerun()
     

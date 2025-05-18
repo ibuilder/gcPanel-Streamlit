@@ -30,8 +30,9 @@ from modules.roadmap import render_roadmap
 
 # Import components
 from components.simple_breadcrumbs import simple_breadcrumbs, get_breadcrumbs_for_page
-from components.sidebar_simple import render_sidebar
+from components.header_nav import render_header_nav
 from components.notification_center import notification_center
+from components.footer import render_footer
 from core.digital_signatures.signature import DigitalSignature
 
 # Initialize core application
@@ -42,7 +43,8 @@ def local_css():
     # Load external CSS files
     css_files = [
         "static/css/main.css", 
-        "static/css/notifications.css"
+        "static/css/notifications.css",
+        "static/css/enhanced-theme.css"
     ]
     
     for css_file in css_files:
@@ -114,63 +116,8 @@ def main():
     # Initialize database and authentication
     initialize_application()
     
-    # Direct sidebar navigation with new logo
-    st.sidebar.image("static/images/gcpanel-logo.svg", width=200)
-    # No need for title text since it's already in the logo
-    
-    st.sidebar.markdown("### Project")
-    st.sidebar.markdown("**Highland Tower Development**")
-    
-    st.sidebar.markdown("### Navigation")
-    
-    # Simple menu options with emoji icons
-    menu_options = [
-        "📊 Dashboard", 
-        "📋 Project Information",
-        "📅 Schedule",
-        "⚠️ Safety",
-        "📝 Contracts", 
-        "💰 Cost Management",
-        "🔧 Engineering",
-        "🚧 Field Operations",
-        "📄 Documents",
-        "🏢 BIM Viewer",
-        "✅ Closeout",
-        "⚙️ Settings"
-    ]
-    
-    # Mapping from display name to internal name
-    menu_map = {
-        "📊 Dashboard": "Dashboard", 
-        "📋 Project Information": "Project Information",
-        "📅 Schedule": "Schedule",
-        "⚠️ Safety": "Safety",
-        "📝 Contracts": "Contracts", 
-        "💰 Cost Management": "Cost Management",
-        "🔧 Engineering": "Engineering",
-        "🚧 Field Operations": "Field Operations",
-        "📄 Documents": "Documents",
-        "🏢 BIM Viewer": "BIM",
-        "✅ Closeout": "Closeout",
-        "⚙️ Settings": "Settings"
-    }
-    
-    # Simple navigation using a selectbox
-    selected = st.sidebar.selectbox(
-        "Select Module",
-        menu_options,
-        label_visibility="collapsed"
-    )
-    
-    # Update state based on selection
-    current_menu = menu_map[selected]
-    if current_menu != st.session_state.get("current_menu"):
-        st.session_state.current_menu = current_menu
-        st.rerun()
-        
-    # Footer
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("© 2025 gcPanel")
+    # Render the new header navigation instead of sidebar
+    render_header_nav()
     
     # Main content area
     with st.container():
@@ -333,6 +280,9 @@ def main():
             render_settings()
         else:
             st.error(f"Unknown menu: {current_menu}")
+            
+        # Render footer at the bottom of every page
+        render_footer()
 
 if __name__ == "__main__":
     main()

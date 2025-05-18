@@ -1,30 +1,60 @@
+"""
+Footer component for the gcPanel application.
+
+This component renders a footer with copyright information
+and additional links or information as needed.
+"""
+
 import streamlit as st
 
 def render_footer():
-    """Render the application footer"""
-    st.markdown("<hr>", unsafe_allow_html=True)
-    
+    """
+    Render the application footer with copyright information.
+    """
+    # Footer container
     with st.container():
-        cols = st.columns([3, 3, 3, 1])
+        # Add some space before the footer
+        st.markdown("<br><br>", unsafe_allow_html=True)
         
-        with cols[0]:
-            st.markdown("### gcPanel")
-            st.markdown("Construction Management Dashboard")
+        # Apply footer styling
+        st.markdown("""
+        <style>
+        .footer-container {
+            border-top: 1px solid #DADCE0;
+            padding: 20px 0;
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #5F6368;
+            font-size: 14px;
+        }
         
-        with cols[1]:
-            st.markdown("### Quick Links")
-            st.markdown("[Documentation](#)")
-            st.markdown("[Support](#)")
-            st.markdown("[Report Issue](#)")
+        .footer-links a {
+            color: #3367D6;
+            text-decoration: none;
+            margin-left: 20px;
+        }
         
-        with cols[2]:
-            st.markdown("### Contact")
-            st.markdown("Email: support@gcpanel.com")
-            st.markdown("Phone: (555) 123-4567")
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        </style>
+        """, unsafe_allow_html=True)
         
-        with cols[3]:
-            st.markdown("### Follow")
-            st.markdown("[LinkedIn](#)")
-            st.markdown("[Twitter](#)")
-    
-    st.markdown("<p style='text-align: center; margin-top: 20px;'>© 2023 gcPanel. All rights reserved.</p>", unsafe_allow_html=True)
+        # Create the footer HTML
+        footer_html = """
+        <div class="footer-container">
+            <div class="footer-copyright">
+                © 2025 gcPanel Construction Management. All rights reserved.
+            </div>
+            <div class="footer-links">
+                <a href="#">Terms</a>
+                <a href="#">Privacy</a>
+                <a href="#">Help</a>
+            </div>
+        </div>
+        """
+        
+        # Render the footer
+        st.markdown(footer_html, unsafe_allow_html=True)

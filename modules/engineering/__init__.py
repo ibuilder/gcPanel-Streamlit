@@ -1,8 +1,10 @@
 """
 Engineering module for the gcPanel Construction Management Dashboard.
 
-This module provides management for Requests for Information (RFIs) and Submittals,
-which are critical for engineering coordination on construction projects.
+This module provides management for engineering coordination documents including:
+1. Requests for Information (RFIs)
+2. Submittals
+3. Transmittals
 """
 
 import streamlit as st
@@ -221,34 +223,36 @@ def render_rfis():
             "priority": random.choice(["Low", "Medium", "High", "Critical"])
         })
     
-    # Filters
-    col1, col2, col3 = st.columns(3)
+    # Only show filters and visualizations if we're not in form mode
+    if not st.session_state.get("show_rfi_form", False):
+        # Filters
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            status_filter = st.multiselect(
+                "Status",
+                [status.value for status in RfiStatus],
+                default=[RfiStatus.DRAFT.value, RfiStatus.SUBMITTED.value, RfiStatus.UNDER_REVIEW.value, RfiStatus.OVERDUE.value],
+                key="rfi_status_filter"
+            )
+        
+        with col2:
+            discipline_filter = st.multiselect(
+                "Discipline",
+                disciplines,
+                default=[],
+                key="rfi_discipline_filter"
+            )
+        
+        with col3:
+            priority_filter = st.multiselect(
+                "Priority",
+                ["Low", "Medium", "High", "Critical"],
+                default=["High", "Critical"],
+                key="rfi_priority_filter"
+            )
     
-    with col1:
-        status_filter = st.multiselect(
-            "Status",
-            [status.value for status in RfiStatus],
-            default=[RfiStatus.DRAFT.value, RfiStatus.SUBMITTED.value, RfiStatus.UNDER_REVIEW.value, RfiStatus.OVERDUE.value],
-            key="rfi_status_filter"
-        )
-    
-    with col2:
-        discipline_filter = st.multiselect(
-            "Discipline",
-            disciplines,
-            default=[],
-            key="rfi_discipline_filter"
-        )
-    
-    with col3:
-        priority_filter = st.multiselect(
-            "Priority",
-            ["Low", "Medium", "High", "Critical"],
-            default=["High", "Critical"],
-            key="rfi_priority_filter"
-        )
-    
-    # Apply filters
+    # Apply filters - always need to do this for the list display
     filtered_rfis = [rfi for rfi in rfis if rfi["status"] in status_filter]
     
     if discipline_filter:
@@ -257,39 +261,41 @@ def render_rfis():
     if priority_filter:
         filtered_rfis = [rfi for rfi in filtered_rfis if rfi["priority"] in priority_filter]
     
-    # RFI metrics
-    metrics_col1, metrics_col2, metrics_col3, metrics_col4 = st.columns(4)
-    
-    with metrics_col1:
-        total_rfis = len(rfis)
-        st.metric("Total RFIs", total_rfis)
-    
-    with metrics_col2:
-        open_rfis = len([rfi for rfi in rfis if rfi["status"] in [RfiStatus.DRAFT.value, RfiStatus.SUBMITTED.value, RfiStatus.UNDER_REVIEW.value, RfiStatus.OVERDUE.value]])
-        st.metric("Open RFIs", open_rfis)
-    
-    with metrics_col3:
-        overdue_rfis = len([rfi for rfi in rfis if rfi["status"] == RfiStatus.OVERDUE.value])
-        st.metric("Overdue", overdue_rfis)
-    
-    with metrics_col4:
-        avg_response_time = 0
-        response_times = []
+    # Only show metrics and visualizations if not in form mode
+    if not st.session_state.get("show_rfi_form", False):
+        # RFI metrics
+        metrics_col1, metrics_col2, metrics_col3, metrics_col4 = st.columns(4)
         
-        for rfi in rfis:
-            if rfi["response_date"] and rfi["submitted_date"]:
-                response_time = (rfi["response_date"] - rfi["submitted_date"]).days
-                response_times.append(response_time)
+        with metrics_col1:
+            total_rfis = len(rfis)
+            st.metric("Total RFIs", total_rfis)
         
-        if response_times:
-            avg_response_time = sum(response_times) / len(response_times)
+        with metrics_col2:
+            open_rfis = len([rfi for rfi in rfis if rfi["status"] in [RfiStatus.DRAFT.value, RfiStatus.SUBMITTED.value, RfiStatus.UNDER_REVIEW.value, RfiStatus.OVERDUE.value]])
+            st.metric("Open RFIs", open_rfis)
         
-        st.metric("Avg. Response Time", f"{avg_response_time:.1f} days")
-    
-    # Visualizations
-    st.subheader("RFI Analysis")
-    
-    viz_col1, viz_col2 = st.columns(2)
+        with metrics_col3:
+            overdue_rfis = len([rfi for rfi in rfis if rfi["status"] == RfiStatus.OVERDUE.value])
+            st.metric("Overdue", overdue_rfis)
+        
+        with metrics_col4:
+            avg_response_time = 0
+            response_times = []
+            
+            for rfi in rfis:
+                if rfi["response_date"] and rfi["submitted_date"]:
+                    response_time = (rfi["response_date"] - rfi["submitted_date"]).days
+                    response_times.append(response_time)
+            
+            if response_times:
+                avg_response_time = sum(response_times) / len(response_times)
+            
+            st.metric("Avg. Response Time", f"{avg_response_time:.1f} days")
+        
+        # Visualizations
+        st.subheader("RFI Analysis")
+        
+        viz_col1, viz_col2 = st.columns(2)
     
     with viz_col1:
         # Status distribution

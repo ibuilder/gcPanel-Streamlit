@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 
 # Import plotly libraries properly to avoid conflicts
 import plotly.express as px
-import plotly.graph_objects as go
+from plotly.graph_objects import Figure, Scatterpolar
 
 def render_milestone_progress():
     """Render the milestone progress view."""
@@ -171,11 +171,11 @@ def render_milestone_progress():
         categories = ["Planning", "Design", "Foundation", "Structure", "Finishes"]
         progress = [75, 60, 45, 30, 10]
     
-    # Create the figure using Plotly
-    fig = go.Figure()
+    # Create the figure using Plotly with explicitly imported types
+    fig = Figure()
     
     # Add the scatter polar trace
-    fig.add_trace(go.Scatterpolar(
+    fig.add_trace(Scatterpolar(
         r=progress,
         theta=categories,
         fill='toself',

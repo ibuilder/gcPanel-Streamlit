@@ -58,10 +58,15 @@ def load_external_resources():
         unsafe_allow_html=True
     )
     
-    # Load JavaScript
+    # Load JavaScript - using consolidated JS with fallback to individual files
     try:
-        with open("static/js/notification_handler.js", "r") as f:
-            st.markdown(f"<script>{f.read()}</script>", unsafe_allow_html=True)
+        if os.path.exists("static/js/consolidated.js"):
+            with open("static/js/consolidated.js", "r") as f:
+                st.markdown(f"<script>{f.read()}</script>", unsafe_allow_html=True)
+        else:
+            # Fallback to individual JS files
+            with open("static/js/notification_handler.js", "r") as f:
+                st.markdown(f"<script>{f.read()}</script>", unsafe_allow_html=True)
     except Exception as e:
         st.error(f"Error loading JavaScript: {e}")
 

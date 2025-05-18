@@ -353,8 +353,23 @@ def main():
         # Get breadcrumbs for current page
         breadcrumb_items = get_breadcrumbs_for_page(current_menu)
         
-        # Render breadcrumbs
-        simple_breadcrumbs(breadcrumb_items)
+        # Create a header row with breadcrumbs and notification center
+        header_col1, header_col2 = st.columns([7, 3])
+        
+        with header_col1:
+            # Render breadcrumbs
+            simple_breadcrumbs(breadcrumb_items)
+        
+        with header_col2:
+            # Initialize notification center
+            if st.session_state.get("show_notification_center", False):
+                notification_center()
+            
+            # Add notification center toggle button
+            show_notifications = st.button("📋 Notifications", key="show_notifications_btn")
+            if show_notifications:
+                st.session_state.show_notification_center = not st.session_state.get("show_notification_center", False)
+                st.rerun()
         
         # Render selected module
         if current_menu == "Dashboard":

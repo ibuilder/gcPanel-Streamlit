@@ -1,142 +1,301 @@
 """
 Sidebar navigation component for the gcPanel Construction Management Dashboard.
 
-This module provides the navigation sidebar with project selection.
+This module provides a responsive sidebar with navigation options to
+different modules in the application.
 """
 
 import streamlit as st
-from assets.styles import get_icon_svg
-
-def navigate_to(menu_item):
-    """
-    Navigate to a menu item.
-    
-    Args:
-        menu_item: The menu item to navigate to
-    """
-    st.session_state.menu = menu_item
-    
-    # Clear any sub-state depending on navigation
-    if menu_item == "Dashboard":
-        if "selected_project_id" in st.session_state:
-            del st.session_state.selected_project_id
-    
-    # Force rerender
-    st.rerun()
+from streamlit_elements import elements, mui
+import os
 
 def render_sidebar():
-    """
-    Render the sidebar navigation.
-    """
+    """Render the sidebar navigation."""
+    
     with st.sidebar:
-        # Application title and logo
-        st.markdown(
-            f"""
-            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
-                <div style="font-size: 1.5rem; font-weight: 600; color: #3e79f7; margin-left: 0.5rem;">
-                    🏗️ gcPanel
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        
-        # User info
-        st.markdown(
-            """
-            <div style="display: flex; align-items: center; margin-bottom: 1.5rem; 
-                       background-color: rgba(62, 121, 247, 0.05); padding: 0.7rem; 
-                       border-radius: 6px;">
-                <div style="width: 40px; height: 40px; border-radius: 50%; 
-                           background-color: #3e79f7; color: white; display: flex; 
-                           justify-content: center; align-items: center; 
-                           font-weight: 600; margin-right: 0.5rem;">
-                    A
-                </div>
-                <div>
-                    <div style="font-weight: 500;">Admin User</div>
-                    <div style="font-size: 0.8rem; color: #6c757d;">Role: Administrator</div>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        
-        # Navigation
-        st.markdown("<div style='font-size: 0.8rem; text-transform: uppercase; color: #6c757d; margin-bottom: 0.5rem;'>Navigation</div>", unsafe_allow_html=True)
-        
-        # Menu items
-        menu_items = [
-            {"label": "Dashboard", "icon": "dashboard"},
-            {"label": "Project Information", "icon": "apartment"},
-            {"label": "Schedule", "icon": "calendar_today"},
-            {"label": "Engineering", "icon": "engineering"},
-            {"label": "Documents", "icon": "description"},
-            {"label": "BIM", "icon": "view_in_ar"},
-            {"label": "Field Operations", "icon": "construction"},
-            {"label": "Safety", "icon": "health_and_safety"},
-            {"label": "Contracts", "icon": "handshake"},
-            {"label": "Cost Management", "icon": "paid"},
-            {"label": "Closeout", "icon": "task_alt"},
-            {"label": "Settings", "icon": "settings"}
-        ]
-        
-        for item in menu_items:
-            is_active = st.session_state.menu == item["label"]
-            
-            # Create a unique key for each navigation button
-            button_key = f"nav_{item['label'].lower().replace(' ', '_')}"
-            
-            # Use Streamlit columns to create custom styled navigation buttons
-            col1, col2 = st.columns([1, 9])
-            
-            with col1:
-                # Icon
-                st.markdown(
-                    f"""
-                    <div style="color: {'#3e79f7' if is_active else '#6c757d'}; 
-                         margin-top: 10px; text-align: center;">
-                        <span class="material-icons">{item["icon"]}</span>
-                    </div>
-                    """, 
-                    unsafe_allow_html=True
-                )
-            
-            with col2:
-                # Navigation button using Streamlit's button
-                if st.button(
-                    item["label"], 
-                    key=button_key, 
-                    type="primary" if is_active else "secondary",
-                    use_container_width=True
-                ):
-                    st.session_state.menu = item["label"]
-                    st.rerun()
+        # Logo and title
+        st.image("generated-icon.png", width=50)
+        st.title("gcPanel")
         
         # Project selection
-        st.markdown("<hr style='margin: 1.5rem 0;'>", unsafe_allow_html=True)
-        st.markdown("<div style='font-size: 0.8rem; text-transform: uppercase; color: #6c757d; margin-bottom: 0.5rem;'>Current Project</div>", unsafe_allow_html=True)
+        st.markdown("### Project")
+        project_name = "Highland Tower Development"
+        st.markdown(f"**{project_name}**")
         
-        # Show current project with icon
-        st.markdown(
-            f"""
-            <div style="display: flex; align-items: center; padding: 0.7rem; 
-                      background-color: rgba(62, 121, 247, 0.05); border-radius: 6px;">
-                <span class="material-icons" style="margin-right: 0.5rem; color: #3e79f7;">apartment</span>
-                <div style="font-weight: 500; color: #2c3e50;">{st.session_state.current_project}</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        # If needed, add a project dropdown here for multi-project support
         
-        # Version info
-        st.markdown(
-            """
-            <div style="position: fixed; bottom: 0; left: 0; width: 100%; 
-                      padding: 0.5rem 1rem; font-size: 0.7rem; color: #6c757d; 
-                      background-color: rgba(255, 255, 255, 0.7); text-align: center;">
-                gcPanel v1.0.0 © 2025
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        # Navigation items
+        st.markdown("### Navigation")
+        
+        # Create the navigation HTML with data attributes for JavaScript interaction
+        nav_items_html = """
+        <ul class="nav-list">
+            <li class="nav-item" data-module="dashboard">
+                <i class="material-icons">dashboard</i>
+                Dashboard
+            </li>
+            <li class="nav-item" data-module="project_information">
+                <i class="material-icons">info</i>
+                Project Information
+            </li>
+            <li class="nav-item" data-module="scheduling">
+                <i class="material-icons">event</i>
+                Schedule
+            </li>
+            <li class="nav-item" data-module="safety">
+                <i class="material-icons">health_and_safety</i>
+                Safety
+            </li>
+            <li class="nav-item" data-module="contracts">
+                <i class="material-icons">description</i>
+                Contracts
+            </li>
+            <li class="nav-item" data-module="cost_management">
+                <i class="material-icons">payments</i>
+                Cost Management
+            </li>
+            <li class="nav-item" data-module="engineering">
+                <i class="material-icons">engineering</i>
+                Engineering
+            </li>
+            <li class="nav-item" data-module="field_operations">
+                <i class="material-icons">construction</i>
+                Field Operations
+            </li>
+            <li class="nav-item" data-module="documents">
+                <i class="material-icons">folder</i>
+                Documents
+            </li>
+            <li class="nav-item" data-module="roadmap">
+                <i class="material-icons">map</i>
+                Roadmap
+            </li>
+            <li class="nav-item" data-module="closeout">
+                <i class="material-icons">task_alt</i>
+                Closeout
+            </li>
+            <li class="nav-item" data-module="settings">
+                <i class="material-icons">settings</i>
+                Settings
+            </li>
+        </ul>
+        """
+        
+        st.markdown(nav_items_html, unsafe_allow_html=True)
+        
+        # Hidden buttons for each navigation item (for Streamlit state management)
+        # These will be clicked by JavaScript
+        with st.container():
+            st.write("")  # Spacer
+            cols = st.columns(3)
+            
+            # Add buttons (hidden with display:none in CSS)
+            with cols[0]:
+                dashboard_clicked = st.button(
+                    "Dashboard",
+                    key="btn_dashboard",
+                    help="Go to Dashboard",
+                    use_container_width=True
+                )
+            
+            with cols[1]:
+                project_info_clicked = st.button(
+                    "Project Info",
+                    key="btn_project_information",
+                    help="Go to Project Information",
+                    use_container_width=True
+                )
+                
+            with cols[2]:
+                scheduling_clicked = st.button(
+                    "Schedule",
+                    key="btn_scheduling",
+                    help="Go to Schedule",
+                    use_container_width=True
+                )
+                
+            with cols[0]:
+                safety_clicked = st.button(
+                    "Safety",
+                    key="btn_safety",
+                    help="Go to Safety",
+                    use_container_width=True
+                )
+                
+            with cols[1]:
+                contracts_clicked = st.button(
+                    "Contracts",
+                    key="btn_contracts",
+                    help="Go to Contracts",
+                    use_container_width=True
+                )
+                
+            with cols[2]:
+                cost_mgmt_clicked = st.button(
+                    "Cost Management",
+                    key="btn_cost_management",
+                    help="Go to Cost Management",
+                    use_container_width=True
+                )
+                
+            with cols[0]:
+                engineering_clicked = st.button(
+                    "Engineering",
+                    key="btn_engineering",
+                    help="Go to Engineering",
+                    use_container_width=True
+                )
+                
+            with cols[1]:
+                field_ops_clicked = st.button(
+                    "Field Operations",
+                    key="btn_field_operations",
+                    help="Go to Field Operations",
+                    use_container_width=True
+                )
+                
+            with cols[2]:
+                documents_clicked = st.button(
+                    "Documents",
+                    key="btn_documents",
+                    help="Go to Documents",
+                    use_container_width=True
+                )
+                
+            with cols[0]:
+                roadmap_clicked = st.button(
+                    "Roadmap",
+                    key="btn_roadmap",
+                    help="Go to Roadmap",
+                    use_container_width=True
+                )
+                
+            with cols[1]:
+                closeout_clicked = st.button(
+                    "Closeout",
+                    key="btn_closeout",
+                    help="Go to Closeout",
+                    use_container_width=True
+                )
+                
+            with cols[2]:
+                settings_clicked = st.button(
+                    "Settings",
+                    key="btn_settings",
+                    help="Go to Settings",
+                    use_container_width=True
+                )
+        
+        # Hide these buttons with CSS
+        st.markdown("""
+        <style>
+            div[data-testid="column"] button {
+                display: none;
+            }
+            
+            /* Add styles to ensure navigation items are visible */
+            .nav-list {
+                list-style: none;
+                padding-left: 0;
+                margin-top: 1rem;
+            }
+            
+            .nav-item {
+                padding: 0.8rem 1rem;
+                margin-bottom: 0.5rem;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                color: #6c757d;
+                border-radius: 6px;
+                transition: all 0.15s ease;
+                font-size: 0.95rem;
+                user-select: none;
+            }
+            
+            .nav-item:hover {
+                background-color: rgba(62, 121, 247, 0.08);
+                color: #3e79f7;
+            }
+            
+            .nav-item.active {
+                background-color: rgba(62, 121, 247, 0.15);
+                color: #3e79f7;
+                font-weight: 500;
+            }
+            
+            .nav-item i {
+                margin-right: 0.75rem;
+                font-size: 1.25rem;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        # Add JavaScript for navigation highlighting
+        st.markdown("""
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Find active module from URL or other state
+                const currentPath = window.location.pathname;
+                const urlParams = new URLSearchParams(window.location.search);
+                let activeModule = urlParams.get('module') || 'dashboard';
+                
+                // Highlight the active navigation item
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(item => {
+                    const module = item.getAttribute('data-module');
+                    if (module === activeModule) {
+                        item.classList.add('active');
+                    }
+                    
+                    // Add click event to each item
+                    item.addEventListener('click', function() {
+                        // Reset all items
+                        navItems.forEach(i => i.classList.remove('active'));
+                        
+                        // Mark this one as active
+                        item.classList.add('active');
+                        
+                        // Find the matching hidden button and click it
+                        const buttonId = `btn_${module}`;
+                        const button = document.querySelector(`button[key="${buttonId}"]`);
+                        if (button) {
+                            button.click();
+                        }
+                    });
+                });
+            });
+        </script>
+        """, unsafe_allow_html=True)
+        
+        # Footer
+        st.markdown("---")
+        st.markdown("© 2025 gcPanel", help="Made with ❤️ by the gcPanel team")
+
+def handle_navigation():
+    """Handle navigation events from the sidebar."""
+    # Change the module based on the clicked button
+    if st.session_state.get("btn_dashboard", False):
+        st.session_state.menu = "dashboard"
+    elif st.session_state.get("btn_project_information", False):
+        st.session_state.menu = "project_information"
+    elif st.session_state.get("btn_scheduling", False):
+        st.session_state.menu = "scheduling"
+    elif st.session_state.get("btn_safety", False):
+        st.session_state.menu = "safety"
+    elif st.session_state.get("btn_contracts", False):
+        st.session_state.menu = "contracts"
+    elif st.session_state.get("btn_cost_management", False):
+        st.session_state.menu = "cost_management"
+    elif st.session_state.get("btn_engineering", False):
+        st.session_state.menu = "engineering"
+    elif st.session_state.get("btn_field_operations", False):
+        st.session_state.menu = "field_operations"
+    elif st.session_state.get("btn_documents", False):
+        st.session_state.menu = "documents"
+    elif st.session_state.get("btn_roadmap", False):
+        st.session_state.menu = "roadmap"
+    elif st.session_state.get("btn_closeout", False):
+        st.session_state.menu = "closeout"
+    elif st.session_state.get("btn_settings", False):
+        st.session_state.menu = "settings"

@@ -35,7 +35,16 @@ def render_safety():
 def render_incidents():
     """Render the incidents section"""
     
-    st.header("Incident Management")
+    # Header with action button
+    col1, col2, col3 = st.columns([2, 1, 1])
+    
+    with col1:
+        st.header("Incident Management")
+    
+    with col3:
+        if st.button("Create New Incident", type="primary", key="create_incident_btn_top", use_container_width=True):
+            st.session_state.show_incident_form = True
+            st.session_state.edit_incident_id = None
     
     # Filters in columns
     col1, col2, col3 = st.columns(3)
@@ -184,10 +193,8 @@ def render_incidents():
             with col3:
                 st.button("View Full Report", key=f"view_report_{row['id']}")
     
-    # Add incident form
+    # Add divider before incident form
     st.divider()
-    if st.button("Report New Incident", type="primary", key="report_incident_btn"):
-        st.session_state.show_incident_form = True
     
     # Display form if button was clicked
     if st.session_state.get("show_incident_form", False):
@@ -235,7 +242,16 @@ def render_incidents():
 def render_inspections():
     """Render the safety inspections section"""
     
-    st.header("Safety Inspections")
+    # Header with action button
+    col1, col2, col3 = st.columns([2, 1, 1])
+    
+    with col1:
+        st.header("Safety Inspections")
+    
+    with col3:
+        if st.button("Create New Inspection", type="primary", key="create_inspection_btn_top", use_container_width=True):
+            st.session_state.show_inspection_form = True
+            st.session_state.edit_inspection_id = None
     
     # Filters in columns
     col1, col2, col3 = st.columns(3)

@@ -265,13 +265,17 @@ def render_rfis():
             )
     
     # Apply filters - always need to do this for the list display
-    filtered_rfis = [rfi for rfi in rfis if rfi["status"] in status_filter]
+    status_filter_value = st.session_state.get("rfi_status_filter", ["Open", "Pending", "Answered"])
+    discipline_filter_value = st.session_state.get("rfi_discipline_filter", [])
+    priority_filter_value = st.session_state.get("rfi_priority_filter", ["High", "Critical"])
     
-    if discipline_filter:
-        filtered_rfis = [rfi for rfi in filtered_rfis if rfi["discipline"] in discipline_filter]
+    filtered_rfis = [rfi for rfi in rfis if rfi["status"] in status_filter_value]
     
-    if priority_filter:
-        filtered_rfis = [rfi for rfi in filtered_rfis if rfi["priority"] in priority_filter]
+    if discipline_filter_value:
+        filtered_rfis = [rfi for rfi in filtered_rfis if rfi["discipline"] in discipline_filter_value]
+    
+    if priority_filter_value:
+        filtered_rfis = [rfi for rfi in filtered_rfis if rfi["priority"] in priority_filter_value]
     
     # Only show metrics and visualizations if not in form mode
     if not st.session_state.get("show_rfi_form", False):

@@ -40,7 +40,8 @@ def load_external_resources():
         "static/css/notification_styles.css",
         "static/css/clean-header.css",
         "static/css/header-components.css",
-        "static/css/breadcrumbs.css"
+        "static/css/breadcrumbs.css",
+        "static/css/notification-center.css"
     ]
     
     for css_file in css_files:

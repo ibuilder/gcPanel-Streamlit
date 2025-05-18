@@ -16,11 +16,11 @@ def notification_center():
     This component allows users to view and manage their notifications.
     It supports filtering, marking as read, and taking action on notifications.
     """
-    # Add custom styling for the notification center
+    # Add notification center (styling from external CSS)
     st.markdown("""
     <div class="notification-center-container">
         <div class="notification-center-header">
-            <h2><i class="material-icons" style="vertical-align: middle; margin-right: 10px;">notifications</i> Notifications</h2>
+            <h2><i class="material-icons">notifications</i> Notifications</h2>
         </div>
     """, unsafe_allow_html=True)
     

@@ -25,7 +25,7 @@ def simple_breadcrumbs(items: List[Dict[str, Any]]) -> None:
         with cols[i * 2]:
             if is_last:
                 # Current page (no click action)
-                st.markdown(f"<div style='color: #3e79f7; font-weight: 500;'>{item.get('label')}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='breadcrumb-item'>{item.get('label')}</div>", unsafe_allow_html=True)
             else:
                 # Clickable breadcrumb
                 label = item.get('label', '')
@@ -36,7 +36,7 @@ def simple_breadcrumbs(items: List[Dict[str, Any]]) -> None:
         # Separator (in odd columns)
         if not is_last:
             with cols[i * 2 + 1]:
-                st.markdown("<div style='text-align: center; color: #6c757d;'>›</div>", unsafe_allow_html=True)
+                st.markdown("<div class='breadcrumb-separator'>›</div>", unsafe_allow_html=True)
 
 def get_breadcrumbs_for_page(page: str) -> List[Dict[str, Any]]:
     """

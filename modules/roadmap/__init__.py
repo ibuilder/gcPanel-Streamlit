@@ -38,6 +38,9 @@ def initialize_roadmap_session_state():
 def render_roadmap():
     """Render the project roadmap page."""
     
+    # Initialize session state variables for this module
+    initialize_roadmap_session_state()
+    
     st.title("Project Roadmap")
     
     # Action buttons at top

@@ -92,69 +92,49 @@ def render_project_details():
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown(
-            f"""
-            <div class="dashboard-card">
-                <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Project Details</h3>
-                
-                <div style="display: flex; margin-bottom: 0.7rem;">
-                    <div style="width: 40%; font-weight: 500; color: #6c757d;">Project Type:</div>
-                    <div>{project_data['type']}</div>
-                </div>
-                
-                <div style="display: flex; margin-bottom: 0.7rem;">
-                    <div style="width: 40%; font-weight: 500; color: #6c757d;">Owner:</div>
-                    <div>{project_data['owner']}</div>
-                </div>
-                
-                <div style="display: flex; margin-bottom: 0.7rem;">
-                    <div style="width: 40%; font-weight: 500; color: #6c757d;">Start Date:</div>
-                    <div>{project_data['start_date']}</div>
-                </div>
-                
-                <div style="display: flex; margin-bottom: 0.7rem;">
-                    <div style="width: 40%; font-weight: 500; color: #6c757d;">End Date:</div>
-                    <div>{project_data['end_date']}</div>
-                </div>
-                
-                <div style="display: flex; margin-bottom: 0.7rem;">
-                    <div style="width: 40%; font-weight: 500; color: #6c757d;">Budget:</div>
-                    <div>{project_data['budget']}</div>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        # Use a native Streamlit container with styling
+        with st.container():
+            st.markdown("### Project Details")
+            
+            # Create subcontainers for each detail
+            details = [
+                {"label": "Project Type", "value": project_data['type']},
+                {"label": "Owner", "value": project_data['owner']},
+                {"label": "Start Date", "value": project_data['start_date']},
+                {"label": "End Date", "value": project_data['end_date']},
+                {"label": "Budget", "value": project_data['budget']}
+            ]
+            
+            # Display each detail in a row
+            for detail in details:
+                cols = st.columns([2, 3])
+                with cols[0]:
+                    st.markdown(f"**{detail['label']}:**")
+                with cols[1]:
+                    st.markdown(f"{detail['value']}")
+                st.markdown("---")
     
     with col2:
-        st.markdown(
-            f"""
-            <div class="dashboard-card">
-                <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Building Information</h3>
-                
-                <div style="display: flex; margin-bottom: 0.7rem;">
-                    <div style="width: 40%; font-weight: 500; color: #6c757d;">Location:</div>
-                    <div>{project_data['location']}</div>
-                </div>
-                
-                <div style="display: flex; margin-bottom: 0.7rem;">
-                    <div style="width: 40%; font-weight: 500; color: #6c757d;">Square Footage:</div>
-                    <div>{project_data['square_footage']}</div>
-                </div>
-                
-                <div style="display: flex; margin-bottom: 0.7rem;">
-                    <div style="width: 40%; font-weight: 500; color: #6c757d;">Stories:</div>
-                    <div>{project_data['stories']}</div>
-                </div>
-                
-                <div style="display: flex; margin-bottom: 0.7rem;">
-                    <div style="width: 40%; font-weight: 500; color: #6c757d;">Units:</div>
-                    <div>{project_data['units']}</div>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        # Use a native Streamlit container with styling
+        with st.container():
+            st.markdown("### Building Information")
+            
+            # Create subcontainers for each detail
+            details = [
+                {"label": "Location", "value": project_data['location']},
+                {"label": "Square Footage", "value": project_data['square_footage']},
+                {"label": "Stories", "value": project_data['stories']},
+                {"label": "Units", "value": project_data['units']}
+            ]
+            
+            # Display each detail in a row
+            for detail in details:
+                cols = st.columns([2, 3])
+                with cols[0]:
+                    st.markdown(f"**{detail['label']}:**")
+                with cols[1]:
+                    st.markdown(f"{detail['value']}")
+                st.markdown("---")
 
 def render_project_edit_form():
     """Render the project edit form."""
@@ -249,35 +229,19 @@ def render_project_team():
     # Display each team member
     for i, member in enumerate(team_members):
         with cols[i % 3]:
-            st.markdown(
-                f"""
-                <div class="dashboard-card" style="margin-bottom: 1rem;">
-                    <div style="display: flex; align-items: center; margin-bottom: 0.7rem;">
-                        <div style="width: 50px; height: 50px; border-radius: 50%; background-color: #f0f0f0; 
-                                 display: flex; justify-content: center; align-items: center; margin-right: 1rem;">
-                            <span class="material-icons">person</span>
-                        </div>
-                        <div>
-                            <div style="font-weight: 500; font-size: 1rem;">{member['name']}</div>
-                            <div style="color: #3e79f7; font-size: 0.9rem;">{member['role']}</div>
-                        </div>
-                    </div>
-                    <div style="margin-bottom: 0.5rem; font-size: 0.9rem;">
-                        <span class="material-icons" style="font-size: 0.9rem; vertical-align: middle; margin-right: 0.5rem; color: #6c757d;">
-                            email
-                        </span>
-                        {member['email']}
-                    </div>
-                    <div style="font-size: 0.9rem;">
-                        <span class="material-icons" style="font-size: 0.9rem; vertical-align: middle; margin-right: 0.5rem; color: #6c757d;">
-                            phone
-                        </span>
-                        {member['phone']}
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+            # Create a container for each team member
+            with st.container():
+                # Create a card-like appearance
+                st.markdown("---")
+                
+                # Team member name and role
+                st.markdown(f"### {member['name']}")
+                st.markdown(f"**{member['role']}**")
+                
+                # Contact information
+                st.markdown(f"📧 {member['email']}")
+                st.markdown(f"📱 {member['phone']}")
+                st.markdown("---")
 
 def render_project_schedule():
     """Render the project schedule information."""
@@ -313,42 +277,35 @@ def render_project_schedule():
     
     # Create milestone cards
     for milestone in milestones:
-        # Determine status style
-        if milestone["status"] == "Completed":
-            status_class = "status-active"
-            icon = "check_circle"
-        elif milestone["status"] == "In Progress":
-            status_class = "status-pending"
-            icon = "hourglass_top"
-        else:
-            status_class = ""
-            icon = "calendar_today"
-        
-        st.markdown(
-            f"""
-            <div class="dashboard-card" style="margin-bottom: 0.7rem; padding: 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div style="display: flex; align-items: center;">
-                        <span class="material-icons" style="margin-right: 0.7rem; color: {
-                            "#38d39f" if milestone["status"] == "Completed" else 
-                            "#f9c851" if milestone["status"] == "In Progress" else "#6c757d"
-                        };">
-                            {icon}
-                        </span>
-                        <div>
-                            <div style="font-weight: 500; font-size: 1rem;">{milestone["name"]}</div>
-                            <div style="color: #6c757d; font-size: 0.9rem;">{milestone["description"]}</div>
-                        </div>
-                    </div>
-                    <div style="display: flex; flex-direction: column; align-items: flex-end;">
-                        <div style="font-size: 0.9rem; margin-bottom: 0.3rem;">{milestone["date"]}</div>
-                        <span class="status-pill {status_class}" style="font-size: 0.8rem;">{milestone["status"]}</span>
-                    </div>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        # Create a container for each milestone
+        with st.container():
+            # Set up the milestone row with columns for layout
+            col_icon, col_details, col_date = st.columns([1, 5, 2])
+            
+            # Determine status icon and color
+            if milestone["status"] == "Completed":
+                status_icon = "✅"
+                status_color = "green"
+            elif milestone["status"] == "In Progress":
+                status_icon = "⏳"
+                status_color = "orange"
+            else:
+                status_icon = "📅"
+                status_color = "gray"
+            
+            # Display milestone details
+            with col_icon:
+                st.markdown(f"### {status_icon}")
+            
+            with col_details:
+                st.markdown(f"### {milestone['name']}")
+                st.markdown(f"{milestone['description']}")
+            
+            with col_date:
+                st.markdown(f"**{milestone['date']}**")
+                st.markdown(f":{status_color}[{milestone['status']}]")
+            
+            st.markdown("---")
 
 def render_project_location():
     """Render the project location information."""
@@ -365,23 +322,22 @@ def render_project_location():
         "lot_size": "42,500 sq ft"
     }
     
-    # Display map
-    st.markdown(
-        f"""
-        <div class="dashboard-card" style="margin-bottom: 1.5rem; padding: 0;">
-            <div style="height: 400px; background-color: #f7f7f7; display: flex; justify-content: center; align-items: center;">
-                <div style="text-align: center;">
-                    <span class="material-icons" style="font-size: 3rem; color: #6c757d; margin-bottom: 1rem;">map</span>
-                    <div>Map would appear here in a complete implementation</div>
-                    <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #6c757d;">
-                        Location: {location_data["latitude"]}, {location_data["longitude"]}
-                    </div>
-                </div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    # Display map placeholder with native Streamlit components
+    with st.container():
+        # Create a card-like container for the map
+        st.markdown("### Map View")
+        
+        # Create a placeholder for the map with some basic styling
+        map_container = st.container()
+        with map_container:
+            # Add a colored background to simulate a map container
+            st.markdown("---")
+            col1, col2, col3 = st.columns([1, 3, 1])
+            with col2:
+                st.markdown("#### Map Placeholder")
+                st.markdown("Map would appear here in a complete implementation")
+                st.markdown(f"**Location:** {location_data['latitude']}, {location_data['longitude']}")
+            st.markdown("---")
     
     # Location details
     col1, col2 = st.columns(2)

@@ -111,7 +111,20 @@ def render_header():
         """
         st.markdown(notification_style, unsafe_allow_html=True)
         
-        # Button with icon and badge directly in button text
-        if st.button("🔔 <span style='position: absolute; top: -5px; right: -5px; background-color: #ef4444; color: white; border-radius: 50%; font-size: 0.7rem; padding: 0px 4px; font-size: 0.7rem;'>3</span>", key="notif_button", help="View notifications"):
+        # Use a pure Python approach for the notification button without HTML
+        notification_col = st.container()
+        notification_button = notification_col.button("🔔", key="notif_button", help="View notifications")
+        
+        # Add the notification badge using a separate element
+        notification_col.markdown(
+            """
+            <div style="position: relative; top: -40px; left: 20px; z-index: 1000; width: 20px; height: 20px;">
+                <span style="background-color: #ef4444; color: white; border-radius: 50%; font-size: 0.7rem; padding: 2px 5px;">3</span>
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )
+        
+        if notification_button:
             st.session_state.show_notification_center = not st.session_state.get("show_notification_center", False)
             st.rerun()

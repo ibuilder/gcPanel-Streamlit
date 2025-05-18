@@ -13,6 +13,10 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import random
 
+# Import submodules
+from modules.scheduling.timeline import render_timeline
+from modules.scheduling.progress_tracking import render_milestone_progress
+
 # Initialize session state variables for this module
 def initialize_schedule_session_state():
     """Initialize session state variables for the Schedule module"""
@@ -49,19 +53,19 @@ def render_scheduling():
     # Action buttons at top
     action_col1, action_col2, action_col3, action_col4 = st.columns(4)
     with action_col1:
-        if st.button("➕ Add Milestone", type="primary", key="add_milestone_btn", use_container_width=True):
+        if st.button("➕ Add Milestone", type="primary", key="schedule_add_milestone_btn", use_container_width=True):
             st.session_state.show_milestone_form = True
     
     with action_col2:
-        if st.button("📊 Update Progress", type="primary", key="update_progress_btn", use_container_width=True):
+        if st.button("📊 Update Progress", type="primary", key="schedule_update_progress_btn", use_container_width=True):
             st.session_state.show_progress_update_form = True
     
     with action_col3:
-        if st.button("👥 Update Allocation", type="primary", key="update_allocation_btn", use_container_width=True):
+        if st.button("👥 Update Allocation", type="primary", key="schedule_update_allocation_btn", use_container_width=True):
             st.session_state.show_allocation_form = True
     
     with action_col4:
-        if st.button("📅 Edit Timeline", type="primary", key="edit_timeline_btn", use_container_width=True):
+        if st.button("📅 Edit Timeline", type="primary", key="schedule_edit_timeline_btn", use_container_width=True):
             st.session_state.show_timeline_form = True
     
     # Project Info
@@ -416,7 +420,61 @@ def render_scheduling():
             if cancel_button:
                 st.session_state.show_task_edit = False
                 st.rerun()
+    # Forms (they will only display if their session state variable is True)
+    if st.session_state.get("show_milestone_form", False):
+        with st.form("milestone_form"):
+            st.subheader("Add New Milestone")
             
+            form_col1, form_col2 = st.columns(2)
+            
+            with form_col1:
+                milestone_name = st.text_input("Milestone Name", key="new_milestone_name")
+                milestone_date = st.date_input("Target Date", key="new_milestone_date")
+                milestone_type = st.selectbox(
+                    "Milestone Type", 
+                    ["Project", "Engineering", "Construction", "Financial", "Regulatory", "Other"],
+                    key="new_milestone_type"
+                )
+            
+            with form_col2:
+                milestone_status = st.selectbox(
+                    "Status", 
+                    ["Not Started", "In Progress", "Complete", "At Risk", "Delayed"],
+                    key="new_milestone_status"
+                )
+                milestone_priority = st.selectbox(
+                    "Priority", 
+                    ["Low", "Medium", "High", "Critical"],
+                    key="new_milestone_priority"
+                )
+                milestone_owner = st.text_input("Owner", key="new_milestone_owner")
+            
+            milestone_description = st.text_area("Description", key="new_milestone_description")
+            
+            # Predecessor milestones
+            st.subheader("Predecessor Milestones")
+            st.multiselect(
+                "Select predecessors",
+                ["Design Approval", "Site Mobilization", "Foundation Complete", "Topping Out", "Building Dry-In"],
+                key="new_milestone_predecessors"
+            )
+            
+            # Form submission
+            submit_col1, submit_col2 = st.columns([1, 5])
+            with submit_col1:
+                submit_milestone = st.form_submit_button("Save")
+            with submit_col2:
+                cancel_milestone = st.form_submit_button("Cancel")
+            
+            if submit_milestone:
+                st.success(f"Milestone '{milestone_name}' added successfully")
+                st.session_state.show_milestone_form = False
+                st.rerun()
+            
+            if cancel_milestone:
+                st.session_state.show_milestone_form = False
+                st.rerun()
+                
     # Tab navigation for scheduling sections
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["Gantt Chart", "Milestones", "Timeline", "Progress Tracking", "Resources"])
     
@@ -430,12 +488,10 @@ def render_scheduling():
     
     # Timeline Tab (from Roadmap)
     with tab3:
-        from modules.scheduling.timeline import render_timeline
         render_timeline()
         
     # Progress Tracking Tab (from Roadmap)
     with tab4:
-        from modules.scheduling.progress_tracking import render_milestone_progress
         render_milestone_progress()
         
     # Resources Tab

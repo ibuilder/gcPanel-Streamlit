@@ -1,109 +1,259 @@
 """
-Clean header component for gcPanel.
+Professional header component for gcPanel.
 
-This component provides a fixed header with navigation positioned
-exactly as required - in the white header area aligned to the right.
+A clean, modern header that matches the design specification
+with project info, logo, and dropdown navigation.
 """
 
 import streamlit as st
 
 def render_header():
     """
-    Render a professional header with centered logo, project info, and navigation.
+    Render the professionally-designed header for gcPanel.
     """
-    # CSS is now loaded from external file in ui_manager.py
-    
-    # Menu options with icons
+    # Menu options with icons for selector
     menu_options = {
-        "📊 Dashboard": "Dashboard", 
-        "📋 Project Information": "Project Information",
-        "📅 Schedule": "Schedule",
-        "⚠️ Safety": "Safety",
-        "📝 Contracts": "Contracts", 
-        "💰 Cost Management": "Cost Management",
-        "🔧 Engineering": "Engineering",
-        "🚧 Field Operations": "Field Operations",
-        "📄 Documents": "Documents",
-        "🏢 BIM Viewer": "BIM",
-        "✅ Closeout": "Closeout",
-        "⚙️ Settings": "Settings"
+        "Dashboard": "Dashboard",
+        "Project Information": "Project Information",
+        "Schedule": "Schedule",
+        "Safety": "Safety",
+        "Contracts": "Contracts",
+        "Cost Management": "Cost Management",
+        "Engineering": "Engineering",
+        "Field Operations": "Field Operations",
+        "Documents": "Documents",
+        "BIM Viewer": "BIM",
+        "Closeout": "Closeout",
+        "Settings": "Settings"
     }
     
     # Get currently selected menu value from session state
     current_menu = st.session_state.get("current_menu", "Dashboard")
     
-    # Get icon for current menu
-    current_icon = ""
-    for k, v in menu_options.items():
-        if v == current_menu:
-            current_icon = k.split(" ")[0]
-            break
+    # Get menu icon map
+    menu_icons = {
+        "Dashboard": "📊",
+        "Project Information": "📋",
+        "Schedule": "📅", 
+        "Safety": "⚠️",
+        "Contracts": "📝",
+        "Cost Management": "💰",
+        "Engineering": "🔧",
+        "Field Operations": "🚧",
+        "Documents": "📄",
+        "BIM": "🏢",
+        "Closeout": "✅",
+        "Settings": "⚙️"
+    }
     
-    # Create main header container
-    st.markdown("""
-    <div class="pro-header-container">
-        <div class="pro-header-left">
-            <div class="pro-project-label">Project</div>
-            <div class="pro-project-name">Highland Tower Development</div>
-        </div>
-        
-        <div class="pro-header-center">
-            <div class="pro-logo">gc<span class="pro-logo-highlight">Panel</span></div>
-        </div>
-        
-        <div class="pro-header-right">
-            <div class="pro-menu-selected">
-                <span class="pro-menu-icon">{}</span>
-                <span class="pro-menu-text">{}</span>
-                <span class="pro-menu-arrow">▼</span>
-            </div>
-        </div>
-    </div>
-    """.format(current_icon, current_menu), unsafe_allow_html=True)
-    
-    # Navigation dropdown (hidden but functional)
-    # Add a CSS class to help target this specific dropdown
+    # Apply styles for fixed header
     st.markdown("""
     <style>
-    /* Target this specific dropdown */
-    div[data-testid="stSelectbox"]:has(select#header_nav_dropdown) {
-        position: absolute !important;
-        opacity: 0 !important;
-        width: 200px !important;
-        height: 50px !important;
-        z-index: 5 !important;
-        right: 24px !important;
-        top: 12px !important;
-    }
+        /* Remove extra space at the top */
+        .block-container {
+            padding-top: 0 !important;
+        }
+        
+        /* Hide selectbox visually but keep it functional */
+        div.row-widget.stSelectbox {
+            position: absolute;
+            right: 20px;
+            top: 28px;
+            width: 250px;
+            opacity: 0;
+            z-index: 10;
+        }
     </style>
     """, unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns([1, 1, 3])
+    # Main Header HTML with embedded styles
+    header_html = f"""
+    <style>
+        /* Header Styling */
+        .gc-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background-color: white;
+            border-bottom: 1px solid #eaeaea;
+        }}
+        
+        /* Left Section - Project Info */
+        .left-section {{
+            flex: 1;
+        }}
+        
+        .project-label {{
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 3px;
+            font-weight: 500;
+        }}
+        
+        .project-name {{
+            font-size: 16px;
+            color: #343a40;
+            font-weight: 600;
+        }}
+        
+        /* Center Section - Logo */
+        .center-section {{
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }}
+        
+        .gc-logo {{
+            font-size: 24px;
+            font-weight: 700;
+            color: #343a40;
+        }}
+        
+        .panel-part {{
+            color: #3b82f6;
+        }}
+        
+        /* Right Section - Menu */
+        .right-section {{
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+        }}
+        
+        .menu-selector {{
+            display: flex;
+            align-items: center;
+            background-color: #f0f7ff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #3b82f6;
+        }}
+        
+        .menu-icon {{
+            margin-right: 8px;
+        }}
+        
+        .menu-label {{
+            font-weight: 500;
+            font-size: 15px;
+        }}
+        
+        .dropdown-arrow {{
+            margin-left: 8px;
+            font-size: 10px;
+            color: #6c757d;
+        }}
+        
+        /* Subheader Styling */
+        .subheader {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 25px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eaeaea;
+        }}
+        
+        /* Breadcrumbs */
+        .breadcrumbs {{
+            display: flex;
+            align-items: center;
+        }}
+        
+        .breadcrumb-link {{
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 14px;
+        }}
+        
+        .breadcrumb-separator {{
+            margin: 0 8px;
+            color: #adb5bd;
+        }}
+        
+        .breadcrumb-current {{
+            color: #343a40;
+            font-weight: 500;
+            font-size: 14px;
+        }}
+        
+        /* Notification Bell */
+        .notification-bell {{
+            position: relative;
+        }}
+        
+        .bell-icon {{
+            font-size: 20px;
+            color: #6c757d;
+            cursor: pointer;
+        }}
+        
+        .notification-count {{
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #dc3545;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }}
+    </style>
+    
+    <header class="gc-header">
+        <div class="left-section">
+            <div class="project-label">Project</div>
+            <div class="project-name">Highland Tower Development</div>
+        </div>
+        
+        <div class="center-section">
+            <div class="gc-logo">gc<span class="panel-part">Panel</span></div>
+        </div>
+        
+        <div class="right-section">
+            <div class="menu-selector">
+                <span class="menu-icon">{menu_icons.get(current_menu, "")}</span>
+                <span class="menu-label">{current_menu}</span>
+                <span class="dropdown-arrow">▼</span>
+            </div>
+        </div>
+    </header>
+    
+    <div class="subheader">
+        <div class="breadcrumbs">
+            <a href="#" class="breadcrumb-link">Home</a>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-current">{current_menu}</span>
+        </div>
+        <div class="notification-bell">
+            <i class="bell-icon">🔔</i>
+            <span class="notification-count">3</span>
+        </div>
+    </div>
+    """
+    
+    # Render the header
+    st.markdown(header_html, unsafe_allow_html=True)
+    
+    # Dropdown selector (hidden but functional)
+    col1, col2, col3 = st.columns([1, 1, 1])
     with col3:
         selected = st.selectbox(
-            "Navigation",
+            label="Navigation",
             options=list(menu_options.keys()),
-            index=list(menu_options.values()).index(current_menu),
+            index=list(menu_options.keys()).index(current_menu),
             label_visibility="collapsed",
-            key="header_nav_dropdown",
+            key="header_nav_dropdown"
         )
         
         # Update the session state when a new menu item is selected
-        if menu_options[selected] != current_menu:
-            st.session_state.current_menu = menu_options[selected]
+        if selected != current_menu:
+            st.session_state.current_menu = selected
             st.rerun()
-    
-    # Secondary navigation bar with breadcrumbs
-    st.markdown(f"""
-    <div class="pro-secondary-nav">
-        <div class="pro-breadcrumbs">
-            <a href="#" class="pro-breadcrumb-item">Home</a>
-            <span class="pro-breadcrumb-separator">›</span>
-            <span class="pro-breadcrumb-current">{current_menu}</span>
-        </div>
-        <div class="pro-notification-area">
-            <span class="pro-notification-icon">🔔</span>
-            <span class="pro-notification-badge">3</span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)

@@ -14,8 +14,8 @@ from datetime import datetime, timedelta
 import random
 import os
 
-# Import the PDF viewer functionality
-from modules.pdf_viewer.pdf_viewer import PDFViewer
+# Import the PDF viewer helper
+from modules.documents.pdf_helper import display_pdf_document
 
 
 def render_documents():
@@ -204,7 +204,7 @@ def render_plans():
             
             # Display the selected document
             if st.session_state.get("selected_document_path"):
-                render_pdf_embed(
+                display_pdf_document(
                     st.session_state.selected_document_path,
                     st.session_state.selected_document_name
                 )
@@ -342,7 +342,7 @@ def render_submittal_pdfs():
             
             # Display the selected document
             if st.session_state.get("selected_document_path"):
-                render_pdf_embed(
+                display_pdf_document(
                     st.session_state.selected_document_path,
                     st.session_state.selected_document_name
                 )
@@ -508,7 +508,7 @@ def render_project_documents():
             
             # Display the selected document
             if st.session_state.get("selected_document_path"):
-                render_pdf_embed(
+                display_pdf_document(
                     st.session_state.selected_document_path,
                     st.session_state.selected_document_name
                 )

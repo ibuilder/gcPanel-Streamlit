@@ -113,8 +113,9 @@ def main():
     # Initialize database and authentication
     initialize_application()
     
-    # Render sidebar
-    render_sidebar()
+    # Render the navigation sidebar
+    from components.navigation import render_navigation
+    render_navigation()
     
     # Main content area
     with st.container():

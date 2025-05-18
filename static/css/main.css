@@ -21,6 +21,9 @@ header {
 /* Sidebar fixes */
 [data-testid="stSidebar"] {
     background-color: #f8f9fa;
+    min-width: 250px;
+    visibility: visible !important;
+    display: block !important;
 }
 
 [data-testid="stSidebar"] .stImage img {
@@ -35,9 +38,17 @@ header {
     margin-bottom: 1rem;
 }
 
+/* Make sidebar content visible */
+section[data-testid="stSidebarContent"] {
+    visibility: visible !important;
+    display: block !important;
+    padding: 1rem;
+}
+
 /* Properly space buttons in sidebar */
 [data-testid="stSidebar"] div.row-widget.stButton {
     margin-bottom: 0.25rem;
+    display: block !important;
 }
 
 /* Typography */

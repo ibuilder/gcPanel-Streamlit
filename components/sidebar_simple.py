@@ -54,9 +54,18 @@ def render_sidebar():
             ("Settings", "⚙️ Settings")
         ]
         
-        # Create navigation buttons for each item
+        # Create navigation buttons with primary/secondary styling based on selection
+        current = st.session_state.get("current_menu", "Dashboard")
+        
+        # Direct navbar creation with button type
         for menu_key, label in nav_items:
-            if st.button(label, key=f"nav_{menu_key.lower().replace(' ', '_')}"):
+            button_type = "primary" if current == menu_key else "secondary"
+            if st.button(
+                label, 
+                key=f"nav_{menu_key.lower().replace(' ', '_')}",
+                type=button_type,
+                use_container_width=True
+            ):
                 st.session_state.current_menu = menu_key
                 st.rerun()
         

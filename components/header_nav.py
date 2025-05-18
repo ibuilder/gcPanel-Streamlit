@@ -28,8 +28,16 @@ def render_header_nav():
             padding: 10px 20px;
             background-color: white;
             border-bottom: 1px solid #DADCE0;
-            margin: -1rem -5rem 1rem -5rem;
+            margin: 0 0 1rem 0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        /* Fix for Streamlit's extra space */
+        .block-container {
+            padding-top: 0 !important;
         }
         
         .header-left {
@@ -132,32 +140,12 @@ def render_header_nav():
             <div class="header-right">
                 <!-- Navigation will be inserted by Streamlit -->
                 <div id="nav-placeholder"></div>
-                
-                <!-- Notification button -->
-                <div class="notification-btn-container">
-                    <button class="notification-btn" id="notification-btn" onclick="document.querySelector('[data-testid=\\"stButton\\"] button').click();">
-                        <i class="material-icons">notifications</i> Notifications
-                    </button>
-                    <div class="notification-badge">3</div>
-                </div>
             </div>
         </div>
         
         <script>
             // Wait for Streamlit to load
             window.addEventListener('load', function() {
-                // Get the notification button
-                const notificationBtn = document.getElementById('notification-btn');
-                
-                // Add click event listener
-                notificationBtn.addEventListener('click', function() {
-                    // Find the hidden Streamlit button and click it
-                    const streamlitBtn = document.querySelector('[data-testid="stButton"] button');
-                    if (streamlitBtn) {
-                        streamlitBtn.click();
-                    }
-                });
-                
                 // Move the navigation selectbox into the header
                 const navElement = document.querySelector('div[data-testid="stSelectbox"]');
                 const navPlaceholder = document.getElementById('nav-placeholder');

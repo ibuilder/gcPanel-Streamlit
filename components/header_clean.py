@@ -83,8 +83,23 @@ def render_header():
     # Display a divider
     st.divider()
     
-    # Only show notification in the header
-    st.markdown(
-        f'<div style="text-align: right; margin-right: 15px;"><span style="position: relative; font-size: 1.2rem;">🔔<span style="position: absolute; top: -8px; right: -8px; background-color: #ef4444; color: white; border-radius: 50%; font-size: 0.7rem; padding: 2px 5px;">3</span></span></div>',
-        unsafe_allow_html=True
-    )
+    # Breadcrumb and notification row
+    brow_col1, brow_col2 = st.columns([11, 1])
+    
+    with brow_col1:
+        # Show breadcrumb for the current page
+        from components.simple_breadcrumbs import get_breadcrumbs_for_page, simple_breadcrumbs
+        breadcrumb_items = get_breadcrumbs_for_page(current_menu)
+        simple_breadcrumbs(breadcrumb_items)
+    
+    with brow_col2:
+        # Only show notification in the header
+        st.markdown(
+            f'<div style="text-align: right;"><span style="position: relative; font-size: 1.2rem;">🔔<span style="position: absolute; top: -8px; right: -8px; background-color: #ef4444; color: white; border-radius: 50%; font-size: 0.7rem; padding: 2px 5px;">3</span></span></div>',
+            unsafe_allow_html=True
+        )
+        
+        # Handle notification clicks
+        if st.button("", key="notification_button", help="View notifications"):
+            st.session_state.show_notification_center = not st.session_state.get("show_notification_center", False)
+            st.rerun()

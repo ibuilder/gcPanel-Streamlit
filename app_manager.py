@@ -94,27 +94,9 @@ def render_application():
         
         # CSS is now loaded from external file (breadcrumbs.css)
         
-        # Create a header row with breadcrumbs and notification center
-        header_col1, header_col2 = st.columns([7, 3])
-        
-        with header_col1:
-            # Render breadcrumbs
-            simple_breadcrumbs(breadcrumb_items)
-        
-        with header_col2:
-            col_right_1, col_right_2 = st.columns([1, 1])
-            
-            with col_right_2:
-                # Add notification button
-                show_notifications = render_notification_button()
-                
-                if show_notifications:
-                    st.session_state.show_notification_center = not st.session_state.get("show_notification_center", False)
-                    st.rerun()
-            
-            # Initialize notification center
-            if st.session_state.get("show_notification_center", False):
-                notification_center()
+        # Only initialize notification center if needed - we'll handle breadcrumbs elsewhere
+        if st.session_state.get("show_notification_center", False):
+            notification_center()
         
         # Add action buttons for pages that need them
         if current_menu in PAGES_WITH_ACTIONS:

@@ -78,7 +78,8 @@ Role-based access control with secure JWT implementation supports multiple user 
 
 ## Screenshots
 
-*Insert screenshots of key interface elements*
+![gcPanel Dashboard](attached_assets/gcpanel-streamlit2.png)
+*gcPanel Construction Management Dashboard - Highland Tower Project*
 
 ## License
 

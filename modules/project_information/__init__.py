@@ -8,6 +8,17 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
 
+def get_status_color(status):
+    """Return the appropriate color for a status value"""
+    status_colors = {
+        "Active": "green",
+        "Planning": "blue",
+        "On Hold": "orange",
+        "Completed": "violet",
+        # Add more statuses as needed
+    }
+    return status_colors.get(status, "gray")
+
 def render_project_information():
     """Render the project information page."""
     
@@ -68,23 +79,14 @@ def render_project_details():
             st.rerun()
     
     # Project header card
-    st.markdown(
-        f"""
-        <div class="dashboard-card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                    <h2 style="margin-bottom: 0.3rem; font-size: 1.5rem;">{project_data['name']}</h2>
-                    <p style="margin-bottom: 1rem; color: #6c757d; font-size: 0.9rem;">Project Code: {project_data['code']}</p>
-                    <p style="margin-bottom: 0.5rem;">{project_data['description']}</p>
-                </div>
-                <div>
-                    <span class="status-pill status-active">{project_data['status']}</span>
-                </div>
-            </div>
-        </div>
-        """, 
-        unsafe_allow_html=True
-    )
+    st.header(project_data['name'])
+    st.caption(f"Project Code: {project_data['code']}")
+    
+    # Status badge
+    st.markdown(f"**Status:** :{get_status_color(project_data['status'])}[{project_data['status']}]")
+    
+    # Project description
+    st.markdown(project_data['description'])
     
     # Key project information in a grid layout
     col1, col2 = st.columns(2)

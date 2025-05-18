@@ -72,7 +72,7 @@ def get_project_schedule_data():
     
     return df, milestones
 
-def predict_project_completion(df, target_completion=100):
+def predict_project_completion(df, target_completion=100.0):
     """
     Predict project completion date using linear regression.
     
@@ -83,6 +83,8 @@ def predict_project_completion(df, target_completion=100):
     Returns:
         tuple: (predicted_date, confidence_interval)
     """
+    # Convert target_completion to float if it's not already
+    target_completion = float(target_completion)
     # Convert dates to numeric for regression
     df = df.copy()
     df['date_numeric'] = (df['date'] - df['date'].min()).dt.days

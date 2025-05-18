@@ -39,6 +39,7 @@ def render_header_nav():
         /* Fix for Streamlit's extra space */
         .block-container {
             padding-top: 0 !important;
+            margin-top: 0 !important;
             max-width: 100% !important;
         }
         
@@ -47,6 +48,17 @@ def render_header_nav():
             padding-left: 1rem !important;
             padding-right: 1rem !important;
             padding-bottom: 1rem !important;
+            margin-top: 0 !important;
+        }
+        
+        /* Fix top margin in stApp */
+        [data-testid="stAppViewContainer"] > div:first-child {
+            margin-top: 0 !important;
+        }
+        
+        [data-testid="stVerticalBlock"] {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
         }
         
         .header-left {
@@ -57,7 +69,9 @@ def render_header_nav():
         .header-right {
             display: flex;
             align-items: center;
+            justify-content: flex-end;
             gap: 20px;
+            min-width: 200px;
         }
         
         .project-info {
@@ -75,9 +89,9 @@ def render_header_nav():
         
         .project-info p {
             margin: 0;
-            font-size: 14px;
+            font-size: 16px;
             color: #3367D6;
-            font-weight: 500;
+            font-weight: 600;
         }
         
         .notification-btn-container {
@@ -126,6 +140,7 @@ def render_header_nav():
         /* Override Streamlit's default selectbox styling */
         div[data-testid="stSelectbox"] {
             margin-bottom: 0 !important;
+            width: 200px !important;
         }
         
         div[data-testid="stSelectbox"] div[data-baseweb="select"] {
@@ -166,7 +181,7 @@ def render_header_nav():
         <div class="header-container">
             <div class="header-left">
                 <div class="logo">
-                    <img src="static/images/gcpanel-logo.svg" alt="gcPanel Logo" width="180">
+                    <img src="static/images/gcpanel-logo.svg" alt="gcPanel Logo" width="150">
                 </div>
                 <div class="project-info">
                     <h3>Project</h3>

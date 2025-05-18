@@ -16,7 +16,7 @@ from modules.dashboard import render_dashboard
 from modules.settings import render_settings
 from modules.project_information import render_project_information
 from modules.pdf_viewer.pdf_viewer import render_pdf_viewer
-from modules.bim_viewer.ifc_viewer import render_bim_viewer
+from modules.bim_viewer.simple_viewer import render_simple_bim_viewer as render_bim_viewer
 from modules.field_operations import render_field_operations
 from modules.scheduling import render_scheduling
 from modules.safety import render_safety

@@ -93,10 +93,6 @@ def render_plans():
                 st.session_state.show_plans_upload = False
                 st.rerun()
     
-    # Plans list section continues below
-        st.session_state.uploaded_plan = None
-        st.rerun()
-    
     # Display current plans
     st.subheader("Current Plans")
     

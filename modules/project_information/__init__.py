@@ -343,64 +343,48 @@ def render_project_location():
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown(
-            f"""
-            <div class="dashboard-card">
-                <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Location Details</h3>
-                
-                <div style="display: flex; margin-bottom: 0.7rem;">
-                    <div style="width: 40%; font-weight: 500; color: #6c757d;">Address:</div>
-                    <div>{location_data['address']}</div>
-                </div>
-                
-                <div style="display: flex; margin-bottom: 0.7rem;">
-                    <div style="width: 40%; font-weight: 500; color: #6c757d;">Zoning:</div>
-                    <div>{location_data['zoning']}</div>
-                </div>
-                
-                <div style="display: flex; margin-bottom: 0.7rem;">
-                    <div style="width: 40%; font-weight: 500; color: #6c757d;">Parcel Number:</div>
-                    <div>{location_data['parcel_number']}</div>
-                </div>
-                
-                <div style="display: flex; margin-bottom: 0.7rem;">
-                    <div style="width: 40%; font-weight: 500; color: #6c757d;">Lot Size:</div>
-                    <div>{location_data['lot_size']}</div>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        # Use native Streamlit components for location details
+        with st.container():
+            st.markdown("### Location Details")
+            
+            # Create detail items with proper formatting
+            details = [
+                {"label": "Address", "value": location_data['address']},
+                {"label": "Zoning", "value": location_data['zoning']},
+                {"label": "Parcel Number", "value": location_data['parcel_number']},
+                {"label": "Lot Size", "value": location_data['lot_size']}
+            ]
+            
+            # Display each detail in a row
+            for detail in details:
+                subcols = st.columns([2, 3])
+                with subcols[0]:
+                    st.markdown(f"**{detail['label']}:**")
+                with subcols[1]:
+                    st.markdown(f"{detail['value']}")
+                st.markdown("---")
     
     with col2:
-        st.markdown(
-            """
-            <div class="dashboard-card">
-                <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Site Conditions</h3>
-                
-                <div style="display: flex; margin-bottom: 0.7rem;">
-                    <div style="width: 40%; font-weight: 500; color: #6c757d;">Soil Type:</div>
-                    <div>Type 2 - Stiff Clay</div>
-                </div>
-                
-                <div style="display: flex; margin-bottom: 0.7rem;">
-                    <div style="width: 40%; font-weight: 500; color: #6c757d;">Elevation:</div>
-                    <div>175 ft above sea level</div>
-                </div>
-                
-                <div style="display: flex; margin-bottom: 0.7rem;">
-                    <div style="width: 40%; font-weight: 500; color: #6c757d;">Water Table:</div>
-                    <div>45 ft below grade</div>
-                </div>
-                
-                <div style="display: flex; margin-bottom: 0.7rem;">
-                    <div style="width: 40%; font-weight: 500; color: #6c757d;">Seismic Zone:</div>
-                    <div>Zone 3</div>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        # Use native Streamlit components for site conditions
+        with st.container():
+            st.markdown("### Site Conditions")
+            
+            # Create site condition details with proper formatting
+            conditions = [
+                {"label": "Soil Type", "value": "Type 2 - Stiff Clay"},
+                {"label": "Elevation", "value": "175 ft above sea level"},
+                {"label": "Water Table", "value": "45 ft below grade"},
+                {"label": "Seismic Zone", "value": "Zone 3"}
+            ]
+            
+            # Display each condition in a row
+            for condition in conditions:
+                subcols = st.columns([2, 3])
+                with subcols[0]:
+                    st.markdown(f"**{condition['label']}:**")
+                with subcols[1]:
+                    st.markdown(f"{condition['value']}")
+                st.markdown("---")
 
 def render_project_documents():
     """Render the project documents section."""

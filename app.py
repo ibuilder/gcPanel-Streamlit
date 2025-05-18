@@ -7,39 +7,8 @@ Featuring advanced modules for document management, BIM integration, and more.
 """
 
 import streamlit as st
-import os
-import pandas as pd
-from datetime import datetime
-
-# Import modules
-from modules.dashboard import render_dashboard
-from modules.settings import render_settings
-from modules.project_information import render_project_information
-from modules.pdf_viewer.pdf_viewer import render_pdf_viewer
-from modules.bim_viewer.basic_viewer import render_basic_bim_viewer
-from modules.bim_viewer.advanced_viewer import render_advanced_bim_viewer
-from modules.field_operations import render_field_operations
-from modules.scheduling import render_scheduling
-from modules.safety import render_safety
-from modules.contracts import render_contracts
-from modules.cost_management import render_cost_management
-from modules.closeout import render_closeout
-from modules.engineering import render_engineering
-from modules.documents import render_documents
-from modules.roadmap import render_roadmap
-from modules.mobile_companion import mobile_companion_page
-
-# Import components
-from components.action_buttons import render_action_buttons
-from components.action_bar import render_action_bar
-from components.simple_breadcrumbs import simple_breadcrumbs, get_breadcrumbs_for_page
-from components.header_nav_fixed import render_header_nav
-from components.notification_center import notification_center
-from components.footer import render_footer
-from core.digital_signatures.signature import DigitalSignature
-
-# Initialize core application
-from core import initialize_application
+from utils.ui_manager import set_page_config
+from app_manager import initialize_session_state, render_application
 
 def local_css():
     """Apply custom CSS for theming"""

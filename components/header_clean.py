@@ -50,42 +50,78 @@ def render_header():
             height: 40px !important;
         }
         
-        /* Custom styling for the header container */
-        .simple-header-container {
+        /* Remove section margins */
+        section[data-testid="stSidebar"] {
+            display: none !important;
+        }
+        
+        /* Main container styling */
+        .main-container {
+            background-color: #f5f7fa;
             padding: 20px;
+            border-radius: 5px;
+            margin: 0 auto;
+            max-width: 100%;
+        }
+        
+        /* Header styling */
+        .header-container {
             background-color: white;
+            border-radius: 5px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
             position: relative;
-            border-bottom: 1px solid #e5e7eb;
-            height: 60px;
         }
         
-        /* Project section styling */
-        .project-section {
-            position: absolute;
-            left: 20px;
-            top: 20px;
-        }
-        
-        .project-label {
-            font-size: 12px;
-            color: #6b7280;
-            margin-bottom: 4px;
-            font-weight: 500;
-        }
-        
-        .project-name {
-            font-size: 16px;
+        /* Code display section */
+        .code-display {
+            background-color: #f5f7fa;
+            border-radius: 5px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            font-family: monospace;
+            font-size: 14px;
             color: #374151;
-            font-weight: 600;
+            border: 1px solid #e5e7eb;
         }
         
-        /* Logo styling in center */
+        .code-line {
+            margin-bottom: 5px;
+            white-space: pre;
+        }
+        
+        /* Navigation row */
+        .nav-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .home-link {
+            font-size: 15px;
+            color: #3b82f6;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        
+        /* Dashboard title section */
+        .dashboard-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+        
+        /* Logo styling */
         .logo-section {
-            position: absolute;
-            left: 50%;
-            top: 30px;
-            transform: translateX(-50%);
-            text-align: center;
+            padding: 5px 10px;
         }
         
         .gc-logo {
@@ -100,15 +136,13 @@ def render_header():
         
         /* Menu selector styling */
         .menu-selector {
-            position: absolute;
-            right: 20px;
-            top: 20px;
             background-color: #f0f7ff;
             border-radius: 6px;
             padding: 8px 16px;
             display: flex;
             align-items: center;
             cursor: pointer;
+            margin-left: 10px;
         }
         
         .menu-icon {
@@ -128,42 +162,11 @@ def render_header():
             font-size: 10px;
         }
         
-        /* Bottom navbar styling */
-        .bottom-navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background-color: #f9fafb;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        /* Breadcrumbs styling */
-        .breadcrumbs {
-            display: flex;
-            align-items: center;
-        }
-        
-        .breadcrumb-home {
-            color: #3b82f6;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        
-        .breadcrumb-separator {
-            margin: 0 8px;
-            color: #9ca3af;
-        }
-        
-        .breadcrumb-current {
-            color: #374151;
-            font-weight: 500;
-            font-size: 14px;
-        }
-        
         /* Notification bell styling */
         .notification-area {
             position: relative;
+            margin-left: auto;
+            margin-right: 10px;
         }
         
         .notification-bell {
@@ -187,38 +190,65 @@ def render_header():
             align-items: center;
             justify-content: center;
         }
+        
+        /* Dropdown menu */
+        .dropdown {
+            position: absolute;
+            right: 20px;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            border-radius: 5px;
+            padding: 5px 10px;
+        }
+        
+        .dropdown-text {
+            font-size: 16px;
+            font-weight: 500;
+            margin-right: 5px;
+        }
+        
+        .dropdown-icon {
+            font-size: 16px;
+            color: #6b7280;
+        }
     </style>
     """, unsafe_allow_html=True)
     
-    # Main header with all components
+    # Render the header based on the HTML code shown in the screenshot
     st.markdown(f"""
-    <div class="simple-header-container">
-        <div class="project-section">
-            <div class="project-label">Project</div>
-            <div class="project-name">Highland Tower Development</div>
+    <div class="main-container">
+        <div class="header-container">
+            <div class="code-display">
+                <div class="code-line">&lt;div class="logo-section"&gt;</div>
+                <div class="code-line">    &lt;div class="gc-logo"&gt;gc&lt;span class="panel-highlight"&gt;Panel&lt;/span&gt;&lt;/div&gt;</div>
+                <div class="code-line">&lt;/div&gt;</div>
+                <div class="code-line"></div>
+                <div class="code-line">&lt;div class="menu-selector"&gt;</div>
+                <div class="code-line">    &lt;span class="menu-icon"&gt;📊&lt;/span&gt;</div>
+                <div class="code-line">    &lt;span class="menu-label"&gt;Dashboard&lt;/span&gt;</div>
+                <div class="code-line">    &lt;span class="dropdown-arrow"&gt;▼&lt;/span&gt;</div>
+                <div class="code-line">&lt;/div&gt;</div>
+            </div>
+            
+            <div class="nav-row">
+                <div class="nav-left">
+                    <a href="#" class="home-link">Home</a>
+                </div>
+                
+                <div class="dropdown">
+                    <span class="dropdown-text">Dashboard</span>
+                    <span class="dropdown-icon">▼</span>
+                </div>
+                
+                <div class="notification-area">
+                    <span class="notification-bell">🔔</span>
+                    <span class="notification-count">3</span>
+                </div>
+            </div>
         </div>
         
-        <div class="logo-section">
-            <div class="gc-logo">gc<span class="panel-highlight">Panel</span></div>
-        </div>
-        
-        <div class="menu-selector">
-            <span class="menu-icon">📊</span>
-            <span class="menu-label">{current_menu}</span>
-            <span class="dropdown-arrow">▼</span>
-        </div>
-    </div>
-    
-    <div class="bottom-navbar">
-        <div class="breadcrumbs">
-            <a href="#" class="breadcrumb-home">Home</a>
-            <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-current">{current_menu}</span>
-        </div>
-        <div class="notification-area">
-            <span class="notification-bell">🔔</span>
-            <span class="notification-count">3</span>
-        </div>
+        <div class="dashboard-title">Dashboard</div>
     </div>
     """, unsafe_allow_html=True)
     

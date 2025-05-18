@@ -411,16 +411,18 @@ def local_css():
         .breadcrumb {{
             display: flex;
             flex-wrap: wrap;
-            padding: 0.5rem 1rem;
-            margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.5rem;
             list-style: none;
             background-color: #f8f9fa;
-            border-radius: 0.25rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
         }}
         
         .breadcrumb-item {{
             display: flex;
             align-items: center;
+            font-size: 0.9rem;
         }}
         
         .breadcrumb-item + .breadcrumb-item {{
@@ -437,6 +439,116 @@ def local_css():
         .breadcrumb-item.active {{
             color: {primary_color};
             font-weight: 500;
+        }}
+        
+        /* Notification Center */
+        .notification-center {{
+            position: absolute;
+            top: 50px;
+            right: 1rem;
+            width: 350px;
+            max-height: 500px;
+            overflow-y: auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid {border_color};
+            z-index: 1000;
+            padding: 0;
+        }}
+        
+        .notification-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid {border_color};
+            background-color: {light_bg};
+        }}
+        
+        .notification-title {{
+            font-weight: 600;
+            font-size: 1rem;
+            margin: 0;
+        }}
+        
+        .notification-actions {{
+            display: flex;
+            gap: 0.5rem;
+        }}
+        
+        .notification-list {{
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }}
+        
+        .notification-item {{
+            padding: 1rem;
+            border-bottom: 1px solid {border_color};
+            transition: background-color 0.15s ease;
+        }}
+        
+        .notification-item:hover {{
+            background-color: rgba(0,0,0,0.01);
+        }}
+        
+        .notification-item:last-child {{
+            border-bottom: none;
+        }}
+        
+        .notification-item-header {{
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }}
+        
+        .notification-item-title {{
+            font-weight: 500;
+            margin: 0;
+            font-size: 0.95rem;
+        }}
+        
+        .notification-item-time {{
+            color: {text_muted};
+            font-size: 0.8rem;
+        }}
+        
+        .notification-item-body {{
+            color: {text_color};
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }}
+        
+        .notification-item-actions {{
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }}
+        
+        .notification-badge {{
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: white;
+            background-color: {danger_color};
+            border-radius: 10px;
+            border: 2px solid white;
+        }}
+        
+        .notification-empty {{
+            padding: 2rem 1rem;
+            text-align: center;
+            color: {text_muted};
+            font-style: italic;
         }}
         
         /* Custom widget styling */
@@ -533,15 +645,115 @@ def main():
             simple_breadcrumbs(breadcrumb_items)
         
         with header_col2:
+            col_right_1, col_right_2 = st.columns([1, 1])
+            
+            with col_right_2:
+                # Add notification center toggle button with styling
+                st.markdown("""
+                <style>
+                    .notification-btn-container {
+                        position: relative;
+                        display: inline-block;
+                        float: right;
+                        margin-right: 10px;
+                    }
+                    .notification-btn {
+                        background-color: #f8f9fa;
+                        border: 1px solid #eef2f7;
+                        border-radius: 6px;
+                        padding: 8px 12px;
+                        font-size: 14px;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        transition: all 0.2s ease;
+                    }
+                    .notification-btn:hover {
+                        background-color: #eef2f7;
+                    }
+                    .notification-btn i {
+                        font-size: 18px;
+                        margin-right: 5px;
+                    }
+                    .notification-badge {
+                        position: absolute;
+                        top: -5px;
+                        right: -5px;
+                        background-color: #ff5b5b;
+                        color: white;
+                        border-radius: 50%;
+                        width: 20px;
+                        height: 20px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 12px;
+                        font-weight: bold;
+                        border: 2px solid white;
+                    }
+                </style>
+                """, unsafe_allow_html=True)
+                
+                # Get the count of unread notifications
+                unread_count = 0
+                if "notifications" in st.session_state:
+                    unread_count = sum(1 for n in st.session_state.get("notifications", []) if not n.get("read", False))
+                
+                # Notification button with badge
+                badge_html = f'<div class="notification-badge">{unread_count}</div>' if unread_count > 0 else ''
+                notification_btn_html = f"""
+                <div class="notification-btn-container">
+                    <button class="notification-btn" id="notification-btn" onclick="document.querySelector('[data-testid="stButton"] button').click();">
+                        <i class="material-icons">notifications</i> Notifications
+                    </button>
+                    {badge_html}
+                </div>
+                <script>
+                    // Wait for Streamlit to load
+                    window.addEventListener('load', function() {{
+                        // Get the notification button
+                        const notificationBtn = document.getElementById('notification-btn');
+                        
+                        // Add click event listener
+                        notificationBtn.addEventListener('click', function() {{
+                            // Find the hidden Streamlit button and click it
+                            const streamlitBtn = document.querySelector('[data-testid="stButton"] button');
+                            if (streamlitBtn) {{
+                                streamlitBtn.click();
+                            }}
+                        }});
+                    }});
+                </script>
+                """
+                st.markdown(notification_btn_html, unsafe_allow_html=True)
+                
+                # Hidden button that will be clicked by JavaScript
+                show_notifications = st.button("Notifications", key="show_notifications_btn")
+                
+                # Hide the actual button with CSS
+                st.markdown("""
+                <style>
+                    [data-testid="stButton"] {
+                        position: absolute;
+                        width: 1px;
+                        height: 1px;
+                        padding: 0;
+                        margin: -1px;
+                        overflow: hidden;
+                        clip: rect(0, 0, 0, 0);
+                        white-space: nowrap;
+                        border-width: 0;
+                    }
+                </style>
+                """, unsafe_allow_html=True)
+                
+                if show_notifications:
+                    st.session_state.show_notification_center = not st.session_state.get("show_notification_center", False)
+                    st.rerun()
+            
             # Initialize notification center
             if st.session_state.get("show_notification_center", False):
                 notification_center()
-            
-            # Add notification center toggle button
-            show_notifications = st.button("📋 Notifications", key="show_notifications_btn")
-            if show_notifications:
-                st.session_state.show_notification_center = not st.session_state.get("show_notification_center", False)
-                st.rerun()
         
         # Render selected module
         if current_menu == "Dashboard":

@@ -16,69 +16,82 @@ def notification_center():
     This component allows users to view and manage their notifications.
     It supports filtering, marking as read, and taking action on notifications.
     """
-    with st.expander("Notification Center", expanded=False):
-        st.subheader("Notifications")
+    # Add custom styling for the notification center
+    st.markdown("""
+    <div class="notification-center-container">
+        <div class="notification-center-header">
+            <h2><i class="material-icons" style="vertical-align: middle; margin-right: 10px;">notifications</i> Notifications</h2>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Get the current user ID from session state
+    user_id = st.session_state.get("user_id", "current_user")
+    
+    # Notification filter options
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        notification_type = st.selectbox(
+            "Type",
+            ["All", "Delivery", "General", "Task", "Schedule", "Document"],
+            key="notification_type_filter"
+        )
+    
+    with col2:
+        time_filter = st.selectbox(
+            "Time Frame",
+            ["Today", "Last 7 Days", "Last 30 Days", "All"],
+            key="notification_time_filter"
+        )
+    
+    with col3:
+        include_read = st.checkbox("Include Read", False, key="include_read_notifications")
+    
+    # Get user notifications
+    notifications = get_user_notifications(user_id, limit=50, include_read=include_read)
+    
+    # Apply filters
+    filtered_notifications = []
+    for notification in notifications:
+        # Apply type filter
+        if notification_type != "All":
+            notification_type_value = notification.get("type", "")
+            if notification_type.lower() not in notification_type_value.lower():
+                continue
         
-        # Get the current user ID from session state
-        user_id = st.session_state.get("user_id", "current_user")
+        # Apply time filter
+        if time_filter != "All":
+            notification_time = notification.get("timestamp", "")
+            if notification_time:
+                try:
+                    timestamp = datetime.datetime.fromisoformat(notification_time)
+                    now = datetime.datetime.now()
+                    
+                    if time_filter == "Today" and timestamp.date() != now.date():
+                        continue
+                    elif time_filter == "Last 7 Days" and (now - timestamp).days > 7:
+                        continue
+                    elif time_filter == "Last 30 Days" and (now - timestamp).days > 30:
+                        continue
+                except ValueError:
+                    # Skip this filter if timestamp is invalid
+                    pass
         
-        # Notification filter options
-        col1, col2, col3 = st.columns(3)
+        filtered_notifications.append(notification)
+    
+    # Display notifications
+    if not filtered_notifications:
+        st.markdown("""
+        <div class="notification-empty">
+            <i class="material-icons" style="font-size: 48px; color: #e0e0e0; display: block; margin-bottom: 10px;">notifications_none</i>
+            <p>No notifications found matching your filters.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        # Option to mark all as read
+        col_actions_1, col_actions_2 = st.columns([1, 4])
         
-        with col1:
-            notification_type = st.selectbox(
-                "Type",
-                ["All", "Delivery", "General", "Task", "Schedule", "Document"],
-                key="notification_type_filter"
-            )
-        
-        with col2:
-            time_filter = st.selectbox(
-                "Time Frame",
-                ["Today", "Last 7 Days", "Last 30 Days", "All"],
-                key="notification_time_filter"
-            )
-        
-        with col3:
-            include_read = st.checkbox("Include Read", False, key="include_read_notifications")
-        
-        # Get user notifications
-        notifications = get_user_notifications(user_id, limit=50, include_read=include_read)
-        
-        # Apply filters
-        filtered_notifications = []
-        for notification in notifications:
-            # Apply type filter
-            if notification_type != "All":
-                notification_type_value = notification.get("type", "")
-                if notification_type.lower() not in notification_type_value.lower():
-                    continue
-            
-            # Apply time filter
-            if time_filter != "All":
-                notification_time = notification.get("timestamp", "")
-                if notification_time:
-                    try:
-                        timestamp = datetime.datetime.fromisoformat(notification_time)
-                        now = datetime.datetime.now()
-                        
-                        if time_filter == "Today" and timestamp.date() != now.date():
-                            continue
-                        elif time_filter == "Last 7 Days" and (now - timestamp).days > 7:
-                            continue
-                        elif time_filter == "Last 30 Days" and (now - timestamp).days > 30:
-                            continue
-                    except ValueError:
-                        # Skip this filter if timestamp is invalid
-                        pass
-            
-            filtered_notifications.append(notification)
-        
-        # Display notifications
-        if not filtered_notifications:
-            st.info("No notifications found matching your filters.")
-        else:
-            # Option to mark all as read
+        with col_actions_1:
             if st.button("Mark All as Read", key="mark_all_read_btn"):
                 for notification in filtered_notifications:
                     notification_id = notification.get("id", "")
@@ -86,10 +99,15 @@ def notification_center():
                         mark_notification_as_read(notification_id)
                 st.success("All notifications marked as read.")
                 st.rerun()
-            
-            # Display notifications
-            for notification in filtered_notifications:
-                render_notification(notification)
+        
+        # Display notifications
+        st.markdown('<div class="notification-list">', unsafe_allow_html=True)
+        for notification in filtered_notifications:
+            render_notification(notification)
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Close the notification center container
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def render_notification(notification):
     """
@@ -124,38 +142,41 @@ def render_notification(notification):
             formatted_time = timestamp
     
     # Set style based on priority and read status
-    bg_color = "#f8f9fa"  # Default light gray
-    border_color = "#dee2e6"  # Default gray
-    
-    if not read:
-        bg_color = "#e8f4f8"  # Light blue for unread
+    priority_class = "normal"
     
     if priority == "high":
-        border_color = "#ffc107"  # Yellow
+        priority_class = "high"
     elif priority == "critical":
-        border_color = "#dc3545"  # Red
+        priority_class = "critical"
+    
+    read_class = "" if read else "unread"
     
     # Get icon based on notification type
-    icon = "🔔"  # Default bell icon
+    icon_name = "notifications"  # Default bell icon
     
     if "delivery" in notification_type:
-        icon = "🚚"
+        icon_name = "local_shipping"
     elif "document" in notification_type:
-        icon = "📄"
+        icon_name = "description"
     elif "task" in notification_type:
-        icon = "✅"
+        icon_name = "task_alt"
     elif "schedule" in notification_type:
-        icon = "📅"
+        icon_name = "event"
     
-    # Render the notification
+    # Render the notification with our new CSS classes
     st.markdown(f"""
-        <div style="padding: 10px; border-left: 4px solid {border_color}; background-color: {bg_color}; margin-bottom: 10px; border-radius: 4px;">
-            <div style="display: flex; justify-content: space-between;">
-                <span style="font-weight: bold;">{icon} {subject}</span>
-                <span style="color: #6c757d; font-size: 0.8em;">{formatted_time}</span>
+        <div class="notification-item {read_class} priority-{priority_class}">
+            <div class="notification-item-header">
+                <div class="notification-item-title">
+                    <i class="material-icons">{icon_name}</i> {subject}
+                </div>
+                <div class="notification-item-time">{formatted_time}</div>
             </div>
-            <div style="margin: 5px 0;">
+            <div class="notification-item-body">
                 {message}
+            </div>
+            <div class="notification-item-footer">
+                <div class="notification-item-type">{notification_type.replace('_', ' ').title()}</div>
             </div>
         </div>
     """, unsafe_allow_html=True)

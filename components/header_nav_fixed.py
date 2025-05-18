@@ -23,7 +23,8 @@ def render_header_nav():
     .header-wrapper {
         position: relative;
         background-color: white;
-        margin-bottom: 2rem;
+        margin: 0;
+        padding: 5px 0;
         border-bottom: 1px solid #DADCE0;
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
@@ -32,7 +33,12 @@ def render_header_nav():
     .gcpanel-logo {
         display: inline-block;
         vertical-align: middle;
-        padding: 10px;
+        padding: 5px 10px;
+    }
+    
+    .gcpanel-logo img {
+        max-height: 40px;
+        width: auto;
     }
     
     .project-info {
@@ -75,11 +81,38 @@ def render_header_nav():
     /* Fix top margin in stApp */
     [data-testid="stAppViewContainer"] > div:first-child {
         margin-top: 0 !important;
+        padding-top: 0 !important;
     }
     
     [data-testid="stVerticalBlock"] {
         padding-top: 0 !important;
         margin-top: 0 !important;
+    }
+    
+    /* Completely remove all default padding */
+    div.css-1544g2n.e1fqkh3o4 {
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
+    
+    div.css-1kyxreq.etr89bj2 {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+    
+    /* Target all top-level containers */
+    div[data-testid="stToolbar"] {
+        visibility: hidden;
+        height: 0;
+        padding: 0;
+        margin: 0;
+    }
+    
+    header[data-testid="stHeader"] {
+        visibility: hidden;
+        height: 0;
+        padding: 0;
+        margin: 0;
     }
     
     /* Position the navigation dropdown in the top right */

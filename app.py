@@ -27,6 +27,10 @@ from modules.closeout import render_closeout
 from modules.engineering import render_engineering
 from modules.documents import render_documents
 from modules.roadmap import render_roadmap
+from modules.mobile_companion import mobile_companion_page
+
+# Import components
+from components.action_buttons import render_action_buttons
 
 # Import components
 from components.simple_breadcrumbs import simple_breadcrumbs, get_breadcrumbs_for_page
@@ -47,7 +51,8 @@ def local_css():
         "static/css/enhanced-theme.css",
         "static/css/optimized-ui.css",
         "static/css/console-fix.css",
-        "static/css/buttons-fix.css"
+        "static/css/buttons-fix.css",
+        "static/css/action-buttons.css"
     ]
     
     for css_file in css_files:

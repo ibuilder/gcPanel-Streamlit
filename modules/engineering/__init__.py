@@ -241,7 +241,7 @@ def render_rfis():
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            status_filter = st.multiselect(
+            st.multiselect(
                 "Status",
                 [status.value for status in RfiStatus],
                 default=[RfiStatus.DRAFT.value, RfiStatus.SUBMITTED.value, RfiStatus.UNDER_REVIEW.value, RfiStatus.OVERDUE.value],
@@ -249,7 +249,7 @@ def render_rfis():
             )
         
         with col2:
-            discipline_filter = st.multiselect(
+            st.multiselect(
                 "Discipline",
                 disciplines,
                 default=[],
@@ -257,7 +257,7 @@ def render_rfis():
             )
         
         with col3:
-            priority_filter = st.multiselect(
+            st.multiselect(
                 "Priority",
                 ["Low", "Medium", "High", "Critical"],
                 default=["High", "Critical"],
@@ -265,7 +265,7 @@ def render_rfis():
             )
     
     # Apply filters - always need to do this for the list display
-    status_filter_value = st.session_state.get("rfi_status_filter", ["Open", "Pending", "Answered"])
+    status_filter_value = st.session_state.get("rfi_status_filter", [RfiStatus.DRAFT.value, RfiStatus.SUBMITTED.value, RfiStatus.UNDER_REVIEW.value, RfiStatus.OVERDUE.value])
     discipline_filter_value = st.session_state.get("rfi_discipline_filter", [])
     priority_filter_value = st.session_state.get("rfi_priority_filter", ["High", "Critical"])
     
@@ -311,73 +311,74 @@ def render_rfis():
         # Visualizations
         st.subheader("RFI Analysis")
         
-        viz_col1, viz_col2 = st.columns(2)
+        # Create columns for visualizations
+        visualization_col1, visualization_col2 = st.columns(2)
+        
+        with visualization_col1:
+            # Status distribution
+            status_counts = {}
+            for rfi in rfis:
+                status = rfi["status"]
+                if status not in status_counts:
+                    status_counts[status] = 0
+                status_counts[status] += 1
+            
+            # Create data for chart
+            status_df = pd.DataFrame({
+                "Status": list(status_counts.keys()),
+                "Count": list(status_counts.values())
+            })
+            
+            # Color map
+            color_map = {
+                RfiStatus.DRAFT.value: "#6c757d",      # Gray
+                RfiStatus.SUBMITTED.value: "#ffc107",  # Yellow
+                RfiStatus.UNDER_REVIEW.value: "#17a2b8", # Cyan
+                RfiStatus.ANSWERED.value: "#28a745",   # Green
+                RfiStatus.CLOSED.value: "#20c997",     # Teal
+                RfiStatus.OVERDUE.value: "#dc3545"     # Red
+            }
+            
+            # Create pie chart
+            fig = px.pie(
+                status_df,
+                values="Count",
+                names="Status",
+                title="RFI Status Distribution",
+                color="Status",
+                color_discrete_map=color_map
+            )
+            
+            st.plotly_chart(fig, use_container_width=True)
     
-    with viz_col1:
-        # Status distribution
-        status_counts = {}
-        for rfi in rfis:
-            status = rfi["status"]
-            if status not in status_counts:
-                status_counts[status] = 0
-            status_counts[status] += 1
-        
-        # Create data for chart
-        status_df = pd.DataFrame({
-            "Status": list(status_counts.keys()),
-            "Count": list(status_counts.values())
-        })
-        
-        # Color map
-        color_map = {
-            RfiStatus.DRAFT.value: "#6c757d",      # Gray
-            RfiStatus.SUBMITTED.value: "#ffc107",  # Yellow
-            RfiStatus.UNDER_REVIEW.value: "#17a2b8", # Cyan
-            RfiStatus.ANSWERED.value: "#28a745",   # Green
-            RfiStatus.CLOSED.value: "#20c997",     # Teal
-            RfiStatus.OVERDUE.value: "#dc3545"     # Red
-        }
-        
-        # Create pie chart
-        fig = px.pie(
-            status_df,
-            values="Count",
-            names="Status",
-            title="RFI Status Distribution",
-            color="Status",
-            color_discrete_map=color_map
-        )
-        
-        st.plotly_chart(fig, use_container_width=True)
-    
-    with viz_col2:
-        # Discipline distribution
-        discipline_counts = {}
-        for rfi in rfis:
-            discipline = rfi["discipline"]
-            if discipline not in discipline_counts:
-                discipline_counts[discipline] = 0
-            discipline_counts[discipline] += 1
-        
-        # Create data for chart
-        discipline_df = pd.DataFrame({
-            "Discipline": list(discipline_counts.keys()),
-            "Count": list(discipline_counts.values())
-        }).sort_values("Count", ascending=False)
-        
-        # Create bar chart
-        fig = px.bar(
-            discipline_df,
-            x="Discipline",
-            y="Count",
-            title="RFIs by Discipline",
-            color="Count",
-            color_continuous_scale="Viridis"
-        )
-        
-        fig.update_layout(xaxis_tickangle=-45)
-        
-        st.plotly_chart(fig, use_container_width=True)
+        with visualization_col2:
+            # Discipline distribution
+            discipline_counts = {}
+            for rfi in rfis:
+                discipline = rfi["discipline"]
+                if discipline not in discipline_counts:
+                    discipline_counts[discipline] = 0
+                discipline_counts[discipline] += 1
+            
+            # Create data for chart
+            discipline_df = pd.DataFrame({
+                "Discipline": list(discipline_counts.keys()),
+                "Count": list(discipline_counts.values())
+            }).sort_values("Count", ascending=False)
+            
+            # Create bar chart
+            fig = px.bar(
+                discipline_df,
+                x="Discipline",
+                y="Count",
+                title="RFIs by Discipline",
+                color="Count",
+                color_continuous_scale="Viridis"
+            )
+            
+            fig.update_layout(xaxis_tickangle=-45)
+            
+            st.plotly_chart(fig, use_container_width=True)
     
     # RFI List
     st.subheader("RFI List")

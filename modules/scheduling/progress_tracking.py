@@ -161,28 +161,21 @@ def render_milestone_progress():
     # Create a radar chart for progress visualization
     st.subheader("Progress Overview")
     
-    # Create radar chart
-    # Convert categories and progress to list if they are pandas Series
-    try:
-        categories = df["Category"].tolist() if hasattr(df["Category"], "tolist") else list(df["Category"])
-        progress = df["Progress"].tolist() if hasattr(df["Progress"], "tolist") else list(df["Progress"])
-    except Exception as e:
-        st.error(f"Error converting data for chart: {e}")
-        categories = ["Planning", "Design", "Foundation", "Structure", "Finishes"]
-        progress = [75, 60, 45, 30, 10]
+    # Create radar chart with proper data conversion
+    radar_data = df[["Category", "Progress"]].copy()
     
-    # Create the figure using Plotly with explicitly imported types
-    fig = Figure()
+    # Use plotly express for radar chart to avoid scale binding issues
+    fig = px.line_polar(
+        radar_data, 
+        r="Progress", 
+        theta="Category", 
+        line_close=True,
+        range_r=[0, 100],
+        color_discrete_sequence=["rgba(32, 128, 64, 1)"]
+    )
     
-    # Add the scatter polar trace
-    fig.add_trace(Scatterpolar(
-        r=progress,
-        theta=categories,
-        fill='toself',
-        line=dict(color='rgba(32, 128, 64, 1)'),
-        fillcolor='rgba(32, 128, 64, 0.5)',
-        name='Progress'
-    ))
+    # Update layout for better appearance
+    fig.update_traces(fill='toself', fillcolor='rgba(32, 128, 64, 0.5)')
     
     fig.update_layout(
         polar=dict(

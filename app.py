@@ -38,59 +38,136 @@ from core import initialize_application
 
 def local_css():
     """Apply custom CSS for theming"""
-    # Define primary color
+    # Define color palette
     primary_color = "#3e79f7"
     secondary_color = "#6c757d"
     success_color = "#38d39f"
     warning_color = "#f9c851"
     danger_color = "#ff5b5b"
+    light_bg = "#f8f9fa"
+    dark_bg = "#313a46"
+    border_color = "#eef2f7"
+    text_color = "#2c3e50"
+    text_muted = "#6c757d"
     
     # Apply custom CSS
     st.markdown(f"""
     <style>
         /* Base styling */
         .stApp {{
-            font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            color: {text_color};
         }}
         
+        /* Typography */
         h1, h2, h3, h4, h5, h6 {{
             font-weight: 600;
-            color: #2c3e50;
+            color: {text_color};
+            margin-bottom: 1rem;
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+        }}
+        
+        h1 {{
+            font-size: 1.75rem;
+            margin-bottom: 1.25rem;
+        }}
+        
+        h2 {{
+            font-size: 1.5rem;
+            margin-top: 1.5rem;
+        }}
+        
+        h3 {{
+            font-size: 1.25rem;
+        }}
+        
+        p {{
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }}
+        
+        a {{
+            color: {primary_color};
+            text-decoration: none;
+        }}
+        
+        a:hover {{
+            text-decoration: underline;
+        }}
+        
+        /* Layout and Spacing */
+        .stApp > header {{
+            background-color: white;
+            border-bottom: 1px solid {border_color};
+        }}
+        
+        section[data-testid="stSidebarContent"] {{
+            padding-top: 2rem;
+        }}
+        
+        .main .block-container {{
+            padding-top: 1rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            max-width: 1200px;
         }}
         
         /* Dashboard cards */
         .dashboard-card {{
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
             background-color: white;
-            border-radius: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            border: 1px solid {border_color};
+            margin-bottom: 1.5rem;
             transition: all 0.2s ease;
-            border: 1px solid #eef2f7;
         }}
         
         .dashboard-card:hover {{
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+        }}
+        
+        .dashboard-card h3 {{
+            margin-top: 0;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }}
+        
+        .dashboard-card h3 svg, 
+        .dashboard-card h3 i {{
+            margin-right: 0.5rem;
+            color: {primary_color};
+        }}
+        
+        .dashboard-card p {{
+            color: {text_muted};
+            margin-bottom: 0.75rem;
         }}
         
         /* Counter cards */
         .counter-value {{
-            font-size: 2rem;
+            font-size: 2.25rem;
             font-weight: 600;
             color: {primary_color};
             margin-bottom: 0.5rem;
+            line-height: 1.2;
         }}
         
         .counter-label {{
             font-size: 0.9rem;
             color: {secondary_color};
+            font-weight: 500;
         }}
         
         /* Navigation styling */
         .nav-list {{
             list-style: none;
             padding-left: 0;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
         }}
         
         .nav-item {{
@@ -101,8 +178,8 @@ def local_css():
             display: flex;
             align-items: center;
             cursor: pointer;
-            color: #6c757d;
-            border-radius: 5px;
+            color: #9097a7;
+            border-radius: 6px;
             text-decoration: none;
             transition: all 0.15s ease;
             font-size: 0.95rem;
@@ -110,13 +187,19 @@ def local_css():
         
         .nav-item:hover {{
             background-color: rgba(62, 121, 247, 0.08);
-            color: {primary_color};
+            color: white;
         }}
         
         .nav-item.active {{
-            background-color: rgba(62, 121, 247, 0.1);
-            color: {primary_color};
+            background-color: rgba(62, 121, 247, 0.15);
+            color: white;
             font-weight: 500;
+        }}
+        
+        .nav-item i, 
+        .nav-item svg {{
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
         }}
         
         .nav-icon {{
@@ -129,94 +212,165 @@ def local_css():
         
         /* Status indicators */
         .status-pill {{
-            display: inline-block;
-            padding: 0.2rem 0.5rem;
-            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 500;
+            letter-spacing: 0.01em;
+            line-height: 1.4;
+            margin-right: 0.5rem;
         }}
         
-        .status-active {{
+        .status-pill i, 
+        .status-pill svg {{
+            margin-right: 0.35rem;
+            font-size: 0.85rem;
+        }}
+        
+        .status-active, .status-complete, .status-approved {{
             background-color: rgba(56, 211, 159, 0.15);
             color: #38d39f;
         }}
         
-        .status-pending {{
+        .status-pending, .status-in-progress, .status-scheduled {{
             background-color: rgba(249, 200, 81, 0.15);
             color: #f9c851;
         }}
         
-        .status-delayed {{
+        .status-delayed, .status-canceled, .status-rejected {{
             background-color: rgba(255, 91, 91, 0.15);
             color: #ff5b5b;
         }}
         
         /* Button styling */
-        .custom-button {{
-            display: inline-block;
+        .custom-button,
+        div.stButton > button,
+        div.stDownloadButton > button {{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             padding: 0.5rem 1rem;
             font-weight: 500;
             text-align: center;
             white-space: nowrap;
-            vertical-align: middle;
             cursor: pointer;
             border: 1px solid transparent;
-            border-radius: 4px;
+            border-radius: 6px;
             transition: all 0.15s ease;
+            font-size: 0.9rem;
+            gap: 0.5rem;
         }}
         
-        .primary-button {{
+        .primary-button,
+        div.stButton > button[kind="primary"] {{
             color: white;
             background-color: {primary_color};
             border-color: {primary_color};
         }}
         
-        .primary-button:hover {{
+        .primary-button:hover,
+        div.stButton > button[kind="primary"]:hover {{
             background-color: #3267d3;
             border-color: #3267d3;
+            box-shadow: 0 2px 5px rgba(62, 121, 247, 0.2);
+        }}
+        
+        .secondary-button,
+        div.stButton > button:not([kind="primary"]) {{
+            color: {text_color};
+            background-color: white;
+            border-color: {border_color};
+        }}
+        
+        .secondary-button:hover,
+        div.stButton > button:not([kind="primary"]):hover {{
+            border-color: {primary_color};
+            color: {primary_color};
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }}
         
         /* Form styling */
         div[data-testid="stForm"] {{
             background-color: white;
             padding: 1.5rem;
-            border-radius: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            border: 1px solid #eef2f7;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            border: 1px solid {border_color};
+            margin-bottom: 1.5rem;
         }}
         
-        /* Table styling */
-        div.stDataFrame {{
-            padding: 1rem;
-            border-radius: 6px;
-            border: 1px solid #eef2f7;
+        div[data-testid="stForm"] > div > div > div {{
+            gap: 1.25rem;
+        }}
+        
+        /* Form input elements */
+        input, select, textarea, div[data-baseweb="input"] input {{
+            border-radius: 6px !important;
+            border: 1px solid {border_color} !important;
+            padding: 0.6rem 0.75rem !important;
+            font-size: 0.95rem !important;
+            transition: all 0.15s ease;
             background-color: white;
         }}
         
-        div.stDataFrame div[data-testid="stTable"] {{
-            border-radius: 6px;
-            overflow: hidden;
+        input:focus, select:focus, textarea:focus, div[data-baseweb="input"] input:focus {{
+            border-color: {primary_color} !important;
+            box-shadow: 0 0 0 3px rgba(62, 121, 247, 0.15) !important;
+            outline: none;
         }}
         
-        div.stDataFrame table {{
-            border-collapse: collapse;
+        /* Labels */
+        label {{
+            font-weight: 500;
+            margin-bottom: 0.35rem;
+            color: {text_color};
+            font-size: 0.95rem;
+        }}
+        
+        /* Table styling */
+        div.stDataFrame, div[data-testid="stTable"] {{
+            padding: 0;
+            border-radius: 8px;
+            border: 1px solid {border_color};
+            background-color: white;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }}
+        
+        div.stDataFrame table, div[data-testid="stTable"] table {{
+            border-collapse: separate;
+            border-spacing: 0;
             width: 100%;
         }}
         
-        div.stDataFrame th {{
-            background-color: #f8f9fa;
-            border-top: none;
-            border-bottom: 2px solid #eef2f7;
-            color: #6c757d;
+        div.stDataFrame th, div[data-testid="stTable"] th {{
+            background-color: {light_bg};
+            padding: 0.75rem 1rem;
+            text-align: left;
             font-weight: 600;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            font-size: 0.8rem;
-            padding: 0.75rem;
+            letter-spacing: 0.05em;
+            color: {text_muted};
+            border-bottom: 1px solid {border_color};
         }}
         
-        div.stDataFrame td {{
-            border-top: 1px solid #eef2f7;
-            padding: 0.75rem;
+        div.stDataFrame td, div[data-testid="stTable"] td {{
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid {border_color};
+            vertical-align: middle;
+            font-size: 0.95rem;
+        }}
+        
+        div.stDataFrame tr:last-child td, div[data-testid="stTable"] tr:last-child td {{
+            border-bottom: none;
+        }}
+        
+        div.stDataFrame tr:hover td, div[data-testid="stTable"] tr:hover td {{
+            background-color: rgba(0,0,0,0.01);
         }}
         
         /* Progress bar styling */
@@ -225,14 +379,32 @@ def local_css():
         }}
         
         /* Tabs styling */
+        div.stTabs {{
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            border: 1px solid {border_color};
+            margin-bottom: 1.5rem;
+        }}
+        
         button[data-baseweb="tab"] {{
-            font-size: 1rem;
+            padding: 0.75rem 1.25rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.15s ease;
         }}
         
         button[data-baseweb="tab"][aria-selected="true"] {{
+            background-color: transparent;
+            border-bottom: 2px solid {primary_color};
             color: {primary_color};
-            border-bottom-color: {primary_color};
             font-weight: 600;
+        }}
+        
+        div[data-testid="stTabContent"] {{
+            padding: 1.5rem;
+            background-color: white;
         }}
         
         /* Breadcrumbs */

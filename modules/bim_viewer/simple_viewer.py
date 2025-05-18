@@ -1,12 +1,13 @@
 """
-Simple BIM Viewer module with static visualization.
+BIM Viewer module with interactive 3D visualization using Streamlit Elements.
 """
 
 import streamlit as st
 import os
+from streamlit_elements import elements, mui, html, three
 
 def render_simple_bim_viewer():
-    """Render a simple BIM Viewer with static visualization."""
+    """Render an interactive BIM Viewer with Streamlit Elements."""
     
     st.title("BIM Viewer")
     
@@ -33,37 +34,76 @@ def render_simple_bim_viewer():
     # Display a header for the model
     st.subheader(f"Building Model: {selected_ifc}")
     
-    # Display a building image with Streamlit components instead of HTML/SVG
-    st.info("3D model visualization - Highland Tower")
+    # Create an interactive 3D viewer using Streamlit Elements
+    st.markdown("### 3D Building Model - Interactive View")
     
-    # Create a simple building representation with native Streamlit components
-    col1, col2, col3 = st.columns([1, 3, 1])
+    # Viewer container with fixed height
+    with st.container():
+        # Use streamlit_elements to create an interactive 3D viewer
+        with elements("interactive_building_viewer"):
+            # Create a card to contain the 3D scene
+            with mui.Box(sx={"height": "500px", "border": "1px solid #ddd", "borderRadius": "8px"}):
+                # Create a Three.js scene
+                with three.Scene(
+                    className="full-screen",
+                    camera={"position": [10, 10, 10]},
+                    background="#f5f5f5"
+                ):
+                    # Add ambient light
+                    three.AmbientLight(intensity=0.6)
+                    
+                    # Add directional light
+                    three.DirectionalLight(
+                        position=[10, 20, 10],
+                        intensity=0.8,
+                        castShadow=True
+                    )
+
+                    # Create a basic building model
+                    # Base (ground floor)
+                    three.Mesh(
+                        geometry=three.BoxGeometry(width=10, height=0.5, depth=10),
+                        material=three.MeshStandardMaterial(color="#999"),
+                        position=[0, 0, 0],
+                        receiveShadow=True,
+                        castShadow=True
+                    )
+                    
+                    # Tower base
+                    three.Mesh(
+                        geometry=three.BoxGeometry(width=8, height=2, depth=8),
+                        material=three.MeshStandardMaterial(color="#ccc"),
+                        position=[0, 1.25, 0],
+                        receiveShadow=True,
+                        castShadow=True
+                    )
+                    
+                    # Main tower
+                    three.Mesh(
+                        geometry=three.BoxGeometry(width=6, height=10, depth=6),
+                        material=three.MeshStandardMaterial(color="#ddd"),
+                        position=[0, 7.25, 0],
+                        receiveShadow=True,
+                        castShadow=True
+                    )
+                    
+                    # Roof structure
+                    three.Mesh(
+                        geometry=three.BoxGeometry(width=5, height=1, depth=5),
+                        material=three.MeshStandardMaterial(color="#bbb"),
+                        position=[0, 12.75, 0],
+                        receiveShadow=True,
+                        castShadow=True
+                    )
+                    
+                    # Add orbital controls to allow rotation
+                    three.OrbitControls(enableDamping=True, dampingFactor=0.08)
     
-    with col2:
-        # Display an image placeholder using expander and progress bars for visualization
-        with st.expander("Building Structure", expanded=True):
-            st.markdown("### Highland Tower")
-            
-            # Display floor levels with progress bars
-            st.markdown("##### Floors")
-            st.progress(1.0, text="Penthouse")
-            st.progress(0.9, text="Floor 12-14")
-            st.progress(0.7, text="Floor 7-11")
-            st.progress(0.5, text="Floor 4-6")
-            st.progress(0.3, text="Floor 1-3")
-            st.progress(0.1, text="Lobby")
-            
-            # Show selected model
-            st.markdown(f"**Selected Model**: {selected_ifc}")
-            
-            # Display dimensions
-            st.markdown("##### Dimensions")
-            st.code("""
-            Width: 35m
-            Length: 40m
-            Height: 60m
-            Gross Area: 168,500 sq ft
-            """)
+    # Add rotation instructions
+    st.caption("👆 Click and drag to rotate the model. Use mouse wheel to zoom in/out.")
+    
+    # Add a separator
+    st.markdown("---")
     
     # Display model controls
     col1, col2, col3 = st.columns(3)

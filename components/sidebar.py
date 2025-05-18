@@ -28,61 +28,58 @@ def render_sidebar():
         # Navigation items
         st.markdown("### Navigation")
         
-        # Define navigation items with icons
-        nav_items = [
-            {"label": "Dashboard", "icon": "dashboard"},
-            {"label": "Project Information", "icon": "info"},
-            {"label": "Schedule", "icon": "event"},
-            {"label": "Safety", "icon": "health_and_safety"},
-            {"label": "Contracts", "icon": "description"},
-            {"label": "Cost Management", "icon": "payments"},
-            {"label": "Engineering", "icon": "engineering"},
-            {"label": "Field Operations", "icon": "construction"},
-            {"label": "Documents", "icon": "folder"},
-            {"label": "BIM Viewer", "icon": "view_in_ar"},
-            {"label": "Roadmap", "icon": "map"},
-            {"label": "Closeout", "icon": "task_alt"},
-            {"label": "Settings", "icon": "settings"}
-        ]
-        
-        # Create navigation buttons with icons
-        for item in nav_items:
-            label = item["label"]
-            icon = item["icon"]
-            key = f"nav_{label.lower().replace(' ', '_')}"
+        # Basic navigation with direct buttons
+        if st.button("Dashboard", key="dashboard_btn", use_container_width=True):
+            st.session_state.menu = "dashboard"
+            st.rerun()
             
-            # Create navigation button
-            if st.button(f":{icon}: {label}", key=key, use_container_width=True):
-                # Convert button label to menu item name
-                if label == "Dashboard":
-                    st.session_state.menu = "dashboard"
-                elif label == "Project Information":
-                    st.session_state.menu = "project_information"
-                elif label == "Schedule":
-                    st.session_state.menu = "scheduling"
-                elif label == "Safety":
-                    st.session_state.menu = "safety"
-                elif label == "Contracts":
-                    st.session_state.menu = "contracts"
-                elif label == "Cost Management":
-                    st.session_state.menu = "cost_management"
-                elif label == "Engineering":
-                    st.session_state.menu = "engineering"
-                elif label == "Field Operations":
-                    st.session_state.menu = "field_operations"
-                elif label == "Documents":
-                    st.session_state.menu = "documents"
-                elif label == "BIM Viewer":
-                    st.session_state.menu = "bim_viewer"
-                elif label == "Roadmap":
-                    st.session_state.menu = "roadmap"
-                elif label == "Closeout":
-                    st.session_state.menu = "closeout"
-                elif label == "Settings":
-                    st.session_state.menu = "settings"
-                
-                # Rerun the app to update the UI
-                st.rerun()
+        if st.button("Project Information", key="project_info_btn", use_container_width=True):
+            st.session_state.menu = "project_information"
+            st.rerun()
+            
+        if st.button("Schedule", key="schedule_btn", use_container_width=True):
+            st.session_state.menu = "scheduling"
+            st.rerun()
+            
+        if st.button("Safety", key="safety_btn", use_container_width=True):
+            st.session_state.menu = "safety"
+            st.rerun()
+            
+        if st.button("Contracts", key="contracts_btn", use_container_width=True):
+            st.session_state.menu = "contracts"
+            st.rerun()
+            
+        if st.button("Cost Management", key="cost_mgmt_btn", use_container_width=True):
+            st.session_state.menu = "cost_management"
+            st.rerun()
+            
+        if st.button("Engineering", key="engineering_btn", use_container_width=True):
+            st.session_state.menu = "engineering"
+            st.rerun()
+            
+        if st.button("Field Operations", key="field_ops_btn", use_container_width=True):
+            st.session_state.menu = "field_operations"
+            st.rerun()
+            
+        if st.button("Documents", key="documents_btn", use_container_width=True):
+            st.session_state.menu = "documents"
+            st.rerun()
+            
+        if st.button("BIM Viewer", key="bim_viewer_btn", use_container_width=True):
+            st.session_state.menu = "bim_viewer"
+            st.rerun()
+            
+        if st.button("Roadmap", key="roadmap_btn", use_container_width=True):
+            st.session_state.menu = "roadmap"
+            st.rerun()
+            
+        if st.button("Closeout", key="closeout_btn", use_container_width=True):
+            st.session_state.menu = "closeout"
+            st.rerun()
+            
+        if st.button("Settings", key="settings_btn", use_container_width=True):
+            st.session_state.menu = "settings"
+            st.rerun()
         
         # Footer
         st.markdown("---")

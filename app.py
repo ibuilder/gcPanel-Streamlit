@@ -113,9 +113,63 @@ def main():
     # Initialize database and authentication
     initialize_application()
     
-    # Render the navigation sidebar
-    from components.navigation import render_navigation
-    render_navigation()
+    # Direct sidebar navigation without any custom components
+    st.sidebar.image("gcpanel.png", width=100)
+    st.sidebar.title("gcPanel")
+    
+    st.sidebar.markdown("### Project")
+    st.sidebar.markdown("**Highland Tower Development**")
+    
+    st.sidebar.markdown("### Navigation")
+    
+    # Simple menu options with emoji icons
+    menu_options = [
+        "📊 Dashboard", 
+        "📋 Project Information",
+        "📅 Schedule",
+        "⚠️ Safety",
+        "📝 Contracts", 
+        "💰 Cost Management",
+        "🔧 Engineering",
+        "🚧 Field Operations",
+        "📄 Documents",
+        "🏢 BIM Viewer",
+        "✅ Closeout",
+        "⚙️ Settings"
+    ]
+    
+    # Mapping from display name to internal name
+    menu_map = {
+        "📊 Dashboard": "Dashboard", 
+        "📋 Project Information": "Project Information",
+        "📅 Schedule": "Schedule",
+        "⚠️ Safety": "Safety",
+        "📝 Contracts": "Contracts", 
+        "💰 Cost Management": "Cost Management",
+        "🔧 Engineering": "Engineering",
+        "🚧 Field Operations": "Field Operations",
+        "📄 Documents": "Documents",
+        "🏢 BIM Viewer": "BIM",
+        "✅ Closeout": "Closeout",
+        "⚙️ Settings": "Settings"
+    }
+    
+    # Simple navigation using a selectbox
+    selected = st.sidebar.selectbox(
+        "Select Module",
+        menu_options,
+        label_visibility="collapsed"
+    )
+    
+    # Update state based on selection
+    current_menu = menu_map[selected]
+    if current_menu != st.session_state.get("current_menu"):
+        st.session_state.current_menu = current_menu
+        st.rerun()
+        
+    # Footer
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("© 2025 gcPanel")
     
     # Main content area
     with st.container():

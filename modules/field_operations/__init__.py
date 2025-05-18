@@ -12,6 +12,7 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta, time
 import random
 import calendar
+from utils.notifications import send_delivery_notification, NotificationType
 
 def render_field_operations():
     """Render the field operations module"""
@@ -288,15 +289,32 @@ def render_quality_control():
 def render_delivery_tracking():
     """Render the delivery tracking section, integrated with procurement items"""
     
+    # Initialize session state variables if they don't exist
+    if "show_delivery_form" not in st.session_state:
+        st.session_state.show_delivery_form = False
+    if "show_reschedule_form" not in st.session_state:
+        st.session_state.show_reschedule_form = False
+    if "reschedule_delivery_id" not in st.session_state:
+        st.session_state.reschedule_delivery_id = None
+    
     # Header with button
     col1, col2, col3 = st.columns([2, 1, 1])
     
     with col1:
         st.header("Delivery Tracking")
     
+    # Show notification indicator in the header
+    with col2:
+        from components.notification_center import notification_indicator
+        notification_indicator()
+    
     with col3:
         if st.button("Add New Delivery", type="primary", key="add_delivery_btn"):
             st.session_state.show_delivery_form = True
+    
+    # Show reschedule form if button was clicked
+    if st.session_state.get("show_reschedule_form", False) and st.session_state.get("reschedule_delivery_id"):
+        render_reschedule_form(st.session_state.reschedule_delivery_id)
     
     # Date filters
     view_col1, view_col2, view_col3 = st.columns(3)
@@ -498,12 +516,18 @@ def render_delivery_list(deliveries_df):
                 st.markdown(f"**Notes:** {row['notes']}")
             
             # Action buttons
-            col1, col2, col3 = st.columns(3)
+            col1, col2, col3, col4 = st.columns(4)
             with col1:
-                st.button("Mark as Received", key=f"receive_{row['id']}")
+                if st.button("Mark as Received", key=f"receive_{row['id']}"):
+                    update_delivery_status(row, "Received")
             with col2:
-                st.button("Reschedule", key=f"reschedule_{row['id']}")
+                if st.button("Report Delay", key=f"delay_{row['id']}"):
+                    update_delivery_status(row, "Delayed")
             with col3:
+                if st.button("Reschedule", key=f"reschedule_{row['id']}"):
+                    st.session_state.reschedule_delivery_id = row['id']
+                    st.session_state.show_reschedule_form = True
+            with col4:
                 st.button("View Details", key=f"details_{row['id']}")
 
 def render_delivery_calendar(deliveries_df, month, year):
@@ -675,6 +699,188 @@ def generate_sample_procurement_items():
         })
     
     return pd.DataFrame(data)
+
+def update_delivery_status(delivery_data, new_status):
+    """
+    Update the status of a delivery and send notifications
+    
+    Args:
+        delivery_data (dict): The delivery data to update
+        new_status (str): The new status for the delivery
+    """
+    # In a real application, this would update the database
+    # For now, just show a success message and send a notification
+    
+    delivery_id = delivery_data['id']
+    item_name = delivery_data['item_name']
+    
+    notification_type = None
+    additional_message = None
+    
+    # Set notification type and additional message based on new status
+    if new_status == "Scheduled":
+        notification_type = NotificationType.DELIVERY_SCHEDULED
+        success_msg = f"Delivery for '{item_name}' has been scheduled."
+    
+    elif new_status == "Confirmed":
+        notification_type = NotificationType.DELIVERY_CONFIRMED
+        success_msg = f"Delivery for '{item_name}' has been confirmed by the supplier."
+    
+    elif new_status == "Delayed":
+        notification_type = NotificationType.DELIVERY_DELAYED
+        success_msg = f"Delivery for '{item_name}' has been marked as delayed."
+        additional_message = "Please contact the project manager for more information."
+    
+    elif new_status == "Canceled":
+        notification_type = NotificationType.DELIVERY_CANCELED
+        success_msg = f"Delivery for '{item_name}' has been canceled."
+        additional_message = "Please contact procurement to reschedule."
+    
+    elif new_status == "Received":
+        notification_type = NotificationType.DELIVERY_ARRIVED
+        success_msg = f"Delivery for '{item_name}' has been marked as received."
+    
+    elif new_status == "Incomplete":
+        notification_type = NotificationType.DELIVERY_INCOMPLETE
+        success_msg = f"Delivery for '{item_name}' has been marked as incomplete."
+        additional_message = "Please document any missing or damaged items."
+    
+    # If we have a valid notification type, send the notification
+    if notification_type:
+        # Get the recipients based on user roles (simplified for demo)
+        recipients = ["project_manager", "site_superintendent"]
+        
+        # Get other interested parties based on the affected tasks
+        if "related_task" in delivery_data:
+            task = delivery_data["related_task"]
+            if "Concrete" in task or "Foundation" in task:
+                recipients.append("concrete_foreman")
+            elif "Steel" in task:
+                recipients.append("steel_foreman")
+            elif "MEP" in task:
+                recipients.append("mep_coordinator")
+        
+        # Send the notification
+        success = send_delivery_notification(
+            delivery_data=delivery_data,
+            notification_type=notification_type,
+            recipients=recipients,
+            additional_message=additional_message
+        )
+        
+        if success:
+            st.success(success_msg)
+        else:
+            st.warning(f"Status updated to {new_status}, but there was an issue sending notifications.")
+    else:
+        st.success(f"Delivery status updated to {new_status}.")
+
+def render_reschedule_form(delivery_id):
+    """
+    Render a form to reschedule a delivery
+    
+    Args:
+        delivery_id (str): The ID of the delivery to reschedule
+    """
+    # In a real application, we would fetch the delivery data from the database
+    # For this demo, we'll create sample data
+    
+    delivery_data = {
+        'id': delivery_id,
+        'item_name': "Sample Item",
+        'supplier': "Sample Supplier",
+        'delivery_date': datetime.now() + timedelta(days=3),
+        'delivery_time': time(9, 0),
+    }
+    
+    with st.form(key=f"reschedule_form_{delivery_id}"):
+        st.subheader(f"Reschedule Delivery: {delivery_data['item_name']}")
+        
+        # Date and time selection
+        col1, col2 = st.columns(2)
+        with col1:
+            new_date = st.date_input(
+                "New Delivery Date", 
+                delivery_data['delivery_date']
+            )
+        
+        with col2:
+            new_time = st.time_input(
+                "New Delivery Time",
+                delivery_data['delivery_time']
+            )
+        
+        # Reason for rescheduling
+        reason = st.selectbox(
+            "Reason for Rescheduling",
+            ["Supplier Request", "Site Not Ready", "Weather Conditions", "Material Shortages", "Other"]
+        )
+        
+        if reason == "Other":
+            other_reason = st.text_input("Specify Reason")
+        
+        # Notes
+        notes = st.text_area("Additional Notes", "")
+        
+        # Notify options
+        notify_options = st.multiselect(
+            "Notify",
+            ["Supplier", "Project Manager", "Site Superintendent", "Subcontractors"],
+            default=["Supplier", "Project Manager"]
+        )
+        
+        # Submit buttons
+        col1, col2 = st.columns(2)
+        with col1:
+            submitted = st.form_submit_button("Save Changes")
+        with col2:
+            canceled = st.form_submit_button("Cancel")
+        
+        if submitted:
+            # Update delivery data
+            delivery_data['delivery_date'] = new_date
+            delivery_data['delivery_time'] = new_time
+            
+            # In a real app, save this to the database
+            
+            # Send notification about rescheduled delivery
+            notification_type = NotificationType.DELIVERY_SCHEDULED
+            recipients = []
+            
+            if "Supplier" in notify_options:
+                recipients.append("supplier")
+            if "Project Manager" in notify_options:
+                recipients.append("project_manager")
+            if "Site Superintendent" in notify_options:
+                recipients.append("site_superintendent")
+            if "Subcontractors" in notify_options:
+                recipients.append("subcontractors")
+            
+            additional_message = f"This delivery has been rescheduled. Reason: {reason if reason != 'Other' else other_reason}."
+            if notes:
+                additional_message += f" Notes: {notes}"
+            
+            success = send_delivery_notification(
+                delivery_data=delivery_data,
+                notification_type=notification_type,
+                recipients=recipients,
+                additional_message=additional_message
+            )
+            
+            if success:
+                st.success(f"Delivery for '{delivery_data['item_name']}' has been rescheduled. Notifications sent.")
+            else:
+                st.warning(f"Delivery rescheduled, but there was an issue sending notifications.")
+            
+            # Clear the form
+            st.session_state.show_reschedule_form = False
+            st.session_state.reschedule_delivery_id = None
+            st.rerun()
+        
+        if canceled:
+            st.session_state.show_reschedule_form = False
+            st.session_state.reschedule_delivery_id = None
+            st.rerun()
 
 def render_field_inspections():
     """Render the field inspections section"""

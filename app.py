@@ -30,6 +30,7 @@ from modules.roadmap import render_roadmap
 # Import components
 from components.simple_breadcrumbs import simple_breadcrumbs, get_breadcrumbs_for_page
 from components.sidebar import render_sidebar
+from components.notification_center import notification_center
 from core.digital_signatures.signature import DigitalSignature
 
 # Initialize core application

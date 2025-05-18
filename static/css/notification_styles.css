@@ -1,0 +1,72 @@
+/* Notification styles */
+
+.notification-btn-container {
+    position: relative;
+    display: inline-block;
+    float: right;
+    margin-right: 10px;
+}
+
+.notification-btn {
+    background-color: #f8f9fa;
+    border: 1px solid #eef2f7;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.notification-btn:hover {
+    background-color: #eef2f7;
+}
+
+.notification-btn i {
+    font-size: 18px;
+    margin-right: 5px;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #ff5b5b;
+    color: white;
+    font-size: 10px;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Only hide notification toggle button */
+.stButton button[kind="secondary"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* But make sure action buttons are visible */
+.action-buttons-container .stButton button {
+    display: inline-flex !important;
+    visibility: visible !important;
+    position: relative !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0.5rem 1rem !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    clip: auto !important;
+    white-space: nowrap !important;
+    border-width: 1px !important;
+}

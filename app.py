@@ -231,7 +231,8 @@ def main():
                 # Hide the actual button with CSS
                 st.markdown("""
                 <style>
-                    [data-testid="stButton"] {
+                    /* Only hide notification toggle button */
+                    .stButton button[kind="secondary"] {
                         position: absolute;
                         width: 1px;
                         height: 1px;
@@ -241,6 +242,21 @@ def main():
                         clip: rect(0, 0, 0, 0);
                         white-space: nowrap;
                         border-width: 0;
+                    }
+                    
+                    /* But make sure action buttons are visible */
+                    .action-buttons-container .stButton button {
+                        display: inline-flex !important;
+                        visibility: visible !important;
+                        position: relative !important;
+                        width: auto !important;
+                        height: auto !important;
+                        padding: 0.5rem 1rem !important;
+                        margin: 0 !important;
+                        overflow: visible !important;
+                        clip: auto !important;
+                        white-space: nowrap !important;
+                        border-width: 1px !important;
                     }
                 </style>
                 """, unsafe_allow_html=True)

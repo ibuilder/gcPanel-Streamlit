@@ -176,7 +176,11 @@ def render_header_nav():
         </style>
         """, unsafe_allow_html=True)
         
-        # Create the header HTML
+        # Create containers for fixed header elements
+        # This ensures exact positioning of elements
+        header_col1, header_col2 = st.columns([3, 1])
+        
+        # Create a simpler header HTML without JavaScript manipulation
         header_html = """
         <div class="header-container">
             <div class="header-left">
@@ -188,32 +192,15 @@ def render_header_nav():
                     <p>Highland Tower Development</p>
                 </div>
             </div>
-            <div class="header-right">
-                <!-- Navigation will be inserted by Streamlit -->
-                <div id="nav-placeholder"></div>
-            </div>
         </div>
-        
-        <script>
-            // Wait for Streamlit to load
-            window.addEventListener('load', function() {
-                // Move the navigation selectbox into the header
-                const navElement = document.querySelector('div[data-testid="stSelectbox"]');
-                const navPlaceholder = document.getElementById('nav-placeholder');
-                if (navElement && navPlaceholder) {
-                    navPlaceholder.appendChild(navElement);
-                }
-            });
-        </script>
         """
         
         # Render the header
-        st.markdown(header_html, unsafe_allow_html=True)
+        with header_col1:
+            st.markdown(header_html, unsafe_allow_html=True)
         
-        # Create a hidden container for the navigation selectbox
-        # It will be moved to the header via JavaScript
-        with st.container():
-            # Simple navigation using a selectbox
+        with header_col2:
+            # Right side - navigation dropdown
             menu_options = [
                 "📊 Dashboard", 
                 "📋 Project Information",
@@ -248,12 +235,28 @@ def render_header_nav():
             # Get currently selected menu value from session state
             current_display_menu = next((k for k, v in menu_map.items() if v == st.session_state.get("current_menu", "Dashboard")), menu_options[0])
             
+            # Style adjustments for the right-aligned dropdown
+            st.markdown("""
+            <style>
+                div[data-testid="column"]:nth-child(2) {
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                }
+                
+                div[data-testid="column"]:nth-child(2) [data-testid="stSelectbox"] {
+                    width: 200px !important;
+                }
+            </style>
+            """, unsafe_allow_html=True)
+            
             # Create the navigation dropdown
             selected = st.selectbox(
                 "Select Module",
                 menu_options,
                 index=menu_options.index(current_display_menu),
-                label_visibility="collapsed"
+                label_visibility="collapsed",
+                key="main_nav_dropdown"
             )
             
             # Update state based on selection

@@ -30,7 +30,7 @@ from modules.roadmap import render_roadmap
 
 # Import components
 from components.simple_breadcrumbs import simple_breadcrumbs, get_breadcrumbs_for_page
-from components.header_nav import render_header_nav
+from components.header_nav_fixed import render_header_nav
 from components.notification_center import notification_center
 from components.footer import render_footer
 from core.digital_signatures.signature import DigitalSignature

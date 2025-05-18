@@ -376,8 +376,7 @@ def main():
             render_cost_management()
         elif current_menu == "Schedule":
             render_scheduling()
-        elif current_menu == "Roadmap":
-            render_roadmap()
+        # Roadmap functionality has been integrated into Schedule module
         elif current_menu == "Closeout":
             render_closeout()
         elif current_menu == "Settings":

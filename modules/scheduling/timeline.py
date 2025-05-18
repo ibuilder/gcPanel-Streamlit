@@ -69,7 +69,11 @@ def render_timeline():
     
     # Add vertical line for today - use string date format to avoid type errors
     today_str = datetime.now().strftime("%Y-%m-%d")
-    fig.add_vline(x=today_str, line_width=2, line_dash="dash", line_color="red", annotation_text="Today")
+    try:
+        fig.add_vline(x=today_str, line_width=2, line_dash="dash", line_color="red", annotation_text="Today")
+    except TypeError as e:
+        st.warning(f"Could not add today's date line to the chart: {e}")
+        st.info("This does not affect the functionality of the timeline.")
     
     # Display the chart
     st.plotly_chart(fig, use_container_width=True)

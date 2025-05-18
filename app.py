@@ -269,6 +269,29 @@ def main():
             if st.session_state.get("show_notification_center", False):
                 notification_center()
         
+        # Define which pages should have Add/Edit buttons
+        pages_with_actions = {
+            "Project Information": "Information", 
+            "Schedule": "Schedule Item",
+            "Safety": "Safety Item",
+            "Contracts": "Contract", 
+            "Cost Management": "Cost Item",
+            "Engineering": "Drawing",
+            "Field Operations": "Field Item",
+            "Documents": "Document",
+            "Closeout": "Closeout Item"
+        }
+        
+        # Add action bar if the current menu needs it
+        if current_menu in pages_with_actions:
+            page_type = pages_with_actions[current_menu]
+            action_result = render_action_bar(page_type=page_type)
+            
+            # Store action results in session state if needed
+            if action_result["add_clicked"] or action_result["edit_clicked"]:
+                st.session_state[f"{current_menu.lower().replace(' ', '_')}_action"] = action_result
+                st.rerun()
+        
         # Render selected module
         if current_menu == "Dashboard":
             render_dashboard()

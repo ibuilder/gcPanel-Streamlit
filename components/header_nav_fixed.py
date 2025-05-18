@@ -16,148 +16,7 @@ def render_header_nav():
     - Navigation dropdown on the right
     """
     
-    # Apply custom CSS for header styling
-    st.markdown("""
-    <style>
-    /* Header container */
-    .header-wrapper {
-        position: relative;
-        background-color: white;
-        margin: 0;
-        padding: 5px 0;
-        border-bottom: 1px solid #DADCE0;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-    
-    /* Logo and project info */
-    .gcpanel-logo {
-        display: inline-block;
-        vertical-align: middle;
-        padding: 5px 10px;
-    }
-    
-    .gcpanel-logo img {
-        max-height: 40px;
-        width: auto;
-    }
-    
-    .project-info {
-        display: inline-block;
-        vertical-align: middle;
-        margin-left: 20px;
-        border-left: 1px solid #DADCE0;
-        padding-left: 20px;
-    }
-    
-    .project-info-label {
-        margin: 0;
-        font-size: 14px;
-        font-weight: 600;
-        color: #5F6368;
-    }
-    
-    .project-name {
-        margin: 0;
-        font-size: 16px;
-        color: #3367D6;
-        font-weight: 600;
-    }
-    
-    /* Fix for Streamlit's extra space */
-    .block-container {
-        padding-top: 0 !important;
-        margin-top: 0 !important;
-        max-width: 100% !important;
-    }
-    
-    /* Remove extra padding from the main area */
-    .main .block-container {
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-        padding-bottom: 1rem !important;
-        margin-top: 0 !important;
-    }
-    
-    /* Fix top margin in stApp */
-    [data-testid="stAppViewContainer"] > div:first-child {
-        margin-top: 0 !important;
-        padding-top: 0 !important;
-    }
-    
-    [data-testid="stVerticalBlock"] {
-        padding-top: 0 !important;
-        margin-top: 0 !important;
-    }
-    
-    /* Completely remove all default padding */
-    div.css-1544g2n.e1fqkh3o4 {
-        padding-top: 0 !important;
-        margin-top: 0 !important;
-    }
-    
-    div.css-1kyxreq.etr89bj2 {
-        margin-top: 0 !important;
-        padding-top: 0 !important;
-    }
-    
-    /* Target all top-level containers */
-    div[data-testid="stToolbar"] {
-        visibility: hidden;
-        height: 0;
-        padding: 0;
-        margin: 0;
-    }
-    
-    header[data-testid="stHeader"] {
-        visibility: hidden;
-        height: 0;
-        padding: 0;
-        margin: 0;
-    }
-    
-    /* Position the navigation dropdown in the top right */
-    .nav-dropdown-container {
-        position: absolute;
-        top: 15px;
-        right: 20px;
-        width: 200px;
-    }
-    
-    /* Hide the label for the dropdown */
-    .nav-dropdown-container label {
-        display: none;
-    }
-    
-    /* Styling for the dropdown */
-    .nav-dropdown-container div[data-baseweb="select"] {
-        background-color: #f5f7fa;
-        border-radius: 6px;
-        border: 1px solid #e1e4e8;
-        transition: all 0.2s;
-    }
-    
-    .nav-dropdown-container div[data-baseweb="select"]:hover {
-        border-color: #3367D6;
-        box-shadow: 0 0 0 1px rgba(51, 103, 214, 0.5);
-    }
-    
-    /* Dropdown list styling */
-    div[role="listbox"] {
-        border-radius: 6px;
-        border: 1px solid #e1e4e8;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-    
-    div[role="option"] {
-        padding: 8px 12px;
-        transition: background-color 0.2s;
-    }
-    
-    div[role="option"]:hover {
-        background-color: rgba(51, 103, 214, 0.1);
-    }
-    </style>
-    """, unsafe_allow_html=True)
+    # Header styling is now moved to external CSS file
     
     # Menu options
     menu_options = [
@@ -191,37 +50,25 @@ def render_header_nav():
         "⚙️ Settings": "Settings"
     }
     
-    # Create the header with logo and project info
-    st.markdown("""
-    <div class="header-wrapper">
-        <div class="gcpanel-logo">
-            <img src="gcpanel.png" alt="gcPanel Logo" style="max-height: 40px; width: auto;">
-        </div>
-        <div class="project-info">
-            <p class="project-info-label">Project</p>
-            <p class="project-name">Highland Tower Development</p>
-        </div>
-        <div class="nav-dropdown-container" id="nav-dropdown-container"></div>
-    </div>
-    """, unsafe_allow_html=True)
+    # Create a two-column layout for our header
+    header_col1, header_col2 = st.columns([3, 1])
     
-    # Create a container for the navigation dropdown
-    with st.container():
-        # Apply CSS to position the dropdown container in the right spot
+    # Left column with the logo and project info
+    with header_col1:
         st.markdown("""
-        <style>
-        /* Move this specific dropdown to the target location */
-        [data-testid="stSelectbox"] {
-            position: fixed;
-            top: 35px; 
-            right: 20px;
-            width: 200px;
-            z-index: 999;
-            background-color: white;
-        }
-        </style>
+        <div class="header-left">
+            <div class="gcpanel-logo">
+                <img src="gcpanel.png" alt="gcPanel Logo">
+            </div>
+            <div class="project-info">
+                <p class="project-info-label">Project</p>
+                <p class="project-name">Highland Tower Development</p>
+            </div>
+        </div>
         """, unsafe_allow_html=True)
-        
+    
+    # Right column with the navigation dropdown
+    with header_col2:
         # Get currently selected menu value from session state
         current_display_menu = next((k for k, v in menu_map.items() if v == st.session_state.get("current_menu", "Dashboard")), menu_options[0])
         

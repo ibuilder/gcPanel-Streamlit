@@ -1,22 +1,45 @@
-/* Header styling fixes */
-
-/* Header container */
-.header-wrapper {
-    position: relative;
-    background-color: white;
-    margin: 0;
-    padding: 15px 0;
-    border-bottom: 1px solid #DADCE0;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    width: 100%;
-    z-index: 1000;
+/* Remove default Streamlit padding */
+.main .block-container {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    max-width: 100% !important;
 }
 
-/* Logo and project info */
+/* Remove top margins from Streamlit */
+.stApp {
+    margin-top: 0 !important;
+}
+
+/* Hide Streamlit default header */
+header[data-testid="stHeader"] {
+    display: none !important;
+}
+
+/* Apply white background to the header columns area */
+[data-testid="stHorizontalBlock"] {
+    background-color: white !important;
+    border-bottom: 1px solid #DADCE0 !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+    padding: 10px 20px !important;
+    margin-bottom: 20px !important;
+}
+
+/* Ensure the columns take up proper space */
+[data-testid="column"] {
+    padding: 0 !important;
+}
+
+/* Left section with logo and project info */
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+/* Logo */
 .gcpanel-logo {
-    display: inline-block;
-    vertical-align: middle;
-    padding: 5px 10px;
+    display: inline-flex;
+    align-items: center;
+    padding-right: 20px;
 }
 
 .gcpanel-logo img {
@@ -24,10 +47,9 @@
     width: auto;
 }
 
+/* Project info */
 .project-info {
     display: inline-block;
-    vertical-align: middle;
-    margin-left: 20px;
     border-left: 1px solid #DADCE0;
     padding-left: 20px;
 }
@@ -47,25 +69,24 @@
 }
 
 /* Navigation dropdown positioning */
-.stSelectbox {
-    position: fixed !important;
-    top: 25px !important;
-    right: 20px !important;
+div[data-testid="stSelectbox"] {
+    margin-top: -80px !important;
+    float: right !important;
     width: 200px !important;
     z-index: 1001 !important;
-    background-color: white !important;
 }
 
-/* Make sure dropdown is visible */
-div[data-testid="stSelectbox"] {
-    display: block !important;
-    visibility: visible !important;
-    position: fixed !important;
-    top: 25px !important;
-    right: 20px !important;
-    width: 200px !important;
-    z-index: 1001 !important;
-    background-color: white !important;
+/* Override Streamlit's default styling */
+.st-emotion-cache-1gulkj5, 
+.st-emotion-cache-b0hgs5,
+section[data-testid="stSidebar"] {
+    margin-top: 0 !important;
+}
+
+/* Main content padding adjustments */
+.main .block-container {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
 }
 
 /* Dropdown list styling */

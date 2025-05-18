@@ -1,0 +1,51 @@
+/* Sidebar navigation styles */
+.nav-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 1.5rem;
+}
+
+.nav-item {
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.5rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: #6c757d;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    font-size: 0.95rem;
+}
+
+.nav-item:hover {
+    background-color: rgba(62, 121, 247, 0.08);
+    color: #3e79f7;
+}
+
+.nav-item.active {
+    background-color: rgba(62, 121, 247, 0.15);
+    color: #3e79f7;
+    font-weight: 500;
+}
+
+.nav-item i, 
+.nav-item svg {
+    margin-right: 0.75rem;
+    font-size: 1.25rem;
+}
+
+.nav-icon {
+    display: inline-block;
+    width: 22px;
+    margin-right: 10px;
+    text-align: center;
+    font-size: 18px;
+}
+
+/* Hide streamlit buttons used for state management */
+div[data-testid="column"] button[data-testid="baseButton-secondary"] {
+    display: none;
+}

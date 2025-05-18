@@ -8,7 +8,46 @@ and custom reporting capabilities for construction project management.
 import streamlit as st
 from modules.analytics.visualizations import dashboard
 from modules.analytics.predictive import timeline_predictor, budget_predictor
-from modules.analytics.reporting import report_generator
+
+# Simple function to render the report generator directly
+def render_report_generator():
+    """Render the report generator interface."""
+    st.header("Custom Report Generator")
+    st.info("Report generator module is being initialized. Full functionality coming soon.")
+    
+    # Project selector
+    project = st.selectbox(
+        "Select Project",
+        ["Highland Tower Development", "Project B", "Project C"],
+        index=0
+    )
+    
+    # Report type selector
+    report_type = st.selectbox(
+        "Report Type",
+        ["Executive Summary", "Detailed Progress Report", "Financial Report", "Schedule Analysis", "Custom Report"]
+    )
+    
+    # Date range selector
+    col1, col2 = st.columns(2)
+    with col1:
+        st.date_input("Start Date", value=None)
+    with col2:
+        st.date_input("End Date", value=None)
+    
+    # Create a placeholder for report preview
+    st.subheader("Report Preview")
+    st.write("Report content will appear here.")
+    
+    # Export options
+    st.subheader("Export Options")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.button("Export as PDF")
+    with col2:
+        st.button("Export as Excel")
+    with col3:
+        st.button("Export as CSV")
 
 def render_analytics():
     """Render the analytics module interface."""

@@ -36,6 +36,7 @@ from modules.closeout import render_closeout
 from modules.engineering import render_engineering
 from modules.documents import render_documents
 from modules.mobile_companion import mobile_companion_page
+from modules.analytics import render_analytics
 
 def initialize_session_state():
     """Initialize session state variables."""
@@ -77,9 +78,15 @@ def render_application():
     # Load external resources
     load_external_resources()
     
-    # Initialize core services
-    from core import initialize_application
-    initialize_application()
+    # Initialize core services if they exist
+    try:
+        from core import initialize_application
+        initialize_application()
+    except ImportError:
+        # Create a placeholder directory if it doesn't exist
+        import os
+        if not os.path.exists('core'):
+            os.makedirs('core', exist_ok=True)
     
     # Render the header with right-aligned navigation
     render_header()
@@ -125,6 +132,8 @@ def render_selected_module(current_menu):
         render_contracts()
     elif current_menu == "Cost Management":
         render_cost_management()
+    elif current_menu == "Analytics":
+        render_analytics()
     elif current_menu == "Engineering":
         render_engineering()
     elif current_menu == "Field Operations":

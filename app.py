@@ -15,8 +15,9 @@ def main():
     # Set page configuration with favicon
     set_page_config()
     
-    # Initialize session state variables
-    app_manager.initialize_session_state()
+    # Initialize session state variables if needed
+    if "current_menu" not in st.session_state:
+        st.session_state["current_menu"] = "Dashboard"
     
     # Render the main application
     app_manager.render_application()

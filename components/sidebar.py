@@ -14,63 +14,75 @@ def render_sidebar():
     
     with st.sidebar:
         # Logo and title
-        st.image("generated-icon.png", width=50)
-        st.title("gcPanel")
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            st.image("gcpanel.png", width=50)
+        with col2:
+            st.markdown("## gcPanel", unsafe_allow_html=True)
         
         # Project selection
         st.markdown("### Project")
         project_name = "Highland Tower Development"
         st.markdown(f"**{project_name}**")
         
-        # If needed, add a project dropdown here for multi-project support
-        
         # Navigation items
         st.markdown("### Navigation")
         
-        # Direct Streamlit approach for navigation
-        st.button("Dashboard", key="btn_dashboard", use_container_width=True)
-        st.button("Project Information", key="btn_project_information", use_container_width=True) 
-        st.button("Schedule", key="btn_scheduling", use_container_width=True)
-        st.button("Safety", key="btn_safety", use_container_width=True)
-        st.button("Contracts", key="btn_contracts", use_container_width=True)
-        st.button("Cost Management", key="btn_cost_management", use_container_width=True)
-        st.button("Engineering", key="btn_engineering", use_container_width=True)
-        st.button("Field Operations", key="btn_field_operations", use_container_width=True)
-        st.button("Documents", key="btn_documents", use_container_width=True)
-        st.button("BIM Viewer", key="btn_bim_viewer", use_container_width=True)
-        st.button("Roadmap", key="btn_roadmap", use_container_width=True)
-        st.button("Closeout", key="btn_closeout", use_container_width=True)
-        st.button("Settings", key="btn_settings", use_container_width=True)
+        # Define navigation items with icons
+        nav_items = [
+            {"label": "Dashboard", "icon": "dashboard"},
+            {"label": "Project Information", "icon": "info"},
+            {"label": "Schedule", "icon": "event"},
+            {"label": "Safety", "icon": "health_and_safety"},
+            {"label": "Contracts", "icon": "description"},
+            {"label": "Cost Management", "icon": "payments"},
+            {"label": "Engineering", "icon": "engineering"},
+            {"label": "Field Operations", "icon": "construction"},
+            {"label": "Documents", "icon": "folder"},
+            {"label": "BIM Viewer", "icon": "view_in_ar"},
+            {"label": "Roadmap", "icon": "map"},
+            {"label": "Closeout", "icon": "task_alt"},
+            {"label": "Settings", "icon": "settings"}
+        ]
         
-        # Apply custom styling for sidebar buttons
-        st.markdown("""
-        <style>
-            /* Style sidebar buttons to look like a navigation menu */
-            [data-testid="baseButton-secondary"] {
-                background-color: transparent !important;
-                border: none !important;
-                text-align: left !important;
-                font-weight: normal !important;
-                padding: 0.8rem 1rem !important;
-                margin-bottom: 0.3rem !important;
-                color: #6c757d !important;
-                border-radius: 6px !important;
-                transition: all 0.15s ease !important;
-            }
+        # Create navigation buttons with icons
+        for item in nav_items:
+            label = item["label"]
+            icon = item["icon"]
+            key = f"nav_{label.lower().replace(' ', '_')}"
             
-            [data-testid="baseButton-secondary"]:hover {
-                background-color: rgba(62, 121, 247, 0.08) !important;
-                color: #3e79f7 !important;
-            }
-            
-            /* Highlight the active navigation item */
-            .active-nav-item {
-                background-color: rgba(62, 121, 247, 0.15) !important;
-                color: #3e79f7 !important;
-                font-weight: 500 !important;
-            }
-        </style>
-        """, unsafe_allow_html=True)
+            # Create navigation button
+            if st.button(f":{icon}: {label}", key=key, use_container_width=True):
+                # Convert button label to menu item name
+                if label == "Dashboard":
+                    st.session_state.menu = "dashboard"
+                elif label == "Project Information":
+                    st.session_state.menu = "project_information"
+                elif label == "Schedule":
+                    st.session_state.menu = "scheduling"
+                elif label == "Safety":
+                    st.session_state.menu = "safety"
+                elif label == "Contracts":
+                    st.session_state.menu = "contracts"
+                elif label == "Cost Management":
+                    st.session_state.menu = "cost_management"
+                elif label == "Engineering":
+                    st.session_state.menu = "engineering"
+                elif label == "Field Operations":
+                    st.session_state.menu = "field_operations"
+                elif label == "Documents":
+                    st.session_state.menu = "documents"
+                elif label == "BIM Viewer":
+                    st.session_state.menu = "bim_viewer"
+                elif label == "Roadmap":
+                    st.session_state.menu = "roadmap"
+                elif label == "Closeout":
+                    st.session_state.menu = "closeout"
+                elif label == "Settings":
+                    st.session_state.menu = "settings"
+                
+                # Rerun the app to update the UI
+                st.rerun()
         
         # Footer
         st.markdown("---")

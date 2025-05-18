@@ -92,14 +92,26 @@ def render_header():
         simple_breadcrumbs(breadcrumb_items)
     
     with brow_col2:
-        # Notification bell with visible button
-        col = st.container()
-        col.markdown(
-            f'<div style="text-align: right; margin-right: 10px;"><span style="font-size: 1.2rem;">🔔<span style="position: absolute; margin-left: -8px; margin-top: -8px; background-color: #ef4444; color: white; border-radius: 50%; font-size: 0.7rem; padding: 2px 5px;">3</span></span></div>',
-            unsafe_allow_html=True
-        )
+        # Create a styled notification button that includes the bell icon
+        notification_style = """
+        <style>
+        div[data-testid="stButton"] > button {
+            background-color: transparent;
+            border: none;
+            color: #6b7280;
+            padding: 0;
+            font-size: 1.2rem;
+            position: relative;
+        }
+        div[data-testid="stButton"] > button:hover {
+            background-color: rgba(0,0,0,0.05);
+            color: #3b82f6;
+        }
+        </style>
+        """
+        st.markdown(notification_style, unsafe_allow_html=True)
         
-        # Use a smaller invisible button to make it clickable
-        if col.button("Notifications", key="notif_button", help="View notifications"):
+        # Button with icon and badge directly in button text
+        if st.button("🔔 <span style='position: absolute; top: -5px; right: -5px; background-color: #ef4444; color: white; border-radius: 50%; font-size: 0.7rem; padding: 0px 4px; font-size: 0.7rem;'>3</span>", key="notif_button", help="View notifications"):
             st.session_state.show_notification_center = not st.session_state.get("show_notification_center", False)
             st.rerun()

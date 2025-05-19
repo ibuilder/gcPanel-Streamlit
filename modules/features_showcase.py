@@ -37,21 +37,122 @@ def render_features_showcase():
         st.header("External Service Integrations")
         st.write("Connect gcPanel with your essential construction management tools.")
         
-        col1, col2 = st.columns(2)
+        # Procore Integration Section
+        st.subheader("Procore Integration")
+        
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            st.markdown("""
+            ### Procore API Integration
+            
+            gcPanel offers comprehensive integration with Procore's REST API, allowing you to:
+            
+            - **Bidirectional Sync**: RFIs, submittals, and change orders sync between gcPanel and Procore
+            - **Document Management**: Access all project documents from either platform 
+            - **Project Directory**: Keep team contacts and responsibilities in sync
+            - **Schedule Integration**: Link Procore tasks with gcPanel schedule items
+            - **Financial Tools**: Connect budget tracking and cost management
+            """)
+            
+        with col2:
+            st.markdown("""
+            #### Setup Requirements
+            
+            - Procore Client ID
+            - Procore Client Secret
+            - OAuth2 Redirect URI
+            - Company ID
+            """)
+            
+            # Example connection button
+            with st.expander("Connection Status"):
+                st.success("Connected to Procore API")
+                st.metric("Projects Synced", "7")
+                st.metric("Last Sync", "Today, 3:45 PM")
+        
+        # Additional construction integrations
+        st.subheader("Additional Platform Integrations")
+        
+        col1, col2, col3 = st.columns(3)
         
         with col1:
-            st.subheader("Project Management")
-            st.info("Connect with tools like Procore, PlanGrid, or Microsoft Project.")
+            st.markdown("### PlanGrid")
+            st.image("https://media.glassdoor.com/sqll/1121655/plangrid-squarelogo-1532549190120.png", width=80)
+            st.markdown("""
+            - Drawing management and version control
+            - Field reports and punch lists
+            - RFI integration
+            - Sheet linking with BIM models
+            """)
             
-            st.subheader("Calendar & Scheduling")
-            st.info("Sync with Google Calendar, Outlook, or iCalendar.")
+            connection_status = "Not Connected"
+            if st.button("Connect PlanGrid", key="connect_plangrid"):
+                st.session_state.plangrid_connected = True
+                connection_status = "Connected"
+            
+            if st.session_state.get("plangrid_connected", False):
+                st.success("Connected to PlanGrid")
+            else:
+                st.warning("Not connected to PlanGrid")
         
         with col2:
-            st.subheader("Cloud Storage")
-            st.info("Link with Dropbox, Google Drive, OneDrive, or Box.")
+            st.markdown("### FieldWire")
+            st.image("https://media.glassdoor.com/sqll/868055/fieldwire-squarelogo-1631024314417.png", width=80)
+            st.markdown("""
+            - Task management integration
+            - Field reporting
+            - Drawing annotation sync
+            - Mobile-first workflow
+            """)
             
-            st.subheader("BIM & Design")
+            connection_status = "Not Connected"
+            if st.button("Connect FieldWire", key="connect_fieldwire"):
+                st.session_state.fieldwire_connected = True
+                connection_status = "Connected"
+                
+            if st.session_state.get("fieldwire_connected", False):
+                st.success("Connected to FieldWire")
+            else:
+                st.warning("Not connected to FieldWire")
+        
+        with col3:
+            st.markdown("### BuildingConnected")
+            st.image("https://media.glassdoor.com/sqll/1140560/buildingconnected-squarelogo-1554137406759.png", width=80)
+            st.markdown("""
+            - Bid management workflow
+            - Prequalification data sync
+            - Subcontractor database
+            - Cost benchmarking
+            """)
+            
+            connection_status = "Not Connected"
+            if st.button("Connect BuildingConnected", key="connect_buildingconnected"):
+                st.session_state.buildingconnected_connected = True
+                connection_status = "Connected"
+                
+            if st.session_state.get("buildingconnected_connected", False):
+                st.success("Connected to BuildingConnected")
+            else:
+                st.warning("Not connected to BuildingConnected")
+        
+        # Additional integration categories
+        st.subheader("Other Integration Categories")
+        
+        other_col1, other_col2 = st.columns(2)
+        
+        with other_col1:
+            st.markdown("### Calendar & Scheduling")
+            st.info("Sync with Google Calendar, Outlook, or iCalendar.")
+            
+            st.markdown("### Cloud Storage")
+            st.info("Link with Dropbox, Google Drive, OneDrive, or Box.")
+        
+        with other_col2:
+            st.markdown("### BIM & Design")
             st.info("Integrate with Autodesk BIM 360, Revit, or SketchUp.")
+            
+            st.markdown("### Financial Systems")
+            st.info("Connect with QuickBooks, Sage, or enterprise ERPs.")
     
     # Analytics Tab
     with tabs[1]:

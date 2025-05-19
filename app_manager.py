@@ -37,6 +37,8 @@ from modules.engineering import render_engineering
 from modules.documents import render_documents
 from modules.mobile_companion import render_mobile_companion
 from modules.analytics import render_analytics
+from modules.ai_assistant import render_ai_assistant
+from modules.features_showcase import render_features_showcase
 
 def initialize_session_state():
     """Initialize session state variables."""
@@ -140,6 +142,10 @@ def render_selected_module(current_menu):
         render_field_operations()
     elif current_menu == "Documents":
         render_documents()
+    elif current_menu == "AI Assistant":
+        render_ai_assistant()
+    elif current_menu == "Features Showcase":
+        render_features_showcase()
     elif current_menu == "BIM":
         # Provide toggle between basic and advanced viewers
         viewer_type = st.radio(

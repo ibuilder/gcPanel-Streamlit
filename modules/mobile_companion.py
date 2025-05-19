@@ -108,59 +108,57 @@ def render_mobile_companion():
 def render_quick_actions():
     """Render quick action buttons for field tasks."""
     # Create a 2x2 grid of quick action buttons
+    st.subheader("Quick Actions")
+    
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("""
-        <div class="mobile-card" onclick="document.getElementById('qa_check_btn').click()">
-            <div style="font-size: 2rem; text-align: center; margin-bottom: 10px;">🔍</div>
-            <div style="text-align: center; font-weight: 500;">QA Check</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        qa_clicked = st.button("QA Check", key="qa_check_btn")
-        if qa_clicked:
+        # Use the mobile_card component instead of direct HTML
+        if create_responsive_card(
+            icon="🔍",
+            title="QA Check",
+            action="Quality assurance inspection form",
+            button_text="QA Check",
+            button_key="qa_check_btn"
+        ):
             st.session_state.quick_action = "qa_check"
             st.rerun()
     
     with col2:
-        st.markdown("""
-        <div class="mobile-card" onclick="document.getElementById('daily_log_btn').click()">
-            <div style="font-size: 2rem; text-align: center; margin-bottom: 10px;">📝</div>
-            <div style="text-align: center; font-weight: 500;">Daily Log</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        log_clicked = st.button("Daily Log", key="daily_log_btn")
-        if log_clicked:
+        # Use the mobile_card component instead of direct HTML
+        if create_responsive_card(
+            icon="📝",
+            title="Daily Log",
+            action="Record daily work activities",
+            button_text="Daily Log",
+            button_key="daily_log_btn"
+        ):
             st.session_state.quick_action = "daily_log"
             st.rerun()
     
     col3, col4 = st.columns(2)
     
     with col3:
-        st.markdown("""
-        <div class="mobile-card" onclick="document.getElementById('material_track_btn').click()">
-            <div style="font-size: 2rem; text-align: center; margin-bottom: 10px;">📦</div>
-            <div style="text-align: center; font-weight: 500;">Materials</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        material_clicked = st.button("Materials", key="material_track_btn")
-        if material_clicked:
+        # Use the mobile_card component instead of direct HTML
+        if create_responsive_card(
+            icon="📦",
+            title="Materials",
+            action="Track material deliveries and usage",
+            button_text="Materials",
+            button_key="material_track_btn"
+        ):
             st.session_state.quick_action = "materials"
             st.rerun()
     
     with col4:
-        st.markdown("""
-        <div class="mobile-card" onclick="document.getElementById('photo_doc_btn').click()">
-            <div style="font-size: 2rem; text-align: center; margin-bottom: 10px;">📸</div>
-            <div style="text-align: center; font-weight: 500;">Photo Doc</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        photo_clicked = st.button("Photo Doc", key="photo_doc_btn")
-        if photo_clicked:
+        # Use the mobile_card component instead of direct HTML
+        if create_responsive_card(
+            icon="📸",
+            title="Photo Doc",
+            action="Document site conditions with photos",
+            button_text="Photo Doc",
+            button_key="photo_doc_btn"
+        ):
             st.session_state.quick_action = "photo_doc"
             st.rerun()
     

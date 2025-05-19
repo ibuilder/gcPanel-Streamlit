@@ -468,8 +468,6 @@ def render_sync_status():
                         st.error(result["error"])
         
         st.divider()
-        
-        st.divider()
 
 def render_integration_import_interface():
     """Render the main integration import interface."""

@@ -226,16 +226,19 @@ def get_mock_incidents(count: int = 5) -> List[Dict]:
 # API Integration Functions
 def get_integration_credentials(platform: str) -> Optional[Dict]:
     """Get the integration credentials for a platform from session state."""
-    if "integrations" not in st.session_state:
+    # Import here to avoid circular imports
+    from modules.integrations.authentication import get_credentials, is_connected
+    
+    if not is_connected(platform):
         return None
     
-    platform_info = st.session_state.integrations.get(platform)
-    if not platform_info or not platform_info.get("status"):
+    # Get stored credentials
+    credentials = get_credentials(platform)
+    if not credentials:
         return None
     
-    # In a real application, you would securely retrieve the actual credentials
-    # Here we just pretend we have valid credentials if the integration is marked as connected
-    return {"connected": True, "platform": platform}
+    # Return credentials with connection status
+    return {"connected": True, "platform": platform, "credentials": credentials}
 
 def fetch_procore_data(data_type: str) -> Dict:
     """

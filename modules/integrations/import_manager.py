@@ -9,11 +9,23 @@ import pandas as pd
 import json
 from datetime import datetime
 
-# Import functions from importers.py
+# Import functions from other modules
 from modules.integrations.importers import (
     import_documents, import_specifications, import_bids,
-    import_daily_reports, import_budget, import_schedule, import_incidents,
-    get_integration_credentials
+    import_daily_reports, import_budget, import_schedule, import_incidents
+)
+
+# Import authentication module
+from modules.integrations.authentication import (
+    initialize_integrations, get_credentials, test_connection, 
+    store_credentials, get_platform_name, get_auth_fields,
+    is_connected, disconnect_platform
+)
+
+# Import data persistence module
+from modules.integrations.data_persistence import (
+    save_imported_data, get_imported_data, delete_imported_data,
+    get_import_history, initialize_database
 )
 
 def render_import_manager():
@@ -25,10 +37,14 @@ def render_import_manager():
     data type to import, then review and confirm the import.
     """)
     
+    # Initialize database and authentication
+    initialize_database()
+    initialize_integrations()
+    
     # Check which integrations are available
     available_platforms = []
     for platform in ["procore", "plangrid", "fieldwire", "buildingconnected"]:
-        if get_integration_credentials(platform):
+        if is_connected(platform):
             available_platforms.append(platform)
     
     if not available_platforms:
@@ -90,6 +106,9 @@ def render_import_manager():
             index=0
         )
         
+        # Convert import method option to simple string
+        import_method_value = "merge" if "Merge" in import_method else "replace"
+        
         st.info(import_options[import_method])
         
         # Start import button
@@ -148,7 +167,7 @@ def render_import_manager():
                             
                             # Calculate some metrics
                             total_bids = len(data)
-                            awarded_bids = sum(1 for bid in data if bid.get("status") == "Awarded")
+                            awarded_bids = sum(1 for bid in data if isinstance(bid, dict) and bid.get("status") == "Awarded")
                             
                             col1, col2, col3 = st.columns(3)
                             col1.metric("Total Bids", total_bids)
@@ -165,49 +184,51 @@ def render_import_manager():
                     
                     elif data_type_key == "budget":
                         # Display budget with summary
-                        if "items" in data:
+                        if isinstance(data, dict) and "items" in data:
                             st.subheader("Budget Categories")
-                            budget_df = pd.DataFrame(data["items"])
+                            budget_items = data.get("items", [])
+                            budget_df = pd.DataFrame(budget_items)
                             st.dataframe(budget_df, use_container_width=True)
                             
                             st.subheader("Budget Summary")
-                            summary = data["summary"]
+                            summary = data.get("summary", {})
                             col1, col2, col3 = st.columns(3)
-                            col1.metric("Total Budget", summary["total_current"])
-                            col2.metric("Total Spent", summary["total_spent"])
-                            col3.metric("Remaining", summary["total_remaining"])
+                            col1.metric("Total Budget", summary.get("total_current", "N/A"))
+                            col2.metric("Total Spent", summary.get("total_spent", "N/A"))
+                            col3.metric("Remaining", summary.get("total_remaining", "N/A"))
                     
                     elif data_type_key == "schedule":
                         # Display schedule with summary
-                        if "tasks" in data:
+                        if isinstance(data, dict) and "tasks" in data:
                             st.subheader("Schedule Tasks")
-                            schedule_df = pd.DataFrame(data["tasks"])
+                            schedule_tasks = data.get("tasks", [])
+                            schedule_df = pd.DataFrame(schedule_tasks)
                             st.dataframe(schedule_df, use_container_width=True)
                             
                             st.subheader("Schedule Summary")
-                            summary = data["summary"]
+                            summary = data.get("summary", {})
                             col1, col2, col3 = st.columns(3)
-                            col1.metric("Start Date", summary["start_date"])
-                            col2.metric("End Date", summary["end_date"])
-                            col3.metric("Completion", summary["percent_complete"])
+                            col1.metric("Start Date", summary.get("start_date", "N/A"))
+                            col2.metric("End Date", summary.get("end_date", "N/A"))
+                            col3.metric("Completion", summary.get("percent_complete", "N/A"))
                     
                     # Add import confirmation if there's valid data
                     if data and start_import:
                         with st.spinner("Importing data..."):
-                            # Simulate import process (in real app, this would save to database)
-                            import time
-                            time.sleep(2)
+                            # Save data using our persistence module
+                            dataset_id = save_imported_data(
+                                platform=selected_platform,
+                                data_type=data_type_key,
+                                data=data,
+                                import_method=import_method_value,
+                                user_id=st.session_state.get("user_id")
+                            )
                             
-                            st.session_state[f"imported_{data_type_key}"] = {
-                                "data": data,
-                                "source": result.get('source', selected_platform_name),
-                                "import_date": datetime.now().strftime("%Y-%m-%d %H:%M"),
-                                "count": len(data) if not isinstance(data, dict) else 
-                                         (len(data.get("items", [])) if "items" in data else 
-                                          len(data.get("tasks", [])))
-                            }
-                            
-                            st.success(f"Successfully imported {data_type_key} from {selected_platform_name}!")
+                            if dataset_id:
+                                st.success(f"Successfully imported {data_type_key} from {selected_platform_name}!")
+                            else:
+                                st.warning(f"Data was imported to temporary storage. Database persistence is not available.")
+                                st.success(f"Successfully imported {data_type_key} to temporary storage.")
                             
                             # Show additional import options
                             st.subheader("Next Steps")
@@ -219,49 +240,118 @@ def render_import_manager():
                                     st.rerun()
                             with col2:
                                 if st.button("View Imported Data"):
-                                    # In a real app, this would navigate to the relevant section
-                                    pass
+                                    st.session_state["import_view_tab"] = 1  # Switch to history tab
+                                    st.rerun()
 
 def render_import_history():
     """Render the import history interface."""
     st.subheader("Import History")
     
-    # Check if any data has been imported
-    has_imported_data = any(key.startswith("imported_") for key in st.session_state.keys())
+    # Get import history from the database or session state
+    history_df = get_import_history()
     
-    if not has_imported_data:
+    # Check if we have any import history
+    if history_df.empty:
         st.info("No import history available. Import data from external platforms to see history here.")
         return
     
-    # Gather import history from session state
-    import_history = []
-    for key, value in st.session_state.items():
-        if key.startswith("imported_"):
-            data_type = key.replace("imported_", "").replace("_", " ").title()
-            import_history.append({
-                "Data Type": data_type,
-                "Source": value.get("source", "Unknown"),
-                "Import Date": value.get("import_date", "Unknown"),
-                "Count": value.get("count", 0)
-            })
+    # Add actions column
+    st.dataframe(history_df, use_container_width=True)
     
-    # Display import history
-    if import_history:
-        history_df = pd.DataFrame(import_history)
-        st.dataframe(history_df, use_container_width=True)
-    else:
-        st.info("No import history available.")
+    # Action buttons for managing imported data
+    st.subheader("Manage Imported Data")
+    
+    # Allow deleting imports
+    with st.form("delete_import_form"):
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            # Get list of import IDs and formats
+            import_options = history_df.apply(
+                lambda row: f"{row['Data Type']} from {row['Platform']} ({row['Import Date']})",
+                axis=1
+            ).tolist()
+            
+            if import_options:
+                selected_import = st.selectbox(
+                    "Select Import to Delete",
+                    options=import_options,
+                    index=0
+                )
+                
+                # Get the ID of the selected import
+                selected_index = import_options.index(selected_import)
+                selected_id = history_df.iloc[selected_index]["ID"] if not history_df.empty else None
+            else:
+                st.write("No imports available to delete.")
+                selected_id = None
+        
+        with col2:
+            delete_submitted = st.form_submit_button("Delete Selected Import")
+            
+        if delete_submitted and selected_id:
+            # Delete the selected import
+            if delete_imported_data(selected_id):
+                st.success("Import deleted successfully!")
+                st.rerun()
+            else:
+                st.error("Failed to delete import. It may be referenced by other data.")
+    
+    # Export functionality
+    st.subheader("Export Data")
+    
+    with st.form("export_data_form"):
+        export_options = history_df.apply(
+            lambda row: f"{row['Data Type']} from {row['Platform']} ({row['Import Date']})",
+            axis=1
+        ).tolist()
+        
+        if export_options:
+            selected_export = st.selectbox(
+                "Select Data to Export",
+                options=export_options,
+                index=0
+            )
+            
+            # Get the details of the selected export
+            selected_export_index = export_options.index(selected_export)
+            export_details = history_df.iloc[selected_export_index] if not history_df.empty else None
+            
+            export_formats = ["CSV", "JSON", "Excel"]
+            export_format = st.selectbox("Export Format", export_formats)
+            
+            export_submitted = st.form_submit_button("Export Data")
+            
+            if export_submitted and export_details is not None:
+                # In a real application, this would retrieve and export the data
+                # For this demo, we'll simulate it
+                st.success(f"Data exported as {export_format}!")
+                
+                # Display a download button (in a real app, this would be connected to the actual file)
+                filename = f"{export_details['Data Type']}_{export_details['Platform']}_{export_details['Import Date']}.{export_format.lower()}"
+                st.download_button(
+                    label=f"Download {export_format} File",
+                    data="Sample export data",
+                    file_name=filename,
+                    mime="text/plain"
+                )
+        else:
+            st.write("No imports available to export.")
+            st.form_submit_button("Export Data", disabled=True)
 
 def render_sync_status():
     """Render the synchronization status interface."""
     st.subheader("Synchronization Status")
+    
+    # Initialize database and authentication
+    initialize_database()
+    initialize_integrations()
     
     # Check for connected platforms
     platforms = ["procore", "plangrid", "fieldwire", "buildingconnected"]
     connected_platforms = []
     
     for platform in platforms:
-        if get_integration_credentials(platform):
+        if is_connected(platform):
             connected_platforms.append(platform)
     
     if not connected_platforms:
@@ -270,41 +360,114 @@ def render_sync_status():
     
     # Display sync status for each connected platform
     for platform in connected_platforms:
-        platform_name = {
-            "procore": "Procore",
-            "plangrid": "PlanGrid",
-            "fieldwire": "FieldWire",
-            "buildingconnected": "BuildingConnected"
-        }.get(platform, platform.capitalize())
+        platform_name = get_platform_name(platform)
         
         st.write(f"### {platform_name}")
         
-        # Create columns for each data type
-        if platform == "procore":
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                st.metric("Documents", "42", "Last sync: Today")
-            with col2:
-                st.metric("RFIs", "18", "Last sync: Today")
-            with col3:
-                st.metric("Submittals", "24", "Last sync: Yesterday")
-            with col4:
-                st.metric("Daily Logs", "35", "Last sync: Today")
-                
-            # Add a sync button
-            if st.button(f"Sync {platform_name} Now", key=f"sync_{platform}"):
-                with st.spinner(f"Syncing with {platform_name}..."):
-                    # Simulate sync process
-                    import time
-                    time.sleep(2)
-                    st.success(f"Synchronized with {platform_name}!")
+        # Get connection status and last sync info
+        platform_info = st.session_state.integrations.get(platform, {})
+        last_connected = platform_info.get("last_connected", "Never")
+        if isinstance(last_connected, str) and last_connected != "Never":
+            try:
+                # Try to parse and format the date
+                last_connected_date = datetime.fromisoformat(last_connected)
+                last_connected_str = last_connected_date.strftime("%Y-%m-%d %H:%M")
+            except:
+                last_connected_str = last_connected
         else:
-            # For other platforms, just show basic status
-            col1, col2 = st.columns(2)
-            with col1:
-                st.metric("Last Sync", "Today")
-            with col2:
-                st.button(f"Sync {platform_name} Now", key=f"sync_{platform}")
+            last_connected_str = "Never connected"
+        
+        # Get imported data counts
+        history_df = get_import_history(50)
+        platform_data = history_df[history_df["Platform"] == platform] if not history_df.empty else pd.DataFrame()
+        
+        # Display platform status
+        st.info(f"Connected: Yes | Last connection: {last_connected_str}")
+        
+        # Create columns for data status
+        if not platform_data.empty:
+            # Group by data type and count
+            data_types = platform_data["Data Type"].value_counts().to_dict()
+            
+            # Show metrics for data types
+            cols = st.columns(min(4, len(data_types) + 1))
+            
+            for i, (data_type, count) in enumerate(data_types.items()):
+                with cols[i % 4]:
+                    # Find the last import date for this data type
+                    last_import = platform_data[platform_data["Data Type"] == data_type]["Import Date"].max()
+                    if pd.isna(last_import):
+                        last_import = "Never"
+                    
+                    st.metric(
+                        data_type, 
+                        f"{count} import{'' if count == 1 else 's'}", 
+                        f"Last sync: {last_import}"
+                    )
+        else:
+            st.write("No data has been imported from this platform yet.")
+                
+        # Add a sync button
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            sync_data_types = []
+            
+            if platform == "procore":
+                sync_data_types = ["Documents", "Specifications", "Bids", "Daily Reports", "Budget", "Schedule", "Incidents"]
+            elif platform == "plangrid":
+                sync_data_types = ["Documents", "Daily Reports"]
+            elif platform == "fieldwire":
+                sync_data_types = ["Documents", "Daily Reports"]
+            elif platform == "buildingconnected":
+                sync_data_types = ["Bids"]
+            
+            selected_sync_type = st.selectbox(
+                f"Select data to sync from {platform_name}",
+                options=sync_data_types,
+                key=f"sync_type_{platform}"
+            )
+        
+        with col2:
+            if st.button(f"Sync Now", key=f"sync_{platform}"):
+                with st.spinner(f"Syncing {selected_sync_type} from {platform_name}..."):
+                    # Convert data type to key format
+                    data_type_key = selected_sync_type.lower().replace(" ", "_")
+                    
+                    # Import data based on selection
+                    if data_type_key == "documents":
+                        result = import_documents(platform)
+                    elif data_type_key == "specifications":
+                        result = import_specifications(platform)
+                    elif data_type_key == "bids":
+                        result = import_bids(platform)
+                    elif data_type_key == "daily_reports":
+                        result = import_daily_reports(platform)
+                    elif data_type_key == "budget":
+                        result = import_budget(platform)
+                    elif data_type_key == "schedule":
+                        result = import_schedule(platform)
+                    elif data_type_key == "incidents":
+                        result = import_incidents(platform)
+                    else:
+                        result = {"error": f"Unknown data type: {data_type_key}"}
+                    
+                    # Save the data
+                    if "error" not in result:
+                        # Save data using our persistence module
+                        data = result.get("data", [])
+                        dataset_id = save_imported_data(
+                            platform=platform,
+                            data_type=data_type_key,
+                            data=data,
+                            import_method="merge",
+                            user_id=st.session_state.get("user_id")
+                        )
+                        
+                        st.success(f"Successfully synced {selected_sync_type} from {platform_name}!")
+                    else:
+                        st.error(result["error"])
+        
+        st.divider()
         
         st.divider()
 

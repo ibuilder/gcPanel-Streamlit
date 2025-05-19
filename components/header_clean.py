@@ -93,19 +93,16 @@ def render_header():
         # Find current menu's formatted option
         current_formatted = f"{menu_options[current_menu]['icon']} {menu_options[current_menu]['label']}"
         
-        # Clean dropdown styling without a header
+        # No accent line, clean styling
         st.markdown("""
         <style>
-        /* Top accent line for the dropdown */
-        .dropdown-accent {
+        /* No accent bar, just additional spacing */
+        .dropdown-spacer {
             margin-top: 5px;
-            height: 3px;
-            background: linear-gradient(to right, #4facfe, #00f2fe);
-            border-radius: 4px 4px 0 0;
         }
         </style>
         
-        <div class="dropdown-accent"></div>
+        <div class="dropdown-spacer"></div>
         """, unsafe_allow_html=True)
         
         # Enhanced stylish dropdown menu
@@ -169,13 +166,13 @@ def render_header():
         </style>
         """, unsafe_allow_html=True)
         
-        # Clean, modern dropdown without label
+        # Clean dropdown showing current selection
         selected_formatted = st.selectbox(
-            "",  # Empty label
+            "Navigation",  # Label for accessibility
             options=formatted_options,
             index=formatted_options.index(current_formatted),
             key="header_nav_dropdown",
-            label_visibility="collapsed"  # Completely hide the label
+            label_visibility="visible"  # Show the label
         )
         
         # Convert selected formatted option back to key

@@ -68,9 +68,9 @@ def render_action_bar(page_type="Item", show_add=True, show_edit=True, show_dele
         with cols[col_index]:
             add_label = f"Add {page_type}"
             add_clicked = st.button(
-                "➕ Add", 
+                add_label, 
                 key=f"add_{page_type.lower().replace(' ', '_')}",
-                help=add_label  # Add tooltip for full context
+                help=f"Create a new {page_type.lower()}"
             )
             if add_clicked:
                 result["add_clicked"] = True
@@ -81,9 +81,9 @@ def render_action_bar(page_type="Item", show_add=True, show_edit=True, show_dele
         with cols[col_index]:
             edit_label = f"Edit {page_type}"
             edit_clicked = st.button(
-                "✏️ Edit", 
+                edit_label, 
                 key=f"edit_{page_type.lower().replace(' ', '_')}",
-                help=edit_label  # Add tooltip for full context
+                help=f"Modify selected {page_type.lower()}"
             )
             if edit_clicked:
                 result["edit_clicked"] = True
@@ -94,9 +94,9 @@ def render_action_bar(page_type="Item", show_add=True, show_edit=True, show_dele
         with cols[col_index]:
             delete_label = f"Delete {page_type}"
             delete_clicked = st.button(
-                "🗑️ Delete", 
+                delete_label,
                 key=f"delete_{page_type.lower().replace(' ', '_')}",
-                help=delete_label  # Add tooltip for full context
+                help=f"Remove selected {page_type.lower()}"
             )
             if delete_clicked:
                 result["delete_clicked"] = True

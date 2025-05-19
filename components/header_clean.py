@@ -33,8 +33,8 @@ def render_header():
     # Get currently selected menu value from session state
     current_menu = st.session_state.get("current_menu", "Dashboard")
     
-    # Create a more balanced three-column layout for the header with extra space for menu
-    col1, col2, col3 = st.columns([4, 4, 3])
+    # Create a balanced two-column layout for the header with more space for the dropdown
+    col1, col3 = st.columns([5, 5])
     
     with col1:
         # Enhanced logo and project name with improved spacing and shadow for better visibility
@@ -61,89 +61,10 @@ def render_header():
             st.session_state.current_menu = "Dashboard"
             st.rerun()
     
-    # Middle column for quick access buttons
-    with col2:
-        # Use Streamlit native components for quick access instead of HTML
-        st.markdown("""
-        <style>
-        .quick-nav {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 10px;
-        }
-        .quick-nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 65px;
-            text-decoration: none;
-            color: #4b5563;
-            transition: all 0.2s ease;
-        }
-        .quick-nav-item:hover {
-            transform: translateY(-2px);
-        }
-        .quick-nav-icon {
-            font-size: 22px;
-            margin-bottom: 5px;
-        }
-        .quick-nav-label {
-            font-size: 11px;
-            text-align: center;
-            color: #4b5563;
-        }
-        </style>
-        <div class="quick-nav">
-            <div class="quick-nav-item" id="quicknav_dashboard">
-                <div class="quick-nav-icon">📊</div>
-                <div class="quick-nav-label">Dashboard</div>
-            </div>
-            <div class="quick-nav-item" id="quicknav_docs">
-                <div class="quick-nav-icon">📄</div>
-                <div class="quick-nav-label">Documents</div>
-            </div>
-            <div class="quick-nav-item" id="quicknav_schedule">
-                <div class="quick-nav-icon">📅</div>
-                <div class="quick-nav-label">Schedule</div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Add actual buttons for proper interaction
-        quick_nav_cols = st.columns(3)
-        with quick_nav_cols[0]:
-            if st.button("Dashboard", key="btn_dashboard", use_container_width=True, 
-                          help="Go to Dashboard", type="secondary"):
-                st.session_state.current_menu = "Dashboard"
-                st.rerun()
-        
-        with quick_nav_cols[1]:
-            if st.button("Documents", key="btn_docs", use_container_width=True, 
-                          help="Go to Documents", type="secondary"):
-                st.session_state.current_menu = "Documents"
-                st.rerun()
-                
-        with quick_nav_cols[2]:
-            if st.button("Schedule", key="btn_schedule", use_container_width=True, 
-                          help="Go to Schedule", type="secondary"):
-                st.session_state.current_menu = "Schedule"
-                st.rerun()
-
-        # Handle quick navigation clicks
-        for quicknav in ['dashboard', 'docs', 'schedule']:
-            if st.session_state.get(f"quicknav_{quicknav}", False):
-                st.session_state[f"quicknav_{quicknav}"] = False
-                if quicknav == 'dashboard':
-                    st.session_state.current_menu = "Dashboard"
-                elif quicknav == 'docs':
-                    st.session_state.current_menu = "Documents"
-                elif quicknav == 'schedule':
-                    st.session_state.current_menu = "Schedule"
-                st.rerun()
+    # No middle column in the new layout - removed to fix LSP error
 
     with col3:
-        # Enhanced right-aligned dropdown with improved styling and organization
+        # Enhanced more prominent dropdown with improved styling and organization
         # Format options to include icons and grouped categories
         formatted_options = [f"{menu_options[k]['icon']} {menu_options[k]['label']}" for k in menu_options.keys()]
         
@@ -153,30 +74,61 @@ def render_header():
         # Find current menu's formatted option
         current_formatted = f"{menu_options[current_menu]['icon']} {menu_options[current_menu]['label']}"
         
+        # Add a prominent header for the navigation
         st.markdown("""
-        <div style="text-align: right; padding-bottom: 5px; margin-top: 5px;">
-            <span style="font-size: 14px; color: #6b7280; font-weight: 500; letter-spacing: 0.5px;">NAVIGATION</span>
+        <div style="text-align: center; padding: 10px 0 12px 0; margin-top: 5px; background-color: #f0f9ff; 
+                    border-radius: 8px 8px 0 0; border: 1px solid #e0e7ff; border-bottom: none;">
+            <span style="font-size: 15px; color: #1e40af; font-weight: 600; letter-spacing: 0.5px; 
+                   text-transform: uppercase;">
+               🧭 Navigation
+            </span>
         </div>
         """, unsafe_allow_html=True)
         
-        # Add custom CSS to improve dropdown appearance
+        # Add custom CSS to improve dropdown appearance and make it more prominent
         st.markdown("""
         <style>
         div[data-baseweb="select"] {
-            border-radius: 8px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             transition: all 0.2s ease;
+            border: 1px solid #e0e7ff;
+            background-color: #f8fafc;
         }
         div[data-baseweb="select"]:hover {
-            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         div[data-baseweb="select"] > div {
             font-weight: 500;
-            padding: 5px 8px;
+            padding: 12px 16px;
+            font-size: 16px;
+        }
+        div[data-baseweb="select"] svg {
+            color: #3b82f6 !important;
+            width: 24px;
+            height: 24px;
+        }
+        div[data-baseweb="menu"] {
+            max-height: 400px !important;
+            overflow-y: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border: 1px solid #e0e7ff;
+        }
+        div[data-baseweb="menu"] ul {
+            padding: 6px 0;
+        }
+        div[data-baseweb="menu"] li {
+            padding: 8px 16px !important;
+            font-size: 15px;
+        }
+        div[data-baseweb="menu"] li:hover {
+            background-color: #f0f9ff !important;
         }
         </style>
         """, unsafe_allow_html=True)
         
+        # More prominent dropdown
         selected_formatted = st.selectbox(
             "Navigation",
             options=formatted_options,

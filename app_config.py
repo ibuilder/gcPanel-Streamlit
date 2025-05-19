@@ -21,6 +21,7 @@ MENU_OPTIONS = [
     "🏢 BIM Viewer",
     "📱 Mobile Companion",
     "✅ Closeout",
+    "✨ Features Showcase",
     "⚙️ Settings"
 ]
 
@@ -39,6 +40,7 @@ MENU_MAP = {
     "🏢 BIM Viewer": "BIM",
     "📱 Mobile Companion": "Mobile Companion",
     "✅ Closeout": "Closeout",
+    "✨ Features Showcase": "Features Showcase",
     "⚙️ Settings": "Settings"
 }
 

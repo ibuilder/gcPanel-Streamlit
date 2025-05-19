@@ -156,5 +156,9 @@ def render_selected_module(current_menu):
         mobile_companion_page()
     elif current_menu == "Closeout":
         render_closeout()
+    elif current_menu == "Features Showcase":
+        # Import and render the features showcase
+        from modules.features_showcase import render_features_showcase
+        render_features_showcase()
     elif current_menu == "Settings":
         render_settings()

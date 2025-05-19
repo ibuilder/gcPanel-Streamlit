@@ -2,7 +2,8 @@
 Settings module for the gcPanel Construction Management Dashboard.
 
 This module provides settings and configuration options for the application,
-including theme settings, user preferences, and system configuration.
+including theme settings, user preferences, system configuration, and
+integration management for external services.
 """
 
 import streamlit as st
@@ -10,13 +11,18 @@ import pandas as pd
 from datetime import datetime, timedelta
 import random
 import colorsys
+import json
+import os
+
+# Import integration manager
+from utils.integration_manager import IntegrationManager, IntegrationType, IntegrationProvider
 
 def render_settings():
     """Render the settings interface."""
     st.header("Settings")
     
     # Create settings tabs
-    tabs = st.tabs(["Appearance", "User Preferences", "System", "About"])
+    tabs = st.tabs(["Appearance", "User Preferences", "Integrations", "System", "About"])
     
     # Appearance Tab
     with tabs[0]:
@@ -25,13 +31,17 @@ def render_settings():
     # User Preferences Tab
     with tabs[1]:
         render_user_preferences()
+        
+    # Integrations Tab
+    with tabs[2]:
+        render_integrations()
     
     # System Tab
-    with tabs[2]:
+    with tabs[3]:
         render_system_settings()
     
     # About Tab
-    with tabs[3]:
+    with tabs[4]:
         render_about_page()
 
 def render_appearance_settings():

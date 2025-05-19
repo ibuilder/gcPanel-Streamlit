@@ -12,6 +12,10 @@ from datetime import datetime, timedelta
 
 def render_features_showcase():
     """Render the features showcase module."""
+    # Import and render the header component
+    from components.header_clean import render_header
+    render_header()
+    
     st.title("gcPanel New Features Showcase")
     
     st.write("""

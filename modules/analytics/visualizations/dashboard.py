@@ -514,27 +514,34 @@ def render_analytics_dashboard():
     with tabs[2]:
         st.plotly_chart(create_risk_matrix(), use_container_width=True)
     
-    # Interactive filters and controls
-    st.sidebar.header("Dashboard Controls")
+    # Interactive filters and controls - moved from sidebar to main content
+    st.subheader("Dashboard Controls")
     
-    st.sidebar.subheader("Data Filters")
-    st.sidebar.checkbox("Show Budget Data", value=True)
-    st.sidebar.checkbox("Show Schedule Data", value=True)
-    st.sidebar.checkbox("Show Quality Data", value=True)
-    st.sidebar.checkbox("Show Safety Data", value=True)
-    
-    st.sidebar.subheader("Visualization Options")
-    st.sidebar.checkbox("Show Trendlines", value=False)
-    st.sidebar.checkbox("Show Forecasts", value=True)
-    st.sidebar.checkbox("Show Annotations", value=True)
-    
-    st.sidebar.button("Refresh Data")
-    
-    # Add export options
-    st.sidebar.subheader("Export Options")
-    export_format = st.sidebar.selectbox(
-        "Export Format",
-        ["PDF", "Excel", "CSV", "Image"]
-    )
-    
-    st.sidebar.button("Export Dashboard", key="export_dashboard")
+    # Create a container for filters and use columns for better layout
+    with st.container():
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.subheader("Data Filters")
+            st.checkbox("Show Budget Data", value=True)
+            st.checkbox("Show Schedule Data", value=True)
+            st.checkbox("Show Quality Data", value=True)
+            st.checkbox("Show Safety Data", value=True)
+        
+        with col2:
+            st.subheader("Visualization Options")
+            st.checkbox("Show Trendlines", value=False)
+            st.checkbox("Show Forecasts", value=True)
+            st.checkbox("Show Annotations", value=True)
+            
+            st.button("Refresh Data")
+        
+        with col3:
+            # Add export options
+            st.subheader("Export Options")
+            export_format = st.selectbox(
+                "Export Format",
+                ["PDF", "Excel", "CSV", "Image"]
+            )
+            
+            st.button("Export Dashboard", key="export_dashboard")

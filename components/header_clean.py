@@ -36,10 +36,10 @@ def render_header():
     col1, col2, col3 = st.columns([5, 3, 2])
     
     with col1:
-        # Logo and project name inline (left-aligned)
+        # Logo and project name inline (left-aligned) with clickable logo
         st.markdown("""
         <div style="display: flex; align-items: center;">
-            <div style="margin-right: 15px;">
+            <div style="margin-right: 15px; cursor: pointer;" onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', key: 'logo_clicked', value: true}, '*')">
                 <span style="font-size: 24px; font-weight: 700;">🏗️ gc<span style="color: #3b82f6;">Panel</span></span>
             </div>
             <div>
@@ -48,6 +48,12 @@ def render_header():
             </div>
         </div>
         """, unsafe_allow_html=True)
+        
+        # Handle logo click
+        if st.session_state.get("logo_clicked", False):
+            st.session_state.logo_clicked = False
+            st.session_state.current_menu = "Dashboard"
+            st.rerun()
     
     with col3:
         # Right aligned dropdown

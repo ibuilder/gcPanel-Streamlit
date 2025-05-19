@@ -434,6 +434,162 @@ def render_project_overview():
     
     st.markdown('</div>', unsafe_allow_html=True)
 
+def render_startup_manual():
+    """Render the project startup manual."""
+    st.subheader("Construction Project Startup Manual")
+    
+    # Create expandable sections for each part of the manual
+    with st.expander("General Information", expanded=True):
+        st.markdown("""
+        ### PROJECT STAFF, JOB INFORMATION AND POLICY
+        
+        The purpose of this manual is to familiarize you with the project and inform you of our company policies 
+        and project specification requirements. Following the instructions provided in this manual will ensure 
+        the administrative portions of the contract flow smoothly, ensuring timely payments and assistance from our staff.
+        
+        The project administration will be conducted solely from the project office. All correspondence relating 
+        to the project should be directed to the Project Executive at the project office.
+        
+        **The general contractor staff members assigned to the project are:**
+        """)
+        
+        # Create a staff table
+        staff_data = {
+            "Title": ["Project Executive", "Project Manager", "Project Superintendent", 
+                      "Project Engineer", "Safety Manager", "Project Accountant"],
+            "Name": ["Robert Smith", "Jennifer Wilson", "Michael Johnson", 
+                     "Sarah Thompson", "David Garcia", "Emily Chen"]
+        }
+        st.table(pd.DataFrame(staff_data))
+        
+        st.markdown("""
+        We look forward to working with you and invite you to discuss any matters pertinent to the timely completion of the project.
+        
+        ### MISCELLANEOUS INFORMATION
+        """)
+        
+        # Create project information table
+        info_data = {
+            "Item": ["Project Title", "Owner", "Developer in Charge", "Architect", "Architect in Charge", 
+                     "Mailing Address", "Shipping Address", "Telephone Number", "Fax Number", "Hours of Work"],
+            "Description": [
+                "Highland Tower Development", 
+                "Highland Properties LLC", 
+                "James Roberts", 
+                "Modern Design Architects", 
+                "Patricia Lee", 
+                "123 Highland Ave, Suite 500, Highland, CA 92346", 
+                "556 Construction Blvd, Highland, CA 92346", 
+                "(555) 123-4567", 
+                "(555) 123-4568", 
+                "Normal work hours are from 7:00 a.m. to 3:30 p.m. Monday through Friday. Any work before 6:30 a.m. or after 5:00 p.m. on weekdays and any time on Saturdays or Sundays must be scheduled and approved by the Project Superintendent."
+            ]
+        }
+        st.table(pd.DataFrame(info_data))
+    
+    with st.expander("Rules and Regulations"):
+        st.markdown("""
+        ### RULES AND REGULATIONS
+        
+        To promote a safe, harmonious working environment and efficient performance, the following rules and regulations apply at all times on this project. Failure to abide by these rules may result in disciplinary action, including dismissal.
+        
+        Subcontractor employees who fail to comply with jobsite rules will be subject to the same action. Employees removed for noncompliance will not be eligible for re-employment on the project.
+        
+        Each subcontractor shall maintain a competent foreman on site at all times to supervise employees and implement changes when authorized. It is the subcontractor's responsibility to ensure their foreman has adequate, current contract documents, shop drawings, as-builts, and other information required to perform the work.
+        
+        #### PARKING
+        
+        - Designated parking areas will be established for all workers.
+        - Unauthorized parking may result in towing at the vehicle owner's expense.
+        
+        #### CONDUCT
+        
+        - Any employee caught stealing, consuming alcohol, using controlled substances, deliberately working unsafely, damaging others' work, fighting, or engaging in horseplay will be dismissed immediately.
+        - Firearms are prohibited on site.
+        - All persons must behave professionally at all times. Catcalls, whistles, gestures, or conduct of an intimidating or degrading nature will not be tolerated.
+        
+        #### THEFT
+        
+        - Theft or pilferage shall result in immediate dismissal.
+        - Neither the Owner nor the General Contractor is liable for loss or damage to construction equipment, tools, temporary structures, or supplies owned by subcontractors.
+        
+        #### WEEKLY SUBCONTRACTOR COORDINATION MEETING
+        
+        - A coordination meeting will be conducted at the project office each week to review progress and discuss field coordination issues.
+        - Subcontractors actively working on site must have an authorized representative attend these meetings.
+        - This meeting is mandatory.
+        - Decisions regarding schedule and manpower will be made in the subcontractor's absence, and the subcontractor will be bound by these decisions.
+        """)
+    
+    with st.expander("Before You Start Work"):
+        st.markdown("""
+        ### BEFORE YOU START WORK
+        
+        All communication (both written and oral) must be made through the project office. All material deliveries must be coordinated with the project office.
+        
+        Before any subcontractor begins work, the following items must be on file in the project office:
+        
+        - CERTIFICATE OF INSURANCE (with specific language as required in the Subcontract Agreement)
+        - SAFETY AND HAZARD COMMUNICATION PROGRAMS
+        - MATERIAL SAFETY DATA SHEETS AND SITE INVENTORY LIST
+        - SUBMITTALS (All submittals must be submitted and APPROVED - NO EXCEPTIONS)
+        - JOB HAZARD ANALYSIS (JHA) for specific activities
+        - INITIAL INSPECTION MEETING (Quality Control meeting to review aspects of work)
+        """)
+    
+    with st.expander("Stored Materials & Certificate of Insurance"):
+        st.markdown("""
+        ### STORED MATERIALS
+        
+        If you plan to bill for stored materials, notify the project office in writing in advance. Payments for stored materials will be made only if all documentation complies with the requirements of your subcontract agreement.
+        
+        ### CERTIFICATE OF INSURANCE
+        
+        In accordance with your subcontract agreement, you must submit a proper Certificate of Insurance in the required amounts before your phase of work can begin on this project.
+        
+        The Certificate Holder shall be listed with a THIRTY (30) DAY notice of cancellation. The project name must be included under the description of operations.
+        
+        Any sub-subcontractors are subject to the same requirements. Their Certificates of Insurance must be submitted to the project office before their work can begin.
+        
+        Absolutely no work will be allowed to commence without a proper Insurance Certificate on file in the Project Office. Additionally, payments will not be processed without current certificates on file.
+        """)
+    
+    with st.expander("Submittals & Payment Procedures"):
+        st.markdown("""
+        ### SUBMITTALS--SHOP DRAWINGS, SAMPLES, MANUFACTURER'S LITERATURE
+        
+        To expedite processing of your submittals:
+        
+        - All submittals must be made to the project office. DO NOT SEND SUBMITTALS TO THE MAIN OFFICE, OWNER'S REPRESENTATIVE, OR ARCHITECT UNLESS SPECIFICALLY ADVISED.
+        - Your subcontract/purchase order is per plans and specifications. Any deviations must be clearly noted in your cover letter with the reason, and highlighted in the submittal itself. If your deviation results in added costs to other subcontractors, these costs will be charged to your account.
+        
+        All submittals must include:
+        - Project name and location
+        - General contractor name
+        - Subcontractor or supplier name
+        - Manufacturer and brand (as applicable)
+        - Project number
+        - Specification number and paragraph where material is specified
+        - Contract drawing number
+        
+        ### MONTHLY PAY REQUISITION
+        
+        Payment requisition procedures:
+        
+        - Submit payment requisitions for "stored material" (with invoice copies) and "work in place" to the project office by the 20th of each month.
+        - Each payment will include an "Affidavit and Partial Waiver of Lien and Partial Release" form that must be executed and returned with your next invoice. Further payments will not be made without this release.
+        - Retention will be held according to the terms of your subcontract or purchase order agreement.
+        - Progress payments will be based on the updated, approved CPM schedule for the month of the current invoice.
+        """)
+    
+    # Add a download button for the full manual
+    st.download_button(
+        label="Download Full Project Startup Manual (PDF)",
+        data=b"Sample PDF Content",  # In a real app, this would be the actual PDF content
+        file_name="Highland_Tower_Project_Startup_Manual.pdf",
+        mime="application/pdf"
+    )
+
 def render_project_team():
     """Render project team information."""
     st.subheader("Project Team")

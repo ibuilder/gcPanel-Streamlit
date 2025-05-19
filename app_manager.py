@@ -124,6 +124,9 @@ def render_application():
 
 def render_selected_module(current_menu):
     """Render the module selected by the user."""
+    # Import render_features_showcase within function scope
+    from modules.features_showcase import render_features_showcase
+    
     if current_menu == "Dashboard":
         render_dashboard()
     elif current_menu == "Project Information":

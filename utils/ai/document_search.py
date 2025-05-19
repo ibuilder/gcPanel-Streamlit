@@ -8,6 +8,46 @@ processing to find and extract relevant information from project documents.
 import streamlit as st
 from utils.ai.anthropic_client import analyze_document
 
+
+def render_smart_search_interface():
+    """
+    Render the smart document search interface.
+    
+    This function provides a UI for users to search project documents
+    using natural language queries.
+    """
+    st.header("Smart Document Search")
+    
+    st.markdown("""
+    Ask questions about your project documents using natural language.
+    The AI will search across all documents and extract relevant information.
+    """)
+    
+    # Search input
+    query = st.text_input(
+        "Ask about your documents", 
+        placeholder="E.g., 'Show me all RFIs related to electrical work'"
+    )
+    
+    # Sample dropdown for document sources to search
+    document_sources = st.multiselect(
+        "Search in",
+        ["RFIs", "Submittals", "Change Orders", "Drawings", "Specifications", "Meeting Minutes", "Daily Reports"],
+        default=["RFIs", "Submittals", "Change Orders"]
+    )
+    
+    # Search button
+    if st.button("Search Documents", type="primary"):
+        if query:
+            with st.spinner("Searching documents..."):
+                # Search for documents
+                results = search_project_documents(query, document_sources)
+                
+                # Render results
+                render_document_search_results(results, query)
+        else:
+            st.warning("Please enter a search query.")
+
 def search_project_documents(query, document_sources=None):
     """
     Search through project documents using natural language queries.

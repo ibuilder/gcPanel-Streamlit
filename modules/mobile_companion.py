@@ -27,12 +27,8 @@ def render_mobile_companion():
     is_offline = check_offline_status()
     
     # Display header with project information
-    st.markdown("""
-    <div style="text-align: center; margin-bottom: 20px;">
-        <h1 style="font-size: 1.8rem; margin-bottom: 5px;">Highland Tower</h1>
-        <p style="color: #666; margin: 0;">Field Companion</p>
-    </div>
-    """, unsafe_allow_html=True)
+    from utils.mobile.components import render_mobile_header
+    render_mobile_header("Highland Tower", "Field Companion")
     
     # Display offline indicator if needed
     if is_offline:

@@ -144,12 +144,12 @@ def create_budget_performance_chart():
     
     # Try to add today marker in compatible format
     try:
-        # If we have data, format today to match the data format
+        # If we have data, use a datetime object that matches our data
         if len(df) > 0:
-            # Convert today to string format to match data types
-            today_str = datetime.now().strftime('%Y-%m-%d')
+            # Create a datetime object for today
+            today_date = pd.Timestamp(datetime.now().date())
             fig.add_vline(
-                x=today_str,
+                x=today_date,
                 line_width=2,
                 line_dash="dash",
                 line_color="green",
@@ -200,31 +200,19 @@ def create_schedule_performance_chart():
     
     # Add current date line with compatible format
     try:
-        # If we have data, ensure we're using a consistent data type for date representation
+        # If we have data, use a consistent approach for the date marker
         if len(df) > 0:
-            # Check the type of date in our dataframe to match it
-            if pd.api.types.is_datetime64_any_dtype(df['date']):
-                # If date column is datetime, use datetime for vline
-                today = pd.Timestamp(datetime.now().date())
-                fig.add_vline(
-                    x=today,
-                    line_width=2,
-                    line_dash="dash",
-                    line_color="green",
-                    annotation_text="Today",
-                    annotation_position="top right"
-                )
-            else:
-                # If date column is string, use string for vline
-                today_str = datetime.now().strftime('%Y-%m-%d')
-                fig.add_vline(
-                    x=today_str,
-                    line_width=2,
-                    line_dash="dash",
-                    line_color="green",
-                    annotation_text="Today",
-                    annotation_position="top right"
-                )
+            # Always use a pandas Timestamp object which is compatible with both
+            # datetime64 and string formatted dates in the visualization
+            today_date = pd.Timestamp(datetime.now().date())
+            fig.add_vline(
+                x=today_date,
+                line_width=2,
+                line_dash="dash",
+                line_color="green",
+                annotation_text="Today",
+                annotation_position="top right"
+            )
     except Exception as e:
         # Skip adding the line if there's an error
         print(f"Could not add date marker: {e}")

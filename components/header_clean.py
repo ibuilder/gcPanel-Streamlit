@@ -80,7 +80,7 @@ def render_header():
             st.session_state.current_menu = "Dashboard"
             st.rerun()
     
-    # No middle column in the new layout - removed to fix LSP error
+    # Two column layout for better spacing
 
     with col3:
         # Enhanced more prominent dropdown with improved styling and organization
@@ -93,16 +93,15 @@ def render_header():
         # Find current menu's formatted option
         current_formatted = f"{menu_options[current_menu]['icon']} {menu_options[current_menu]['label']}"
         
-        # No accent line, clean styling
+        # Clean styling without extra spacers
         st.markdown("""
         <style>
-        /* No accent bar, just additional spacing */
-        .dropdown-spacer {
-            margin-top: 5px;
+        /* Align dropdown with the rest of the header */
+        div.row-widget.stSelectbox {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
         }
         </style>
-        
-        <div class="dropdown-spacer"></div>
         """, unsafe_allow_html=True)
         
         # Enhanced stylish dropdown menu

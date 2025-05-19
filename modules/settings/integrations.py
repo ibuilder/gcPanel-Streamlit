@@ -3,6 +3,9 @@ External Services Integration Manager for gcPanel.
 
 This module provides a comprehensive interface for managing integrations 
 with external services, APIs, and third-party tools used by the application.
+
+It uses the authentication system from modules.integrations.authentication
+to securely manage credentials and ensure consistent connectivity.
 """
 
 import streamlit as st
@@ -10,6 +13,15 @@ import pandas as pd
 from datetime import datetime, timedelta
 import json
 import os
+
+# Import our enhanced authentication system
+from modules.integrations.authentication import (
+    initialize_integrations,
+    store_credentials,
+    test_connection,
+    is_connected,
+    get_connection_status
+)
 
 # Define integration categories and available services
 INTEGRATION_CATEGORIES = {
@@ -117,19 +129,27 @@ INTEGRATION_CATEGORIES = {
 
 def load_integration_status():
     """Load integration status from session state or initialize defaults."""
+    # Initialize our authentication system if not already done
+    initialize_integrations()
+    
     if "integrations" not in st.session_state:
         st.session_state.integrations = {}
         
-        # Initialize integration status from the INTEGRATION_CATEGORIES dictionary
+        # Initialize integration status from the authentication system
         for category, services in INTEGRATION_CATEGORIES.items():
             for service in services:
                 service_id = service["id"]
+                
+                # Check connection status using our authentication system
+                connected = is_connected(service_id)
+                connection_info = get_connection_status(service_id)
+                
                 st.session_state.integrations[service_id] = {
                     "name": service["name"],
-                    "status": service["status"],
+                    "status": connected,
                     "category": category,
-                    "last_sync": "Never" if not service["status"] else "Today",
-                    "api_key": "" if not service["status"] else "••••••••••••••••"
+                    "last_sync": connection_info.get("last_sync", "Never"),
+                    "connection_info": connection_info
                 }
 
 def save_integration_status(service_id, status, api_key=""):

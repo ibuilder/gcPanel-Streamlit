@@ -33,19 +33,24 @@ def render_header():
     # Get currently selected menu value from session state
     current_menu = st.session_state.get("current_menu", "Dashboard")
     
-    # Create a three-column layout for the header
-    col1, col2, col3 = st.columns([5, 3, 2])
+    # Create a more balanced three-column layout for the header with extra space for menu
+    col1, col2, col3 = st.columns([4, 4, 3])
     
     with col1:
-        # Logo and project name inline (left-aligned) with clickable logo
+        # Enhanced logo and project name with improved spacing and shadow for better visibility
         st.markdown("""
-        <div style="display: flex; align-items: center;">
-            <div style="margin-right: 15px; cursor: pointer;" onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', key: 'logo_clicked', value: true}, '*')">
-                <span style="font-size: 24px; font-weight: 700;">🏗️ gc<span style="color: #3b82f6;">Panel</span></span>
+        <div style="display: flex; align-items: center; padding: 10px 0;">
+            <div style="margin-right: 18px; cursor: pointer; transition: transform 0.2s ease;" 
+                 onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', key: 'logo_clicked', value: true}, '*')"
+                 onmouseover="this.style.transform='scale(1.05)'" 
+                 onmouseout="this.style.transform='scale(1)'">
+                <span style="font-size: 26px; font-weight: 700; text-shadow: 0px 1px 2px rgba(0,0,0,0.1);">
+                    🏗️ gc<span style="color: #3b82f6;">Panel</span>
+                </span>
             </div>
-            <div>
-                <div style="font-size: 12px; color: #6b7280;">Project</div>
-                <div style="font-size: 16px; font-weight: 600;">Highland Tower Development</div>
+            <div style="border-left: 3px solid #3b82f6; padding-left: 15px;">
+                <div style="font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Project</div>
+                <div style="font-size: 16px; font-weight: 600; color: #1f2937;">Highland Tower Development</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -56,9 +61,50 @@ def render_header():
             st.session_state.current_menu = "Dashboard"
             st.rerun()
     
+    # Middle column for quick access buttons
+    with col2:
+        # Add quick access buttons for most common features
+        st.markdown("""
+        <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px;">
+            <a href="#" onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', key: 'quicknav_dashboard', value: true}, '*')" 
+               style="text-decoration: none; color: #4b5563; display: flex; flex-direction: column; align-items: center; width: 65px; transition: transform 0.2s;"
+               onmouseover="this.style.transform='translateY(-2px)'; this.style.color='#3b82f6';" 
+               onmouseout="this.style.transform=''; this.style.color='#4b5563';">
+                <div style="font-size: 22px; margin-bottom: 3px;">📊</div>
+                <div style="font-size: 11px; text-align: center;">Dashboard</div>
+            </a>
+            <a href="#" onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', key: 'quicknav_docs', value: true}, '*')" 
+               style="text-decoration: none; color: #4b5563; display: flex; flex-direction: column; align-items: center; width: 65px; transition: transform 0.2s;"
+               onmouseover="this.style.transform='translateY(-2px)'; this.style.color='#3b82f6';" 
+               onmouseout="this.style.transform=''; this.style.color='#4b5563';">
+                <div style="font-size: 22px; margin-bottom: 3px;">📄</div>
+                <div style="font-size: 11px; text-align: center;">Documents</div>
+            </a>
+            <a href="#" onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', key: 'quicknav_schedule', value: true}, '*')" 
+               style="text-decoration: none; color: #4b5563; display: flex; flex-direction: column; align-items: center; width: 65px; transition: transform 0.2s;"
+               onmouseover="this.style.transform='translateY(-2px)'; this.style.color='#3b82f6';" 
+               onmouseout="this.style.transform=''; this.style.color='#4b5563';">
+                <div style="font-size: 22px; margin-bottom: 3px;">📅</div>
+                <div style="font-size: 11px; text-align: center;">Schedule</div>
+            </a>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Handle quick navigation clicks
+        for quicknav in ['dashboard', 'docs', 'schedule']:
+            if st.session_state.get(f"quicknav_{quicknav}", False):
+                st.session_state[f"quicknav_{quicknav}"] = False
+                if quicknav == 'dashboard':
+                    st.session_state.current_menu = "Dashboard"
+                elif quicknav == 'docs':
+                    st.session_state.current_menu = "Documents"
+                elif quicknav == 'schedule':
+                    st.session_state.current_menu = "Schedule"
+                st.rerun()
+
     with col3:
-        # Right aligned dropdown
-        # Format options to include icons
+        # Enhanced right-aligned dropdown with improved styling and organization
+        # Format options to include icons and grouped categories
         formatted_options = [f"{menu_options[k]['icon']} {menu_options[k]['label']}" for k in menu_options.keys()]
         
         # Create a mapping from formatted options back to keys
@@ -68,9 +114,27 @@ def render_header():
         current_formatted = f"{menu_options[current_menu]['icon']} {menu_options[current_menu]['label']}"
         
         st.markdown("""
-        <div style="text-align: right; padding-bottom: 5px;">
-            <span style="font-size: 14px; color: #6b7280;">Navigation</span>
+        <div style="text-align: right; padding-bottom: 5px; margin-top: 5px;">
+            <span style="font-size: 14px; color: #6b7280; font-weight: 500; letter-spacing: 0.5px;">NAVIGATION</span>
         </div>
+        """, unsafe_allow_html=True)
+        
+        # Add custom CSS to improve dropdown appearance
+        st.markdown("""
+        <style>
+        div[data-baseweb="select"] {
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+        div[data-baseweb="select"]:hover {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        div[data-baseweb="select"] > div {
+            font-weight: 500;
+            padding: 5px 8px;
+        }
+        </style>
         """, unsafe_allow_html=True)
         
         selected_formatted = st.selectbox(

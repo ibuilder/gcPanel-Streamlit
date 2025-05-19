@@ -23,7 +23,13 @@ def data_table(
     page_size: int = 10,
     exportable: bool = True,
     key: Optional[str] = None,
-    on_row_click: Optional[Callable] = None
+    on_row_click: Optional[Callable] = None,
+    selectable: bool = False,
+    editable: bool = False,
+    show_row_numbers: bool = True,
+    compact: bool = False,
+    highlight_rows: bool = True,
+    filter_position: str = "top"
 ) -> Tuple[pd.DataFrame, Optional[Dict[str, Any]]]:
     """
     Display an interactive data table with filtering, sorting, and export capabilities.
@@ -40,6 +46,12 @@ def data_table(
         exportable: Whether to allow data export
         key: Unique key for the table component
         on_row_click: Callback function when a row is clicked
+        selectable: Whether to allow row selection
+        editable: Whether to allow inline editing of cell values
+        show_row_numbers: Whether to display row numbers
+        compact: Whether to use compact row height for dense data display
+        highlight_rows: Whether to highlight rows on hover
+        filter_position: Position of the filter controls ("top" or "column")
         
     Returns:
         Tuple of (filtered_data, selected_row)

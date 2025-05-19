@@ -14,29 +14,103 @@ def simple_breadcrumbs(items: List[Dict[str, Any]]) -> None:
     Args:
         items: List of breadcrumb items, each with keys 'label' and 'path'
     """
-    # Create a horizontal layout for the breadcrumbs
-    cols = st.columns(len(items) * 2 - 1)
+    # Apply custom CSS for improved breadcrumb styling
+    st.markdown("""
+    <style>
+    .breadcrumb-container {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+        margin-bottom: 15px;
+        overflow-x: auto;
+        white-space: nowrap;
+        background-color: rgba(255, 255, 255, 0.03);
+        border-radius: 6px;
+        padding: 8px 16px;
+    }
+    .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        font-size: 14px;
+        color: #6b7280;
+        transition: color 0.2s ease;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+    .breadcrumb-item.active {
+        font-weight: 500;
+        color: #3b82f6;
+        background-color: rgba(59, 130, 246, 0.08);
+    }
+    .breadcrumb-item:not(.active):hover {
+        color: #3b82f6;
+        background-color: rgba(59, 130, 246, 0.05);
+    }
+    .breadcrumb-separator {
+        margin: 0 5px;
+        color: #9ca3af;
+        font-size: 16px;
+    }
+    .stButton button {
+        background: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        color: #6b7280 !important;
+        font-size: 14px;
+        padding: 2px 8px !important;
+        height: auto !important;
+        transition: all 0.2s ease;
+        margin: 0 !important;
+        min-width: auto !important;
+    }
+    .stButton button:hover {
+        color: #3b82f6 !important;
+        background-color: rgba(59, 130, 246, 0.05) !important;
+        transform: none !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Create HTML for breadcrumbs
+    breadcrumb_html = '<div class="breadcrumb-container">'
     
     # Add each breadcrumb item
     for i, item in enumerate(items):
         is_last = i == len(items) - 1
+        label = item.get('label', '')
+        path = item.get('path', 'Dashboard')
         
-        # Breadcrumb item (in even columns)
-        with cols[i * 2]:
-            if is_last:
-                # Current page (no click action)
-                st.markdown(f"<div class='breadcrumb-item'>{item.get('label')}</div>", unsafe_allow_html=True)
-            else:
-                # Clickable breadcrumb
-                label = item.get('label', '')
-                if st.button(label, key=f"breadcrumb_{i}", type="secondary", use_container_width=True):
-                    st.session_state.menu = item.get('path', 'Dashboard')
-                    st.rerun()
+        # Generate unique ID for each breadcrumb
+        item_id = f"breadcrumb_{path.lower().replace(' ', '_')}_{i}"
         
-        # Separator (in odd columns)
+        if is_last:
+            # Current page (no click action)
+            breadcrumb_html += f'<div class="breadcrumb-item active" id="{item_id}">{label}</div>'
+        else:
+            # Clickable breadcrumb
+            breadcrumb_html += f'<div class="breadcrumb-item" id="{item_id}" onclick="window.parent.postMessage({{type: \'streamlit:setComponentValue\', key: \'{item_id}_clicked\', value: true}}, \'*\')" style="cursor: pointer;">{label}</div>'
+        
+        # Add separator
         if not is_last:
-            with cols[i * 2 + 1]:
-                st.markdown("<div class='breadcrumb-separator'>›</div>", unsafe_allow_html=True)
+            breadcrumb_html += '<div class="breadcrumb-separator">›</div>'
+    
+    breadcrumb_html += '</div>'
+    
+    # Render the breadcrumb container
+    st.markdown(breadcrumb_html, unsafe_allow_html=True)
+    
+    # Handle breadcrumb clicks
+    for i, item in enumerate(items):
+        if i == len(items) - 1:  # Skip the last (current) item
+            continue
+            
+        path = item.get('path', 'Dashboard')
+        item_id = f"breadcrumb_{path.lower().replace(' ', '_')}_{i}_clicked"
+        
+        if st.session_state.get(item_id, False):
+            st.session_state[item_id] = False
+            st.session_state.current_menu = path
+            st.rerun()
 
 def get_breadcrumbs_for_page(page: str) -> List[Dict[str, Any]]:
     """

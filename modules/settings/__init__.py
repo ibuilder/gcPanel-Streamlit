@@ -14,7 +14,7 @@ def render_settings():
     st.header("Settings")
     
     # Settings categories
-    categories = st.tabs(["User Profile", "Appearance", "Notifications", "Data Management", "System"])
+    categories = st.tabs(["User Profile", "Appearance", "Notifications", "Data Management", "System", "Integrations"])
     
     with categories[0]:  # User Profile
         render_user_profile()
@@ -30,6 +30,10 @@ def render_settings():
         
     with categories[4]:  # System
         render_system_settings()
+        
+    with categories[5]:  # Integrations
+        from modules.settings.integrations import render_integration_settings
+        render_integration_settings()
 
 def render_user_profile():
     """Render user profile settings."""

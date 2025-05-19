@@ -34,6 +34,7 @@ def render_settings():
         
     # Integrations Tab
     with tabs[2]:
+        from modules.settings_components.integrations import render_integrations
         render_integrations()
     
     # System Tab
@@ -95,10 +96,10 @@ def render_appearance_settings():
             """, unsafe_allow_html=True)
             
             # Use a hidden button to capture the click
-            if st.button(f"Select {color_name}", key=f"color_btn_{color_name}", help=f"Select {color_name} theme", label_visibility="collapsed"):
+            if st.button(f"Select {color_name}", key=f"color_btn_{color_name}", help=f"Select {color_name} theme"):
                 st.session_state.theme_color = color_code
                 # In a real application, you would save this preference to a database
-                st.experimental_rerun()
+                st.rerun()
         
         i += 1
     

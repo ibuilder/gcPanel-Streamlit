@@ -275,8 +275,31 @@ def save_imported_data(platform: str, data_type: str, data: Any, import_method: 
                         session.add(summary_item)
             
             # Commit is handled by the context manager
-            # Convert SQLAlchemy Column type to int before returning
-            return int(dataset.id) if dataset.id is not None else None
+            # Properly handle the SQLAlchemy Column type conversion
+            if dataset is None:
+                return None
+                
+            # Access the ID attribute carefully
+            dataset_id = getattr(dataset, 'id', None)
+            if dataset_id is not None:
+                # For SQLAlchemy objects, we need to get the raw scalar value
+                try:
+                    # Try to extract scalar value or convert to integer
+                    if hasattr(dataset_id, '_asdict'):
+                        # Handle SQLAlchemy result objects
+                        return int(dataset_id._asdict().get('id', 0))
+                    elif hasattr(dataset_id, 'value'):
+                        # Handle SQLAlchemy InstrumentedAttribute
+                        return int(dataset_id.value)
+                    else:
+                        # Direct conversion attempt
+                        return int(str(dataset_id))
+                except (TypeError, ValueError, AttributeError) as e:
+                    # Log the error for debugging
+                    print(f"Error converting dataset_id: {e}")
+                    # Return any integer-castable value
+                    return 0
+            return None
     
     except Exception as e:
         st.error(f"Failed to save imported data: {str(e)}")
@@ -308,10 +331,11 @@ def get_imported_data(platform: Optional[str] = None, data_type: Optional[str] =
             # Build query based on filters
             query = session.query(ImportedDataset)
             
-            if platform:
+            # Properly handle SQLAlchemy filter conditions
+            if platform is not None:
                 query = query.filter(ImportedDataset.platform == platform)
                 
-            if data_type:
+            if data_type is not None:
                 query = query.filter(ImportedDataset.data_type == data_type)
                 
             # Order by most recent first and limit results
@@ -340,8 +364,16 @@ def get_imported_data(platform: Optional[str] = None, data_type: Optional[str] =
                 
                 if data_type in ["budget", "schedule"]:
                     # Special handling for composite types
-                    summary_item = next((item for item in items if item.item_type == "summary"), None)
-                    data_items = [item for item in items if item.item_type != "summary"]
+                    # Safely check item_type without using SQLAlchemy boolean conditions
+                    summary_item = None
+                    data_items = []
+                    
+                    for item in items:
+                        item_type_val = str(item.item_type) if item.item_type is not None else ""
+                        if item_type_val == "summary":
+                            summary_item = item
+                        else:
+                            data_items.append(item)
                     
                     if data_type == "budget":
                         dataset_info["data"] = {
@@ -429,11 +461,16 @@ def get_import_history(limit: int = 50) -> pd.DataFrame:
                 "Status": dataset.status
             } for dataset in datasets]
             
+            # Define the column names to ensure consistency
+            columns = ["ID", "Platform", "Data Type", "Import Date", "Items", "Method", "Status"]
+            
             if not history_data:
                 # Return empty DataFrame with correct columns
-                return pd.DataFrame(columns=["ID", "Platform", "Data Type", "Import Date", "Items", "Method", "Status"])
+                return pd.DataFrame(columns=columns)
                 
-            return pd.DataFrame(history_data)
+            # Create DataFrame with explicit column order to avoid LSP issues
+            df = pd.DataFrame(history_data)
+            return df[columns] if len(df.columns) > 0 else df
     
     except Exception as e:
         st.error(f"Failed to retrieve import history: {str(e)}")

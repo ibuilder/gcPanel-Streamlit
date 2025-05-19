@@ -1,659 +1,488 @@
 """
-Realtime Collaboration Module for gcPanel.
+Real-time collaboration utilities for document editing and commenting.
 
-This module provides WebSocket-based collaboration tools for real-time
-interaction between team members, including chat, document editing,
-comment threads, and @mentions.
+This module provides functionality for real-time collaboration on documents,
+including collaborative editing, commenting, and version control.
 """
 
 import streamlit as st
-import json
-import time
-import uuid
 from datetime import datetime
+import random
 
-# ----- WebSocket Mock Implementation -----
-# In a real application, this would use actual WebSockets
-# For this demo, we'll simulate it with session state
-
-class MockWebSocketManager:
-    """Mock WebSocket Manager for demonstration purposes.
-    
-    In a real implementation, this would use actual WebSockets.
+def render_document_collaboration(document_id, editable=True):
     """
-    
-    def __init__(self):
-        """Initialize WebSocket manager."""
-        # Initialize connection in session state if not present
-        if "ws_connected" not in st.session_state:
-            st.session_state.ws_connected = False
-            
-        if "ws_messages" not in st.session_state:
-            st.session_state.ws_messages = []
-            
-        if "ws_users_online" not in st.session_state:
-            st.session_state.ws_users_online = [
-                {"id": "user1", "name": "John Smith", "role": "Project Manager", "status": "online"},
-                {"id": "user2", "name": "Sarah Johnson", "role": "Field Engineer", "status": "online"},
-                {"id": "user3", "name": "Mike Chen", "role": "Architect", "status": "away"},
-                {"id": "user4", "name": "Lisa Rodriguez", "role": "Safety Manager", "status": "offline"}
-            ]
-    
-    def connect(self):
-        """Connect to WebSocket."""
-        st.session_state.ws_connected = True
-        return True
-    
-    def disconnect(self):
-        """Disconnect from WebSocket."""
-        st.session_state.ws_connected = False
-        return True
-    
-    def is_connected(self):
-        """Check if WebSocket is connected."""
-        return st.session_state.ws_connected
-    
-    def send_message(self, channel, message_data):
-        """Send a message through WebSocket.
-        
-        Args:
-            channel (str): Channel/room to send message to
-            message_data (dict): Message data to send
-        
-        Returns:
-            bool: True if successful, False otherwise
-        """
-        if not self.is_connected():
-            return False
-            
-        # Add message metadata
-        message = {
-            "id": str(uuid.uuid4()),
-            "timestamp": datetime.now().isoformat(),
-            "channel": channel,
-            "data": message_data
-        }
-        
-        # Add to session state message history
-        st.session_state.ws_messages.append(message)
-        
-        return True
-    
-    def get_messages(self, channel=None, limit=50):
-        """Get messages from WebSocket.
-        
-        Args:
-            channel (str): Optional channel to filter messages
-            limit (int): Maximum number of messages to return
-            
-        Returns:
-            list: List of messages
-        """
-        if not self.is_connected():
-            return []
-            
-        # Filter by channel if specified
-        if channel:
-            messages = [m for m in st.session_state.ws_messages if m["channel"] == channel]
-        else:
-            messages = st.session_state.ws_messages
-            
-        # Sort by timestamp and limit
-        messages.sort(key=lambda m: m["timestamp"], reverse=True)
-        return messages[:limit]
-    
-    def get_online_users(self):
-        """Get list of online users.
-        
-        Returns:
-            list: List of online users
-        """
-        if not self.is_connected():
-            return []
-            
-        return st.session_state.ws_users_online
-
-
-# ----- Document Collaboration -----
-
-def get_document_comments(document_id):
-    """Get comments for a document.
+    Render collaborative document editing interface.
     
     Args:
-        document_id (str): Document ID
+        document_id (str): Identifier for the document
+        editable (bool): Whether the document is editable by the current user
+    """
+    # Get document content (in a real app, this would come from a database)
+    document_content = get_document_content(document_id)
+    
+    # Show collaborative editing interface
+    if editable:
+        edited_content = st.text_area(
+            "Document Content", 
+            value=document_content, 
+            height=400,
+            key=f"doc_editor_{document_id}"
+        )
+        
+        # Show active collaborators
+        active_users = get_active_collaborators(document_id)
+        
+        if active_users:
+            st.markdown("### Active Collaborators")
+            
+            cols = st.columns(len(active_users))
+            for i, user in enumerate(active_users):
+                with cols[i]:
+                    st.markdown(f"""
+                    <div style="text-align: center;">
+                        <div style="width: 40px; height: 40px; border-radius: 20px; background-color: {user['color']}; 
+                                 color: white; display: flex; align-items: center; justify-content: center; 
+                                 margin: 0 auto;">
+                            {user['name'][0]}
+                        </div>
+                        <div style="margin-top: 5px; font-size: 12px;">{user['name']}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+        
+        # Save and version control buttons
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            if st.button("Save Changes", key=f"save_doc_{document_id}"):
+                # In a real app, save to database
+                st.success("Document saved successfully!")
+                
+                # Track the edit in revision history
+                add_revision_history_entry(
+                    document_id=document_id,
+                    user_name="Current User",
+                    action="Edited document",
+                    details="Updated document content"
+                )
+                
+        with col2:
+            if st.button("Create New Version", key=f"version_doc_{document_id}"):
+                # In a real app, create a new version in the database
+                st.success("New version created successfully!")
+                
+                # Track the version creation
+                add_revision_history_entry(
+                    document_id=document_id,
+                    user_name="Current User",
+                    action="Created new version",
+                    details="Created version 2.1"
+                )
+        
+        with col3:
+            if st.button("Discard Changes", key=f"discard_doc_{document_id}"):
+                # Reload original content
+                st.session_state[f"doc_editor_{document_id}"] = document_content
+                st.rerun()
+    else:
+        # Read-only view
+        # Use a different approach to avoid backslash issues in f-strings
+        # First we'll replace newlines with <br> tags
+        formatted_content = document_content.replace("\n", "<br>")
+        
+        # Then construct the HTML without f-string escape sequences
+        content_html = f"""
+        <div style="border: 1px solid #e6e6e6; border-radius: 5px; padding: 15px; 
+                  background-color: #f9f9f9;">
+            {formatted_content}
+        </div>
+        """
+        st.markdown(content_html, unsafe_allow_html=True)
+        
+        st.warning("You don't have permission to edit this document.")
+
+def render_collaboration_chat(document_id, current_user="Current User"):
+    """
+    Render real-time collaboration chat interface.
+    
+    Args:
+        document_id (str): Identifier for the document
+        current_user (str): Name of the current user
+    """
+    # Implementation of real-time chat
+    st.subheader("Collaboration Chat")
+    
+    # Initialize chat history if not present
+    if f"chat_history_{document_id}" not in st.session_state:
+        st.session_state[f"chat_history_{document_id}"] = [
+            {"user": "System", "message": "Chat started for this document", "time": datetime.now().strftime("%H:%M")}
+        ]
+    
+    # Display chat history
+    chat_container = st.container()
+    with chat_container:
+        for chat in st.session_state[f"chat_history_{document_id}"]:
+            user_color = generate_user_color(chat["user"])
+            st.markdown(
+                f"""
+                <div style="margin-bottom: 10px;">
+                    <span style="font-weight: bold; color: {user_color};">{chat["user"]}</span>
+                    <span style="font-size: 0.8em; color: gray;"> ({chat["time"]})</span><br>
+                    <span style="margin-left: 10px;">{chat["message"]}</span>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+    
+    # Add new message
+    with st.form(f"chat_form_{document_id}", clear_on_submit=True):
+        message = st.text_area("Message", height=50, key=f"chat_message_{document_id}")
+        submitted = st.form_submit_button("Send")
+        
+        if submitted and message:
+            new_chat = {
+                "user": current_user,
+                "message": message,
+                "time": datetime.now().strftime("%H:%M")
+            }
+            st.session_state[f"chat_history_{document_id}"].append(new_chat)
+            st.rerun()
+
+def render_comment_thread(document_id, current_user="Current User"):
+    """
+    Render comments thread for collaborative discussion on a document.
+    
+    Args:
+        document_id (str): Identifier for the document
+        current_user (str): Name of the current user
+    """
+    # Get existing comments (in a real app, this would come from a database)
+    comments = get_document_comments(document_id)
+    
+    # Display comments
+    if not comments:
+        st.info("No comments on this document yet. Be the first to comment!")
+    else:
+        for comment in comments:
+            # Determine if comment has replies
+            has_replies = 'replies' in comment and comment['replies']
+            
+            # User avatar color based on name
+            user_color = generate_user_color(comment['user'])
+            
+            # Main comment box
+            with st.container():
+                # Avatar and username
+                col1, col2 = st.columns([1, 9])
+                
+                with col1:
+                    st.markdown(f"""
+                    <div style="width: 40px; height: 40px; border-radius: 20px; background-color: {user_color}; 
+                             color: white; display: flex; align-items: center; justify-content: center; margin-top: 10px;">
+                        {comment['user'][0]}
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with col2:
+                    # Comment header
+                    st.markdown(f"""
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="font-weight: 500;">{comment['user']}</span>
+                        <span style="color: #666; font-size: 12px;">{comment['time']}</span>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    # Comment type badge if applicable
+                    if 'type' in comment and comment['type']:
+                        badge_color = {
+                            'question': '#3b82f6',
+                            'issue': '#ef4444',
+                            'suggestion': '#8b5cf6',
+                            'general': '#6b7280'
+                        }.get(comment['type'].lower(), '#6b7280')
+                        
+                        st.markdown(f"""
+                        <div style="display: inline-block; background-color: {badge_color}; color: white; 
+                                 border-radius: 12px; padding: 1px 8px; font-size: 12px; margin-bottom: 8px;">
+                            {comment['type']}
+                        </div>
+                        """, unsafe_allow_html=True)
+                    
+                    # Comment text
+                    st.markdown(f"<div style='margin-bottom: 5px;'>{comment['text']}</div>", unsafe_allow_html=True)
+                    
+                    # Comment actions
+                    action_col1, action_col2, action_col3 = st.columns([1, 1, 5])
+                    
+                    with action_col1:
+                        reply_button = st.button("Reply", key=f"reply_{comment['id']}")
+                        if reply_button:
+                            st.session_state[f"replying_to_{comment['id']}"] = True
+                    
+                    with action_col2:
+                        resolve_button = st.button("Resolve", key=f"resolve_{comment['id']}")
+                        if resolve_button:
+                            st.success(f"Comment resolved by {current_user}")
+                            
+                            # Track resolution in comment history
+                            add_comment_history_entry(
+                                comment_id=comment['id'],
+                                user_name=current_user,
+                                action="resolved",
+                            )
+            
+            # Show replies if any
+            if has_replies:
+                for reply in comment['replies']:
+                    reply_color = generate_user_color(reply['user'])
+                    
+                    # Indented reply
+                    with st.container():
+                        # Add indentation
+                        rep_col1, rep_col2, rep_col3 = st.columns([1, 1, 8])
+                        
+                        with rep_col2:
+                            st.markdown(f"""
+                            <div style="width: 30px; height: 30px; border-radius: 15px; background-color: {reply_color}; 
+                                     color: white; display: flex; align-items: center; justify-content: center; margin-top: 10px;">
+                                {reply['user'][0]}
+                            </div>
+                            """, unsafe_allow_html=True)
+                        
+                        with rep_col3:
+                            # Reply header
+                            st.markdown(f"""
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span style="font-weight: 500;">{reply['user']}</span>
+                                <span style="color: #666; font-size: 12px;">{reply['time']}</span>
+                            </div>
+                            <div style='margin-bottom: 5px;'>{reply['text']}</div>
+                            """, unsafe_allow_html=True)
+            
+            # Show reply form if active
+            if st.session_state.get(f"replying_to_{comment['id']}", False):
+                with st.container():
+                    # Add indentation
+                    rep_col1, rep_col2 = st.columns([2, 8])
+                    
+                    with rep_col2:
+                        reply_text = st.text_area(
+                            "Your reply", 
+                            key=f"reply_text_{comment['id']}",
+                            height=100
+                        )
+                        
+                        reply_col1, reply_col2 = st.columns([1, 1])
+                        
+                        with reply_col1:
+                            if st.button("Post Reply", key=f"post_reply_{comment['id']}"):
+                                if reply_text.strip():
+                                    st.success("Reply posted!")
+                                    
+                                    # In a real app, save to database
+                                    # Here we just clear the form
+                                    st.session_state[f"replying_to_{comment['id']}"] = False
+                                    st.session_state[f"reply_text_{comment['id']}"] = ""
+                                    
+                                    # Track in comment history
+                                    add_comment_history_entry(
+                                        comment_id=comment['id'],
+                                        user_name=current_user,
+                                        action="replied",
+                                        details=reply_text
+                                    )
+                                    
+                                    st.rerun()
+                                else:
+                                    st.error("Reply cannot be empty")
+                        
+                        with reply_col2:
+                            if st.button("Cancel", key=f"cancel_reply_{comment['id']}"):
+                                st.session_state[f"replying_to_{comment['id']}"] = False
+                                st.rerun()
+            
+            # Add separator between comments
+            st.markdown("<hr style='margin: 15px 0;'>", unsafe_allow_html=True)
+
+# Helper functions for real-time collaboration features
+
+def get_document_content(document_id):
+    """
+    Get the content of a document by ID.
+    
+    Args:
+        document_id (str): Identifier for the document
         
     Returns:
-        list: List of comments
+        str: Document content text
     """
     # In a real app, this would fetch from a database
-    # For this demo, we'll simulate with session state
+    # Here we return sample content for demonstration
     
-    if "document_comments" not in st.session_state:
-        st.session_state.document_comments = {}
+    if document_id == "DOC-001":
+        return """# Foundation Specifications
+
+## 1. General Requirements
+
+The foundation system shall be designed to support all applied loads, including both dead and live loads, as well as lateral loads such as wind and seismic forces. All work shall comply with ACI 318 and local building codes.
+
+## 2. Materials
+
+### 2.1 Concrete
+- Compressive Strength: 4,000 psi at 28 days
+- Water-Cement Ratio: Maximum 0.45
+- Air Content: 5-7%
+
+### 2.2 Reinforcement
+- Deformed Bars: ASTM A615, Grade 60
+- Welded Wire Fabric: ASTM A1064
+"""
+    elif document_id == "DOC-002":
+        return """# Electrical Specifications
+
+## 1. General Requirements
+
+All electrical work shall comply with the National Electrical Code (NEC) and local building codes. All materials shall be UL listed and labeled.
+
+## 2. Materials
+
+### 2.1 Conductors
+- Building Wire: THHN/THWN, copper, 600V
+- Cable: Type MC, copper, 600V
+
+### 2.2 Raceways
+- Conduit: Rigid galvanized steel (RGS)
+- EMT: Electro-galvanized steel
+"""
+    else:
+        return f"# Document {document_id}\n\nContent for this document is not available."
+
+def get_active_collaborators(document_id):
+    """
+    Get list of users currently collaborating on a document.
+    
+    Args:
+        document_id (str): Identifier for the document
         
-    if document_id not in st.session_state.document_comments:
-        # Generate some sample comments
-        st.session_state.document_comments[document_id] = [
+    Returns:
+        list: List of active collaborator information
+    """
+    # In a real app, this would track active users in real-time
+    # For demo, return some sample users
+    return [
+        {"name": "John Smith", "color": "#3b82f6"},
+        {"name": "Sarah Johnson", "color": "#8b5cf6"},
+        {"name": "Mike Chen", "color": "#10b981"},
+    ]
+
+def get_document_comments(document_id):
+    """
+    Get comments for a document.
+    
+    Args:
+        document_id (str): Identifier for the document
+        
+    Returns:
+        list: List of comment objects
+    """
+    # In a real app, this would fetch from a database
+    # Here we return sample comments for demonstration
+    
+    if document_id == "DOC-001":
+        return [
             {
                 "id": "comment1",
-                "user": {"id": "user1", "name": "John Smith", "avatar": "JS"},
-                "timestamp": "2025-05-15T10:30:00",
-                "text": "Please review section 3.2 of this document.",
-                "mentions": [],
-                "reactions": {"👍": 2, "👎": 0},
+                "user": "Sarah Johnson",
+                "time": "Yesterday at 3:45 PM",
+                "type": "Question",
+                "text": "Should we specify a minimum thickness for the foundation slab?",
                 "replies": [
                     {
                         "id": "reply1",
-                        "user": {"id": "user2", "name": "Sarah Johnson", "avatar": "SJ"},
-                        "timestamp": "2025-05-15T11:15:00",
-                        "text": "I've made the requested changes.",
-                        "mentions": ["user1"],
-                        "reactions": {"👍": 1}
+                        "user": "John Smith",
+                        "time": "Yesterday at 4:15 PM",
+                        "text": "Yes, I'll add a minimum of 12 inches for the main foundation."
                     }
                 ]
             },
             {
                 "id": "comment2",
-                "user": {"id": "user3", "name": "Mike Chen", "avatar": "MC"},
-                "timestamp": "2025-05-16T09:45:00",
-                "text": "The dimensions on page 5 need to be updated to match the revised plans.",
-                "mentions": ["user2"],
-                "reactions": {"👍": 0, "👎": 0},
+                "user": "Mike Chen",
+                "time": "2 days ago",
+                "type": "Issue",
+                "text": "The reinforcement spacing doesn't match the structural engineer's latest calculations. We need to update this.",
                 "replies": []
             }
         ]
-    
-    return st.session_state.document_comments[document_id]
-
-def add_document_comment(document_id, user_data, comment_text, mentions=None, parent_id=None):
-    """Add a comment to a document.
-    
-    Args:
-        document_id (str): Document ID
-        user_data (dict): User data of commenter
-        comment_text (str): Comment text
-        mentions (list): List of user IDs mentioned
-        parent_id (str): Parent comment ID for replies
-        
-    Returns:
-        dict: Newly created comment
-    """
-    # Initialize if needed
-    if "document_comments" not in st.session_state:
-        st.session_state.document_comments = {}
-        
-    if document_id not in st.session_state.document_comments:
-        st.session_state.document_comments[document_id] = []
-    
-    # Create new comment
-    comment = {
-        "id": str(uuid.uuid4()),
-        "user": user_data,
-        "timestamp": datetime.now().isoformat(),
-        "text": comment_text,
-        "mentions": mentions or [],
-        "reactions": {},
-        "replies": []
-    }
-    
-    # Add as reply or top-level comment
-    if parent_id:
-        # Find parent comment
-        for existing_comment in st.session_state.document_comments[document_id]:
-            if existing_comment["id"] == parent_id:
-                existing_comment["replies"].append(comment)
-                break
-    else:
-        # Add as top-level comment
-        st.session_state.document_comments[document_id].append(comment)
-    
-    # Notify mentioned users (in real app, this would send notifications)
-    if mentions:
-        for user_id in mentions:
-            # Mock notification that would be sent to the user
-            notification = {
-                "type": "mention",
-                "sender": user_data,
-                "document_id": document_id,
-                "comment_id": comment["id"],
-                "timestamp": comment["timestamp"]
+    elif document_id == "DOC-002":
+        return [
+            {
+                "id": "comment3",
+                "user": "Lisa Rodriguez",
+                "time": "Today at 9:30 AM",
+                "type": "Suggestion",
+                "text": "We should add specifications for LED lighting fixtures throughout the building.",
+                "replies": []
             }
-            # In a real app, this would send the notification to the user
-    
-    return comment
-
-def add_reaction_to_comment(document_id, comment_id, reaction, user_id, is_reply=False, parent_id=None):
-    """Add a reaction to a comment.
-    
-    Args:
-        document_id (str): Document ID
-        comment_id (str): Comment ID
-        reaction (str): Reaction emoji
-        user_id (str): User ID adding the reaction
-        is_reply (bool): Whether the comment is a reply
-        parent_id (str): Parent comment ID if is_reply is True
-        
-    Returns:
-        bool: True if successful, False otherwise
-    """
-    # Make sure document exists
-    if "document_comments" not in st.session_state or document_id not in st.session_state.document_comments:
-        return False
-    
-    # Find the comment
-    if is_reply and parent_id:
-        for comment in st.session_state.document_comments[document_id]:
-            if comment["id"] == parent_id:
-                for reply in comment["replies"]:
-                    if reply["id"] == comment_id:
-                        # Add reaction
-                        if reaction not in reply["reactions"]:
-                            reply["reactions"][reaction] = 0
-                        reply["reactions"][reaction] += 1
-                        return True
-    else:
-        for comment in st.session_state.document_comments[document_id]:
-            if comment["id"] == comment_id:
-                # Add reaction
-                if reaction not in comment["reactions"]:
-                    comment["reactions"][reaction] = 0
-                comment["reactions"][reaction] += 1
-                return True
-    
-    return False
-
-def parse_mentions(text):
-    """Parse @mentions in text.
-    
-    Args:
-        text (str): Text to parse
-        
-    Returns:
-        list: List of mentioned user IDs
-    """
-    # In a real application, this would match user handles and IDs
-    # For this demo, we'll do a simple parsing
-    
-    # Mock user mapping for demonstration
-    user_handles = {
-        "@john": "user1",
-        "@sarah": "user2",
-        "@mike": "user3",
-        "@lisa": "user4"
-    }
-    
-    mentioned_users = []
-    
-    # Check for each handle
-    for handle, user_id in user_handles.items():
-        if handle in text:
-            mentioned_users.append(user_id)
-    
-    return mentioned_users
-
-
-# ----- Collaboration UI Components -----
-
-def render_comment_thread(document_id, current_user):
-    """Render a comment thread for a document.
-    
-    Args:
-        document_id (str): Document ID
-        current_user (dict): Current user data
-        
-    Returns:
-        None
-    """
-    # Get comments for the document
-    comments = get_document_comments(document_id)
-    
-    # Render comments UI
-    st.markdown("### Comments")
-    
-    if not comments:
-        st.info("No comments yet. Be the first to comment!")
-    
-    # Render each comment
-    for comment in comments:
-        render_comment(comment, document_id, current_user)
-    
-    # Add new comment
-    st.markdown("### Add Comment")
-    new_comment = st.text_area("Write a comment (use @username to mention someone)", key=f"new_comment_{document_id}")
-    
-    if st.button("Post Comment", key=f"post_comment_{document_id}"):
-        if new_comment:
-            # Parse mentions
-            mentions = parse_mentions(new_comment)
-            
-            # Add comment
-            add_document_comment(document_id, current_user, new_comment, mentions)
-            
-            # Clear input and show success
-            st.success("Comment posted!")
-            st.session_state[f"new_comment_{document_id}"] = ""
-            st.rerun()
-
-def render_comment(comment, document_id, current_user, is_reply=False):
-    """Render a single comment.
-    
-    Args:
-        comment (dict): Comment data
-        document_id (str): Document ID
-        current_user (dict): Current user data
-        is_reply (bool): Whether the comment is a reply
-        
-    Returns:
-        None
-    """
-    # Comment container
-    indent = "40px" if is_reply else "0px"
-    
-    st.markdown(f"""
-    <div style="margin-left: {indent}; margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
-        <div style="display: flex; align-items: center; margin-bottom: 8px;">
-            <div style="width: 30px; height: 30px; border-radius: 50%; background-color: #3B82F6; color: white; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
-                {comment["user"]["avatar"]}
-            </div>
-            <div>
-                <div style="font-weight: bold;">{comment["user"]["name"]}</div>
-                <div style="font-size: 0.8em; color: #666;">{format_timestamp(comment["timestamp"])}</div>
-            </div>
-        </div>
-        <div style="margin-bottom: 10px;">{format_comment_text(comment["text"])}</div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Reactions
-    reaction_col1, reaction_col2, reaction_col3 = st.columns([1, 1, 10])
-    
-    with reaction_col1:
-        thumbs_up_count = comment["reactions"].get("👍", 0)
-        if st.button(f"👍 {thumbs_up_count}", key=f"thumbs_up_{comment['id']}"):
-            add_reaction_to_comment(document_id, comment["id"], "👍", current_user["id"], is_reply)
-            st.rerun()
-    
-    with reaction_col2:
-        thumbs_down_count = comment["reactions"].get("👎", 0)
-        if st.button(f"👎 {thumbs_down_count}", key=f"thumbs_down_{comment['id']}"):
-            add_reaction_to_comment(document_id, comment["id"], "👎", current_user["id"], is_reply)
-            st.rerun()
-    
-    # Show replies if any
-    if not is_reply and comment["replies"]:
-        with st.expander(f"View {len(comment['replies'])} replies", expanded=True):
-            for reply in comment["replies"]:
-                render_comment(reply, document_id, current_user, is_reply=True)
-    
-    # Reply input (only for top-level comments)
-    if not is_reply:
-        reply_text = st.text_input("Reply to this comment", key=f"reply_{comment['id']}")
-        
-        if st.button("Reply", key=f"post_reply_{comment['id']}"):
-            if reply_text:
-                # Parse mentions
-                mentions = parse_mentions(reply_text)
-                
-                # Always mention the original commenter
-                if comment["user"]["id"] not in mentions:
-                    mentions.append(comment["user"]["id"])
-                
-                # Add reply
-                add_document_comment(document_id, current_user, reply_text, mentions, comment["id"])
-                
-                # Clear input and show success
-                st.success("Reply posted!")
-                st.session_state[f"reply_{comment['id']}"] = ""
-                st.rerun()
-
-def format_timestamp(timestamp_str):
-    """Format timestamp for display.
-    
-    Args:
-        timestamp_str (str): ISO format timestamp string
-        
-    Returns:
-        str: Formatted timestamp
-    """
-    try:
-        timestamp = datetime.fromisoformat(timestamp_str)
-        now = datetime.now()
-        
-        # Calculate the time difference
-        diff = now - timestamp
-        
-        # Format based on difference
-        if diff.days == 0:
-            # Today - show time
-            return timestamp.strftime("Today at %I:%M %p")
-        elif diff.days == 1:
-            # Yesterday
-            return "Yesterday"
-        elif diff.days < 7:
-            # This week
-            return timestamp.strftime("%A")  # Day name
-        else:
-            # Older
-            return timestamp.strftime("%b %d, %Y")
-    
-    except Exception:
-        # Fallback for any parsing issues
-        return timestamp_str
-
-def format_comment_text(text):
-    """Format comment text with mentions, links, etc.
-    
-    Args:
-        text (str): Comment text
-        
-    Returns:
-        str: Formatted comment text
-    """
-    # Mock user mapping for demonstration
-    user_handles = {
-        "@john": '<span style="color: #3B82F6; font-weight: bold;">@john</span>',
-        "@sarah": '<span style="color: #3B82F6; font-weight: bold;">@sarah</span>',
-        "@mike": '<span style="color: #3B82F6; font-weight: bold;">@mike</span>',
-        "@lisa": '<span style="color: #3B82F6; font-weight: bold;">@lisa</span>'
-    }
-    
-    # Replace mentions with styled versions
-    for handle, styled in user_handles.items():
-        text = text.replace(handle, styled)
-    
-    return text
-
-def render_collaboration_chat(channel="general", height=400):
-    """Render a collaboration chat interface.
-    
-    Args:
-        channel (str): Chat channel to display
-        height (int): Height of the chat window
-        
-    Returns:
-        None
-    """
-    # Initialize WebSocket connection
-    ws_manager = MockWebSocketManager()
-    ws_manager.connect()
-    
-    # Mock current user
-    if "current_user" not in st.session_state:
-        st.session_state.current_user = {
-            "id": "current_user",
-            "name": "You",
-            "avatar": "YO",
-            "role": "Project Engineer"
-        }
-    
-    current_user = st.session_state.current_user
-    
-    # Get online users
-    online_users = ws_manager.get_online_users()
-    
-    # Display the chat window
-    st.markdown(f"""
-    <div style="border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px;">
-        <div style="background-color: #f0f0f0; padding: 8px 15px; border-bottom: 1px solid #ddd; font-weight: bold;">
-            {channel.capitalize()} Chat
-        </div>
-        <div id="chat-messages" style="height: {height-50}px; overflow-y: auto; padding: 10px; background-color: #fff;">
-    """, unsafe_allow_html=True)
-    
-    # Get messages for the channel
-    messages = ws_manager.get_messages(channel)
-    
-    # If no messages, show a placeholder
-    if not messages:
-        st.markdown("No messages yet. Start the conversation!")
-    
-    # Otherwise, display the messages
-    for message in messages:
-        data = message["data"]
-        timestamp = format_timestamp(message["timestamp"])
-        
-        # Message container
-        message_html = f"""
-        <div style="margin-bottom: 10px; {'text-align: right;' if data['user']['id'] == current_user['id'] else ''}">
-            <div style="display: inline-block; max-width: 80%; background-color: {'#e2f0fd' if data['user']['id'] == current_user['id'] else '#f1f1f1'}; border-radius: 10px; padding: 8px 12px;">
-                <div style="font-size: 0.8em; color: #666; margin-bottom: 3px;">
-                    {data['user']['name'] if data['user']['id'] != current_user['id'] else 'You'} • {timestamp}
-                </div>
-                <div>{format_comment_text(data['text'])}</div>
-            </div>
-        </div>
-        """
-        
-        st.markdown(message_html, unsafe_allow_html=True)
-    
-    # Close the chat window div
-    st.markdown("</div></div>", unsafe_allow_html=True)
-    
-    # Message input area
-    message_text = st.text_input("Type a message (use @username to mention)", key=f"chat_input_{channel}")
-    
-    col1, col2 = st.columns([4, 1])
-    
-    with col1:
-        # Show typing indicator (simulated)
-        if "typing_users" not in st.session_state:
-            st.session_state.typing_users = []
-            
-        if st.session_state.typing_users:
-            typing_text = ", ".join([u["name"] for u in st.session_state.typing_users])
-            st.caption(f"{typing_text} {'is' if len(st.session_state.typing_users) == 1 else 'are'} typing...")
-    
-    with col2:
-        # Send button
-        if st.button("Send", key=f"send_button_{channel}"):
-            if message_text:
-                # Parse mentions
-                mentions = parse_mentions(message_text)
-                
-                # Send message
-                ws_manager.send_message(channel, {
-                    "user": current_user,
-                    "text": message_text,
-                    "mentions": mentions
-                })
-                
-                # Clear input
-                st.session_state[f"chat_input_{channel}"] = ""
-                st.rerun()
-    
-    # Online users sidebar
-    with st.sidebar:
-        st.subheader("Online Users")
-        
-        for user in online_users:
-            status_color = "green" if user["status"] == "online" else "orange" if user["status"] == "away" else "gray"
-            
-            st.markdown(f"""
-            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {status_color}; margin-right: 10px;"></div>
-                <div>{user["name"]} <span style="font-size: 0.8em; color: #666;">({user["role"]})</span></div>
-            </div>
-            """, unsafe_allow_html=True)
-
-
-# ----- Document Collaboration UI -----
-
-def render_document_collaboration(document_id, document_title, document_content, current_user=None):
-    """Render a collaborative document editor.
-    
-    Args:
-        document_id (str): Document ID
-        document_title (str): Document title
-        document_content (str): Document content (can be HTML)
-        current_user (dict): Current user, defaults to session
-        
-    Returns:
-        None
-    """
-    # Use the provided user or session user
-    if current_user is None:
-        if "current_user" not in st.session_state:
-            st.session_state.current_user = {
-                "id": "current_user",
-                "name": "You",
-                "avatar": "YO",
-                "role": "Project Engineer"
-            }
-        current_user = st.session_state.current_user
-    
-    # Document header
-    st.title(document_title)
-    
-    # Status indicators
-    col1, col2, col3 = st.columns([1, 1, 5])
-    
-    with col1:
-        st.markdown("""
-        <div style="display: flex; align-items: center;">
-            <div style="width: 10px; height: 10px; border-radius: 50%; background-color: green; margin-right: 5px;"></div>
-            <div style="font-size: 0.9em;">3 viewers</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown("""
-        <div style="display: flex; align-items: center;">
-            <div style="width: 10px; height: 10px; border-radius: 50%; background-color: orange; margin-right: 5px;"></div>
-            <div style="font-size: 0.9em;">Last edit: 5m ago</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Document tabs (Document, Comments, History)
-    tabs = st.tabs(["Document", "Comments", "History"])
-    
-    # Document tab
-    with tabs[0]:
-        # Document content (HTML)
-        st.markdown(document_content, unsafe_allow_html=True)
-        
-        # Edit button
-        if st.button("Edit Document"):
-            st.info("Document editing would be implemented here. In a real application, this would use WebSockets for real-time collaboration.")
-    
-    # Comments tab
-    with tabs[1]:
-        render_comment_thread(document_id, current_user)
-    
-    # History tab
-    with tabs[2]:
-        st.markdown("### Document History")
-        
-        # Mock history data
-        history = [
-            {"user": "Sarah Johnson", "action": "Updated section 3.2", "timestamp": "2025-05-16T15:30:00"},
-            {"user": "John Smith", "action": "Added new diagrams", "timestamp": "2025-05-14T11:20:00"},
-            {"user": "Mike Chen", "action": "Initial document creation", "timestamp": "2025-05-10T09:45:00"}
         ]
+    else:
+        return []
+
+def add_revision_history_entry(document_id, user_name, action, details=None):
+    """
+    Add an entry to document revision history.
+    
+    Args:
+        document_id (str): Identifier for the document
+        user_name (str): Name of the user making the change
+        action (str): Type of action performed
+        details (str, optional): Additional details about the action
+    """
+    # In a real app, this would save to a database
+    # Here we just print a message to simulate this
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    details_str = f": {details}" if details else ""
+    
+    st.write(f"Added to history: {timestamp} - {user_name} {action}{details_str}")
+
+def add_comment_history_entry(comment_id, user_name, action, details=None):
+    """
+    Add an entry to comment history.
+    
+    Args:
+        comment_id (str): Identifier for the comment
+        user_name (str): Name of the user performing the action
+        action (str): Type of action performed
+        details (str, optional): Additional details about the action
+    """
+    # In a real app, this would save to a database
+    # Here we just print a message to simulate this
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    details_str = f": {details}" if details else ""
+    
+    st.write(f"Comment {comment_id}: {timestamp} - {user_name} {action}{details_str}")
+
+def generate_user_color(username):
+    """
+    Generate a consistent color for a user based on their username.
+    
+    Args:
+        username (str): The username
         
-        for entry in history:
-            st.markdown(f"""
-            <div style="margin-bottom: 10px; padding: 8px; border-left: 2px solid #3B82F6;">
-                <div style="font-weight: bold;">{entry['action']}</div>
-                <div style="font-size: 0.8em; color: #666;">{entry['user']} • {format_timestamp(entry['timestamp'])}</div>
-            </div>
-            """, unsafe_allow_html=True)
+    Returns:
+        str: A hex color code
+    """
+    # Simple hash function to generate a color based on username
+    colors = [
+        "#3b82f6",  # Blue
+        "#10b981",  # Green
+        "#8b5cf6",  # Purple
+        "#ef4444",  # Red
+        "#f59e0b",  # Orange
+        "#6366f1",  # Indigo
+        "#ec4899",  # Pink
+        "#14b8a6",  # Teal
+    ]
+    
+    # Use a hash of the username to pick a consistent color
+    color_index = sum(ord(c) for c in username) % len(colors)
+    return colors[color_index]

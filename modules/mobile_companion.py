@@ -1,490 +1,724 @@
 """
-Mobile companion module for the gcPanel application.
+Mobile Companion module for gcPanel.
 
-This module provides the mobile companion interface showing how the
-construction management dashboard can be accessed on mobile devices.
+This module provides a dedicated mobile interface for field personnel,
+with PWA support for offline capabilities, optimized layouts for smaller screens,
+and quick access to field-relevant features.
 """
 
 import streamlit as st
-from components.mobile_app.layout import render_mobile_header, render_mobile_bottom_nav, render_mobile_frame
+from datetime import datetime, timedelta
+import random
+import json
 
-def mobile_dashboard():
-    """
-    Render a mobile-optimized dashboard with key metrics and activity.
-    """
-    # Render the header
-    render_mobile_header()
+# Import mobile utilities
+from utils.mobile.responsive_layout import add_mobile_styles, create_responsive_card, create_mobile_list_item, create_mobile_tab_layout
+from utils.mobile.pwa_support import setup_pwa, check_offline_status, cache_file_for_offline, get_cached_files
+
+def render_mobile_companion():
+    """Render the mobile companion dashboard optimized for field personnel."""
+    # Add mobile-friendly styles
+    add_mobile_styles()
     
+    # Set up PWA support for offline access
+    setup_pwa()
+    
+    # Check if we're in offline mode
+    is_offline = check_offline_status()
+    
+    # Display header with project information
     st.markdown("""
-    <div style="padding: 0 10px 60px 10px;">  <!-- Add padding at bottom for the nav bar -->
-        <h2 style="font-size: 20px; margin: 15px 0;">Highland Tower Development</h2>
-        
-        <!-- Project Progress Card -->
-        <div style="background-color: white; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-                    padding: 15px; margin-bottom: 15px;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                    <div style="font-size: 14px; color: #5F6368;">Overall Progress</div>
-                    <div style="font-size: 24px; font-weight: 600; color: #3367D6;">72%</div>
-                </div>
-                <div style="background-color: #E8F0FE; border-radius: 50%; width: 40px; height: 40px; 
-                            display: flex; align-items: center; justify-content: center;">
-                    <span class="material-icons" style="color: #3367D6;">trending_up</span>
-                </div>
-            </div>
-            <div style="height: 8px; background-color: #E8F0FE; border-radius: 4px; margin: 10px 0;">
-                <div style="height: 8px; width: 72%; background-color: #3367D6; border-radius: 4px;"></div>
-            </div>
-            <div style="font-size: 12px; color: #5F6368;">Updated today at 9:30 AM</div>
-        </div>
-        
-        <!-- Quick Stats -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-            <div style="background-color: white; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 15px;">
-                <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                    <span class="material-icons" style="color: #FF5252; margin-right: 5px;">flag</span>
-                    <div style="font-size: 14px; color: #5F6368;">Tasks Due</div>
-                </div>
-                <div style="font-size: 24px; font-weight: 600; color: #FF5252;">8</div>
-            </div>
-            <div style="background-color: white; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 15px;">
-                <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                    <span class="material-icons" style="color: #4285F4; margin-right: 5px;">question_answer</span>
-                    <div style="font-size: 14px; color: #5F6368;">Open RFIs</div>
-                </div>
-                <div style="font-size: 24px; font-weight: 600; color: #4285F4;">12</div>
-            </div>
-        </div>
-        
-        <!-- Today's Schedule -->
-        <h3 style="font-size: 16px; margin: 15px 0;">Today's Schedule</h3>
-        <div style="background-color: white; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-                    padding: 15px; margin-bottom: 15px;">
-            <div style="border-left: 3px solid #4285F4; padding-left: 10px; margin-bottom: 10px;">
-                <div style="font-weight: 500; font-size: 14px;">9:00 AM - Site Inspection</div>
-                <div style="font-size: 12px; color: #5F6368;">East Wing, Floor 3</div>
-            </div>
-            <div style="border-left: 3px solid #0F9D58; padding-left: 10px; margin-bottom: 10px;">
-                <div style="font-weight: 500; font-size: 14px;">11:30 AM - Team Meeting</div>
-                <div style="font-size: 12px; color: #5F6368;">Project Office</div>
-            </div>
-            <div style="border-left: 3px solid #DB4437; padding-left: 10px;">
-                <div style="font-weight: 500; font-size: 14px;">2:00 PM - Concrete Pour</div>
-                <div style="font-size: 12px; color: #5F6368;">West Foundation</div>
-            </div>
-        </div>
-        
-        <!-- Recent Activity -->
-        <h3 style="font-size: 16px; margin: 15px 0;">Recent Activity</h3>
-        <div style="background-color: white; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-                    padding: 15px; margin-bottom: 15px;">
-            <div style="display: flex; margin-bottom: 12px;">
-                <span class="material-icons" style="color: #4285F4; margin-right: 10px;">question_answer</span>
-                <div>
-                    <div style="font-weight: 500; font-size: 14px;">RFI #123 was answered</div>
-                    <div style="font-size: 12px; color: #5F6368;">2 hours ago</div>
-                </div>
-            </div>
-            <div style="display: flex; margin-bottom: 12px;">
-                <span class="material-icons" style="color: #0F9D58; margin-right: 10px;">check_circle</span>
-                <div>
-                    <div style="font-weight: 500; font-size: 14px;">Submittal #45 was approved</div>
-                    <div style="font-size: 12px; color: #5F6368;">Yesterday</div>
-                </div>
-            </div>
-            <div style="display: flex;">
-                <span class="material-icons" style="color: #DB4437; margin-right: 10px;">warning</span>
-                <div>
-                    <div style="font-weight: 500; font-size: 14px;">Issue reported on Floor 5</div>
-                    <div style="font-size: 12px; color: #5F6368;">Yesterday</div>
-                </div>
-            </div>
-        </div>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h1 style="font-size: 1.8rem; margin-bottom: 5px;">Highland Tower</h1>
+        <p style="color: #666; margin: 0;">Field Companion</p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Render the bottom navigation
-    render_mobile_bottom_nav()
-
-def mobile_tasks():
-    """
-    Render a mobile-optimized tasks list.
-    """
-    # Render the header
-    render_mobile_header()
+    # Display offline indicator if needed
+    if is_offline:
+        st.warning("⚠️ You are currently in offline mode. Some features may be limited.")
     
+    # Quick action buttons
+    render_quick_actions()
+    
+    # Create a tabbed interface for different sections
+    tabs = [
+        {"icon": "📋", "label": "Activities", "content": render_todays_activities()},
+        {"icon": "⚠️", "label": "Issues", "content": render_field_issues()},
+        {"icon": "📄", "label": "Documents", "content": render_offline_documents()},
+        {"icon": "✅", "label": "Safety", "content": render_safety_checklist()},
+        {"icon": "🌤️", "label": "Weather", "content": render_weather_conditions()}
+    ]
+    
+    selected_tab = create_mobile_tab_layout(tabs)
+    
+    # Add a floating action button for quick report
     st.markdown("""
-    <div style="padding: 0 10px 60px 10px;">
-        <h2 style="font-size: 20px; margin: 15px 0;">Tasks</h2>
-        
-        <!-- Filter options -->
-        <div style="display: flex; margin-bottom: 15px; background-color: #F8F9FA; border-radius: 20px; padding: 5px;">
-            <button style="flex: 1; background-color: #3367D6; color: white; border: none; 
-                          border-radius: 20px; padding: 8px; font-size: 14px; font-weight: 500;">My Tasks</button>
-            <button style="flex: 1; background: none; border: none; color: #5F6368; 
-                          border-radius: 20px; padding: 8px; font-size: 14px;">All Tasks</button>
-        </div>
-        
-        <!-- Tasks list -->
-        <div style="background-color: white; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-                    margin-bottom: 15px;">
-            <!-- Task 1 -->
-            <div style="padding: 15px; border-bottom: 1px solid #F1F3F4; display: flex; align-items: flex-start;">
-                <div style="margin-right: 10px; padding-top: 2px;">
-                    <span class="material-icons" style="color: #FF5252; font-size: 20px;">priority_high</span>
-                </div>
-                <div style="flex-grow: 1;">
-                    <div style="font-weight: 500; margin-bottom: 5px;">Submit foundation inspection request</div>
-                    <div style="font-size: 12px; display: flex; color: #5F6368; margin-bottom: 8px;">
-                        <span style="margin-right: 10px;">Due: May 22, 2025</span>
-                        <span>Assigned to you</span>
-                    </div>
-                    <div style="display: flex; align-items: center;">
-                        <span style="font-size: 12px; background-color: #FFEBEE; color: #FF5252; 
-                                    padding: 2px 8px; border-radius: 10px; margin-right: 8px;">High Priority</span>
-                        <span style="font-size: 12px; background-color: #E8F0FE; color: #3367D6; 
-                                    padding: 2px 8px; border-radius: 10px;">Permit</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Task 2 -->
-            <div style="padding: 15px; border-bottom: 1px solid #F1F3F4; display: flex; align-items: flex-start;">
-                <div style="margin-right: 10px; padding-top: 2px;">
-                    <span class="material-icons" style="color: #4285F4; font-size: 20px;">arrow_right</span>
-                </div>
-                <div style="flex-grow: 1;">
-                    <div style="font-weight: 500; margin-bottom: 5px;">Review structural steel shop drawings</div>
-                    <div style="font-size: 12px; display: flex; color: #5F6368; margin-bottom: 8px;">
-                        <span style="margin-right: 10px;">Due: May 24, 2025</span>
-                        <span>Assigned to you</span>
-                    </div>
-                    <div style="display: flex; align-items: center;">
-                        <span style="font-size: 12px; background-color: #E8F0FE; color: #4285F4; 
-                                    padding: 2px 8px; border-radius: 10px; margin-right: 8px;">Medium Priority</span>
-                        <span style="font-size: 12px; background-color: #E8F0FE; color: #3367D6; 
-                                    padding: 2px 8px; border-radius: 10px;">Submittal</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Task 3 -->
-            <div style="padding: 15px; display: flex; align-items: flex-start;">
-                <div style="margin-right: 10px; padding-top: 2px;">
-                    <span class="material-icons" style="color: #5F6368; font-size: 20px;">arrow_right</span>
-                </div>
-                <div style="flex-grow: 1;">
-                    <div style="font-weight: 500; margin-bottom: 5px;">Finalize interior finish selections</div>
-                    <div style="font-size: 12px; display: flex; color: #5F6368; margin-bottom: 8px;">
-                        <span style="margin-right: 10px;">Due: May 30, 2025</span>
-                        <span>Assigned to you</span>
-                    </div>
-                    <div style="display: flex; align-items: center;">
-                        <span style="font-size: 12px; background-color: #F1F3F4; color: #5F6368; 
-                                    padding: 2px 8px; border-radius: 10px; margin-right: 8px;">Low Priority</span>
-                        <span style="font-size: 12px; background-color: #E8F0FE; color: #3367D6; 
-                                    padding: 2px 8px; border-radius: 10px;">Design</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Floating Action Button -->
-        <div style="position: fixed; bottom: 70px; right: 20px; z-index: 1001;">
-            <button style="width: 56px; height: 56px; border-radius: 28px; background-color: #3367D6; 
-                         border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.2); display: flex; 
-                         align-items: center; justify-content: center;">
-                <span class="material-icons" style="color: white; font-size: 24px;">add</span>
-            </button>
-        </div>
+    <div class="mobile-action-button" onclick="document.getElementById('report_issue_button').click()">
+        ➕
     </div>
     """, unsafe_allow_html=True)
     
-    # Render the bottom navigation
-    render_mobile_bottom_nav()
-
-def render_mobile_screen():
-    """
-    Display the mobile app based on the selected screen.
-    """
-    # Get current page from session state
-    current_page = st.session_state.get("mobile_page", "dashboard")
+    # Hidden button for the floating action
+    if st.button("Report Issue", key="report_issue_button"):
+        st.session_state.show_issue_form = True
+        st.rerun()
     
-    # Render the appropriate page
-    if current_page == "dashboard":
-        mobile_dashboard()
-    elif current_page == "tasks":
-        mobile_tasks()
-    else:
-        # Placeholder for other screens
-        render_mobile_header()
-        st.markdown(f"""
-        <div style="padding: 20px; text-align: center; margin-top: 40px;">
-            <span class="material-icons" style="font-size: 48px; color: #3367D6;">{
-                "photo_camera" if current_page == "photos" else
-                "description" if current_page == "docs" else
-                "more_horiz"
-            }</span>
-            <h2 style="margin-top: 20px; font-size: 20px;">Coming Soon</h2>
-            <p style="color: #5F6368; margin-top: 10px;">
-                The {
-                    "Photos" if current_page == "photos" else
-                    "Documents" if current_page == "docs" else
-                    "More Options"
-                } section is under development.
-            </p>
+    # Display issue form if needed
+    if st.session_state.get("show_issue_form", False):
+        with st.form("issue_report_form"):
+            st.subheader("Report Field Issue")
+            
+            issue_type = st.selectbox("Issue Type", [
+                "Safety Concern", "Quality Issue", "Material Shortage",
+                "Equipment Problem", "Design Conflict", "Other"
+            ])
+            
+            location = st.text_input("Location (Floor/Zone/Room)")
+            description = st.text_area("Description")
+            priority = st.select_slider("Priority", options=["Low", "Medium", "High", "Critical"])
+            
+            photo_col, assign_col = st.columns(2)
+            with photo_col:
+                photo = st.file_uploader("Add Photo", type=["jpg", "jpeg", "png"])
+            
+            with assign_col:
+                assigned_to = st.selectbox("Assign to", [
+                    "Site Supervisor", "Project Manager", "Safety Officer", 
+                    "Quality Control", "Subcontractor"
+                ])
+            
+            submit_col, cancel_col = st.columns(2)
+            with submit_col:
+                submit = st.form_submit_button("Submit Issue")
+            
+            with cancel_col:
+                cancel = st.form_submit_button("Cancel")
+            
+            if submit:
+                # Process issue submission
+                st.success("Issue reported successfully!")
+                st.session_state.show_issue_form = False
+                st.rerun()
+            
+            if cancel:
+                st.session_state.show_issue_form = False
+                st.rerun()
+
+def render_quick_actions():
+    """Render quick action buttons for field tasks."""
+    # Create a 2x2 grid of quick action buttons
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        <div class="mobile-card" onclick="document.getElementById('qa_check_btn').click()">
+            <div style="font-size: 2rem; text-align: center; margin-bottom: 10px;">🔍</div>
+            <div style="text-align: center; font-weight: 500;">QA Check</div>
         </div>
         """, unsafe_allow_html=True)
-        render_mobile_bottom_nav()
+        
+        qa_clicked = st.button("QA Check", key="qa_check_btn")
+        if qa_clicked:
+            st.session_state.quick_action = "qa_check"
+            st.rerun()
+    
+    with col2:
+        st.markdown("""
+        <div class="mobile-card" onclick="document.getElementById('daily_log_btn').click()">
+            <div style="font-size: 2rem; text-align: center; margin-bottom: 10px;">📝</div>
+            <div style="text-align: center; font-weight: 500;">Daily Log</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        log_clicked = st.button("Daily Log", key="daily_log_btn")
+        if log_clicked:
+            st.session_state.quick_action = "daily_log"
+            st.rerun()
+    
+    col3, col4 = st.columns(2)
+    
+    with col3:
+        st.markdown("""
+        <div class="mobile-card" onclick="document.getElementById('material_track_btn').click()">
+            <div style="font-size: 2rem; text-align: center; margin-bottom: 10px;">📦</div>
+            <div style="text-align: center; font-weight: 500;">Materials</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        material_clicked = st.button("Materials", key="material_track_btn")
+        if material_clicked:
+            st.session_state.quick_action = "materials"
+            st.rerun()
+    
+    with col4:
+        st.markdown("""
+        <div class="mobile-card" onclick="document.getElementById('photo_doc_btn').click()">
+            <div style="font-size: 2rem; text-align: center; margin-bottom: 10px;">📸</div>
+            <div style="text-align: center; font-weight: 500;">Photo Doc</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        photo_clicked = st.button("Photo Doc", key="photo_doc_btn")
+        if photo_clicked:
+            st.session_state.quick_action = "photo_doc"
+            st.rerun()
+    
+    # Handle quick action selection
+    if st.session_state.get("quick_action") == "qa_check":
+        st.subheader("Quality Assurance Check")
+        
+        qa_type = st.selectbox("Check Type", [
+            "Concrete Placement", "Steel Erection", "Mechanical Installation",
+            "Electrical Installation", "Finishes Inspection"
+        ])
+        
+        location = st.text_input("Location")
+        notes = st.text_area("Inspection Notes")
+        status = st.radio("Status", ["Pass", "Fail", "Pending Correction"])
+        
+        if st.button("Submit QA Check"):
+            st.success("QA Check submitted successfully!")
+            st.session_state.pop("quick_action")
+            st.rerun()
+            
+        if st.button("Cancel", key="cancel_qa"):
+            st.session_state.pop("quick_action")
+            st.rerun()
+    
+    elif st.session_state.get("quick_action") == "daily_log":
+        st.subheader("Daily Field Log")
+        
+        date = st.date_input("Date", datetime.now())
+        weather = st.selectbox("Weather Conditions", [
+            "Sunny", "Partly Cloudy", "Overcast", "Rain", "Snow", "Windy"
+        ])
+        
+        temp_col, wind_col = st.columns(2)
+        with temp_col:
+            temperature = st.number_input("Temperature (°F)", 0, 120, 75)
+        
+        with wind_col:
+            wind = st.number_input("Wind Speed (mph)", 0, 100, 5)
+        
+        workers = st.number_input("Workers on Site", 0, 500, 35)
+        activities = st.text_area("Activities Performed")
+        issues = st.text_area("Issues/Delays Encountered")
+        
+        if st.button("Submit Daily Log"):
+            st.success("Daily Log submitted successfully!")
+            st.session_state.pop("quick_action")
+            st.rerun()
+            
+        if st.button("Cancel", key="cancel_log"):
+            st.session_state.pop("quick_action")
+            st.rerun()
+    
+    elif st.session_state.get("quick_action") == "materials":
+        st.subheader("Material Tracking")
+        
+        material = st.selectbox("Material Type", [
+            "Concrete", "Structural Steel", "Rebar", "Lumber", 
+            "Mechanical Equipment", "Electrical Equipment", "Finishes"
+        ])
+        
+        status = st.selectbox("Status", [
+            "Received", "Inspected", "Rejected", "Installed"
+        ])
+        
+        quantity = st.number_input("Quantity", 0, 10000, 1)
+        location = st.text_input("Storage Location")
+        notes = st.text_area("Notes")
+        
+        if st.button("Submit Material Update"):
+            st.success("Material update submitted successfully!")
+            st.session_state.pop("quick_action")
+            st.rerun()
+            
+        if st.button("Cancel", key="cancel_material"):
+            st.session_state.pop("quick_action")
+            st.rerun()
+    
+    elif st.session_state.get("quick_action") == "photo_doc":
+        st.subheader("Photo Documentation")
+        
+        photo = st.file_uploader("Upload Photo", type=["jpg", "jpeg", "png"])
+        
+        if photo:
+            st.image(photo, use_column_width=True)
+        
+        type_col, location_col = st.columns(2)
+        
+        with type_col:
+            photo_type = st.selectbox("Photo Type", [
+                "Progress", "Issue", "Material", "Safety", "Quality"
+            ])
+        
+        with location_col:
+            location = st.text_input("Location")
+        
+        description = st.text_area("Description")
+        
+        if st.button("Submit Photo"):
+            st.success("Photo submitted successfully!")
+            st.session_state.pop("quick_action")
+            st.rerun()
+            
+        if st.button("Cancel", key="cancel_photo"):
+            st.session_state.pop("quick_action")
+            st.rerun()
 
-def mobile_companion_page():
+def render_todays_activities():
+    """Render today's scheduled activities."""
+    # Get today's date for display
+    today = datetime.now().strftime("%A, %B %d")
+    
+    content = f"""
+    <h3 style="margin-bottom: 15px;">Today's Activities ({today})</h3>
     """
-    Display the mobile companion page.
     
-    This page shows a demonstration of the mobile app interface for the gcPanel application.
+    # Sample activities for demonstration
+    activities = [
+        {
+            "title": "Concrete Pour - Level 3 West",
+            "time": "7:00 AM - 10:00 AM",
+            "status": "Completed",
+            "team": "Concrete Crew"
+        },
+        {
+            "title": "Electrical Rough-in - Level 4",
+            "time": "8:00 AM - 4:00 PM",
+            "status": "In Progress",
+            "team": "Electrical"
+        },
+        {
+            "title": "Safety Meeting - All Personnel",
+            "time": "12:00 PM - 12:30 PM",
+            "status": "Upcoming",
+            "team": "All Crews"
+        },
+        {
+            "title": "Structural Inspection - Level 2",
+            "time": "2:00 PM - 3:00 PM",
+            "status": "Upcoming",
+            "team": "QA/QC"
+        },
+        {
+            "title": "Material Delivery - Windows",
+            "time": "3:30 PM - 4:30 PM",
+            "status": "Upcoming",
+            "team": "Receiving"
+        }
+    ]
+    
+    # Display activity list
+    for activity in activities:
+        status_color = {
+            "Completed": "#10b981",  # Green
+            "In Progress": "#3b82f6",  # Blue
+            "Upcoming": "#6b7280"  # Gray
+        }.get(activity["status"], "#6b7280")
+        
+        content += f"""
+        <div style="background-color: white; border-radius: 8px; padding: 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <div style="font-weight: 600;">{activity["title"]}</div>
+                <div style="color: {status_color}; font-weight: 500; font-size: 0.9rem;">{activity["status"]}</div>
+            </div>
+            <div style="color: #666; font-size: 0.9rem; margin-bottom: 5px;">
+                ⏱️ {activity["time"]} • 👥 {activity["team"]}
+            </div>
+        </div>
+        """
+    
+    return content
+
+def render_field_issues():
+    """Render field issues reporting section."""
+    content = """
+    <h3 style="margin-bottom: 15px;">Field Issues</h3>
     """
-    # Initialize session state for mobile page if not set
-    if "mobile_page" not in st.session_state:
-        st.session_state.mobile_page = "dashboard"
     
-    # Page header with Add/Edit buttons
-    st.title("📱 Mobile Companion App")
+    # Sample issues for demonstration
+    issues = [
+        {
+            "id": "ISS-127",
+            "title": "Plumbing conflict with HVAC duct",
+            "location": "Level 5, Unit 512",
+            "priority": "High",
+            "status": "Open",
+            "reported_by": "Mike Chen",
+            "date": "Today, 9:15 AM"
+        },
+        {
+            "id": "ISS-126",
+            "title": "Missing electrical boxes per drawing",
+            "location": "Level 4, East Corridor",
+            "priority": "Medium",
+            "status": "Assigned",
+            "reported_by": "Sarah Johnson",
+            "date": "Yesterday, 3:30 PM"
+        },
+        {
+            "id": "ISS-125",
+            "title": "Concrete honeycomb in column",
+            "location": "Level 2, Column C4",
+            "priority": "High",
+            "status": "In Progress",
+            "reported_by": "John Smith",
+            "date": "May 18, 11:20 AM"
+        },
+        {
+            "id": "ISS-124",
+            "title": "Damaged drywall from water leak",
+            "location": "Level 6, Units 605-608",
+            "priority": "Medium", 
+            "status": "Resolved",
+            "reported_by": "Lisa Rodriguez",
+            "date": "May 17, 8:45 AM" 
+        }
+    ]
     
-    # Import and use our action buttons component
-    from components.action_buttons import render_action_buttons
-    
-    # Display action buttons (Add, Edit) at the top of the page
-    actions = render_action_buttons("Feature", show_delete=False)
-    
-    # Show description of the mobile companion
-    st.markdown("""
-    The gcPanel Mobile Companion allows field teams to access critical project information 
-    on-the-go. The interface is optimized for smartphones and tablets, with easy navigation 
-    and quick access to key features.
-    """)
-    
-    # Create tabs for different sections
-    tab1, tab2, tab3 = st.tabs(["Mobile Preview", "Features", "Getting Started"])
-    
-    with tab1:
-        # Show mobile app preview in a phone frame
-        def show_mobile_content():
-            render_mobile_screen()
+    # Display issues list
+    for issue in issues:
+        priority_color = {
+            "Low": "#10b981",  # Green
+            "Medium": "#f59e0b",  # Amber
+            "High": "#ef4444",  # Red
+            "Critical": "#7f1d1d"  # Dark Red
+        }.get(issue["priority"], "#6b7280")
         
-        # Use our mobile frame component to display the app
-        render_mobile_frame(show_mobile_content)
+        status_color = {
+            "Open": "#ef4444",  # Red
+            "Assigned": "#f59e0b",  # Amber
+            "In Progress": "#3b82f6",  # Blue
+            "Resolved": "#10b981"  # Green
+        }.get(issue["status"], "#6b7280")
         
-        # Add a note about interactivity
-        st.info("Note: This is a demonstration of the mobile interface. Some features may have limited functionality in this preview.")
-    
-    with tab2:
-        # Show features of the mobile app
-        st.subheader("Key Features")
-        
-        # Feature cards in a 3-column layout
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            st.markdown("""
-            <div style="background-color: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 100%;">
-                <div style="text-align: center; margin-bottom: 10px;">
-                    <span class="material-icons" style="font-size: 36px; color: #3367D6;">dashboard</span>
-                </div>
-                <h4 style="text-align: center; margin-bottom: 10px;">Project Dashboard</h4>
-                <p style="font-size: 14px; color: #5F6368; text-align: center;">
-                    Real-time project metrics and KPIs for quick decisions on the go.
-                </p>
+        content += f"""
+        <div style="background-color: white; border-radius: 8px; padding: 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <div style="font-weight: 600;">{issue["title"]}</div>
+                <div style="color: {status_color}; font-weight: 500; font-size: 0.9rem;">{issue["status"]}</div>
             </div>
-            """, unsafe_allow_html=True)
-        
-        with col2:
-            st.markdown("""
-            <div style="background-color: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 100%;">
-                <div style="text-align: center; margin-bottom: 10px;">
-                    <span class="material-icons" style="font-size: 36px; color: #DB4437;">assignment</span>
-                </div>
-                <h4 style="text-align: center; margin-bottom: 10px;">Task Management</h4>
-                <p style="font-size: 14px; color: #5F6368; text-align: center;">
-                    Create, assign, and update tasks directly from your mobile device.
-                </p>
+            <div style="color: #666; font-size: 0.9rem; margin-bottom: 5px;">
+                📍 {issue["location"]}
             </div>
-            """, unsafe_allow_html=True)
-        
-        with col3:
-            st.markdown("""
-            <div style="background-color: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 100%;">
-                <div style="text-align: center; margin-bottom: 10px;">
-                    <span class="material-icons" style="font-size: 36px; color: #0F9D58;">photo_camera</span>
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                <div>
+                    <span style="background-color: {priority_color}; color: white; padding: 2px 6px; border-radius: 4px;">
+                        {issue["priority"]}
+                    </span>
+                    <span style="color: #666; margin-left: 8px;">
+                        {issue["id"]}
+                    </span>
                 </div>
-                <h4 style="text-align: center; margin-bottom: 10px;">Site Photos</h4>
-                <p style="font-size: 14px; color: #5F6368; text-align: center;">
-                    Capture, tag, and organize site photos with location metadata.
-                </p>
+                <div style="color: #666;">
+                    {issue["date"]}
+                </div>
             </div>
-            """, unsafe_allow_html=True)
+        </div>
+        """
+    
+    return content
+
+def render_offline_documents():
+    """Render offline-capable document access."""
+    content = """
+    <h3 style="margin-bottom: 15px;">Offline Documents</h3>
+    <p style="color: #666; margin-bottom: 15px; font-size: 0.9rem;">
+        Documents cached for offline access. Tap to view.
+    </p>
+    """
+    
+    # Get cached documents (in a real app, this would use the cache_file_for_offline function)
+    documents = [
+        {
+            "id": "DOC-001",
+            "title": "Foundation Specifications",
+            "type": "Technical Specification",
+            "size": "2.4 MB", 
+            "cached_date": "May 18, 2025"
+        },
+        {
+            "id": "DOC-015",
+            "title": "Floor Plans - Residential Levels 1-7",
+            "type": "Drawing Set",
+            "size": "18.7 MB",
+            "cached_date": "May 18, 2025"
+        },
+        {
+            "id": "DOC-023",
+            "title": "Electrical Layout - Retail Spaces",
+            "type": "Drawing Set",
+            "size": "9.2 MB",
+            "cached_date": "May 17, 2025"
+        },
+        {
+            "id": "DOC-047",
+            "title": "Highland Tower Project Schedule",
+            "type": "Schedule",
+            "size": "1.8 MB",
+            "cached_date": "May 17, 2025"
+        },
+        {
+            "id": "DOC-089",
+            "title": "Safety Protocols & Procedures",
+            "type": "Manual",
+            "size": "3.5 MB",
+            "cached_date": "May 16, 2025"
+        }
+    ]
+    
+    # Display document list
+    for doc in documents:
+        doc_icon = {
+            "Technical Specification": "📄",
+            "Drawing Set": "🗺️",
+            "Schedule": "📅",
+            "Manual": "📚",
+            "Report": "📊"
+        }.get(doc["type"], "📄")
         
-        # Second row of features
-        st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
-        col4, col5, col6 = st.columns(3)
-        
-        with col4:
-            st.markdown("""
-            <div style="background-color: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 100%;">
-                <div style="text-align: center; margin-bottom: 10px;">
-                    <span class="material-icons" style="font-size: 36px; color: #4285F4;">description</span>
-                </div>
-                <h4 style="text-align: center; margin-bottom: 10px;">Document Access</h4>
-                <p style="font-size: 14px; color: #5F6368; text-align: center;">
-                    View and share project documents from anywhere in the field.
-                </p>
+        content += render_offline_document_item(doc, doc_icon)
+    
+    # Add option to cache more documents
+    content += """
+    <div style="margin-top: 20px; text-align: center;">
+        <button style="background-color: #f3f4f6; border: 1px solid #d1d5db; color: #374151; 
+                      padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer;">
+            Cache More Documents
+        </button>
+    </div>
+    """
+    
+    return content
+
+def render_offline_document_item(doc, icon="📄"):
+    """Render a single offline document item."""
+    return f"""
+    <div style="background-color: white; border-radius: 8px; padding: 12px; margin-bottom: 10px; 
+               box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer;">
+        <div style="display: flex; align-items: center;">
+            <div style="font-size: 1.8rem; margin-right: 12px;">
+                {icon}
             </div>
-            """, unsafe_allow_html=True)
-        
-        with col5:
-            st.markdown("""
-            <div style="background-color: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 100%;">
-                <div style="text-align: center; margin-bottom: 10px;">
-                    <span class="material-icons" style="font-size: 36px; color: #F9AB00;">notifications</span>
+            <div style="flex-grow: 1;">
+                <div style="font-weight: 500; margin-bottom: 3px;">{doc["title"]}</div>
+                <div style="display: flex; color: #666; font-size: 0.8rem;">
+                    <div style="margin-right: 12px;">{doc["type"]}</div>
+                    <div style="margin-right: 12px;">|</div>
+                    <div>{doc["size"]}</div>
                 </div>
-                <h4 style="text-align: center; margin-bottom: 10px;">Push Notifications</h4>
-                <p style="font-size: 14px; color: #5F6368; text-align: center;">
-                    Receive real-time alerts for important project updates.
-                </p>
             </div>
-            """, unsafe_allow_html=True)
+        </div>
+    </div>
+    """
+
+def render_safety_checklist():
+    """Render safety checklist for field personnel."""
+    content = """
+    <h3 style="margin-bottom: 15px;">Safety Checklist</h3>
+    <p style="color: #666; margin-bottom: 15px; font-size: 0.9rem;">
+        Complete daily safety inspection before beginning work.
+    </p>
+    """
+    
+    if "safety_checklist_complete" not in st.session_state:
+        st.session_state.safety_checklist_complete = False
+    
+    if "safety_checklist_items" not in st.session_state:
+        st.session_state.safety_checklist_items = {
+            "ppe": False,
+            "hazards": False,
+            "equipment": False,
+            "fire_extinguishers": False,
+            "first_aid": False,
+            "emergency_exits": False,
+            "fall_protection": False,
+            "housekeeping": False
+        }
+    
+    # Create the checklist UI outside of the content variable
+    # since we need interactive elements
+    content_safe = """
+    <div style="background-color: white; border-radius: 8px; padding: 15px; margin-bottom: 20px; 
+               box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <div style="font-weight: 600; margin-bottom: 10px;">Daily Safety Inspection</div>
+    """
+    
+    # Return the HTML content to be displayed
+    return content + content_safe + """</div>"""
+
+def render_checklist_items(readonly=False):
+    """Render safety checklist items and return if all are checked."""
+    checklist_items = [
+        {
+            "id": "ppe",
+            "label": "All workers have proper PPE (hard hat, safety glasses, gloves, vests)"
+        },
+        {
+            "id": "hazards",
+            "label": "Work area is free of potential hazards and properly marked"
+        },
+        {
+            "id": "equipment",
+            "label": "All equipment and tools are in good working condition"
+        },
+        {
+            "id": "fire_extinguishers",
+            "label": "Fire extinguishers are accessible and properly charged"
+        },
+        {
+            "id": "first_aid",
+            "label": "First aid kits are stocked and accessible"
+        },
+        {
+            "id": "emergency_exits",
+            "label": "Emergency exits are clear and accessible"
+        },
+        {
+            "id": "fall_protection",
+            "label": "Fall protection is in place where required"
+        },
+        {
+            "id": "housekeeping",
+            "label": "Site is clean and materials are properly stored"
+        }
+    ]
+    
+    for item in checklist_items:
+        checked = st.checkbox(
+            item["label"],
+            value=st.session_state.safety_checklist_items[item["id"]],
+            disabled=readonly,
+            key=f"safety_{item['id']}"
+        )
+        st.session_state.safety_checklist_items[item["id"]] = checked
+    
+    # Check if all items are complete
+    all_complete = all(st.session_state.safety_checklist_items.values())
+    
+    if all_complete and not st.session_state.safety_checklist_complete:
+        if st.button("Submit Safety Checklist"):
+            st.session_state.safety_checklist_complete = True
+            st.success("Safety checklist completed and submitted!")
+    
+    if st.session_state.safety_checklist_complete:
+        st.info("✅ Safety checklist completed for today.")
         
-        with col6:
-            st.markdown("""
-            <div style="background-color: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 100%;">
-                <div style="text-align: center; margin-bottom: 10px;">
-                    <span class="material-icons" style="font-size: 36px; color: #3367D6;">sync</span>
-                </div>
-                <h4 style="text-align: center; margin-bottom: 10px;">Offline Mode</h4>
-                <p style="font-size: 14px; color: #5F6368; text-align: center;">
-                    Work without internet connectivity and sync when back online.
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-    
-    with tab3:
-        # Getting started guide
-        st.subheader("Getting Started")
-        
-        # Create expandable sections
-        with st.expander("Download the App", expanded=True):
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.markdown("""
-                <div style="text-align: center;">
-                    <a href="#" style="display: inline-block; background-color: black; color: white; 
-                                    text-decoration: none; padding: 8px 16px; border-radius: 8px; 
-                                    margin: 10px; text-align: center; min-width: 200px;">
-                        <div style="display: flex; align-items: center; justify-content: center;">
-                            <span style="font-size: 24px; margin-right: 8px;">
-                                <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
-                                    <path d="M17.6,9.48l-1.91-3.3c-0.14-0.24-0.44-0.32-0.68-0.18L12,8.5V2H5C3.9,2,3,2.9,3,4v16c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2
-                                    V8C21,8,17.6,9.48,17.6,9.48z M10.25,9.75H7.5v1.5h2.75v1.5H7.5v1.5h2.75V18h-4V6h4V9.75z M16.5,18h-1.5v-6h-1.5V18h-1.5V9
-                                    h4.5V18z"/>
-                                </svg>
-                            </span>
-                            <div>
-                                <div style="font-size: 10px; text-align: left;">GET IT ON</div>
-                                <div style="font-size: 16px; font-weight: 500; text-align: left;">Google Play</div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            with col2:
-                st.markdown("""
-                <div style="text-align: center;">
-                    <a href="#" style="display: inline-block; background-color: black; color: white; 
-                                    text-decoration: none; padding: 8px 16px; border-radius: 8px; 
-                                    margin: 10px; text-align: center; min-width: 200px;">
-                        <div style="display: flex; align-items: center; justify-content: center;">
-                            <span style="font-size: 24px; margin-right: 8px;">
-                                <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
-                                    <path d="M17.05,12.04C17.03,9.82,18.81,8.04,20.98,8c0.01,2.23-1.78,4.01-3.93,4.04
-                                    M6.95,8C9.13,8.05,10.92,9.81,10.98,12.04c-2.17,0-3.97-1.79-4.03-4.04
-                                    M15.05,22h-6.1c-1.6,0-2.89-1.29-2.89-2.89V8.75C6.06,6.12,8.29,4,10.96,4H13c2.67,0,4.9,2.12,4.9,4.75
-                                    v10.36c0,1.6-1.29,2.89-2.89,2.89"/>
-                                </svg>
-                            </span>
-                            <div>
-                                <div style="font-size: 10px; text-align: left;">Download on the</div>
-                                <div style="font-size: 16px; font-weight: 500; text-align: left;">App Store</div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                """, unsafe_allow_html=True)
-        
-        with st.expander("Login and Setup", expanded=False):
-            st.markdown("""
-            ### Setting Up Your Account
-            
-            1. **Download and Install**: Get the app from your device's app store.
-            2. **Login**: Use your existing gcPanel credentials to sign in.
-            3. **Project Selection**: Select your active project(s) for mobile access.
-            4. **Notification Preferences**: Configure which alerts you want to receive.
-            5. **Offline Access**: Select documents for offline availability.
-            """)
-            
-            st.image("static/img/gcpanel.png", width=150, caption="Login with your existing gcPanel credentials")
-        
-        with st.expander("Security Features", expanded=False):
-            st.markdown("""
-            ### Security Information
-            
-            The gcPanel Mobile Companion includes several security features:
-            
-            * **Biometric Authentication**: Enable fingerprint or face recognition for quick secure access.
-            * **Auto Timeout**: Sessions automatically timeout after 30 minutes of inactivity.
-            * **Remote Wipe**: Administrators can remotely wipe app data if a device is lost or stolen.
-            * **Encrypted Storage**: All local data is encrypted on your device.
-            * **Secure Connections**: All data transfers use encrypted HTTPS connections.
-            """)
-    
-    # Add a "Learn More" section at the bottom
-    st.markdown("""
-    ---
-    
-    ### Want to Learn More?
-    
-    Contact your system administrator to get access to the mobile companion app for your project.
-    """)
-    
-    # Track button clicks for Add/Edit
-    if actions['add_clicked']:
-        st.session_state.show_add_form = True
-        st.rerun()
-    elif actions['edit_clicked']:
-        st.session_state.show_edit_form = True
-        st.rerun()
-    
-    # Display forms if buttons were clicked
-    if st.session_state.get("show_add_form", False):
-        st.subheader("Add New Mobile Feature")
-        with st.form("add_feature_form"):
-            feature_name = st.text_input("Feature Name")
-            feature_description = st.text_area("Feature Description")
-            feature_icon = st.selectbox("Feature Icon", ["dashboard", "assignment", "photo_camera", "description", "notifications"])
-            st.form_submit_button("Save Feature", type="primary")
-        
-        # Add a cancel button
-        if st.button("Cancel"):
-            st.session_state.show_add_form = False
+        if st.button("Reset Checklist"):
+            for key in st.session_state.safety_checklist_items:
+                st.session_state.safety_checklist_items[key] = False
+            st.session_state.safety_checklist_complete = False
             st.rerun()
     
-    if st.session_state.get("show_edit_form", False):
-        st.subheader("Edit Mobile Features")
-        with st.form("edit_features_form"):
-            st.multiselect("Select Features to Edit", ["Dashboard", "Task Management", "Site Photos", "Document Access", "Push Notifications", "Offline Mode"])
-            st.form_submit_button("Save Changes", type="primary")
+    return all_complete
+
+def render_weather_conditions():
+    """Render current and forecasted weather conditions."""
+    content = """
+    <h3 style="margin-bottom: 15px;">Weather Conditions</h3>
+    """
+    
+    # Current conditions display
+    current_weather = {
+        "condition": "Partly Cloudy",
+        "temperature": "72°F",
+        "feels_like": "70°F",
+        "humidity": "45%",
+        "wind": "8 mph NW",
+        "precipitation": "0%"
+    }
+    
+    content += f"""
+    <div style="background-color: white; border-radius: 8px; padding: 15px; margin-bottom: 20px; 
+               box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+            <div style="font-size: 2.5rem; margin-right: 15px;">⛅</div>
+            <div>
+                <div style="font-size: 1.5rem; font-weight: 500;">{current_weather["temperature"]}</div>
+                <div style="color: #666;">{current_weather["condition"]}</div>
+            </div>
+        </div>
         
-        # Add a cancel button
-        if st.button("Cancel"):
-            st.session_state.show_edit_form = False
-            st.rerun()
+        <div style="display: flex; flex-wrap: wrap; margin-top: 10px;">
+            <div style="width: 50%; margin-bottom: 8px;">
+                <div style="color: #666; font-size: 0.9rem;">Feels Like</div>
+                <div>{current_weather["feels_like"]}</div>
+            </div>
+            <div style="width: 50%; margin-bottom: 8px;">
+                <div style="color: #666; font-size: 0.9rem;">Humidity</div>
+                <div>{current_weather["humidity"]}</div>
+            </div>
+            <div style="width: 50%; margin-bottom: 8px;">
+                <div style="color: #666; font-size: 0.9rem;">Wind</div>
+                <div>{current_weather["wind"]}</div>
+            </div>
+            <div style="width: 50%; margin-bottom: 8px;">
+                <div style="color: #666; font-size: 0.9rem;">Precipitation</div>
+                <div>{current_weather["precipitation"]}</div>
+            </div>
+        </div>
+    </div>
+    """
+    
+    # Forecast display
+    content += """
+    <div style="font-weight: 600; margin-bottom: 10px;">5-Day Forecast</div>
+    """
+    
+    forecast = [
+        {"day": "Today", "icon": "⛅", "high": "74°F", "low": "60°F", "condition": "Partly Cloudy"},
+        {"day": "Wed", "icon": "☀️", "high": "78°F", "low": "62°F", "condition": "Sunny"},
+        {"day": "Thu", "icon": "☀️", "high": "80°F", "low": "65°F", "condition": "Sunny"},
+        {"day": "Fri", "icon": "🌧️", "high": "72°F", "low": "61°F", "condition": "Showers"},
+        {"day": "Sat", "icon": "⛅", "high": "75°F", "low": "63°F", "condition": "Partly Cloudy"}
+    ]
+    
+    content += """
+    <div style="display: flex; overflow-x: auto; margin-bottom: 20px;">
+    """
+    
+    for day in forecast:
+        content += f"""
+        <div style="min-width: 80px; text-align: center; padding: 10px;">
+            <div style="font-weight: 500; margin-bottom: 5px;">{day["day"]}</div>
+            <div style="font-size: 1.8rem; margin-bottom: 5px;">{day["icon"]}</div>
+            <div style="font-weight: 500;">{day["high"]}</div>
+            <div style="color: #666; font-size: 0.9rem;">{day["low"]}</div>
+        </div>
+        """
+    
+    content += """
+    </div>
+    """
+    
+    # Add weather alerts if any
+    content += """
+    <div style="background-color: #fef2f2; border-radius: 8px; padding: 12px; margin-bottom: 10px;">
+        <div style="font-weight: 600; color: #b91c1c; margin-bottom: 5px;">⚠️ Rain Expected Thursday</div>
+        <div style="color: #666; font-size: 0.9rem;">
+            Take precautions to protect open areas and schedule work accordingly.
+        </div>
+    </div>
+    """
+    
+    return content
+
+# Helper function for sending notifications
+def send_notification(user_id, template_name, **kwargs):
+    """
+    Send a notification to a user using a template.
+    
+    Args:
+        user_id (str): ID of the user to notify
+        template_name (str): Name of the notification template to use
+        **kwargs: Template variables
+    """
+    # In a real app, this would send the notification to the user
+    # Here we just print what would be sent
+    print(f"Notification to user {user_id} using template {template_name}")
+    print(f"Template variables: {kwargs}")
+    
+    return True

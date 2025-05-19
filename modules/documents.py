@@ -309,6 +309,188 @@ def render_favorite_documents():
     if not favorites:
         st.info("You haven't marked any documents as favorites yet.")
 
+def render_document_collaboration_features():
+    """Render real-time collaboration features for documents."""
+    st.subheader("Document Collaboration")
+    
+    # Select document to collaborate on
+    documents = [
+        "DOC-001: Foundation Drawings", 
+        "DOC-002: Electrical Specifications", 
+        "DOC-003: General Conditions",
+        "DOC-006: HVAC Design",
+        "DOC-010: Facade Details"
+    ]
+    
+    selected_doc = st.selectbox("Select Document to Collaborate On", documents)
+    
+    # Tabs for different collaboration features
+    collab_tabs = st.tabs(["Document Editor", "Comments", "Version History", "Activity Log"])
+    
+    # Document Editor tab
+    with collab_tabs[0]:
+        st.subheader(f"Editing: {selected_doc}")
+        
+        # Mock document content
+        initial_content = """# Foundation Specifications
+
+## 1. General Requirements
+
+The foundation system shall be designed to support all applied loads, including both dead and live loads, as well as lateral loads such as wind and seismic forces. All work shall comply with ACI 318 and local building codes.
+
+## 2. Materials
+
+### 2.1 Concrete
+- Compressive Strength: 4,000 psi at 28 days
+- Water-Cement Ratio: Maximum 0.45
+- Air Content: 5-7%
+
+### 2.2 Reinforcement
+- Deformed Bars: ASTM A615, Grade 60
+- Welded Wire Fabric: ASTM A1064
+"""
+        
+        # Collaborative text editor
+        edited_content = st.text_area("Document Content", value=initial_content, height=400)
+        
+        # Show who's currently editing
+        st.markdown("""
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <div style="font-size: 14px;">Currently editing:</div>
+            <div style="background-color: #e6f7ff; border-radius: 12px; padding: 0 10px; font-size: 14px;">John Smith</div>
+            <div style="background-color: #fff7e6; border-radius: 12px; padding: 0 10px; font-size: 14px;">Sarah Johnson</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns([1,1,1])
+        with col1:
+            st.button("Save Changes")
+        with col2:
+            st.button("Revert Changes")
+        with col3:
+            st.button("Create New Version")
+    
+    # Comments tab
+    with collab_tabs[1]:
+        st.subheader("Comments & Discussions")
+        
+        # Discussion thread for the document
+        render_comment_thread(document_id=selected_doc.split(":")[0])
+        
+        # Add new comment form
+        st.subheader("Add Comment")
+        comment_text = st.text_area("Comment", placeholder="Type your comment here...", height=100)
+        
+        # Comment options
+        col1, col2 = st.columns([3, 1])
+        
+        with col1:
+            comment_type = st.radio("Comment Type", ["General", "Question", "Issue", "Suggestion"], horizontal=True)
+            mention_users = st.multiselect("Mention Users", ["John Smith", "Sarah Johnson", "Mike Chen", "Lisa Rodriguez"])
+        
+        with col2:
+            st.markdown("<br>", unsafe_allow_html=True)  # Spacing
+            if st.button("Post Comment"):
+                if comment_text:
+                    st.success("Comment posted successfully!")
+                    st.session_state.comment_text = ""
+                    st.rerun()
+                else:
+                    st.error("Please enter a comment.")
+    
+    # Version History tab
+    with collab_tabs[2]:
+        st.subheader("Version History")
+        
+        # Version list
+        versions = [
+            {"version": "v3.2", "date": "2025-05-15", "author": "John Smith", "changes": "Updated concrete specifications and added notes for frost protection."},
+            {"version": "v3.1", "date": "2025-05-01", "author": "Sarah Johnson", "changes": "Fixed reinforcement spacing requirements."},
+            {"version": "v3.0", "date": "2025-04-20", "author": "Mike Chen", "changes": "Major revision to comply with updated building codes."},
+            {"version": "v2.1", "date": "2025-03-15", "author": "John Smith", "changes": "Added waterproofing details."},
+            {"version": "v2.0", "date": "2025-02-28", "author": "Lisa Rodriguez", "changes": "Updated foundation type to address soil report findings."},
+            {"version": "v1.0", "date": "2025-01-20", "author": "John Smith", "changes": "Initial document creation."}
+        ]
+        
+        # Display versions as a timeline
+        for i, ver in enumerate(versions):
+            col1, col2 = st.columns([1, 5])
+            
+            with col1:
+                st.markdown(f"""
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <div style="background-color: {'#1f77b4' if i == 0 else '#aaa'}; color: white; width: 40px; height: 40px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                        {ver['version']}
+                    </div>
+                    <div style="height: 30px; width: 2px; background-color: #ddd; margin-top: 5px; {'' if i < len(versions)-1 else 'display: none;'}"></div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with col2:
+                st.markdown(f"""
+                <div style="border: 1px solid #ddd; border-radius: 5px; padding: 10px; margin-bottom: {5 if i < len(versions)-1 else 0}px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: bold;">{ver['date']}</span>
+                        <span style="color: #666;">{ver['author']}</span>
+                    </div>
+                    <div style="margin-top: 5px;">{ver['changes']}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            # Compare versions buttons
+            if i > 0:
+                col3, col4 = st.columns([4, 1])
+                with col4:
+                    st.button(f"Compare to {versions[i-1]['version']}", key=f"compare_{i}")
+    
+    # Activity Log tab
+    with collab_tabs[3]:
+        st.subheader("Activity Log")
+        
+        # Activity data
+        activities = [
+            {"action": "Edited document", "user": "John Smith", "time": "10 minutes ago", "details": "Updated concrete specifications."},
+            {"action": "Added comment", "user": "Sarah Johnson", "time": "30 minutes ago", "details": "Question about reinforcement spacing."},
+            {"action": "Viewed document", "user": "Mike Chen", "time": "1 hour ago", "details": ""},
+            {"action": "Created new version", "user": "John Smith", "time": "2 hours ago", "details": "Version 3.2 created."},
+            {"action": "Mentioned you", "user": "Lisa Rodriguez", "time": "Yesterday", "details": "In comment: 'Can @CurrentUser please review this section?'"},
+            {"action": "Resolved comment", "user": "Sarah Johnson", "time": "Yesterday", "details": "Marked comment as resolved."},
+            {"action": "Downloaded document", "user": "Mike Chen", "time": "2 days ago", "details": ""}
+        ]
+        
+        # Activity filters
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            action_filter = st.multiselect("Filter by Action", 
+                                         ["All", "Viewed", "Edited", "Downloaded", "Commented", "Created version", "Resolved comment", "Mentioned"], 
+                                         default=["All"])
+        
+        with col2:
+            user_filter = st.multiselect("Filter by User",
+                                       ["All", "John Smith", "Sarah Johnson", "Mike Chen", "Lisa Rodriguez"],
+                                       default=["All"])
+        
+        # Display activities
+        for activity in activities:
+            # Apply filters
+            if ("All" not in action_filter and not any(a.lower() in activity["action"].lower() for a in action_filter)) or \
+               ("All" not in user_filter and activity["user"] not in user_filter):
+                continue
+                
+            st.markdown(f"""
+            <div style="display: flex; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                <div style="width: 40px; height: 40px; background-color: #f0f0f0; border-radius: 20px; margin-right: 15px; display: flex; align-items: center; justify-content: center;">
+                    {activity["user"][0]}
+                </div>
+                <div style="flex-grow: 1;">
+                    <div style="font-weight: 500;">{activity["user"]} {activity["action"]}</div>
+                    <div style="color: #666; font-size: 12px;">{activity["time"]}</div>
+                    <div style="font-size: 14px; margin-top: 5px;">{activity["details"]}</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
 def render_document_upload():
     """Render document upload interface."""
     st.subheader("Upload Document")

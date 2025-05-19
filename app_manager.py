@@ -35,7 +35,7 @@ from modules.cost_management import render_cost_management
 from modules.closeout import render_closeout
 from modules.engineering import render_engineering
 from modules.documents import render_documents
-from modules.mobile_companion import mobile_companion_page
+from modules.mobile_companion import render_mobile_companion
 from modules.analytics import render_analytics
 
 def initialize_session_state():
@@ -153,7 +153,7 @@ def render_selected_module(current_menu):
         else:
             render_advanced_bim_viewer()
     elif current_menu == "Mobile Companion":
-        mobile_companion_page()
+        render_mobile_companion()
     elif current_menu == "Closeout":
         render_closeout()
     elif current_menu == "Features Showcase":

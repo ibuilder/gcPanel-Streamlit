@@ -1,282 +1,186 @@
 """
-PWA Support Module for gcPanel.
+Progressive Web App support for mobile applications.
 
-This module provides Progressive Web App (PWA) support for gcPanel,
-enabling offline capabilities, home screen installation, and more.
+This module provides functionality to make the Streamlit app work as a
+Progressive Web App (PWA) with offline capabilities.
 """
 
 import streamlit as st
-import json
-import os
 
 def setup_pwa():
     """
-    Set up Progressive Web App support.
+    Configure the application to function as a Progressive Web App (PWA).
     
-    This function adds the necessary manifest and service worker
-    to enable PWA functionality.
+    This adds the necessary manifest and service worker for PWA support,
+    enabling offline functionality and add-to-home-screen capability.
     """
-    # Add PWA meta tags
-    st.markdown("""
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="theme-color" content="#3B82F6">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="apple-mobile-web-app-title" content="gcPanel">
-        <link rel="apple-touch-icon" href="static/images/gcpanel-icon-192.png">
-    </head>
-    """, unsafe_allow_html=True)
+    # Add PWA meta tags and manifest link
+    pwa_meta = """
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="gcPanel Field">
+    <link rel="manifest" href="./static/manifest.json">
+    <link rel="apple-touch-icon" href="./static/icon-192x192.png">
+    """
     
-    # Add PWA install prompt handler
-    st.markdown("""
+    # Add service worker registration script
+    service_worker = """
     <script>
-    // PWA installation
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('./static/service-worker.js')
+                .then(function(registration) {
+                    console.log('PWA: ServiceWorker registration successful with scope: ', registration.scope);
+                })
+                .catch(function(error) {
+                    console.log('PWA: ServiceWorker registration failed: ', error);
+                });
+        });
+    }
+    </script>
+    """
+    
+    # Add PWA installation prompt
+    pwa_install_prompt = """
+    <script>
+    // Store the install prompt event
     let deferredPrompt;
     
     window.addEventListener('beforeinstallprompt', (e) => {
         // Prevent Chrome 67 and earlier from automatically showing the prompt
         e.preventDefault();
-        // Stash the event so it can be triggered later
+        // Store the event for later use
         deferredPrompt = e;
         
-        // Show the install button
-        const installButton = document.createElement('div');
-        installButton.id = 'pwa-install-button';
-        installButton.innerHTML = `
-            <div style="position: fixed; bottom: 20px; right: 20px; background-color: #3B82F6; color: white; padding: 10px 15px; border-radius: 50px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 9999; display: flex; align-items: center; cursor: pointer;">
-                <span style="margin-right: 8px;">📱</span>
-                <span>Install App</span>
-            </div>
-        `;
+        // Show your custom install prompt
+        document.getElementById('installPWA').style.display = 'block';
+    });
+    
+    function showInstallPrompt() {
+        // Hide the install button
+        document.getElementById('installPWA').style.display = 'none';
         
-        document.body.appendChild(installButton);
-        
-        installButton.addEventListener('click', (e) => {
-            // Hide the install button
-            installButton.style.display = 'none';
-            
-            // Show the prompt
+        // Show the native install prompt
+        if (deferredPrompt) {
             deferredPrompt.prompt();
             
-            // Wait for the user to respond to the prompt
             deferredPrompt.userChoice.then((choiceResult) => {
                 if (choiceResult.outcome === 'accepted') {
-                    console.log('User accepted the install prompt');
+                    console.log('User accepted the PWA installation');
                 } else {
-                    console.log('User dismissed the install prompt');
+                    console.log('User dismissed the PWA installation');
                 }
                 deferredPrompt = null;
             });
-        });
-    });
-    
-    // Check if app is in standalone mode (installed)
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-        console.log('App is running in standalone mode');
-        
-        // Add a class to the body for PWA-specific styling
-        document.body.classList.add('pwa-mode');
+        }
     }
+    </script>
     
-    // Handle online/offline status
+    <div id="installPWA" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #3b82f6; color: white; padding: 10px 20px; border-radius: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; font-size: 14px; text-align: center;">
+        <div style="margin-bottom: 8px;">Add to Home Screen for offline access</div>
+        <button onclick="showInstallPrompt()" style="background-color: white; color: #3b82f6; border: none; padding: 5px 15px; border-radius: 16px; font-weight: 500; cursor: pointer;">Install</button>
+    </div>
+    """
+    
+    # Combine all PWA components and inject into the page
+    st.markdown(pwa_meta + service_worker + pwa_install_prompt, unsafe_allow_html=True)
+
+def check_offline_status():
+    """
+    Check if the application is currently running in offline mode.
+    
+    Returns:
+        bool: True if app is in offline mode, False otherwise
+    """
+    # Add offline status detection script
+    offline_check_script = """
+    <script>
+    // Function to check online status
     function updateOnlineStatus() {
-        const statusIndicator = document.createElement('div');
-        statusIndicator.id = 'online-status-indicator';
-        
         if (navigator.onLine) {
-            // Online - remove offline message if it exists
-            const existingIndicator = document.getElementById('online-status-indicator');
-            if (existingIndicator) {
-                existingIndicator.remove();
-            }
+            // Online - remove offline indicator
+            document.getElementById('offlineIndicator').style.display = 'none';
+            // Set a session storage value
+            sessionStorage.setItem('isOffline', 'false');
         } else {
-            // Offline - show message
-            statusIndicator.innerHTML = `
-                <div style="position: fixed; top: 60px; left: 0; right: 0; background-color: #fff3cd; color: #856404; text-align: center; padding: 8px; z-index: 9999;">
-                    You are offline. Some features may be limited.
-                </div>
-            `;
-            
-            // Add to body if not already present
-            if (!document.getElementById('online-status-indicator')) {
-                document.body.appendChild(statusIndicator);
-            }
+            // Offline - show offline indicator
+            document.getElementById('offlineIndicator').style.display = 'block';
+            // Set a session storage value
+            sessionStorage.setItem('isOffline', 'true');
         }
     }
     
-    // Check status on load
-    window.addEventListener('load', updateOnlineStatus);
-    
-    // Listen for changes
+    // Add event listeners for online/offline events
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
+    
+    // Initial check
+    updateOnlineStatus();
     </script>
-    """, unsafe_allow_html=True)
+    
+    <div id="offlineIndicator" style="display: none; position: fixed; top: 10px; right: 10px; background-color: #f9c851; color: #333; padding: 5px 10px; border-radius: 12px; font-size: 12px; z-index: 1000;">
+        Offline Mode
+    </div>
+    """
+    
+    # Add the offline detection script
+    st.markdown(offline_check_script, unsafe_allow_html=True)
+    
+    # Return placeholder - in a real app, this would check session storage
+    # Since Streamlit can't directly access JavaScript variables, we'd need
+    # a more complex solution for a real app
+    return False
 
-def create_service_worker():
+def cache_file_for_offline(file_path, file_type):
     """
-    Create a service worker file for offline support.
+    Mark a file to be cached for offline use by the service worker.
     
-    In a real implementation, this would write the service worker
-    file to the static directory. For this demo, we'll just display
-    the code that would be used.
-    """
-    service_worker_code = """
-    // Service Worker for gcPanel PWA
-    
-    const CACHE_NAME = 'gcpanel-cache-v1';
-    const urlsToCache = [
-        '/',
-        '/static/css/main.css',
-        '/static/js/main.js',
-        '/static/images/logo.png',
-        '/static/images/icons/icon-192x192.png',
-        '/static/images/icons/icon-512x512.png'
-    ];
-    
-    // Install event - cache assets
-    self.addEventListener('install', event => {
-        event.waitUntil(
-            caches.open(CACHE_NAME)
-                .then(cache => {
-                    console.log('Opened cache');
-                    return cache.addAll(urlsToCache);
-                })
-        );
-    });
-    
-    // Fetch event - serve from cache if available
-    self.addEventListener('fetch', event => {
-        event.respondWith(
-            caches.match(event.request)
-                .then(response => {
-                    // Cache hit - return response
-                    if (response) {
-                        return response;
-                    }
-                    
-                    // Clone the request
-                    const fetchRequest = event.request.clone();
-                    
-                    return fetch(fetchRequest)
-                        .then(response => {
-                            // Check if valid response
-                            if (!response || response.status !== 200 || response.type !== 'basic') {
-                                return response;
-                            }
-                            
-                            // Clone the response
-                            const responseToCache = response.clone();
-                            
-                            // Cache the response
-                            caches.open(CACHE_NAME)
-                                .then(cache => {
-                                    cache.put(event.request, responseToCache);
-                                });
-                                
-                            return response;
-                        })
-                        .catch(() => {
-                            // Network failed, try to serve from cache for HTML pages
-                            if (event.request.url.indexOf('.html') > -1 || 
-                                event.request.url.endsWith('/')) {
-                                return caches.match('/offline.html');
-                            }
-                        });
-                })
-        );
-    });
-    
-    // Activate event - clean up old caches
-    self.addEventListener('activate', event => {
-        const cacheWhitelist = [CACHE_NAME];
+    Args:
+        file_path (str): Path to the file to cache
+        file_type (str): Type of file (document, image, etc.)
         
-        event.waitUntil(
-            caches.keys().then(cacheNames => {
-                return Promise.all(
-                    cacheNames.map(cacheName => {
-                        if (cacheWhitelist.indexOf(cacheName) === -1) {
-                            return caches.delete(cacheName);
-                        }
-                    })
-                );
-            })
-        );
-    });
+    Returns:
+        bool: True if successful, False otherwise
     """
+    # In a real application, this would update a list of files to be cached
+    # by the service worker. For this demo, we'll just return success.
     
-    return service_worker_code
+    # Simulate successful caching
+    return True
 
-def create_manifest():
+def get_cached_files(file_type=None):
     """
-    Create a web app manifest for PWA support.
+    Get a list of files that are cached for offline use.
     
-    In a real implementation, this would write the manifest
-    file to the static directory. For this demo, we'll just display
-    the manifest that would be used.
+    Args:
+        file_type (str, optional): Filter by file type
+        
+    Returns:
+        list: List of cached file paths
     """
-    manifest = {
-        "name": "gcPanel Construction Management",
-        "short_name": "gcPanel",
-        "description": "Construction management dashboard for the Highland Tower Development",
-        "start_url": "/",
-        "display": "standalone",
-        "background_color": "#ffffff",
-        "theme_color": "#3B82F6",
-        "icons": [
-            {
-                "src": "static/images/gcpanel-icon-192.png",
-                "sizes": "192x192",
-                "type": "image/png"
-            },
-            {
-                "src": "static/images/gcpanel-icon-512.png",
-                "sizes": "512x512",
-                "type": "image/png"
-            }
+    # In a real application, this would return files from the cache storage
+    # For this demo, we'll return a static list
+    
+    all_cached_files = {
+        "document": [
+            "/documents/foundation_plan.pdf",
+            "/documents/concrete_specs.pdf",
+            "/documents/safety_plan.pdf"
+        ],
+        "image": [
+            "/images/site_photo_1.jpg",
+            "/images/site_photo_2.jpg"
+        ],
+        "data": [
+            "/data/project_schedule.json",
+            "/data/project_contacts.json"
         ]
     }
     
-    return json.dumps(manifest, indent=2)
-
-def show_pwa_details():
-    """Display PWA implementation details for development purposes."""
-    with st.expander("PWA Implementation Details"):
-        st.markdown("""
-        ### PWA Implementation
-        
-        To implement PWA capabilities, three key components are required:
-        
-        1. **Web App Manifest**: JSON file that provides information about the app
-        2. **Service Worker**: JavaScript file that enables offline functionality
-        3. **HTTPS**: PWAs require secure connections
-        
-        Below are the implementations for this project:
-        """)
-        
-        # Show manifest.json
-        st.markdown("#### Web App Manifest (manifest.json)")
-        st.code(create_manifest(), language="json")
-        
-        # Show service-worker.js
-        st.markdown("#### Service Worker (service-worker.js)")
-        st.code(create_service_worker(), language="javascript")
-        
-        # Show registration code
-        st.markdown("#### Service Worker Registration (in main.js)")
-        registration_code = """
-        // Register service worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful');
-                    })
-                    .catch(error => {
-                        console.log('ServiceWorker registration failed:', error);
-                    });
-            });
-        }
-        """
-        st.code(registration_code, language="javascript")
+    if file_type and file_type in all_cached_files:
+        return all_cached_files[file_type]
+    
+    # Return flattened list of all cached files
+    return [file for files in all_cached_files.values() for file in files]

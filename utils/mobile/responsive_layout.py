@@ -1,171 +1,333 @@
 """
-Mobile-responsive layout utilities for gcPanel.
+Responsive layout utilities for mobile optimization.
 
-This module provides utilities for creating responsive layouts for different screen sizes.
+This module provides utilities to create responsive layouts optimized for
+mobile devices and smaller screens.
 """
 
 import streamlit as st
 
 def add_mobile_styles():
-    """Add mobile-specific CSS styles to the application."""
-    # Add custom CSS for mobile optimization
-    st.markdown("""
+    """
+    Add CSS styles for mobile optimization.
+    
+    This function injects CSS that makes the UI more mobile-friendly,
+    with appropriate sizing, spacing, and touch targets.
+    """
+    mobile_styles = """
     <style>
-    /* General Mobile Optimizations */
-    @media (max-width: 768px) {
-        .block-container {
-            padding-top: 1rem;
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
-        
-        h1 {
-            font-size: 1.5rem !important;
-        }
-        
-        h2 {
-            font-size: 1.3rem !important;
-        }
-        
-        h3 {
-            font-size: 1.1rem !important;
-        }
-        
-        p, li, .stTextInput > div[data-baseweb="input"] > div, 
-        .stTextArea textarea, .stButton button, .stSelectbox div {
-            font-size: 0.9rem !important;
-        }
-        
-        /* Increase touch targets */
-        .stButton button {
-            min-height: 44px;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stSelectbox div[role="listbox"] span {
-            min-height: 44px;
-            display: flex;
-            align-items: center;
-        }
-        
-        /* Reduce table font size */
-        .dataframe {
-            font-size: 0.7rem !important;
-        }
-        
-        /* Optimize chart size */
-        .stPlotlyChart {
-            height: 250px !important;
-        }
-    }
-    
-    /* Offline indicator styling */
-    .offline-indicator {
-        background-color: #fff3cd;
-        color: #856404;
-        padding: 8px 16px;
-        border-radius: 4px;
-        margin-bottom: 16px;
-        display: none; /* Hidden by default, shown via JavaScript when offline */
-    }
-    
-    /* Responsive card styling */
-    .responsive-card {
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 16px;
-        margin-bottom: 16px;
-        background-color: white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        transition: transform 0.2s ease;
-    }
-    
-    .responsive-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .responsive-card-title {
-        font-weight: bold;
-        margin-bottom: 8px;
-        font-size: 1.1rem;
-    }
-    
-    .responsive-card-content {
-        color: #555;
-    }
-    
-    /* Add offline detection JavaScript */
-    </style>
-    <script>
-    // Check for online/offline status
-    function updateOfflineStatus() {
-        var offlineIndicator = document.querySelector('.offline-indicator');
-        if (offlineIndicator) {
-            if (navigator.onLine) {
-                offlineIndicator.style.display = 'none';
-            } else {
-                offlineIndicator.style.display = 'block';
+        /* Base mobile responsive styles */
+        @media (max-width: 768px) {
+            /* Increase touch targets */
+            .stButton > button {
+                min-height: 44px !important;
+                min-width: 44px !important;
+            }
+            
+            /* Adjust heading sizes */
+            h1 {
+                font-size: 1.8rem !important;
+            }
+            
+            h2 {
+                font-size: 1.5rem !important;
+            }
+            
+            h3 {
+                font-size: 1.2rem !important;
+            }
+            
+            /* Adjust padding/margins for content */
+            .block-container {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+            
+            /* Make inputs larger for touch */
+            input, select, textarea {
+                font-size: 16px !important; /* Prevents iOS zoom on focus */
+            }
+            
+            /* Improve spacing in forms */
+            div[data-testid="stForm"] {
+                padding: 0.5rem !important;
+            }
+            
+            /* Ensure tables can scroll horizontally */
+            .stTable {
+                overflow-x: auto !important;
+            }
+            
+            /* Prevent images from overflowing */
+            img {
+                max-width: 100% !important;
+                height: auto !important;
             }
         }
-    }
-    
-    // Initial check
-    document.addEventListener('DOMContentLoaded', function() {
-        updateOfflineStatus();
-    });
-    
-    // Listen for online/offline events
-    window.addEventListener('online', updateOfflineStatus);
-    window.addEventListener('offline', updateOfflineStatus);
-    </script>
-    """, unsafe_allow_html=True)
-
-def create_responsive_card(title, content, on_click=None):
+        
+        /* Mobile card styles */
+        .mobile-card {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .mobile-card:active {
+            transform: scale(0.98);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .mobile-card-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .mobile-card-action {
+            font-size: 0.9rem;
+            color: #777;
+            margin-bottom: 10px;
+        }
+        
+        /* Mobile tabs styles */
+        .mobile-tabs {
+            display: flex;
+            overflow-x: auto;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .mobile-tab {
+            padding: 8px 16px;
+            margin-right: 5px;
+            white-space: nowrap;
+            border-radius: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .mobile-tab.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        /* Mobile list item styles */
+        .mobile-list-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .mobile-list-item-content {
+            flex-grow: 1;
+        }
+        
+        .mobile-list-item-title {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        
+        .mobile-list-item-subtitle {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        /* Mobile-friendly form styles */
+        .mobile-form-field {
+            margin-bottom: 20px;
+        }
+        
+        .mobile-form-label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        /* Bottom navigation styles */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            background-color: white;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            padding: 10px 0;
+            z-index: 1000;
+        }
+        
+        .mobile-bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+        
+        .mobile-bottom-nav-icon {
+            font-size: 1.5rem;
+            margin-bottom: 2px;
+        }
+        
+        /* Mobile action buttons */
+        .mobile-action-button {
+            position: fixed;
+            bottom: 70px;
+            right: 20px;
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        
+        .mobile-action-button:active {
+            transform: scale(0.95);
+        }
+    </style>
     """
-    Create a responsive card component.
+    
+    st.markdown(mobile_styles, unsafe_allow_html=True)
+
+def create_responsive_card(icon, title, action, button_text, button_key):
+    """
+    Create a mobile-friendly card with an action button.
     
     Args:
-        title (str): Title of the card
-        content (str): Content text of the card
-        on_click (function, optional): Function to execute when card is clicked
+        icon (str): Emoji or icon to display
+        title (str): Card title
+        action (str): Description of the action
+        button_text (str): Text for the action button
+        button_key (str): Unique key for the button
         
     Returns:
-        bool: True if card was clicked, False otherwise
+        bool: True if the button was clicked, False otherwise
     """
-    # Create card HTML
-    card_html = f"""
-    <div class="responsive-card" id="card_{hash(title)}">
-        <div class="responsive-card-title">{title}</div>
-        <div class="responsive-card-content">{content}</div>
-    </div>
-    """
+    col1, col2 = st.columns([1, 4])
     
-    # Add click handler if provided
-    if on_click:
-        card_html += f"""
-        <script>
-        document.getElementById("card_{hash(title)}").addEventListener("click", function() {{
-            // Set a value in localStorage that will be detected
-            localStorage.setItem("cardClicked_{hash(title)}", "true");
-            window.location.reload();
-        }});
+    with col1:
+        st.markdown(f"""
+        <div style="font-size: 2rem; display: flex; align-items: center; justify-content: center; 
+                   height: 100%;">
+            {icon}
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown(f"""
+        <div class="mobile-card-title">{title}</div>
+        <div class="mobile-card-action">{action}</div>
+        """, unsafe_allow_html=True)
         
-        // Check if this card was clicked
-        document.addEventListener("DOMContentLoaded", function() {{
-            if (localStorage.getItem("cardClicked_{hash(title)}")) {{
-                // Clear the flag
-                localStorage.removeItem("cardClicked_{hash(title)}");
-                // Execute callback
-                window.streamlitIsReady.then(() => {{
-                    Streamlit.setComponentValue(true);
-                }});
-            }}
-        }});
-        </script>
-        """
+        button_clicked = st.button(button_text, key=button_key)
     
-    # Render the card
-    clicked = st.markdown(card_html, unsafe_allow_html=True)
+    # Add separator
+    st.markdown("<hr style='margin: 15px 0 20px 0; opacity: 0.2;'>", unsafe_allow_html=True)
+    
+    return button_clicked
+
+def create_mobile_tab_layout(tab_items):
+    """
+    Create a mobile-friendly tab layout.
+    
+    Args:
+        tab_items (list): List of dictionaries with 'icon', 'label', and 'content' keys
+            
+    Returns:
+        int: Index of the selected tab
+    """
+    # Generate a unique key for this set of tabs
+    import random
+    tab_key = f"mobile_tabs_{random.randint(1000, 9999)}"
+    
+    # Initialize selected tab index if not present
+    if f"{tab_key}_index" not in st.session_state:
+        st.session_state[f"{tab_key}_index"] = 0
+    
+    # Create the mobile tab bar
+    st.markdown(
+        """
+        <div class="mobile-tabs">
+        """ +
+        "".join([
+            f"""
+            <div class="mobile-tab {'active' if idx == st.session_state[f"{tab_key}_index"] else ''}" 
+                 onclick="this.dispatchEvent(new CustomEvent('tab_click', {{bubbles: true, detail: {{index: {idx}}}}}))">
+                {item['icon']} {item['label']}
+            </div>
+            """
+            for idx, item in enumerate(tab_items)
+        ]) +
+        """
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    # Add JavaScript for click handling
+    # Since Streamlit doesn't directly support JS interactivity,
+    # we'll use buttons below the tabs for tab switching
+    
+    # Create hidden buttons for each tab
+    cols = st.columns(len(tab_items))
+    for idx, col in enumerate(cols):
+        with col:
+            if st.button(f"Tab {idx}", key=f"{tab_key}_{idx}"):
+                st.session_state[f"{tab_key}_index"] = idx
+                st.rerun()
+    
+    # Display the content of the selected tab
+    selected_idx = st.session_state[f"{tab_key}_index"]
+    st.markdown(tab_items[selected_idx]['content'])
+    
+    return selected_idx
+
+def create_mobile_list_item(title, subtitle=None, trailing_icon=None, on_tap_key=None):
+    """
+    Create a mobile-friendly list item.
+    
+    Args:
+        title (str): Main title text
+        subtitle (str, optional): Subtitle or description text
+        trailing_icon (str, optional): Icon to show on the right side
+        on_tap_key (str, optional): Key for the clickable area
+        
+    Returns:
+        bool: True if the item was tapped/clicked, False otherwise
+    """
+    # Create the list item container
+    with st.container():
+        col1, col2 = st.columns([5, 1])
+        
+        with col1:
+            st.markdown(f"""
+            <div class="mobile-list-item-title">{title}</div>
+            {f'<div class="mobile-list-item-subtitle">{subtitle}</div>' if subtitle else ''}
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            if trailing_icon:
+                st.markdown(f"""
+                <div style="text-align: right; font-size: 1.2rem;">{trailing_icon}</div>
+                """, unsafe_allow_html=True)
+        
+        # Invisible button for click/tap handling
+        clicked = False
+        if on_tap_key:
+            # Full-width invisible button overlay
+            clicked = st.button("", key=on_tap_key)
+    
+    # Add separator
+    st.markdown("<hr style='margin: 0; opacity: 0.2;'>", unsafe_allow_html=True)
     
     return clicked

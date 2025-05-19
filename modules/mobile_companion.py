@@ -528,8 +528,9 @@ def render_safety_checklist():
     with st.expander("Daily Safety Inspection", expanded=True):
         all_complete = render_checklist_items()
     
-    # Return all_complete to indicate if all items are checked
-    return all_complete
+    # For tab interface compatibility, we need to return an empty string
+    # The actual functionality happens via streamlit interface elements
+    return ""
 
 def render_checklist_items(readonly=False):
     """Render safety checklist items and return if all are checked."""

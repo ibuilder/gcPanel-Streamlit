@@ -25,6 +25,7 @@ def render_header():
         "BIM Viewer": {"label": "BIM", "icon": "🏢"},
         "Mobile Companion": {"label": "Mobile Companion", "icon": "📱"},
         "Closeout": {"label": "Closeout", "icon": "✅"},
+        "Integrations": {"label": "Integrations", "icon": "🔄"},
         "Features Showcase": {"label": "Features Showcase", "icon": "✨"},
         "Settings": {"label": "Settings", "icon": "⚙️"}
     }

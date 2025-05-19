@@ -1,471 +1,282 @@
 """
-Progressive Web App (PWA) Support for gcPanel.
+PWA Support Module for gcPanel.
 
-This module provides functionality to enable PWA capabilities,
-allowing the application to work offline and be installed on mobile devices.
+This module provides Progressive Web App (PWA) support for gcPanel,
+enabling offline capabilities, home screen installation, and more.
 """
 
 import streamlit as st
-import os
 import json
-from datetime import datetime
+import os
 
-def generate_manifest():
+def setup_pwa():
     """
-    Generate a Web App Manifest for PWA support.
+    Set up Progressive Web App support.
     
-    Returns:
-        dict: The manifest as a dictionary
+    This function adds the necessary manifest and service worker
+    to enable PWA functionality.
     """
-    return {
-        "name": "gcPanel Construction Management",
-        "short_name": "gcPanel",
-        "description": "Construction management dashboard for project teams",
-        "start_url": "/",
-        "display": "standalone",
-        "background_color": "#FFFFFF",
-        "theme_color": "#3B82F6",
-        "icons": [
-            {
-                "src": "static/images/icon-192x192.png",
-                "sizes": "192x192",
-                "type": "image/png"
-            },
-            {
-                "src": "static/images/icon-512x512.png",
-                "sizes": "512x512",
-                "type": "image/png"
-            }
-        ]
-    }
-
-def generate_service_worker():
-    """
-    Generate a Service Worker script for offline capabilities.
-    
-    Returns:
-        str: Service worker JavaScript code
-    """
-    # Get the current timestamp for cache versioning
-    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    
-    return f"""
-    // Service Worker for gcPanel PWA
-    const CACHE_NAME = 'gcpanel-cache-v{timestamp}';
-    const ASSETS_TO_CACHE = [
-        '/',
-        '/static/css/style.css',
-        '/static/js/main.js',
-        '/static/images/logo.png',
-        '/static/images/icon-192x192.png',
-        '/static/images/icon-512x512.png',
-        // Add other assets that should be available offline
-    ];
-
-    // Install event - cache assets
-    self.addEventListener('install', event => {{
-        event.waitUntil(
-            caches.open(CACHE_NAME)
-                .then(cache => {{
-                    console.log('Caching app assets');
-                    return cache.addAll(ASSETS_TO_CACHE);
-                }})
-        );
-    }});
-
-    // Activate event - clean up old caches
-    self.addEventListener('activate', event => {{
-        event.waitUntil(
-            caches.keys().then(cacheNames => {{
-                return Promise.all(
-                    cacheNames.map(cacheName => {{
-                        if (cacheName !== CACHE_NAME) {{
-                            console.log('Deleting old cache:', cacheName);
-                            return caches.delete(cacheName);
-                        }}
-                    }})
-                );
-            }})
-        );
-    }});
-
-    // Fetch event - serve cached content when offline
-    self.addEventListener('fetch', event => {{
-        event.respondWith(
-            caches.match(event.request)
-                .then(response => {{
-                    if (response) {{
-                        return response;
-                    }}
-                    
-                    // Clone the request - request can only be used once
-                    const fetchRequest = event.request.clone();
-                    
-                    return fetch(fetchRequest).then(response => {{
-                        // Check if valid response
-                        if (!response || response.status !== 200 || response.type !== 'basic') {{
-                            return response;
-                        }}
-                        
-                        // Clone the response - response can only be used once
-                        const responseToCache = response.clone();
-                        
-                        caches.open(CACHE_NAME)
-                            .then(cache => {{
-                                // Only cache GET requests
-                                if (event.request.method === 'GET') {{
-                                    cache.put(event.request, responseToCache);
-                                }}
-                            }});
-                            
-                        return response;
-                    }}).catch(() => {{
-                        // If network request fails and we don't have a cached response,
-                        // try to return a fallback for HTML pages
-                        if (event.request.headers.get('accept').includes('text/html')) {{
-                            return caches.match('/offline.html');
-                        }}
-                    }});
-                }})
-        );
-    }});
-    """
-
-def generate_offline_page():
-    """
-    Generate a simple offline page.
-    
-    Returns:
-        str: HTML content for the offline page
-    """
-    return """
-    <!DOCTYPE html>
-    <html lang="en">
+    # Add PWA meta tags
+    st.markdown("""
     <head>
-        <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>gcPanel - Offline</title>
-        <style>
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                height: 100vh;
-                margin: 0;
-                padding: 20px;
-                text-align: center;
-                background-color: #f5f7fa;
-                color: #333;
-            }
-            .container {
-                max-width: 600px;
-                background-color: white;
-                border-radius: 8px;
-                padding: 30px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            }
-            h1 {
-                color: #3B82F6;
-                margin-bottom: 10px;
-            }
-            p {
-                line-height: 1.6;
-                margin-bottom: 20px;
-            }
-            .icon {
-                font-size: 48px;
-                margin-bottom: 20px;
-            }
-            .cached-data {
-                background-color: #f0f4f8;
-                border-radius: 4px;
-                padding: 15px;
-                margin-top: 20px;
-            }
-            .retry-button {
-                background-color: #3B82F6;
-                color: white;
-                border: none;
-                padding: 12px 24px;
-                border-radius: 4px;
-                font-weight: bold;
-                cursor: pointer;
-                margin-top: 20px;
-            }
-            .retry-button:hover {
-                background-color: #2563EB;
-            }
-        </style>
+        <meta name="theme-color" content="#3B82F6">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="gcPanel">
+        <link rel="apple-touch-icon" href="static/images/gcpanel-icon-192.png">
     </head>
-    <body>
-        <div class="container">
-            <div class="icon">📶</div>
-            <h1>You're Offline</h1>
-            <p>It looks like you've lost your internet connection. Don't worry, you can still access previously loaded data and some basic functionality.</p>
-            
-            <div class="cached-data">
-                <h3>Available Offline:</h3>
-                <ul id="offline-features">
-                    <li>Project dashboard (last synced data)</li>
-                    <li>Document viewer (previously opened documents)</li>
-                    <li>Field notes and checklists</li>
-                </ul>
-            </div>
-            
-            <button class="retry-button" onclick="window.location.reload()">
-                Retry Connection
-            </button>
-        </div>
-        
-        <script>
-            // Check connection status when user clicks retry
-            document.querySelector('.retry-button').addEventListener('click', () => {
-                if (navigator.onLine) {
-                    window.location.href = '/';
-                } else {
-                    alert('Still offline. Please check your connection and try again.');
-                }
-            });
-            
-            // Listen for online status change
-            window.addEventListener('online', () => {
-                window.location.href = '/';
-            });
-        </script>
-    </body>
-    </html>
-    """
-
-def create_pwa_assets(static_dir="static"):
-    """
-    Create necessary PWA assets if they don't exist.
+    """, unsafe_allow_html=True)
     
-    Args:
-        static_dir (str): Directory to store static assets
-    """
-    # Create directory structure
-    os.makedirs(f"{static_dir}/js", exist_ok=True)
-    os.makedirs(f"{static_dir}/css", exist_ok=True)
-    os.makedirs(f"{static_dir}/images", exist_ok=True)
-    
-    # Create manifest.json
-    manifest = generate_manifest()
-    with open(f"{static_dir}/manifest.json", "w") as f:
-        json.dump(manifest, f, indent=2)
-    
-    # Create service-worker.js
-    with open(f"{static_dir}/service-worker.js", "w") as f:
-        f.write(generate_service_worker())
-    
-    # Create offline.html
-    with open(f"{static_dir}/offline.html", "w") as f:
-        f.write(generate_offline_page())
-    
-    # Create a minimal main.js
-    main_js = """
-    // Register service worker for PWA
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(registration => {
-                    console.log('Service Worker registered with scope:', registration.scope);
-                })
-                .catch(error => {
-                    console.error('Service Worker registration failed:', error);
-                });
-        });
-    }
-    
-    // Add to home screen functionality
+    # Add PWA install prompt handler
+    st.markdown("""
+    <script>
+    // PWA installation
     let deferredPrompt;
-    const addBtn = document.querySelector('.add-to-home');
     
     window.addEventListener('beforeinstallprompt', (e) => {
         // Prevent Chrome 67 and earlier from automatically showing the prompt
         e.preventDefault();
         // Stash the event so it can be triggered later
         deferredPrompt = e;
-        // Update UI to notify the user they can add to home screen
-        if (addBtn) {
-            addBtn.style.display = 'block';
+        
+        // Show the install button
+        const installButton = document.createElement('div');
+        installButton.id = 'pwa-install-button';
+        installButton.innerHTML = `
+            <div style="position: fixed; bottom: 20px; right: 20px; background-color: #3B82F6; color: white; padding: 10px 15px; border-radius: 50px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 9999; display: flex; align-items: center; cursor: pointer;">
+                <span style="margin-right: 8px;">📱</span>
+                <span>Install App</span>
+            </div>
+        `;
+        
+        document.body.appendChild(installButton);
+        
+        installButton.addEventListener('click', (e) => {
+            // Hide the install button
+            installButton.style.display = 'none';
             
-            addBtn.addEventListener('click', () => {
-                // Show the install prompt
-                deferredPrompt.prompt();
-                // Wait for the user to respond to the prompt
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the A2HS prompt');
-                    } else {
-                        console.log('User dismissed the A2HS prompt');
-                    }
-                    deferredPrompt = null;
-                    addBtn.style.display = 'none';
-                });
+            // Show the prompt
+            deferredPrompt.prompt();
+            
+            // Wait for the user to respond to the prompt
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                } else {
+                    console.log('User dismissed the install prompt');
+                }
+                deferredPrompt = null;
             });
-        }
+        });
     });
     
-    // Handle offline/online status
-    function updateOnlineStatus() {
-        const status = navigator.onLine ? 'online' : 'offline';
-        console.log(`App is now ${status}`);
+    // Check if app is in standalone mode (installed)
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('App is running in standalone mode');
         
-        // Update UI based on connection status
-        const offlineIndicator = document.querySelector('.offline-indicator');
-        if (offlineIndicator) {
-            offlineIndicator.style.display = status === 'offline' ? 'block' : 'none';
+        // Add a class to the body for PWA-specific styling
+        document.body.classList.add('pwa-mode');
+    }
+    
+    // Handle online/offline status
+    function updateOnlineStatus() {
+        const statusIndicator = document.createElement('div');
+        statusIndicator.id = 'online-status-indicator';
+        
+        if (navigator.onLine) {
+            // Online - remove offline message if it exists
+            const existingIndicator = document.getElementById('online-status-indicator');
+            if (existingIndicator) {
+                existingIndicator.remove();
+            }
+        } else {
+            // Offline - show message
+            statusIndicator.innerHTML = `
+                <div style="position: fixed; top: 60px; left: 0; right: 0; background-color: #fff3cd; color: #856404; text-align: center; padding: 8px; z-index: 9999;">
+                    You are offline. Some features may be limited.
+                </div>
+            `;
+            
+            // Add to body if not already present
+            if (!document.getElementById('online-status-indicator')) {
+                document.body.appendChild(statusIndicator);
+            }
         }
     }
     
+    // Check status on load
+    window.addEventListener('load', updateOnlineStatus);
+    
+    // Listen for changes
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
-    
-    // Initial check
-    updateOnlineStatus();
-    """
-    
-    with open(f"{static_dir}/js/main.js", "w") as f:
-        f.write(main_js)
-    
-    # Create minimal CSS
-    main_css = """
-    /* Offline indicator */
-    .offline-indicator {
-        display: none;
-        background-color: #fef2f2;
-        color: #b91c1c;
-        padding: 0.5rem 1rem;
-        border-radius: 4px;
-        text-align: center;
-        margin-bottom: 1rem;
-        font-weight: bold;
-    }
-    
-    /* Add to home screen button */
-    .add-to-home {
-        display: none;
-        background-color: #3B82F6;
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 4px;
-        cursor: pointer;
-        margin: 0.5rem 0;
-    }
-    
-    .add-to-home:hover {
-        background-color: #2563EB;
-    }
-    
-    /* Mobile optimizations */
-    @media (max-width: 768px) {
-        .mobile-stack {
-            flex-direction: column !important;
-        }
-        
-        .mobile-full-width {
-            width: 100% !important;
-        }
-        
-        .mobile-hide {
-            display: none !important;
-        }
-        
-        .mobile-show {
-            display: block !important;
-        }
-        
-        .mobile-text-center {
-            text-align: center !important;
-        }
-        
-        .mobile-compact {
-            padding: 0.5rem !important;
-            margin: 0.5rem 0 !important;
-        }
-    }
-    """
-    
-    with open(f"{static_dir}/css/style.css", "w") as f:
-        f.write(main_css)
-
-def add_pwa_head_tags():
-    """
-    Add necessary PWA meta tags to the page header.
-    
-    This function injects HTML with meta tags required for PWA functionality.
-    """
-    pwa_tags = """
-    <link rel="manifest" href="/static/manifest.json">
-    <meta name="theme-color" content="#3B82F6">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="gcPanel">
-    <link rel="apple-touch-icon" href="/static/images/icon-192x192.png">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <script src="/static/js/main.js" defer></script>
-    """
-    
-    st.markdown(pwa_tags, unsafe_allow_html=True)
-
-def add_offline_indicator():
-    """
-    Add an offline status indicator to the page.
-    
-    This function adds a banner that appears when the device goes offline.
-    """
-    indicator_html = """
-    <div class="offline-indicator">
-        You are currently offline. Some features may be limited.
-    </div>
-    
-    <script>
-    // Update the indicator based on current connection status
-    document.addEventListener('DOMContentLoaded', function() {
-        const indicator = document.querySelector('.offline-indicator');
-        if (indicator) {
-            indicator.style.display = navigator.onLine ? 'none' : 'block';
-        }
-    });
     </script>
-    """
-    
-    st.markdown(indicator_html, unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-def add_install_prompt():
+def create_service_worker():
     """
-    Add a button to prompt users to install the PWA.
+    Create a service worker file for offline support.
     
-    This function adds a button that triggers the install prompt on compatible devices.
+    In a real implementation, this would write the service worker
+    file to the static directory. For this demo, we'll just display
+    the code that would be used.
     """
-    prompt_html = """
-    <button class="add-to-home">
-        Add gcPanel to Home Screen
-    </button>
+    service_worker_code = """
+    // Service Worker for gcPanel PWA
+    
+    const CACHE_NAME = 'gcpanel-cache-v1';
+    const urlsToCache = [
+        '/',
+        '/static/css/main.css',
+        '/static/js/main.js',
+        '/static/images/logo.png',
+        '/static/images/icons/icon-192x192.png',
+        '/static/images/icons/icon-512x512.png'
+    ];
+    
+    // Install event - cache assets
+    self.addEventListener('install', event => {
+        event.waitUntil(
+            caches.open(CACHE_NAME)
+                .then(cache => {
+                    console.log('Opened cache');
+                    return cache.addAll(urlsToCache);
+                })
+        );
+    });
+    
+    // Fetch event - serve from cache if available
+    self.addEventListener('fetch', event => {
+        event.respondWith(
+            caches.match(event.request)
+                .then(response => {
+                    // Cache hit - return response
+                    if (response) {
+                        return response;
+                    }
+                    
+                    // Clone the request
+                    const fetchRequest = event.request.clone();
+                    
+                    return fetch(fetchRequest)
+                        .then(response => {
+                            // Check if valid response
+                            if (!response || response.status !== 200 || response.type !== 'basic') {
+                                return response;
+                            }
+                            
+                            // Clone the response
+                            const responseToCache = response.clone();
+                            
+                            // Cache the response
+                            caches.open(CACHE_NAME)
+                                .then(cache => {
+                                    cache.put(event.request, responseToCache);
+                                });
+                                
+                            return response;
+                        })
+                        .catch(() => {
+                            // Network failed, try to serve from cache for HTML pages
+                            if (event.request.url.indexOf('.html') > -1 || 
+                                event.request.url.endsWith('/')) {
+                                return caches.match('/offline.html');
+                            }
+                        });
+                })
+        );
+    });
+    
+    // Activate event - clean up old caches
+    self.addEventListener('activate', event => {
+        const cacheWhitelist = [CACHE_NAME];
+        
+        event.waitUntil(
+            caches.keys().then(cacheNames => {
+                return Promise.all(
+                    cacheNames.map(cacheName => {
+                        if (cacheWhitelist.indexOf(cacheName) === -1) {
+                            return caches.delete(cacheName);
+                        }
+                    })
+                );
+            })
+        );
+    });
     """
     
-    st.markdown(prompt_html, unsafe_allow_html=True)
+    return service_worker_code
 
-def setup_pwa():
+def create_manifest():
     """
-    Set up all PWA features.
+    Create a web app manifest for PWA support.
     
-    This function initializes all PWA components and ensures the necessary
-    files are created.
+    In a real implementation, this would write the manifest
+    file to the static directory. For this demo, we'll just display
+    the manifest that would be used.
     """
-    # Create static assets directory if it doesn't exist
-    static_dir = "static"
-    if not os.path.exists(static_dir):
-        create_pwa_assets(static_dir)
+    manifest = {
+        "name": "gcPanel Construction Management",
+        "short_name": "gcPanel",
+        "description": "Construction management dashboard for the Highland Tower Development",
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#ffffff",
+        "theme_color": "#3B82F6",
+        "icons": [
+            {
+                "src": "static/images/gcpanel-icon-192.png",
+                "sizes": "192x192",
+                "type": "image/png"
+            },
+            {
+                "src": "static/images/gcpanel-icon-512.png",
+                "sizes": "512x512",
+                "type": "image/png"
+            }
+        ]
+    }
     
-    # Add PWA meta tags to head
-    add_pwa_head_tags()
-    
-    # Add offline indicator
-    add_offline_indicator()
-    
-    # Add install prompt button
-    add_install_prompt()
+    return json.dumps(manifest, indent=2)
+
+def show_pwa_details():
+    """Display PWA implementation details for development purposes."""
+    with st.expander("PWA Implementation Details"):
+        st.markdown("""
+        ### PWA Implementation
+        
+        To implement PWA capabilities, three key components are required:
+        
+        1. **Web App Manifest**: JSON file that provides information about the app
+        2. **Service Worker**: JavaScript file that enables offline functionality
+        3. **HTTPS**: PWAs require secure connections
+        
+        Below are the implementations for this project:
+        """)
+        
+        # Show manifest.json
+        st.markdown("#### Web App Manifest (manifest.json)")
+        st.code(create_manifest(), language="json")
+        
+        # Show service-worker.js
+        st.markdown("#### Service Worker (service-worker.js)")
+        st.code(create_service_worker(), language="javascript")
+        
+        # Show registration code
+        st.markdown("#### Service Worker Registration (in main.js)")
+        registration_code = """
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            });
+        }
+        """
+        st.code(registration_code, language="javascript")

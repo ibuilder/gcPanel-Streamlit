@@ -37,24 +37,24 @@ def render_header():
     col1, col3 = st.columns([5, 5])
     
     with col1:
-        # Professional logo and project name with improved styling - removed mouseover/mouseout events that caused React errors
-        st.markdown("""
-        <div style="display: flex; align-items: center; padding: 12px 0; background: linear-gradient(to right, #f8f9fa, #ffffff); 
-                    border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-            <div style="margin-right: 20px; cursor: pointer; transition: transform 0.2s ease;" 
-                 onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', key: 'logo_clicked', value: true}, '*')">
-                <span style="font-size: 24px; font-weight: 700; letter-spacing: 0.3px; background: linear-gradient(45deg, #2c3e50, #4a6572); 
-                             -webkit-background-clip: text; -webkit-text-fill-color: transparent; padding: 4px 10px;">
-                    gc<span style="font-weight: 600;">Panel</span>
-                </span>
-            </div>
-            <div style="border-left: 3px solid #4a6572; padding-left: 15px;">
+        # Use Streamlit's native components instead of HTML with event handlers
+        logo_col, info_col = st.columns([1, 3])
+        
+        with logo_col:
+            # The pure Streamlit way - use a button that looks like text
+            if st.button("🏗️ gcPanel", key="logo_button", use_container_width=True, 
+                      type="primary", help="Return to dashboard"):
+                st.session_state.logo_clicked = True
+                st.rerun()
+                
+        with info_col:
+            st.markdown("""
+            <div style="border-left: 3px solid #4a6572; padding-left: 15px; margin-left: -15px;">
                 <div style="font-size: 12px; color: #4a6572; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500;">Project</div>
                 <div style="font-size: 16px; font-weight: 600; color: #2c3e50;">Highland Tower Development</div>
                 <div style="font-size: 12px; color: #64748b;">$45.5M • 168,500 sq ft • 15 Stories</div>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
         
         # Handle logo click
         if st.session_state.get("logo_clicked", False):

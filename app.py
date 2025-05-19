@@ -11,6 +11,7 @@ The application now includes enhanced features for production readiness:
 - Mobile optimization with PWA support
 - Real-time collaboration tools
 - AI-powered features
+- Improved spacing and UI consistency
 """
 
 import streamlit as st
@@ -29,6 +30,9 @@ from modules.ai_assistant import render_ai_assistant
 from utils.mobile.responsive_layout import add_mobile_styles
 from utils.mobile.pwa_support import setup_pwa
 
+# Import improved container styling for better spacing
+from assets.container_styles import apply_container_styles
+
 def main():
     """Main application entry point."""
     # Set page configuration with favicon
@@ -37,6 +41,9 @@ def main():
     # Enable mobile optimizations and PWA support
     add_mobile_styles()
     setup_pwa()
+    
+    # Apply improved container styles to fix spacing issues
+    apply_container_styles()
     
     # Initialize session state variables if needed
     if "current_menu" not in st.session_state:

@@ -23,7 +23,8 @@ def get_mock_project_data():
     # Generate dates for last 12 months
     end_date = datetime.now()
     start_date = end_date - timedelta(days=365)
-    dates = pd.date_range(start=start_date, end=end_date, freq='M')
+    # Using 'ME' (month end) frequency instead of deprecated 'M'
+    dates = pd.date_range(start=start_date, end=end_date, freq='ME')
     
     # Generate budget data
     planned_budget = np.linspace(0, 45500000, len(dates))  # $45.5M total budget

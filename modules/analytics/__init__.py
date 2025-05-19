@@ -70,7 +70,8 @@ def render_analytics():
     
     # Custom Reports tab
     with tabs[2]:
-        report_generator.render_report_generator()
+        from modules.analytics.reports import render_report_generator
+        render_report_generator()
 
 def render_predictive_analytics():
     """Render the predictive analytics section."""

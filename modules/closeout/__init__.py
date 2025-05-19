@@ -31,11 +31,11 @@ def render_occupancy_permits():
         # Calculate progress percentage based on permit statuses
         approved_count = 2  # From our sample data
         total_count = 5     # From our sample data
-        progress_pct = (approved_count / total_count) * 100
+        progress_pct = (approved_count / total_count)  # Value between 0.0 and 1.0
         
         # Display progress bar
         st.progress(progress_pct)
-        st.markdown(f"**{progress_pct:.1f}% Complete** ({approved_count}/{total_count} permits approved)")
+        st.markdown(f"**{progress_pct*100:.1f}% Complete** ({approved_count}/{total_count} permits approved)")
     
     # Add status visualization
     st.markdown("### Permit Status Overview")

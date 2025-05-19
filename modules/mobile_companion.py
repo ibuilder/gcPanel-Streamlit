@@ -326,7 +326,7 @@ def render_todays_activities():
 
 def render_field_issues():
     """Render field issues reporting section."""
-    from utils.mobile.components import render_mobile_tag, render_list_item
+    from utils.mobile.components import render_mobile_tag, render_list_item, render_card_with_icon
     
     st.subheader("Field Issues")
     
@@ -370,48 +370,56 @@ def render_field_issues():
         }
     ]
     
-    # Display issues list
+    # Display issues list using Streamlit components
     for issue in issues:
-        priority_color = {
-            "Low": "#10b981",  # Green
-            "Medium": "#f59e0b",  # Amber
-            "High": "#ef4444",  # Red
-            "Critical": "#7f1d1d"  # Dark Red
-        }.get(issue["priority"], "#6b7280")
+        # Set colors based on priority and status
+        priority_colors = {
+            "Low": ("green", "#E8F5E9"),
+            "Medium": ("orange", "#FFF3E0"),
+            "High": ("red", "#FFEBEE"),
+            "Critical": ("darkred", "#FFD7D7")
+        }
         
-        status_color = {
-            "Open": "#ef4444",  # Red
-            "Assigned": "#f59e0b",  # Amber
-            "In Progress": "#3b82f6",  # Blue
-            "Resolved": "#10b981"  # Green
-        }.get(issue["status"], "#6b7280")
+        status_colors = {
+            "Open": ("red", "#FFEBEE"),
+            "Assigned": ("orange", "#FFF3E0"),
+            "In Progress": ("blue", "#E3F2FD"),
+            "Resolved": ("green", "#E8F5E9")
+        }
         
-        content += f"""
-        <div style="background-color: white; border-radius: 8px; padding: 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                <div style="font-weight: 600;">{issue["title"]}</div>
-                <div style="color: {status_color}; font-weight: 500; font-size: 0.9rem;">{issue["status"]}</div>
-            </div>
-            <div style="color: #666; font-size: 0.9rem; margin-bottom: 5px;">
-                📍 {issue["location"]}
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
-                <div>
-                    <span style="background-color: {priority_color}; color: white; padding: 2px 6px; border-radius: 4px;">
-                        {issue["priority"]}
-                    </span>
-                    <span style="color: #666; margin-left: 8px;">
-                        {issue["id"]}
-                    </span>
-                </div>
-                <div style="color: #666;">
-                    {issue["date"]}
-                </div>
-            </div>
-        </div>
-        """
+        priority_color, priority_bg = priority_colors.get(issue["priority"], ("gray", "#F5F5F5"))
+        status_color, status_bg = status_colors.get(issue["status"], ("gray", "#F5F5F5"))
+        
+        # Create a nice card for each issue
+        with st.container():
+            # Title row with status
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.markdown(f"**{issue['title']}**")
+            with col2:
+                st.markdown(
+                    f"<span style='color:{status_color};font-weight:500;'>{issue['status']}</span>", 
+                    unsafe_allow_html=True
+                )
+            
+            # Location info
+            st.caption(f"📍 {issue['location']}")
+            
+            # Bottom row with priority, ID, and date
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                st.markdown(
+                    f"<span style='background-color:{priority_bg};color:{priority_color};padding:2px 6px;border-radius:4px;font-size:0.8rem;'>{issue['priority']}</span> <span style='color:#666;font-size:0.8rem;'>{issue['id']}</span>", 
+                    unsafe_allow_html=True
+                )
+            with col2:
+                st.caption(f"{issue['date']}")
+            
+            # Add a light divider
+            st.markdown("---")
     
-    return content
+    # Empty string to satisfy the return type expected by the caller
+    return ""
 
 def render_offline_documents():
     """Render offline-capable document access."""

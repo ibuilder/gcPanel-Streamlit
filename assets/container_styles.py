@@ -28,11 +28,12 @@ def apply_container_styles():
         padding: 0.5rem 0.75rem;
     }
     
-    /* Container spacing */
+    /* Full screen container */
     .main .block-container {
-        padding-left: 2.5rem;
-        padding-right: 2.5rem;
-        max-width: 72rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        max-width: 100%;
+        width: 100%;
     }
     
     /* Card-style containers with proper padding */

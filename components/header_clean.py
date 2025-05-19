@@ -37,20 +37,23 @@ def render_header():
     col1, col3 = st.columns([5, 5])
     
     with col1:
-        # Enhanced logo and project name with improved spacing and shadow for better visibility
+        # Professional logo and project name with improved styling
         st.markdown("""
-        <div style="display: flex; align-items: center; padding: 10px 0;">
-            <div style="margin-right: 18px; cursor: pointer; transition: transform 0.2s ease;" 
+        <div style="display: flex; align-items: center; padding: 12px 0; background: linear-gradient(to right, #f8f9fa, #ffffff); 
+                    border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="margin-right: 20px; cursor: pointer; transition: transform 0.2s ease;" 
                  onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', key: 'logo_clicked', value: true}, '*')"
-                 onmouseover="this.style.transform='scale(1.05)'" 
+                 onmouseover="this.style.transform='scale(1.02)'" 
                  onmouseout="this.style.transform='scale(1)'">
-                <span style="font-size: 26px; font-weight: 700; text-shadow: 0px 1px 2px rgba(0,0,0,0.1);">
-                    🏗️ gc<span style="color: #3b82f6;">Panel</span>
+                <span style="font-size: 24px; font-weight: 700; letter-spacing: 0.3px; background: linear-gradient(45deg, #2c3e50, #4a6572); 
+                             -webkit-background-clip: text; -webkit-text-fill-color: transparent; padding: 4px 10px;">
+                    gc<span style="font-weight: 600;">Panel</span>
                 </span>
             </div>
-            <div style="border-left: 3px solid #3b82f6; padding-left: 15px;">
-                <div style="font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Project</div>
-                <div style="font-size: 16px; font-weight: 600; color: #1f2937;">Highland Tower Development</div>
+            <div style="border-left: 3px solid #4a6572; padding-left: 15px;">
+                <div style="font-size: 12px; color: #4a6572; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500;">Project</div>
+                <div style="font-size: 16px; font-weight: 600; color: #2c3e50;">Highland Tower Development</div>
+                <div style="font-size: 12px; color: #64748b;">$45.5M • 168,500 sq ft • 15 Stories</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -74,56 +77,63 @@ def render_header():
         # Find current menu's formatted option
         current_formatted = f"{menu_options[current_menu]['icon']} {menu_options[current_menu]['label']}"
         
-        # Add a prominent header for the navigation
+        # Add a sleek, professional header for the navigation
         st.markdown("""
-        <div style="text-align: center; padding: 10px 0 12px 0; margin-top: 5px; background-color: #f0f9ff; 
-                    border-radius: 8px 8px 0 0; border: 1px solid #e0e7ff; border-bottom: none;">
-            <span style="font-size: 15px; color: #1e40af; font-weight: 600; letter-spacing: 0.5px; 
+        <div style="text-align: center; padding: 8px 0; margin-top: 5px; 
+                    background: linear-gradient(to right, #2c3e50, #4a6572); 
+                    border-radius: 4px 4px 0 0; border: none;">
+            <span style="font-size: 14px; color: #ffffff; font-weight: 500; letter-spacing: 0.5px; 
                    text-transform: uppercase;">
-               🧭 Navigation
+               Navigation
             </span>
         </div>
         """, unsafe_allow_html=True)
         
-        # Add custom CSS to improve dropdown appearance and make it more prominent
+        # Add custom CSS to improve dropdown appearance with more professional styling
         st.markdown("""
         <style>
         div[data-baseweb="select"] {
-            border-radius: 0 0 8px 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
             transition: all 0.2s ease;
-            border: 1px solid #e0e7ff;
-            background-color: #f8fafc;
+            border: 1px solid #dfe1e5;
+            background-color: #ffffff;
         }
         div[data-baseweb="select"]:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
         }
         div[data-baseweb="select"] > div {
             font-weight: 500;
             padding: 12px 16px;
-            font-size: 16px;
+            font-size: 15px;
+            color: #333333;
         }
         div[data-baseweb="select"] svg {
-            color: #3b82f6 !important;
-            width: 24px;
-            height: 24px;
+            color: #4a6572 !important;
+            width: 20px;
+            height: 20px;
         }
         div[data-baseweb="menu"] {
-            max-height: 400px !important;
+            max-height: 450px !important;
             overflow-y: auto;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            border: 1px solid #e0e7ff;
+            border-radius: 4px;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.12);
+            border: 1px solid #dfe1e5;
         }
         div[data-baseweb="menu"] ul {
-            padding: 6px 0;
+            padding: 4px 0;
         }
         div[data-baseweb="menu"] li {
-            padding: 8px 16px !important;
-            font-size: 15px;
+            padding: 10px 16px !important;
+            font-size: 14px;
         }
         div[data-baseweb="menu"] li:hover {
-            background-color: #f0f9ff !important;
+            background-color: #f5f7fa !important;
+        }
+        
+        /* Make logo and header more professional */
+        .company-logo {
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
         }
         </style>
         """, unsafe_allow_html=True)

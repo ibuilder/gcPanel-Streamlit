@@ -40,13 +40,7 @@ from modules.analytics import render_analytics
 from modules.ai_assistant import render_ai_assistant
 
 # Import feature showcase module
-try:
-    from modules.features_showcase import render_features_showcase
-except ImportError:
-    # Define fallback function if module is not found
-    def render_features_showcase():
-        import streamlit as st
-        st.warning("Features showcase module is currently unavailable.")
+from modules.features_showcase import render_features_showcase
 
 def initialize_session_state():
     """Initialize session state variables."""

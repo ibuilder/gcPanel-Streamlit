@@ -21,9 +21,9 @@ import app_manager
 from modules.features_showcase import render_features_showcase
 from modules.mobile_field_companion import render_mobile_field_companion
 
-# Import AI features
-from utils.ai.document_search import render_smart_search_interface
-from utils.ai.smart_suggestions import IntelligentAlerts
+# Import AI features 
+# Modified to use modules directly instead of utility functions
+from modules.ai_assistant import render_ai_assistant
 
 # Import mobile optimization
 from utils.mobile.responsive_layout import add_mobile_styles

@@ -111,7 +111,8 @@ def render_features_showcase():
         
         with col2:
             st.subheader("Mobile Companion Preview")
-            st.image("https://placehold.co/400x250", caption="Mobile Interface Preview")
+            # Use a placeholder message instead of loading an external image
+            st.info("Mobile companion interface preview would be displayed here.")
     
     # Collaboration Tab
     with tabs[3]:

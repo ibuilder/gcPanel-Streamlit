@@ -37,14 +37,12 @@ def render_header():
     col1, col3 = st.columns([5, 5])
     
     with col1:
-        # Professional logo and project name with improved styling
+        # Professional logo and project name with improved styling - removed mouseover/mouseout events that caused React errors
         st.markdown("""
         <div style="display: flex; align-items: center; padding: 12px 0; background: linear-gradient(to right, #f8f9fa, #ffffff); 
                     border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
             <div style="margin-right: 20px; cursor: pointer; transition: transform 0.2s ease;" 
-                 onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', key: 'logo_clicked', value: true}, '*')"
-                 onmouseover="this.style.transform='scale(1.02)'" 
-                 onmouseout="this.style.transform='scale(1)'">
+                 onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', key: 'logo_clicked', value: true}, '*')">
                 <span style="font-size: 24px; font-weight: 700; letter-spacing: 0.3px; background: linear-gradient(45deg, #2c3e50, #4a6572); 
                              -webkit-background-clip: text; -webkit-text-fill-color: transparent; padding: 4px 10px;">
                     gc<span style="font-weight: 600;">Panel</span>

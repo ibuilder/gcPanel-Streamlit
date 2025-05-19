@@ -1,0 +1,29 @@
+Minified React error #231; visit https://reactjs.org/docs/error-decoder.html?invariant=231&args[]=onMouseOver&args[]=string for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+at In (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:10131)
+at https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:36368
+at u1 (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:48:40651)
+at vn (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:9535)
+at u0 (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:35194)
+at aa (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:18558)
+at Do (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:18442)
+Minified React error #231; visit https://reactjs.org/docs/error-decoder.html?invariant=231&args[]=onMouseOut&args[]=string for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+Minified React error #231; visit https://reactjs.org/docs/error-decoder.html?invariant=231&args[]=onMouseOver&args[]=string for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+Minified React error #231; visit https://reactjs.org/docs/error-decoder.html?invariant=231&args[]=onMouseOut&args[]=string for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+Minified React error #231; visit https://reactjs.org/docs/error-decoder.html?invariant=231&args[]=onMouseOver&args[]=string for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+Minified React error #231; visit https://reactjs.org/docs/error-decoder.html?invariant=231&args[]=onMouseOut&args[]=string for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+at In (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:10131)
+at https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:36368
+at u1 (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:48:40651)
+at vn (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:9535)
+at u0 (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:35194)
+at aa (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:18558)
+at Do (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:18442)
+Minified React error #231; visit https://reactjs.org/docs/error-decoder.html?invariant=231&args[]=onMouseOver&args[]=string for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+at In (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:10131)
+at https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:36368
+at u1 (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:48:40651)
+at vn (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:9535)
+at u0 (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:35194)
+at aa (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:18558)
+at Do (https://3eed9d5b-ff9c-4b87-b6d9-85173af6171a-00-p17x4ack6446.worf.replit.dev/static/js/index.C1z8KpLA.js:45:18442)
+Minified React error #231; visit https://reactjs.org/docs/error-decoder.html?invariant=231&args[]=onMouseOut&args[]=string for the full message or use the non-minified dev environment for full errors and additional helpful warnings.

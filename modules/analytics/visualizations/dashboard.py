@@ -139,7 +139,7 @@ def create_budget_performance_chart():
     )
     
     # Format y-axis as currency
-    fig.update_yaxes(tickprefix="$", tickformat=",.0f")
+    fig.update_layout(yaxis=dict(tickprefix="$", tickformat=",.0f"))
     
     # Try to add today marker in compatible format
     try:
@@ -355,7 +355,7 @@ def create_cost_breakdown_chart():
     )
     
     # Format y-axis as currency
-    fig.update_yaxes(tickprefix="$", tickformat=",.0f")
+    fig.update_layout(yaxis=dict(tickprefix="$", tickformat=",.0f"))
     
     return fig
 

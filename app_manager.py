@@ -38,6 +38,7 @@ from modules.documents import render_documents
 from modules.mobile_companion import render_mobile_companion
 from modules.analytics import render_analytics
 from modules.ai_assistant import render_ai_assistant
+from modules.integrations import render_integrations
 
 # Import feature showcase module
 from modules.features_showcase import render_features_showcase
@@ -167,6 +168,8 @@ def render_selected_module(current_menu):
         render_mobile_companion()
     elif current_menu == "Closeout":
         render_closeout()
+    elif current_menu == "Integrations":
+        render_integrations()
     elif current_menu == "Features Showcase":
         # Import and render the features showcase
         from modules.features_showcase import render_features_showcase

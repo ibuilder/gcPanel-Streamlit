@@ -48,17 +48,14 @@ def render_mobile_companion():
     
     selected_tab = create_mobile_tab_layout(tabs)
     
-    # Add a floating action button for quick report
-    st.markdown("""
-    <div class="mobile-action-button" onclick="document.getElementById('report_issue_button').click()">
-        ➕
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Hidden button for the floating action
-    if st.button("Report Issue", key="report_issue_button"):
-        st.session_state.show_issue_form = True
-        st.rerun()
+    # Add a floating action button for quick report using Streamlit's button
+    # This removes the embedded HTML and uses standard Streamlit components
+    report_button_col = st.container()
+    with report_button_col:
+        st.write("")  # Add some spacing
+        if st.button("➕ Report Issue", key="report_issue_button", type="primary"):
+            st.session_state.show_issue_form = True
+            st.rerun()
     
     # Display issue form if needed
     if st.session_state.get("show_issue_form", False):
@@ -329,9 +326,9 @@ def render_todays_activities():
 
 def render_field_issues():
     """Render field issues reporting section."""
-    content = """
-    <h3 style="margin-bottom: 15px;">Field Issues</h3>
-    """
+    from utils.mobile.components import render_mobile_tag
+    
+    st.subheader("Field Issues")
     
     # Sample issues for demonstration
     issues = [

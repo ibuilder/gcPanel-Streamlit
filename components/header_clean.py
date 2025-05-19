@@ -18,11 +18,14 @@ def render_header():
         "Safety": {"label": "Safety", "icon": "⚠️"},
         "Contracts": {"label": "Contracts", "icon": "📝"},
         "Cost Management": {"label": "Cost Management", "icon": "💰"},
+        "Analytics": {"label": "Analytics", "icon": "📈"},
         "Engineering": {"label": "Engineering", "icon": "🔧"},
         "Field Operations": {"label": "Field Operations", "icon": "🏗️"},
         "Documents": {"label": "Documents", "icon": "📄"},
         "BIM Viewer": {"label": "BIM", "icon": "🏢"},
+        "Mobile Companion": {"label": "Mobile Companion", "icon": "📱"},
         "Closeout": {"label": "Closeout", "icon": "✅"},
+        "Features Showcase": {"label": "Features Showcase", "icon": "✨"},
         "Settings": {"label": "Settings", "icon": "⚙️"}
     }
     

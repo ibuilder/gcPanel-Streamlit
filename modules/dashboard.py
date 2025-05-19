@@ -3,6 +3,7 @@ Dashboard module for the gcPanel Construction Management Dashboard.
 
 This module provides the dashboard view with construction project metrics,
 activity feeds, and key performance indicators.
+Includes mobile optimization and intelligent alerts for a responsive user experience.
 """
 
 import streamlit as st
@@ -10,11 +11,44 @@ import pandas as pd
 from datetime import datetime, timedelta
 import random
 
+# Import mobile optimizations
+from utils.mobile.responsive_layout import add_mobile_styles
+from utils.mobile.pwa_support import setup_pwa
+
+# Import AI features
+from utils.ai.smart_suggestions import IntelligentAlerts
+
 def render_dashboard():
     """Render the main dashboard with project overview and metrics."""
     
+    # Apply mobile optimizations and PWA support
+    add_mobile_styles()
+    setup_pwa()
+    
     # Page title
     st.header("Dashboard")
+    
+    # Initialize intelligent alerts system
+    alerts = IntelligentAlerts()
+    
+    # Display intelligent alerts at the top of the dashboard
+    with st.expander("Intelligent Alerts", expanded=True):
+        # Get high priority alerts
+        high_priority_alerts = alerts.get_alerts_by_priority("high_priority")
+        
+        if high_priority_alerts:
+            st.warning(f"**{len(high_priority_alerts)} High Priority Alerts Require Attention**")
+            
+            for alert in high_priority_alerts:
+                st.markdown(f"""
+                <div style="background-color: #f8d7da; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">{alert['title']}</div>
+                    <div style="margin-bottom: 10px;">{alert['description']}</div>
+                    <div style="font-size: 0.9em; margin-bottom: 5px;"><b>Recommendation:</b> {alert['recommendation']}</div>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.success("No high priority alerts at this time.")
     
     # Check if we have a selected project
     project_name = st.session_state.get('current_project', 'Highland Tower Development')

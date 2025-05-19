@@ -44,12 +44,28 @@ from modules.integrations import render_integrations
 from modules.features_showcase import render_features_showcase
 
 def initialize_session_state():
-    """Initialize session state variables."""
+    """
+    Initialize session state variables from config and set up required app state.
+    
+    This function initializes:
+    1. Default session state variables from app_config
+    2. Notification system state
+    3. Any other required application state variables
+    """
+    # Initialize default session state from configuration
+    _initialize_default_state()
+    
+    # Initialize notification system
+    _initialize_notifications()
+    
+def _initialize_default_state():
+    """Initialize the basic session state variables from configuration."""
     for key, value in DEFAULT_SESSION_STATE.items():
         if key not in st.session_state:
             st.session_state[key] = value
-            
-    # Initialize notifications if not present
+
+def _initialize_notifications():
+    """Initialize the notification system state if not already present."""
     if "notifications" not in st.session_state:
         st.session_state.notifications = [
             {
@@ -79,8 +95,23 @@ def initialize_session_state():
         ]
     
 def render_application():
-    """Render the main application interface."""
-    # Load external resources
+    """
+    Render the main application interface.
+    
+    This function orchestrates the application rendering process through several steps:
+    1. Load external resources (CSS, JS)
+    2. Initialize core services
+    3. Render the application UI components
+    """
+    # Setup application environment
+    _setup_application_environment()
+    
+    # Render UI components
+    _render_ui_framework()
+
+def _setup_application_environment():
+    """Set up the application environment and initialize core services."""
+    # Load external resources (CSS, JS)
     load_external_resources()
     
     # Initialize core services if they exist
@@ -92,8 +123,10 @@ def render_application():
         import os
         if not os.path.exists('core'):
             os.makedirs('core', exist_ok=True)
-    
-    # Render the header with right-aligned navigation
+
+def _render_ui_framework():
+    """Render the main UI framework including header, navigation, and content."""
+    # Render the application header with navigation
     render_header()
     
     # Main content area
@@ -101,59 +134,61 @@ def render_application():
         # Get current menu selection
         current_menu = st.session_state.get("current_menu", "Dashboard")
         
-        # Get breadcrumbs for current page
-        breadcrumb_items = get_breadcrumbs_for_page(current_menu)
+        # Handle notification center
+        _handle_notification_display()
         
-        # CSS is now loaded from external file (breadcrumbs.css)
+        # Handle action buttons for appropriate pages
+        _handle_action_buttons(current_menu)
         
-        # Only initialize notification center if needed - we'll handle breadcrumbs elsewhere
-        if st.session_state.get("show_notification_center", False):
-            notification_center()
-        
-        # Add action buttons for pages that need them
-        if current_menu in PAGES_WITH_ACTIONS:
-            page_type = PAGES_WITH_ACTIONS[current_menu]
-            action_result = render_action_bar(page_type=page_type)
-            
-            # Store action results in session state if needed
-            if action_result["add_clicked"] or action_result["edit_clicked"]:
-                st.session_state[f"{current_menu.lower().replace(' ', '_')}_action"] = action_result
-                st.rerun()
-        
-        # Render the selected module
+        # Render the selected module's content
         render_selected_module(current_menu)
 
+def _handle_notification_display():
+    """Display notification center if toggled by user."""
+    if st.session_state.get("show_notification_center", False):
+        notification_center()
+
+def _handle_action_buttons(current_menu):
+    """Handle rendering and processing of action buttons for specific pages."""
+    if current_menu in PAGES_WITH_ACTIONS:
+        page_type = PAGES_WITH_ACTIONS[current_menu]
+        action_result = render_action_bar(page_type=page_type)
+        
+        # Store action results in session state if needed
+        if action_result["add_clicked"] or action_result["edit_clicked"]:
+            st.session_state[f"{current_menu.lower().replace(' ', '_')}_action"] = action_result
+            st.rerun()
+
 def render_selected_module(current_menu):
-    """Render the module selected by the user."""
-    # Import render_features_showcase within function scope
-    from modules.features_showcase import render_features_showcase
+    """
+    Render the module selected by the user.
     
-    if current_menu == "Dashboard":
-        render_dashboard()
-    elif current_menu == "Project Information":
-        render_project_information()
-    elif current_menu == "Schedule":
-        render_scheduling()
-    elif current_menu == "Safety":
-        render_safety()
-    elif current_menu == "Contracts":
-        render_contracts()
-    elif current_menu == "Cost Management":
-        render_cost_management()
-    elif current_menu == "Analytics":
-        render_analytics()
-    elif current_menu == "Engineering":
-        render_engineering()
-    elif current_menu == "Field Operations":
-        render_field_operations()
-    elif current_menu == "Documents":
-        render_documents()
-    elif current_menu == "AI Assistant":
-        render_ai_assistant()
-    elif current_menu == "Features Showcase":
-        render_features_showcase()
-    elif current_menu == "BIM":
-        # Provide toggle between basic and advanced viewers
+    Uses a module mapping approach for cleaner code organization and easier maintenance.
+    Special cases like BIM with multiple view options are handled separately.
+    """
+    # Define a mapping of menu items to their rendering functions
+    # This makes it easy to add new modules without modifying the if/elif chain
+    module_mapping = {
+        "Dashboard": render_dashboard,
+        "Project Information": render_project_information,
+        "Schedule": render_scheduling,
+        "Safety": render_safety,
+        "Contracts": render_contracts,
+        "Cost Management": render_cost_management,
+        "Analytics": render_analytics,
+        "Engineering": render_engineering,
+        "Field Operations": render_field_operations,
+        "Documents": render_documents,
+        "AI Assistant": render_ai_assistant,
+        "Features Showcase": render_features_showcase,
+        "Mobile Companion": render_mobile_companion,
+        "Closeout": render_closeout,
+        "Integrations": render_integrations,
+        "Settings": render_settings
+    }
+    
+    # Handle special case for BIM with multiple view options
+    if current_menu == "BIM":
         viewer_type = st.radio(
             "Select BIM Viewer Type", 
             ["Basic Floor Stacks", "Advanced 3D Viewer"],
@@ -164,15 +199,8 @@ def render_selected_module(current_menu):
             render_basic_bim_viewer()
         else:
             render_advanced_bim_viewer()
-    elif current_menu == "Mobile Companion":
-        render_mobile_companion()
-    elif current_menu == "Closeout":
-        render_closeout()
-    elif current_menu == "Integrations":
-        render_integrations()
-    elif current_menu == "Features Showcase":
-        # Import and render the features showcase
-        from modules.features_showcase import render_features_showcase
-        render_features_showcase()
-    elif current_menu == "Settings":
-        render_settings()
+    # For regular modules, use the mapping to find and call the appropriate function
+    elif current_menu in module_mapping:
+        module_mapping[current_menu]()
+    else:
+        st.error(f"Module '{current_menu}' not found. Please select a valid module.")

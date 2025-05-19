@@ -2,11 +2,24 @@
 Application configuration for gcPanel.
 
 This module contains centralized application settings and configuration options.
+The configuration is organized into logical sections to improve maintainability:
+
+- Navigation: Menu options and mapping
+- Session State: Default session values
+- UI Configuration: Pages with action buttons, theme settings
+- Project Information: Global project data
+
+To extend the application, developers can modify the appropriate section
+without affecting other parts of the configuration.
 """
 
 import streamlit as st
 
-# Menu options for the application
+# ============================================================================
+# NAVIGATION CONFIGURATION
+# ============================================================================
+
+# All available modules with their display names (including icons)
 MENU_OPTIONS = [
     "📊 Dashboard", 
     "📋 Project Information",
@@ -26,7 +39,7 @@ MENU_OPTIONS = [
     "⚙️ Settings"
 ]
 
-# Mapping from display names to internal names
+# Mapping from display names (with icons) to internal module names
 MENU_MAP = {
     "📊 Dashboard": "Dashboard", 
     "📋 Project Information": "Project Information",
@@ -46,16 +59,25 @@ MENU_MAP = {
     "⚙️ Settings": "Settings"
 }
 
-# Default session state values
+# ============================================================================
+# SESSION STATE CONFIGURATION
+# ============================================================================
+
+# Default values for session state variables
 DEFAULT_SESSION_STATE = {
-    "current_menu": "Dashboard",
-    "user": None,
-    "theme": "light",
-    "show_notifications": False,
-    "mobile_page": "dashboard"
+    "current_menu": "Dashboard",  # Default landing page
+    "user": None,                 # User information when logged in
+    "theme": "light",             # UI theme (light/dark)
+    "show_notifications": False,  # Notification panel visibility
+    "mobile_page": "dashboard"    # Current page in mobile view
 }
 
-# Pages that should have Add/Edit buttons
+# ============================================================================
+# UI CONFIGURATION
+# ============================================================================
+
+# Pages that should display action buttons (Add/Edit/Delete)
+# The value is the item type label used in the buttons
 PAGES_WITH_ACTIONS = {
     "Project Information": "Information", 
     "Schedule": "Schedule Item",
@@ -67,4 +89,21 @@ PAGES_WITH_ACTIONS = {
     "Documents": "Document",
     "Mobile Companion": "Feature",
     "Closeout": "Closeout Item"
+}
+
+# ============================================================================
+# PROJECT INFORMATION
+# ============================================================================
+
+# Global project information used throughout the application
+PROJECT_INFO = {
+    "name": "Highland Tower Development",
+    "value": "$45.5M",
+    "size": "168,500 sq ft",
+    "floors": "15 stories above ground, 2 below",
+    "units": "120 residential, 8 retail",
+    "location": "Downtown Highland District",
+    "client": "Highland Properties LLC",
+    "start_date": "2025-01-15",
+    "completion_date": "2027-06-30"
 }

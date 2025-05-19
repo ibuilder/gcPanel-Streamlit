@@ -20,8 +20,7 @@ def render_mobile_companion():
     # Add mobile-friendly styles
     add_mobile_styles()
     
-    # Set up PWA support for offline access
-    setup_pwa()
+    # PWA support is now set up in app.py to avoid duplicate setup
     
     # Check if we're in offline mode
     is_offline = check_offline_status()

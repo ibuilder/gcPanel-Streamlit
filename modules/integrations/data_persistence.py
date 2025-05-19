@@ -275,7 +275,8 @@ def save_imported_data(platform: str, data_type: str, data: Any, import_method: 
                         session.add(summary_item)
             
             # Commit is handled by the context manager
-            return dataset.id
+            # Convert SQLAlchemy Column type to int before returning
+            return int(dataset.id) if dataset.id is not None else None
     
     except Exception as e:
         st.error(f"Failed to save imported data: {str(e)}")

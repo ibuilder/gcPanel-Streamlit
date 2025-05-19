@@ -20,13 +20,39 @@ def render_action_bar(page_type="Item", show_add=True, show_edit=True, show_dele
     Returns:
         dict: Dictionary containing button click states (add_clicked, edit_clicked, delete_clicked)
     """
-    # CSS for the action bar
+    # CSS for the action bar with improved button styling
     st.markdown("""
+    <style>
+    .stButton > button {
+        min-width: 120px;
+        height: 42px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        padding: 0px 15px;
+        border-radius: 5px;
+        font-weight: 500;
+    }
+    .action-bar {
+        display: flex;
+        justify-content: flex-end;
+        padding: 10px 0;
+        margin-bottom: 15px;
+        border-bottom: 1px solid rgba(49, 51, 63, 0.2);
+    }
+    </style>
     <div class="action-bar">
     """, unsafe_allow_html=True)
     
-    # Setup columns for buttons
-    cols = st.columns([6, 1, 1, 1])
+    # Calculate how many buttons to show
+    visible_buttons = sum([show_add, show_edit, show_delete])
+    
+    # Setup columns with appropriate spacing
+    # Giving more space to the content area and proper spacing for buttons
+    cols = []
+    if visible_buttons > 0:
+        cols = st.columns([5] + [1] * visible_buttons)
+    else:
+        cols = [st.container()]  # Just a placeholder if no buttons
     
     # Initialize result tracking
     result = {
@@ -35,27 +61,43 @@ def render_action_bar(page_type="Item", show_add=True, show_edit=True, show_dele
         "delete_clicked": False
     }
     
+    col_index = 1  # Start from the second column (after the content space)
+    
     # Add button
     if show_add:
-        with cols[1]:
+        with cols[col_index]:
             add_label = f"Add {page_type}"
-            add_clicked = st.button(f"➕ {add_label}", key=f"add_{page_type.lower().replace(' ', '_')}")
+            add_clicked = st.button(
+                "➕ Add", 
+                key=f"add_{page_type.lower().replace(' ', '_')}",
+                help=add_label  # Add tooltip for full context
+            )
             if add_clicked:
                 result["add_clicked"] = True
+        col_index += 1
     
     # Edit button
     if show_edit:
-        with cols[2]:
+        with cols[col_index]:
             edit_label = f"Edit {page_type}"
-            edit_clicked = st.button(f"✏️ {edit_label}", key=f"edit_{page_type.lower().replace(' ', '_')}")
+            edit_clicked = st.button(
+                "✏️ Edit", 
+                key=f"edit_{page_type.lower().replace(' ', '_')}",
+                help=edit_label  # Add tooltip for full context
+            )
             if edit_clicked:
                 result["edit_clicked"] = True
+        col_index += 1
     
     # Delete button
     if show_delete:
-        with cols[3]:
+        with cols[col_index]:
             delete_label = f"Delete {page_type}"
-            delete_clicked = st.button(f"🗑️ {delete_label}", key=f"delete_{page_type.lower().replace(' ', '_')}")
+            delete_clicked = st.button(
+                "🗑️ Delete", 
+                key=f"delete_{page_type.lower().replace(' ', '_')}",
+                help=delete_label  # Add tooltip for full context
+            )
             if delete_clicked:
                 result["delete_clicked"] = True
     

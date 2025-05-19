@@ -297,6 +297,49 @@ def disconnect_platform(platform_id: str) -> None:
             "token_info": None
         }
 
+def get_connection_status(platform_id: str) -> Dict[str, Any]:
+    """
+    Get detailed connection status information for a platform.
+    
+    Args:
+        platform_id: ID of the platform
+        
+    Returns:
+        Dict[str, Any]: Connection status information including:
+            - last_sync: timestamp of last data sync
+            - connection_time: when the connection was established
+            - auth_type: type of authentication (oauth, api_key)
+            - scopes: authorized access scopes (for OAuth)
+    """
+    initialize_integrations()
+    
+    platform_info = st.session_state.integrations.get(platform_id, {})
+    
+    if not platform_info.get("status", False):
+        return {"connected": False}
+        
+    platform_config = PLATFORM_CONFIG.get(platform_id, {})
+    auth_type = platform_config.get("auth_type", "unknown")
+    
+    # Build connection status information without including sensitive credentials
+    status = {
+        "connected": True,
+        "last_sync": platform_info.get("last_sync", "Never"),
+        "connection_time": platform_info.get("last_connected", "Unknown"),
+        "auth_type": auth_type
+    }
+    
+    # Add OAuth-specific information if applicable
+    if auth_type == "oauth2":
+        token_info = platform_info.get("token_info", {})
+        if token_info:
+            status.update({
+                "scopes": token_info.get("scope", []),
+                "expires": token_info.get("expires", "Unknown")
+            })
+    
+    return status
+
 def get_authorized_headers(platform_id: str) -> Optional[Dict[str, str]]:
     """
     Get authorized headers for API requests.

@@ -152,19 +152,45 @@ def load_integration_status():
                     "connection_info": connection_info
                 }
 
-def save_integration_status(service_id, status, api_key=""):
-    """Save integration status to session state."""
+def save_integration_status(service_id, status, credentials=None):
+    """
+    Save integration status to the authentication system.
+    
+    Args:
+        service_id: The ID of the service to update
+        status: Whether the service is connected
+        credentials: Dictionary of credentials if connecting
+    """
     if "integrations" in st.session_state and service_id in st.session_state.integrations:
+        # Update local session state
         st.session_state.integrations[service_id]["status"] = status
         
-        if status:
+        if status and credentials:
+            # Convert to proper dictionary if we received a single API key
+            if isinstance(credentials, str):
+                # Find the key field name from the service definition
+                key_field = "api_key"  # Default
+                for category in INTEGRATION_CATEGORIES:
+                    for service in INTEGRATION_CATEGORIES[category]:
+                        if service["id"] == service_id and "required_fields" in service:
+                            # Use the first field that contains 'key' or is literally 'api_key'
+                            for field in service["required_fields"]:
+                                if "key" in field.lower() or field == "api_key":
+                                    key_field = field
+                                    break
+                            break
+                
+                # Create credentials dictionary with the appropriate key
+                credentials = {key_field: credentials}
+            
+            # Store in our authentication system
+            store_credentials(service_id, credentials)
+            
+            # Mark the last sync time
             st.session_state.integrations[service_id]["last_sync"] = datetime.now().strftime("%Y-%m-%d %H:%M")
-            if api_key:
-                # In a real application, this would be securely stored
-                st.session_state.integrations[service_id]["api_key"] = "••••••••••••••••"
         else:
-            # If disconnecting, reset API key
-            st.session_state.integrations[service_id]["api_key"] = ""
+            # If disconnecting, we can clear our credentials
+            store_credentials(service_id, {})
 
 def render_integration_manager():
     """Render the integration manager interface."""
@@ -291,15 +317,29 @@ def render_integration_card(service_id, service_name, logo_path):
                         # Check if all required fields are filled
                         if service_def and "required_fields" in service_def:
                             if all(form_fields[field] for field in service_def["required_fields"]):
-                                save_integration_status(service_id, True, form_fields.get("api_key", ""))
-                                st.success(f"Connected to {service_name}")
-                                st.rerun()
+                                # Test the connection with our authentication system
+                                success, message = test_connection(service_id, form_fields)
+                                
+                                if success:
+                                    # Save the credentials to our authentication system
+                                    save_integration_status(service_id, True, form_fields)
+                                    st.success(f"Connected to {service_name}: {message}")
+                                    st.rerun()
+                                else:
+                                    st.error(f"Connection failed: {message}")
                             else:
                                 st.error("All fields are required")
                         elif form_fields.get("api_key"):
-                            save_integration_status(service_id, True, form_fields["api_key"])
-                            st.success(f"Connected to {service_name}")
-                            st.rerun()
+                            # Simple API key auth without other fields
+                            credentials = {"api_key": form_fields["api_key"]}
+                            success, message = test_connection(service_id, credentials)
+                            
+                            if success:
+                                save_integration_status(service_id, True, credentials)
+                                st.success(f"Connected to {service_name}: {message}")
+                                st.rerun()
+                            else:
+                                st.error(f"Connection failed: {message}")
                         else:
                             st.error("API Key or Access Token is required")
         

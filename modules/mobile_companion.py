@@ -326,7 +326,7 @@ def render_todays_activities():
 
 def render_field_issues():
     """Render field issues reporting section."""
-    from utils.mobile.components import render_mobile_tag
+    from utils.mobile.components import render_mobile_tag, render_list_item
     
     st.subheader("Field Issues")
     
@@ -608,9 +608,9 @@ def render_checklist_items(readonly=False):
 
 def render_weather_conditions():
     """Render current and forecasted weather conditions."""
-    content = """
-    <h3 style="margin-bottom: 15px;">Weather Conditions</h3>
-    """
+    from utils.mobile.components import render_weather_card, render_mobile_alerts
+    
+    st.subheader("Weather Conditions")
     
     # Current conditions display
     current_weather = {
@@ -622,80 +622,61 @@ def render_weather_conditions():
         "precipitation": "0%"
     }
     
-    content += f"""
-    <div style="background-color: white; border-radius: 8px; padding: 15px; margin-bottom: 20px; 
-               box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-        <div style="display: flex; align-items: center; margin-bottom: 15px;">
-            <div style="font-size: 2.5rem; margin-right: 15px;">⛅</div>
-            <div>
-                <div style="font-size: 1.5rem; font-weight: 500;">{current_weather["temperature"]}</div>
-                <div style="color: #666;">{current_weather["condition"]}</div>
-            </div>
-        </div>
+    # Use our reusable weather card component
+    render_weather_card(
+        temperature=current_weather["temperature"],
+        conditions=current_weather["condition"],
+        forecast="Clear skies expected for the next 24 hours with temperatures ranging from 65-75°F.",
+        location="Highland Tower Site"
+    )
+    
+    # Display additional weather details
+    col1, col2 = st.columns(2)
+    with col1:
+        st.caption("Feels Like")
+        st.write(current_weather["feels_like"])
         
-        <div style="display: flex; flex-wrap: wrap; margin-top: 10px;">
-            <div style="width: 50%; margin-bottom: 8px;">
-                <div style="color: #666; font-size: 0.9rem;">Feels Like</div>
-                <div>{current_weather["feels_like"]}</div>
-            </div>
-            <div style="width: 50%; margin-bottom: 8px;">
-                <div style="color: #666; font-size: 0.9rem;">Humidity</div>
-                <div>{current_weather["humidity"]}</div>
-            </div>
-            <div style="width: 50%; margin-bottom: 8px;">
-                <div style="color: #666; font-size: 0.9rem;">Wind</div>
-                <div>{current_weather["wind"]}</div>
-            </div>
-            <div style="width: 50%; margin-bottom: 8px;">
-                <div style="color: #666; font-size: 0.9rem;">Precipitation</div>
-                <div>{current_weather["precipitation"]}</div>
-            </div>
-        </div>
-    </div>
-    """
+        st.caption("Wind")
+        st.write(current_weather["wind"])
     
-    # Forecast display
-    content += """
-    <div style="font-weight: 600; margin-bottom: 10px;">5-Day Forecast</div>
-    """
+    with col2:
+        st.caption("Humidity")
+        st.write(current_weather["humidity"])
+        
+        st.caption("Precipitation")
+        st.write(current_weather["precipitation"])
     
-    forecast = [
-        {"day": "Today", "icon": "⛅", "high": "74°F", "low": "60°F", "condition": "Partly Cloudy"},
-        {"day": "Wed", "icon": "☀️", "high": "78°F", "low": "62°F", "condition": "Sunny"},
-        {"day": "Thu", "icon": "☀️", "high": "80°F", "low": "65°F", "condition": "Sunny"},
-        {"day": "Fri", "icon": "🌧️", "high": "72°F", "low": "61°F", "condition": "Showers"},
-        {"day": "Sat", "icon": "⛅", "high": "75°F", "low": "63°F", "condition": "Partly Cloudy"}
+    # 5-Day Forecast section
+    st.subheader("5-Day Forecast")
+    
+    # Create a 5-day forecast using Streamlit components
+    forecast_data = [
+        {"day": "Today", "temp_high": "72°F", "temp_low": "65°F", "condition": "Partly Cloudy", "icon": "⛅"},
+        {"day": "Tomorrow", "temp_high": "75°F", "temp_low": "67°F", "condition": "Sunny", "icon": "☀️"},
+        {"day": "Wednesday", "temp_high": "70°F", "temp_low": "63°F", "condition": "Showers", "icon": "🌧️"},
+        {"day": "Thursday", "temp_high": "68°F", "temp_low": "60°F", "condition": "Partly Cloudy", "icon": "⛅"},
+        {"day": "Friday", "temp_high": "73°F", "temp_low": "66°F", "condition": "Sunny", "icon": "☀️"}
     ]
     
-    content += """
-    <div style="display: flex; overflow-x: auto; margin-bottom: 20px;">
-    """
+    # Display the forecast in a grid
+    cols = st.columns(5)
+    for i, day in enumerate(forecast_data):
+        with cols[i]:
+            st.markdown(f"**{day['day']}**")
+            st.markdown(f"{day['icon']} {day['condition']}")
+            st.markdown(f"High: {day['temp_high']}")
+            st.markdown(f"Low: {day['temp_low']}")
     
-    for day in forecast:
-        content += f"""
-        <div style="min-width: 80px; text-align: center; padding: 10px;">
-            <div style="font-weight: 500; margin-bottom: 5px;">{day["day"]}</div>
-            <div style="font-size: 1.8rem; margin-bottom: 5px;">{day["icon"]}</div>
-            <div style="font-weight: 500;">{day["high"]}</div>
-            <div style="color: #666; font-size: 0.9rem;">{day["low"]}</div>
-        </div>
-        """
+    # Add weather alerts
+    weather_alerts = [
+        {
+            "text": "Rain Expected Thursday. Take precautions to protect open areas and schedule work accordingly.",
+            "type": "warning",
+            "icon": "⚠️"
+        }
+    ]
     
-    content += """
-    </div>
-    """
-    
-    # Add weather alerts if any
-    content += """
-    <div style="background-color: #fef2f2; border-radius: 8px; padding: 12px; margin-bottom: 10px;">
-        <div style="font-weight: 600; color: #b91c1c; margin-bottom: 5px;">⚠️ Rain Expected Thursday</div>
-        <div style="color: #666; font-size: 0.9rem;">
-            Take precautions to protect open areas and schedule work accordingly.
-        </div>
-    </div>
-    """
-    
-    return content
+    render_mobile_alerts(weather_alerts)
 
 # Helper function for sending notifications
 def send_notification(user_id, template_name, **kwargs):

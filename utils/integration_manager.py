@@ -1,548 +1,337 @@
 """
 Integration Manager for gcPanel.
 
-This module manages connections with external services including project management tools,
-calendars, cloud storage, and construction management platforms.
+This module provides tools for managing external service integrations
+such as project management platforms, calendar services, cloud storage,
+and construction management platforms.
 """
 
+from enum import Enum, auto
+from typing import Dict, List, Optional, Any
 import streamlit as st
-import os
 import json
-from enum import Enum
-from datetime import datetime, timedelta
-import requests
+import os
+import pandas as pd
+
 
 class IntegrationType(Enum):
-    """Types of integrations supported by gcPanel."""
-    
-    PROJECT_MANAGEMENT = "project_management"
-    CALENDAR = "calendar" 
-    CLOUD_STORAGE = "cloud_storage"
-    CONSTRUCTION_MANAGEMENT = "construction_management"
+    """Enum representing different types of integrations."""
+    PROJECT_MANAGEMENT = auto()
+    CALENDAR = auto()
+    CLOUD_STORAGE = auto()
+    CONSTRUCTION_MANAGEMENT = auto()
+    DESIGN = auto()
 
-class IntegrationProvider(Enum):
-    """Integration providers supported by gcPanel."""
+
+class IntegrationProvider:
+    """Class representing a specific integration provider."""
     
-    # Project Management
-    JIRA = "jira"
-    ASANA = "asana"
-    MS_PROJECT = "ms_project"
-    
-    # Calendar
-    GOOGLE_CALENDAR = "google_calendar"
-    MS_OUTLOOK = "ms_outlook"
-    
-    # Cloud Storage
-    GOOGLE_DRIVE = "google_drive"
-    DROPBOX = "dropbox"
-    ONEDRIVE = "onedrive"
-    
-    # Construction Management
-    PROCORE = "procore"
+    def __init__(
+        self, 
+        id: str, 
+        name: str, 
+        description: str, 
+        logo_url: Optional[str] = None, 
+        auth_type: str = "oauth2",
+        auth_fields: Optional[List[Dict[str, Any]]] = None
+    ):
+        """
+        Initialize a new integration provider.
+        
+        Args:
+            id: Unique identifier for the provider
+            name: Display name for the provider
+            description: Description of the provider
+            logo_url: URL to the provider's logo
+            auth_type: Authentication type (oauth2, api_key, credentials)
+            auth_fields: Fields required for authentication
+        """
+        self.id = id
+        self.name = name
+        self.description = description
+        self.logo_url = logo_url
+        self.auth_type = auth_type
+        self.auth_fields = auth_fields or []
+
 
 class IntegrationManager:
-    """Integration Manager for external services."""
+    """Manager for handling external service integrations."""
     
     def __init__(self):
         """Initialize the integration manager."""
-        # Initialize integrations if not in session state
+        self._initialize_session_state()
+        self._load_integrations()
+    
+    def _initialize_session_state(self):
+        """Initialize session state for integrations."""
         if "integrations" not in st.session_state:
             st.session_state.integrations = {}
-            
-        if "integration_auth_cache" not in st.session_state:
-            st.session_state.integration_auth_cache = {}
     
-    def get_integration_status(self, provider):
+    def _load_integrations(self):
         """
-        Get the connection status for a provider.
-        
-        Args:
-            provider (IntegrationProvider): The integration provider
-            
-        Returns:
-            dict: Status information for the provider
+        Load saved integrations from config.
+        In a production environment, this would load from a database.
         """
-        # Check if provider is connected
-        if provider.value in st.session_state.integrations:
-            integration_data = st.session_state.integrations[provider.value]
-            
-            # Default status shape
-            status = {
-                "connected": True,
-                "provider": provider.value,
-                "last_synced": integration_data.get("last_synced", None),
-                "connection_info": integration_data.get("connection_info", {}),
-                "error": None
-            }
-            
-            return status
-        
-        return {
-            "connected": False,
-            "provider": provider.value,
-            "last_synced": None,
-            "connection_info": {},
-            "error": None
+        # In development, we'll use a simplified dictionary in session state
+        self.providers = {
+            IntegrationType.PROJECT_MANAGEMENT: [
+                IntegrationProvider(
+                    id="procore",
+                    name="Procore",
+                    description="Connect with Procore for project management, quality, and safety.",
+                    auth_type="oauth2",
+                    auth_fields=[
+                        {"name": "client_id", "type": "string", "label": "Client ID"},
+                        {"name": "client_secret", "type": "password", "label": "Client Secret"},
+                        {"name": "redirect_uri", "type": "string", "label": "Redirect URI"}
+                    ]
+                ),
+                IntegrationProvider(
+                    id="plangrid",
+                    name="PlanGrid",
+                    description="Connect with PlanGrid for construction document management.",
+                    auth_type="api_key",
+                    auth_fields=[
+                        {"name": "api_key", "type": "password", "label": "API Key"}
+                    ]
+                ),
+                IntegrationProvider(
+                    id="ms_project",
+                    name="Microsoft Project",
+                    description="Connect with Microsoft Project for scheduling and resource planning.",
+                    auth_type="oauth2",
+                    auth_fields=[
+                        {"name": "client_id", "type": "string", "label": "Client ID"},
+                        {"name": "client_secret", "type": "password", "label": "Client Secret"},
+                        {"name": "tenant_id", "type": "string", "label": "Tenant ID"}
+                    ]
+                )
+            ],
+            IntegrationType.CALENDAR: [
+                IntegrationProvider(
+                    id="google_calendar",
+                    name="Google Calendar",
+                    description="Sync with Google Calendar for scheduling and reminders.",
+                    auth_type="oauth2",
+                    auth_fields=[
+                        {"name": "client_id", "type": "string", "label": "Client ID"},
+                        {"name": "client_secret", "type": "password", "label": "Client Secret"}
+                    ]
+                ),
+                IntegrationProvider(
+                    id="outlook",
+                    name="Microsoft Outlook",
+                    description="Sync with Outlook Calendar for scheduling and reminders.",
+                    auth_type="oauth2",
+                    auth_fields=[
+                        {"name": "client_id", "type": "string", "label": "Client ID"},
+                        {"name": "client_secret", "type": "password", "label": "Client Secret"},
+                        {"name": "tenant_id", "type": "string", "label": "Tenant ID"}
+                    ]
+                )
+            ],
+            IntegrationType.CLOUD_STORAGE: [
+                IntegrationProvider(
+                    id="dropbox",
+                    name="Dropbox",
+                    description="Connect to Dropbox for file storage and sharing.",
+                    auth_type="oauth2",
+                    auth_fields=[
+                        {"name": "app_key", "type": "string", "label": "App Key"},
+                        {"name": "app_secret", "type": "password", "label": "App Secret"}
+                    ]
+                ),
+                IntegrationProvider(
+                    id="google_drive",
+                    name="Google Drive",
+                    description="Connect to Google Drive for file storage and sharing.",
+                    auth_type="oauth2",
+                    auth_fields=[
+                        {"name": "client_id", "type": "string", "label": "Client ID"},
+                        {"name": "client_secret", "type": "password", "label": "Client Secret"}
+                    ]
+                ),
+                IntegrationProvider(
+                    id="onedrive",
+                    name="Microsoft OneDrive",
+                    description="Connect to OneDrive for file storage and sharing.",
+                    auth_type="oauth2",
+                    auth_fields=[
+                        {"name": "client_id", "type": "string", "label": "Client ID"},
+                        {"name": "client_secret", "type": "password", "label": "Client Secret"},
+                        {"name": "tenant_id", "type": "string", "label": "Tenant ID"}
+                    ]
+                )
+            ],
+            IntegrationType.CONSTRUCTION_MANAGEMENT: [
+                IntegrationProvider(
+                    id="buildertrend",
+                    name="Buildertrend",
+                    description="Connect with Buildertrend for residential construction management.",
+                    auth_type="api_key",
+                    auth_fields=[
+                        {"name": "api_key", "type": "password", "label": "API Key"}
+                    ]
+                ),
+                IntegrationProvider(
+                    id="fieldwire",
+                    name="Fieldwire",
+                    description="Connect with Fieldwire for field management and task tracking.",
+                    auth_type="api_key",
+                    auth_fields=[
+                        {"name": "api_key", "type": "password", "label": "API Key"}
+                    ]
+                )
+            ],
+            IntegrationType.DESIGN: [
+                IntegrationProvider(
+                    id="autodesk_bim360",
+                    name="Autodesk BIM 360",
+                    description="Connect with BIM 360 for design collaboration and model management.",
+                    auth_type="oauth2",
+                    auth_fields=[
+                        {"name": "client_id", "type": "string", "label": "Client ID"},
+                        {"name": "client_secret", "type": "password", "label": "Client Secret"}
+                    ]
+                ),
+                IntegrationProvider(
+                    id="revit",
+                    name="Autodesk Revit",
+                    description="Connect with Revit for BIM modeling and coordination.",
+                    auth_type="api_key",
+                    auth_fields=[
+                        {"name": "api_key", "type": "password", "label": "API Key"}
+                    ]
+                )
+            ]
         }
     
-    def list_integrations(self, integration_type=None):
+    def get_integration_types(self) -> List[IntegrationType]:
         """
-        List all active integrations, optionally filtered by type.
+        Get all available integration types.
         
-        Args:
-            integration_type (IntegrationType, optional): Filter by integration type
-            
         Returns:
-            dict: Mapping of provider names to status information
+            List of integration types
         """
-        result = {}
-        
-        # Get all connected providers
-        for provider_value in st.session_state.integrations:
-            try:
-                provider = IntegrationProvider(provider_value)
-                
-                # Apply type filter if provided
-                if integration_type is not None:
-                    provider_type = self.get_provider_type(provider)
-                    if provider_type != integration_type:
-                        continue
-                
-                # Add to result
-                result[provider.value] = self.get_integration_status(provider)
-            except ValueError:
-                # Invalid provider value in session state
-                continue
-        
-        return result
+        return list(self.providers.keys())
     
-    def get_provider_type(self, provider):
+    def get_providers(self, integration_type: IntegrationType) -> List[IntegrationProvider]:
         """
-        Get the integration type for a provider.
+        Get all providers for a specific integration type.
         
         Args:
-            provider (IntegrationProvider): The integration provider
+            integration_type: The type of integration
             
         Returns:
-            IntegrationType: The provider's integration type
+            List of providers for the specified integration type
         """
-        # Project Management
-        if provider in [IntegrationProvider.JIRA, IntegrationProvider.ASANA, IntegrationProvider.MS_PROJECT]:
-            return IntegrationType.PROJECT_MANAGEMENT
-        
-        # Calendar
-        if provider in [IntegrationProvider.GOOGLE_CALENDAR, IntegrationProvider.MS_OUTLOOK]:
-            return IntegrationType.CALENDAR
-        
-        # Cloud Storage
-        if provider in [IntegrationProvider.GOOGLE_DRIVE, IntegrationProvider.DROPBOX, IntegrationProvider.ONEDRIVE]:
-            return IntegrationType.CLOUD_STORAGE
-        
-        # Construction Management
-        if provider in [IntegrationProvider.PROCORE]:
-            return IntegrationType.CONSTRUCTION_MANAGEMENT
-        
-        # Unknown provider
-        raise ValueError(f"Unknown provider: {provider}")
+        return self.providers.get(integration_type, [])
     
-    def connect(self, provider, auth_data):
+    def is_connected(self, integration_type: IntegrationType, provider_id: str) -> bool:
         """
-        Connect to an integration provider.
+        Check if a provider is connected.
         
         Args:
-            provider (IntegrationProvider): The integration provider
-            auth_data (dict): Authentication data for the provider
+            integration_type: The type of integration
+            provider_id: The provider ID
             
         Returns:
-            bool: True if connection was successful, False otherwise
+            True if connected, False otherwise
         """
-        # Validate provider
-        if not isinstance(provider, IntegrationProvider):
-            raise ValueError("Provider must be an IntegrationProvider enum value")
+        integrations = st.session_state.integrations
+        type_key = integration_type.name
         
-        # The implementation would normally perform OAuth or API key validation here
-        # For this demonstration, we'll simulate success
+        return (
+            type_key in integrations and
+            provider_id in integrations[type_key] and
+            integrations[type_key][provider_id].get("connected", False)
+        )
+    
+    def get_connection_details(
+        self, 
+        integration_type: IntegrationType, 
+        provider_id: str
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Get connection details for a provider.
         
-        # Create connection entry
-        st.session_state.integrations[provider.value] = {
+        Args:
+            integration_type: The type of integration
+            provider_id: The provider ID
+            
+        Returns:
+            Connection details or None if not connected
+        """
+        integrations = st.session_state.integrations
+        type_key = integration_type.name
+        
+        if not self.is_connected(integration_type, provider_id):
+            return None
+        
+        return integrations[type_key][provider_id]
+    
+    def connect(
+        self, 
+        integration_type: IntegrationType, 
+        provider_id: str, 
+        credentials: Dict[str, Any]
+    ) -> bool:
+        """
+        Connect to a provider with credentials.
+        
+        Args:
+            integration_type: The type of integration
+            provider_id: The provider ID
+            credentials: The credentials for authentication
+            
+        Returns:
+            True if connection was successful, False otherwise
+        """
+        # In a production environment, this would validate the credentials
+        # with the provider's API and store tokens securely
+        
+        # For development, we'll simply store the credentials in session state
+        integrations = st.session_state.integrations
+        type_key = integration_type.name
+        
+        if type_key not in integrations:
+            integrations[type_key] = {}
+        
+        # In real implementation, we would validate credentials here
+        # and get access tokens from the provider's API
+        
+        # Store connection details
+        integrations[type_key][provider_id] = {
             "connected": True,
-            "last_synced": datetime.now().isoformat(),
-            "connection_info": {
-                "user": auth_data.get("user", "Demo User"),
-                "organization": auth_data.get("organization", "Demo Org")
-            }
+            "credentials": credentials,
+            "connected_at": str(pd.Timestamp.now())
         }
         
-        # Cache auth data
-        st.session_state.integration_auth_cache[provider.value] = auth_data
-        
         return True
     
-    def disconnect(self, provider):
+    def disconnect(self, integration_type: IntegrationType, provider_id: str) -> bool:
         """
-        Disconnect from an integration provider.
+        Disconnect from a provider.
         
         Args:
-            provider (IntegrationProvider): The integration provider
+            integration_type: The type of integration
+            provider_id: The provider ID
             
         Returns:
-            bool: True if disconnection was successful, False otherwise
+            True if disconnection was successful, False otherwise
         """
-        # Validate provider
-        if not isinstance(provider, IntegrationProvider):
-            raise ValueError("Provider must be an IntegrationProvider enum value")
+        integrations = st.session_state.integrations
+        type_key = integration_type.name
         
-        # Check if connected
-        if provider.value not in st.session_state.integrations:
+        if not self.is_connected(integration_type, provider_id):
             return False
         
-        # Remove from session state
-        del st.session_state.integrations[provider.value]
+        # In a production environment, this would revoke tokens
+        # and clean up the connection with the provider's API
         
-        # Remove cached auth data
-        if provider.value in st.session_state.integration_auth_cache:
-            del st.session_state.integration_auth_cache[provider.value]
+        # Remove connection details
+        if type_key in integrations and provider_id in integrations[type_key]:
+            del integrations[type_key][provider_id]
+            return True
         
-        return True
-    
-    def sync(self, provider):
-        """
-        Sync data with an integration provider.
-        
-        Args:
-            provider (IntegrationProvider): The integration provider
-            
-        Returns:
-            bool: True if sync was successful, False otherwise
-        """
-        # Validate provider
-        if not isinstance(provider, IntegrationProvider):
-            raise ValueError("Provider must be an IntegrationProvider enum value")
-        
-        # Check if connected
-        if provider.value not in st.session_state.integrations:
-            return False
-        
-        # Update last synced timestamp
-        st.session_state.integrations[provider.value]["last_synced"] = datetime.now().isoformat()
-        
-        return True
-    
-    def sync_all(self):
-        """
-        Sync data with all connected integration providers.
-        
-        Returns:
-            dict: Mapping of provider names to sync results
-        """
-        results = {}
-        
-        # Sync each connected provider
-        for provider_value in st.session_state.integrations:
-            try:
-                provider = IntegrationProvider(provider_value)
-                results[provider.value] = self.sync(provider)
-            except ValueError:
-                # Invalid provider value in session state
-                results[provider_value] = False
-        
-        return results
-    
-    def get_data(self, provider, resource_type, params=None):
-        """
-        Get data from an integration provider.
-        
-        Args:
-            provider (IntegrationProvider): The integration provider
-            resource_type (str): The type of resource to get
-            params (dict, optional): Parameters for the request
-            
-        Returns:
-            dict: Data from the provider
-        """
-        # Validate provider
-        if not isinstance(provider, IntegrationProvider):
-            raise ValueError("Provider must be an IntegrationProvider enum value")
-        
-        # Check if connected
-        if provider.value not in st.session_state.integrations:
-            return {"error": "Not connected to provider"}
-        
-        # In a real implementation, this would call the provider's API
-        # For this demonstration, we'll return mock data based on the provider and resource type
-        
-        # Mock data based on provider and resource type
-        mock_data = self._get_mock_data(provider, resource_type, params)
-        
-        return mock_data
-    
-    def _get_mock_data(self, provider, resource_type, params=None):
-        """
-        Get mock data for a provider and resource type.
-        
-        Args:
-            provider (IntegrationProvider): The integration provider
-            resource_type (str): The type of resource to get
-            params (dict, optional): Parameters for the request
-            
-        Returns:
-            dict: Mock data
-        """
-        # Jira mock data
-        if provider == IntegrationProvider.JIRA:
-            if resource_type == "issues":
-                return {
-                    "issues": [
-                        {
-                            "id": "HTWR-123",
-                            "title": "Update concrete specifications",
-                            "status": "In Progress",
-                            "assignee": "John Smith",
-                            "created": "2025-05-10T14:30:00",
-                            "updated": "2025-05-15T09:15:00"
-                        },
-                        {
-                            "id": "HTWR-124",
-                            "title": "Review structural drawings for floor 12",
-                            "status": "To Do",
-                            "assignee": "Sarah Johnson",
-                            "created": "2025-05-12T11:00:00",
-                            "updated": "2025-05-12T11:00:00"
-                        },
-                        {
-                            "id": "HTWR-125",
-                            "title": "Resolve MEP conflict on floor 8",
-                            "status": "Done",
-                            "assignee": "Mike Chen",
-                            "created": "2025-05-08T16:45:00",
-                            "updated": "2025-05-14T15:30:00"
-                        }
-                    ]
-                }
-        
-        # Google Calendar mock data
-        if provider == IntegrationProvider.GOOGLE_CALENDAR:
-            if resource_type == "events":
-                return {
-                    "events": [
-                        {
-                            "id": "ev123",
-                            "title": "Weekly Construction Meeting",
-                            "start": "2025-05-20T10:00:00",
-                            "end": "2025-05-20T11:00:00",
-                            "location": "Construction Trailer",
-                            "attendees": ["John Smith", "Sarah Johnson", "Mike Chen"]
-                        },
-                        {
-                            "id": "ev124",
-                            "title": "Concrete Pour - Floor 12",
-                            "start": "2025-05-22T08:00:00",
-                            "end": "2025-05-22T17:00:00",
-                            "location": "Floor 12",
-                            "attendees": ["John Smith", "Concrete Crew"]
-                        },
-                        {
-                            "id": "ev125",
-                            "title": "City Inspector Visit",
-                            "start": "2025-05-24T13:00:00",
-                            "end": "2025-05-24T15:00:00",
-                            "location": "Site Office",
-                            "attendees": ["Sarah Johnson", "City Inspector"]
-                        }
-                    ]
-                }
-        
-        # Google Drive mock data
-        if provider == IntegrationProvider.GOOGLE_DRIVE:
-            if resource_type == "files":
-                return {
-                    "files": [
-                        {
-                            "id": "file123",
-                            "name": "Highland Tower Specifications.pdf",
-                            "type": "application/pdf",
-                            "created": "2025-04-15T09:00:00",
-                            "updated": "2025-05-10T14:30:00",
-                            "size": 2500000
-                        },
-                        {
-                            "id": "file124",
-                            "name": "Structural Drawings.dwg",
-                            "type": "application/autocad",
-                            "created": "2025-04-20T11:15:00",
-                            "updated": "2025-05-12T16:45:00",
-                            "size": 8500000
-                        },
-                        {
-                            "id": "file125",
-                            "name": "Project Schedule.mpp",
-                            "type": "application/ms-project",
-                            "created": "2025-04-10T08:30:00",
-                            "updated": "2025-05-14T10:00:00",
-                            "size": 1200000
-                        }
-                    ]
-                }
-        
-        # Procore mock data
-        if provider == IntegrationProvider.PROCORE:
-            if resource_type == "projects":
-                return {
-                    "projects": [
-                        {
-                            "id": "proj123",
-                            "name": "Highland Tower Development",
-                            "status": "Active",
-                            "start_date": "2024-06-01",
-                            "end_date": "2026-08-15",
-                            "budget": 45500000
-                        }
-                    ]
-                }
-            elif resource_type == "rfi":
-                return {
-                    "rfi": [
-                        {
-                            "id": "rfi123",
-                            "subject": "Foundation Waterproofing Detail",
-                            "status": "Open",
-                            "created_by": "John Smith",
-                            "assigned_to": "Architect",
-                            "date_created": "2025-05-12T09:30:00",
-                            "due_date": "2025-05-19T17:00:00"
-                        },
-                        {
-                            "id": "rfi124",
-                            "subject": "Curtain Wall Connection Detail",
-                            "status": "Answered",
-                            "created_by": "Sarah Johnson",
-                            "assigned_to": "Structural Engineer",
-                            "date_created": "2025-05-10T14:15:00",
-                            "due_date": "2025-05-17T17:00:00",
-                            "date_answered": "2025-05-15T11:30:00"
-                        }
-                    ]
-                }
-        
-        # Default empty response
-        return {"message": "No data available for this provider and resource type"}
-
-# Provider-specific integration classes would be imported here
-# For this demo, we'll just reference them but not implement
-
-def get_jira_integration():
-    """
-    Get the Jira integration module.
-    
-    Returns:
-        module: Jira integration module
-    """
-    try:
-        import integrations.jira_integration
-        return integrations.jira_integration
-    except ImportError:
-        return None
-
-def get_asana_integration():
-    """
-    Get the Asana integration module.
-    
-    Returns:
-        module: Asana integration module
-    """
-    try:
-        import integrations.asana_integration
-        return integrations.asana_integration
-    except ImportError:
-        return None
-
-def get_ms_project_integration():
-    """
-    Get the MS Project integration module.
-    
-    Returns:
-        module: MS Project integration module
-    """
-    try:
-        import integrations.ms_project_integration
-        return integrations.ms_project_integration
-    except ImportError:
-        return None
-
-def get_google_calendar_integration():
-    """
-    Get the Google Calendar integration module.
-    
-    Returns:
-        module: Google Calendar integration module
-    """
-    try:
-        import integrations.google_calendar_integration
-        return integrations.google_calendar_integration
-    except ImportError:
-        return None
-
-def get_ms_outlook_integration():
-    """
-    Get the MS Outlook integration module.
-    
-    Returns:
-        module: MS Outlook integration module
-    """
-    try:
-        import integrations.ms_outlook_integration
-        return integrations.ms_outlook_integration
-    except ImportError:
-        return None
-
-def get_google_drive_integration():
-    """
-    Get the Google Drive integration module.
-    
-    Returns:
-        module: Google Drive integration module
-    """
-    try:
-        import integrations.google_drive_integration
-        return integrations.google_drive_integration
-    except ImportError:
-        return None
-
-def get_dropbox_integration():
-    """
-    Get the Dropbox integration module.
-    
-    Returns:
-        module: Dropbox integration module
-    """
-    try:
-        import integrations.dropbox_integration
-        return integrations.dropbox_integration
-    except ImportError:
-        return None
-
-def get_onedrive_integration():
-    """
-    Get the OneDrive integration module.
-    
-    Returns:
-        module: OneDrive integration module
-    """
-    try:
-        import integrations.onedrive_integration
-        return integrations.onedrive_integration
-    except ImportError:
-        return None
-
-def get_procore_integration():
-    """
-    Get the Procore integration module.
-    
-    Returns:
-        module: Procore integration module
-    """
-    try:
-        import integrations.procore_integration
-        return integrations.procore_integration
-    except ImportError:
-        return None
+        return False

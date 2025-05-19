@@ -260,7 +260,7 @@ def render_integration_card(service_id, service_name, logo_path):
                             is_secret = "secret" in field.lower() or "password" in field.lower() or "key" in field.lower() or "token" in field.lower()
                             
                             # Create the input field
-                            form_fields[field] = st.text_input(display_name, type="password" if is_secret else "text")
+                            form_fields[field] = st.text_input(display_name, type="password" if is_secret else "default")
                     else:
                         # Fallback for services without defined fields
                         form_fields["api_key"] = st.text_input("API Key or Access Token", type="password")

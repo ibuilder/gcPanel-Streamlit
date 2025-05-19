@@ -136,10 +136,20 @@ def test_connection(platform_id: str, credentials: Dict[str, Any]) -> Tuple[bool
     
     # This simulates a successful connection
     if auth_type == "oauth2":
-        client_id_field = platform_config.get("client_id_field")
-        client_secret_field = platform_config.get("client_secret_field")
+        # Get fields with safer default values to avoid None issues
+        client_id_field = "client_id"
+        if "client_id_field" in platform_config:
+            client_id_field = platform_config["client_id_field"]
+            
+        client_secret_field = "client_secret"
+        if "client_secret_field" in platform_config:
+            client_secret_field = platform_config["client_secret_field"]
         
-        if not credentials.get(client_id_field) or not credentials.get(client_secret_field):
+        # Check credentials with safer access
+        has_client_id = client_id_field in credentials and credentials[client_id_field]
+        has_client_secret = client_secret_field in credentials and credentials[client_secret_field]
+        
+        if not has_client_id or not has_client_secret:
             return False, "Missing client ID or client secret"
             
         # In a real implementation, we would make an OAuth token request
@@ -161,9 +171,14 @@ def test_connection(platform_id: str, credentials: Dict[str, Any]) -> Tuple[bool
         return True, f"Successfully connected to {platform_config['name']}"
         
     elif auth_type == "api_key":
-        key_field = platform_config.get("key_field")
+        # Get the key field with safer default values
+        key_field = "api_key"
+        if "key_field" in platform_config:
+            key_field = platform_config["key_field"]
         
-        if not credentials.get(key_field):
+        # Check credentials safely
+        has_key = key_field in credentials and credentials[key_field]
+        if not has_key:
             return False, "Missing API key"
             
         # In a real implementation, we would verify the API key
@@ -185,7 +200,12 @@ def get_platform_logo(platform_id: str) -> str:
     if platform_id not in PLATFORM_CONFIG:
         return "🔗"
     
-    return PLATFORM_CONFIG[platform_id].get("logo", "🔗")
+    # Safely get logo with explicit None check
+    logo = None
+    if "logo" in PLATFORM_CONFIG[platform_id]:
+        logo = PLATFORM_CONFIG[platform_id]["logo"]
+    
+    return logo if logo is not None else "🔗"
 
 def get_auth_fields(platform_id: str) -> Dict[str, str]:
     """

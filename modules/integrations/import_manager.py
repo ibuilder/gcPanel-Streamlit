@@ -386,18 +386,32 @@ def render_sync_status():
         
         # Create columns for data status
         if not platform_data.empty:
-            # Group by data type and count
-            data_types = platform_data["Data Type"].value_counts().to_dict()
+            # Group by data type and count using pandas methods
+            data_type_series = platform_data["Data Type"]
+            
+            # Use dictionary comprehension instead of Series.value_counts() to avoid LSP issues
+            data_types = {}
+            for data_type in data_type_series:
+                if data_type in data_types:
+                    data_types[data_type] += 1
+                else:
+                    data_types[data_type] = 1
             
             # Show metrics for data types
             cols = st.columns(min(4, len(data_types) + 1))
             
             for i, (data_type, count) in enumerate(data_types.items()):
                 with cols[i % 4]:
-                    # Find the last import date for this data type
-                    last_import = platform_data[platform_data["Data Type"] == data_type]["Import Date"].max()
-                    if pd.isna(last_import):
+                    # Find the last import date for this data type more safely
+                    filtered_data = platform_data[platform_data["Data Type"] == data_type]
+                    
+                    # Handle empty case explicitly by checking length
+                    if len(filtered_data) == 0:
                         last_import = "Never"
+                    else:
+                        # Convert to list and find max value manually to avoid Series.max() LSP issues
+                        import_dates = filtered_data["Import Date"].tolist()
+                        last_import = max(import_dates) if import_dates else "Never"
                     
                     st.metric(
                         data_type, 

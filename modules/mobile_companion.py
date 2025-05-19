@@ -523,16 +523,13 @@ def render_safety_checklist():
             "housekeeping": False
         }
     
-    # Create the checklist UI outside of the content variable
-    # since we need interactive elements
-    content_safe = """
-    <div style="background-color: white; border-radius: 8px; padding: 15px; margin-bottom: 20px; 
-               box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-        <div style="font-weight: 600; margin-bottom: 10px;">Daily Safety Inspection</div>
-    """
+    # Create the checklist UI using Streamlit components
+    st.container()
+    with st.expander("Daily Safety Inspection", expanded=True):
+        all_complete = render_checklist_items()
     
-    # Return the HTML content to be displayed
-    return content + content_safe + """</div>"""
+    # Return all_complete to indicate if all items are checked
+    return all_complete
 
 def render_checklist_items(readonly=False):
     """Render safety checklist items and return if all are checked."""

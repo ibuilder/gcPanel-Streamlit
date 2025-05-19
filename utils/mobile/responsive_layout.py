@@ -18,6 +18,41 @@ def add_mobile_styles():
     <style>
         /* Base mobile responsive styles */
         @media (max-width: 768px) {
+            /* Completely remove top spacing for mobile */
+            .main .block-container {
+                padding-top: 0 !important;
+                margin-top: 0 !important;
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+            }
+            
+            /* Aggressively remove all space above header */
+            header {
+                display: none !important;
+            }
+            
+            .stApp {
+                margin-top: 0 !important;
+                padding-top: 0 !important;
+            }
+            
+            /* Fix header layout for mobile */
+            div[data-testid="column"] {
+                width: 100% !important;
+                flex: 1 1 100% !important;
+            }
+            
+            /* Mobile-optimized navigation */
+            div[data-baseweb="select"] {
+                margin-top: 0 !important;
+                width: 100% !important;
+            }
+            
+            /* Hide the "Navigation" label on mobile */
+            div[data-baseweb="select"] > label {
+                display: none !important;
+            }
+            
             /* Increase touch targets */
             .stButton > button {
                 min-height: 44px !important;
@@ -26,21 +61,15 @@ def add_mobile_styles():
             
             /* Adjust heading sizes */
             h1 {
-                font-size: 1.8rem !important;
+                font-size: 1.6rem !important;
             }
             
             h2 {
-                font-size: 1.5rem !important;
+                font-size: 1.4rem !important;
             }
             
             h3 {
-                font-size: 1.2rem !important;
-            }
-            
-            /* Adjust padding/margins for content */
-            .block-container {
-                padding-left: 1rem !important;
-                padding-right: 1rem !important;
+                font-size: 1.1rem !important;
             }
             
             /* Make inputs larger for touch */
@@ -62,6 +91,11 @@ def add_mobile_styles():
             img {
                 max-width: 100% !important;
                 height: auto !important;
+            }
+            
+            /* Compress project info on mobile */
+            .project-info-text {
+                font-size: 11px !important;
             }
         }
         

@@ -33,7 +33,33 @@ def render_header():
     # Get currently selected menu value from session state
     current_menu = st.session_state.get("current_menu", "Dashboard")
     
-    # Create a balanced two-column layout for the header with more space for the dropdown
+    # Check if we're on mobile based on screen width (using CSS media query and JavaScript)
+    st.markdown("""
+    <script>
+    // Add a class to the body based on screen width
+    if (window.innerWidth <= 768) {
+        document.body.classList.add('is-mobile');
+    } else {
+        document.body.classList.remove('is-mobile');
+    }
+    </script>
+    <style>
+    /* Mobile-specific header styles */
+    @media (max-width: 768px) {
+        /* Stack header elements vertically on mobile */
+        .mobile-stack {
+            display: block !important;
+        }
+        
+        /* Smaller project info on mobile */
+        .project-info div {
+            font-size: 90% !important;
+        }
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Responsive column layout - adjusts for mobile
     col1, col3 = st.columns([5, 5])
     
     with col1:
@@ -67,11 +93,30 @@ def render_header():
                 
         with info_col:
             st.markdown("""
-            <div style="border-left: 3px solid #4a6572; padding-left: 15px; margin-left: -15px;">
+            <div class="project-info" style="border-left: 3px solid #4a6572; padding-left: 15px; margin-left: -15px;">
                 <div style="font-size: 12px; color: #4a6572; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500;">Project</div>
-                <div style="font-size: 16px; font-weight: 600; color: #2c3e50;">Highland Tower Development</div>
-                <div style="font-size: 12px; color: #64748b;">$45.5M • 168,500 sq ft • 15 Stories</div>
+                <div class="project-title" style="font-size: 16px; font-weight: 600; color: #2c3e50;">Highland Tower Development</div>
+                <div class="project-details" style="font-size: 12px; color: #64748b;">$45.5M • 168,500 sq ft • 15 Stories</div>
             </div>
+            
+            <style>
+            /* Mobile responsive project info */
+            @media (max-width: 768px) {
+                .project-info {
+                    padding-left: 10px !important;
+                    margin-left: -10px !important;
+                }
+                .project-title {
+                    font-size: 14px !important;
+                    white-space: nowrap !important;
+                    overflow: hidden !important;
+                    text-overflow: ellipsis !important;
+                }
+                .project-details {
+                    font-size: 10px !important;
+                }
+            }
+            </style>
             """, unsafe_allow_html=True)
         
         # Handle logo click
@@ -165,13 +210,38 @@ def render_header():
         </style>
         """, unsafe_allow_html=True)
         
-        # Clean dropdown showing current selection
+        # Mobile-friendly dropdown
+        # On mobile, we want to hide the label but keep it for accessibility on desktop
+        st.markdown("""
+        <style>
+        /* Hide the label on mobile */
+        @media (max-width: 768px) {
+            label[data-baseweb="label"] {
+                display: none !important;
+            }
+            
+            /* Make dropdown take full width on mobile */
+            div[data-baseweb="select"] {
+                width: 100% !important;
+                margin-top: 0 !important;
+            }
+            
+            /* Larger touch target on mobile */
+            div[data-baseweb="select"] > div {
+                min-height: 44px !important;
+                padding: 10px 14px !important;
+            }
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        # Responsive dropdown
         selected_formatted = st.selectbox(
             "Navigation",  # Label for accessibility
             options=formatted_options,
             index=formatted_options.index(current_formatted),
             key="header_nav_dropdown",
-            label_visibility="visible"  # Show the label
+            label_visibility="visible"  # Show the label on desktop, hidden on mobile via CSS
         )
         
         # Convert selected formatted option back to key

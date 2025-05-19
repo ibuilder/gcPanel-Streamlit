@@ -19,7 +19,7 @@ def render_project_information():
     project_name = st.session_state.get('current_project', 'Highland Tower Development')
     
     # Tabs for different project information sections
-    tabs = st.tabs(["Overview", "Team", "Schedule", "Documents", "Photos", "Settings"])
+    tabs = st.tabs(["Overview", "Team", "Schedule", "Startup Manual", "Documents", "Photos", "Settings"])
     
     with tabs[0]:
         render_project_overview()
@@ -31,12 +31,15 @@ def render_project_information():
         render_project_schedule()
     
     with tabs[3]:
-        render_project_documents()
+        render_startup_manual()
     
     with tabs[4]:
-        render_project_photos()
+        render_project_documents()
     
     with tabs[5]:
+        render_project_photos()
+    
+    with tabs[6]:
         render_project_settings()
 
 def render_project_overview():

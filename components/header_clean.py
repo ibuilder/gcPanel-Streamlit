@@ -210,12 +210,17 @@ def render_header():
         </style>
         """, unsafe_allow_html=True)
         
-        # Mobile-friendly dropdown
-        # On mobile, we want to hide the label but keep it for accessibility on desktop
+        # Enhanced navigation styling with vertical alignment fix
         st.markdown("""
         <style>
-        /* Hide the label on mobile */
+        /* Fix vertical alignment with the rest of the header */
+        div[data-baseweb="select"] {
+            margin-top: 18px !important; /* Align with logo and project info */
+        }
+        
+        /* Mobile responsive adjustments */
         @media (max-width: 768px) {
+            /* Hide the label on mobile */
             label[data-baseweb="label"] {
                 display: none !important;
             }
@@ -223,7 +228,7 @@ def render_header():
             /* Make dropdown take full width on mobile */
             div[data-baseweb="select"] {
                 width: 100% !important;
-                margin-top: 0 !important;
+                margin-top: 10px !important; /* Reduced margin for mobile */
             }
             
             /* Larger touch target on mobile */

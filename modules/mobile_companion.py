@@ -423,12 +423,8 @@ def render_field_issues():
 
 def render_offline_documents():
     """Render offline-capable document access."""
-    content = """
-    <h3 style="margin-bottom: 15px;">Offline Documents</h3>
-    <p style="color: #666; margin-bottom: 15px; font-size: 0.9rem;">
-        Documents cached for offline access. Tap to view.
-    </p>
-    """
+    st.subheader("Offline Documents")
+    st.caption("Documents cached for offline access. Tap to view.")
     
     # Get cached documents (in a real app, this would use the cache_file_for_offline function)
     documents = [
@@ -479,49 +475,38 @@ def render_offline_documents():
             "Report": "📊"
         }.get(doc["type"], "📄")
         
-        content += render_offline_document_item(doc, doc_icon)
+        # Create a card for each document
+        st.container()
+        col1, col2 = st.columns([1, 4])
+        
+        with col1:
+            st.markdown(f"### {doc_icon}")
+            
+        with col2:
+            st.markdown(f"**{doc['title']}**")
+            st.caption(f"{doc['type']} • {doc['size']} • Cached {doc['cached_date']}")
+        
+        st.markdown("---")
     
     # Add option to cache more documents
-    content += """
-    <div style="margin-top: 20px; text-align: center;">
-        <button style="background-color: #f3f4f6; border: 1px solid #d1d5db; color: #374151; 
-                      padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer;">
-            Cache More Documents
-        </button>
-    </div>
-    """
+    st.container()
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.button("Cache More Documents", key="cache_more_docs")
     
-    return content
+    # Empty string to satisfy the return type expected by the caller
+    return ""
 
 def render_offline_document_item(doc, icon="📄"):
     """Render a single offline document item."""
-    return f"""
-    <div style="background-color: white; border-radius: 8px; padding: 12px; margin-bottom: 10px; 
-               box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer;">
-        <div style="display: flex; align-items: center;">
-            <div style="font-size: 1.8rem; margin-right: 12px;">
-                {icon}
-            </div>
-            <div style="flex-grow: 1;">
-                <div style="font-weight: 500; margin-bottom: 3px;">{doc["title"]}</div>
-                <div style="display: flex; color: #666; font-size: 0.8rem;">
-                    <div style="margin-right: 12px;">{doc["type"]}</div>
-                    <div style="margin-right: 12px;">|</div>
-                    <div>{doc["size"]}</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    """
+    # This function is no longer needed as we're using Streamlit components directly
+    # Keeping it for backwards compatibility
+    return ""
 
 def render_safety_checklist():
     """Render safety checklist for field personnel."""
-    content = """
-    <h3 style="margin-bottom: 15px;">Safety Checklist</h3>
-    <p style="color: #666; margin-bottom: 15px; font-size: 0.9rem;">
-        Complete daily safety inspection before beginning work.
-    </p>
-    """
+    st.subheader("Safety Checklist")
+    st.caption("Complete daily safety inspection before beginning work.")
     
     if "safety_checklist_complete" not in st.session_state:
         st.session_state.safety_checklist_complete = False

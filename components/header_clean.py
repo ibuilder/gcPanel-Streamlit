@@ -93,45 +93,19 @@ def render_header():
         # Find current menu's formatted option
         current_formatted = f"{menu_options[current_menu]['icon']} {menu_options[current_menu]['label']}"
         
-        # Modern, elegant navigation header
+        # Clean dropdown styling without a header
         st.markdown("""
         <style>
-        /* Elegant Navigation Header */
-        .navigation-header {
+        /* Top accent line for the dropdown */
+        .dropdown-accent {
             margin-top: 5px;
-            padding: 6px 0;
-            background: linear-gradient(135deg, #1a2a6c, #2a4858);
-            border-radius: 4px 4px 0 0;
-            border: none;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .navigation-header:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
+            height: 3px;
             background: linear-gradient(to right, #4facfe, #00f2fe);
-        }
-        
-        .nav-title {
-            font-size: 13px;
-            color: #ffffff;
-            font-weight: 500;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            text-align: center;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            border-radius: 4px 4px 0 0;
         }
         </style>
         
-        <div class="navigation-header">
-            <div class="nav-title">Navigation</div>
-        </div>
+        <div class="dropdown-accent"></div>
         """, unsafe_allow_html=True)
         
         # Enhanced stylish dropdown menu
@@ -195,13 +169,13 @@ def render_header():
         </style>
         """, unsafe_allow_html=True)
         
-        # More prominent dropdown
+        # Clean, modern dropdown without label
         selected_formatted = st.selectbox(
-            "Navigation",
+            "",  # Empty label
             options=formatted_options,
             index=formatted_options.index(current_formatted),
             key="header_nav_dropdown",
-            label_visibility="collapsed"
+            label_visibility="collapsed"  # Completely hide the label
         )
         
         # Convert selected formatted option back to key
@@ -212,10 +186,19 @@ def render_header():
             st.session_state.current_menu = selected
             st.rerun()
     
-    # Display a divider
-    st.divider()
+    # Display a subtle, elegant divider
+    st.markdown("""
+    <style>
+    .elegant-divider {
+        height: 1px;
+        background: linear-gradient(to right, rgba(220,220,220,0.1), rgba(220,220,220,0.7), rgba(220,220,220,0.1));
+        margin: 10px 0 12px 0;
+    }
+    </style>
+    <div class="elegant-divider"></div>
+    """, unsafe_allow_html=True)
     
-    # Breadcrumb and notification row
+    # Breadcrumb and notification row with better spacing
     brow_col1, brow_col2 = st.columns([11, 1])
     
     with brow_col1:

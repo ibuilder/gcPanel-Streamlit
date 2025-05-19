@@ -28,18 +28,27 @@ def apply_container_styles():
         padding: 0.5rem 0.75rem;
     }
     
-    /* Full screen container with minimal top padding */
+    /* Full screen container with no top padding */
     .main .block-container {
         padding-left: 2rem;
         padding-right: 2rem;
-        padding-top: 0.5rem !important;
+        padding-top: 0 !important;
         max-width: 100%;
         width: 100%;
     }
     
-    /* Remove extra top margins */
+    /* Remove extra top margins and padding */
     .stApp header {
-        margin-top: -2rem;
+        margin-top: -2.5rem;
+    }
+    
+    /* Fix Streamlit's default padding */
+    .stApp {
+        margin-top: -4rem;
+    }
+    
+    .css-18e3th9 {
+        padding-top: 0 !important;
     }
     
     /* Card-style containers with proper padding */

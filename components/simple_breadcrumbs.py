@@ -14,59 +14,69 @@ def simple_breadcrumbs(items: List[Dict[str, Any]]) -> None:
     Args:
         items: List of breadcrumb items, each with keys 'label' and 'path'
     """
-    # Apply custom CSS for improved breadcrumb styling
+    # Apply elegant, modern breadcrumb styling
     st.markdown("""
     <style>
     .breadcrumb-container {
         display: flex;
         align-items: center;
-        padding: 10px 0;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
         overflow-x: auto;
         white-space: nowrap;
-        background-color: rgba(255, 255, 255, 0.03);
-        border-radius: 6px;
-        padding: 8px 16px;
+        padding: 6px 0;
+        position: relative;
     }
+    
     .breadcrumb-item {
         display: inline-flex;
         align-items: center;
-        font-size: 14px;
+        font-size: 13px;
+        font-weight: 400;
         color: #6b7280;
-        transition: color 0.2s ease;
-        padding: 4px 8px;
-        border-radius: 4px;
+        transition: all 0.25s ease;
+        padding: 3px 10px;
+        border-radius: 20px;
+        margin-right: 4px;
+        letter-spacing: 0.2px;
     }
+    
     .breadcrumb-item.active {
         font-weight: 500;
-        color: #3b82f6;
-        background-color: rgba(59, 130, 246, 0.08);
+        color: #2563eb;
+        background-color: rgba(37, 99, 235, 0.07);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     }
+    
     .breadcrumb-item:not(.active):hover {
-        color: #3b82f6;
-        background-color: rgba(59, 130, 246, 0.05);
+        color: #2563eb;
+        background-color: rgba(37, 99, 235, 0.04);
+        transform: translateX(1px);
     }
+    
     .breadcrumb-separator {
-        margin: 0 5px;
-        color: #9ca3af;
-        font-size: 16px;
+        margin: 0 2px;
+        color: #d1d5db;
+        font-size: 14px;
+        user-select: none;
     }
+    
     .stButton button {
         background: none !important;
         border: none !important;
         box-shadow: none !important;
         color: #6b7280 !important;
-        font-size: 14px;
+        font-size: 13px;
         padding: 2px 8px !important;
         height: auto !important;
         transition: all 0.2s ease;
         margin: 0 !important;
         min-width: auto !important;
     }
+    
     .stButton button:hover {
-        color: #3b82f6 !important;
-        background-color: rgba(59, 130, 246, 0.05) !important;
-        transform: none !important;
+        color: #2563eb !important;
+        background-color: rgba(37, 99, 235, 0.04) !important;
+        transform: translateX(1px) !important;
     }
     </style>
     """, unsafe_allow_html=True)

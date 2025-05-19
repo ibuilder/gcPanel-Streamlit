@@ -3,6 +3,45 @@ Authentication module for external service integrations.
 
 This module handles secure authentication with external construction management
 platforms such as Procore, PlanGrid, FieldWire, and BuildingConnected.
+
+# Usage Example:
+```python
+from modules.integrations.authentication import (
+    initialize_integrations, 
+    store_credentials, 
+    test_connection,
+    is_connected
+)
+
+# Initialize the authentication system
+initialize_integrations()
+
+# Store credentials for a platform
+credentials = {
+    "client_id": "your_client_id",
+    "client_secret": "your_client_secret"
+}
+success = store_credentials("procore", credentials)
+
+# Test the connection with the stored credentials
+is_successful, message = test_connection("procore", credentials)
+
+# Check if a platform is connected
+if is_connected("procore"):
+    # Perform actions with the connected platform
+    pass
+```
+
+# Supported Platforms:
+- Procore: OAuth 2.0 authentication (client_id, client_secret)
+- PlanGrid: API key authentication (api_key)
+- FieldWire: API key authentication (api_key, email)
+- BuildingConnected: OAuth 2.0 authentication (client_id, client_secret)
+
+# Security Notes:
+- In production, credentials should be stored securely using encryption
+- OAuth tokens should be refreshed automatically when expired
+- API keys should be rotated periodically for security
 """
 
 import streamlit as st

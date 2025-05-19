@@ -2,6 +2,40 @@
 Integration Import Manager for gcPanel.
 
 This module provides functionality to import data from external platforms into gcPanel.
+It serves as the main interface for users to connect with construction management
+platforms, import project data, and keep information synchronized.
+
+# Features:
+- Platform connection management through authenticated API connections
+- Data preview for imported information
+- Flexible import strategies (merge or replace)
+- Import history tracking and reporting
+- Synchronization monitoring and management
+- Automatic persistence of imported data
+
+# Components:
+- Import Manager: User interface for data import operations
+- Import History: Tracking and management of past imports
+- Sync Status: Interface for monitoring and triggering synchronization
+
+# Supported Platforms:
+- Procore: Full-featured construction management platform
+- PlanGrid: Field-focused document and task management
+- FieldWire: Mobile-first field operations platform
+- BuildingConnected: Preconstruction and bidding platform
+
+# Data Types:
+Different platforms support various data types for import:
+- Documents: Project files, drawings, and specifications
+- Bids: Bidding information and contractor submissions
+- Daily Reports: Field observations and progress tracking
+- Budget: Financial information and cost tracking
+- Schedule: Project timeline and task scheduling
+- Incidents: Safety incidents and related information
+
+# Usage:
+This module is designed to be used through the Streamlit UI interface.
+Access it through the "Integrations" section of the application.
 """
 
 import streamlit as st

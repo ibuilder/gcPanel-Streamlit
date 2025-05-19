@@ -1,7 +1,57 @@
 """
 Data persistence module for external integrations.
 
-This module handles saving and retrieving imported data from external platforms.
+This module handles saving and retrieving imported data from external platforms
+in a reliable way with database support and session state fallback.
+
+# Usage Example:
+```python
+from modules.integrations.data_persistence import (
+    initialize_database,
+    save_imported_data,
+    get_imported_data,
+    get_import_history
+)
+
+# Initialize the database connection
+initialize_database()
+
+# Save imported data from an external platform
+data = [{"id": "doc-1", "name": "Floor Plan", "type": "Drawing"}]
+dataset_id = save_imported_data(
+    platform="procore",
+    data_type="documents",
+    data=data,
+    import_method="merge"  # or "replace"
+)
+
+# Retrieve previously imported data
+documents = get_imported_data(platform="procore", data_type="documents")
+
+# Get import history for reporting
+history_df = get_import_history(limit=50)
+```
+
+# Features:
+- Automatic database initialization with session state fallback
+- Support for both merge and replace import strategies
+- Comprehensive import history tracking
+- Support for various data formats (list of items, nested structures)
+- Clean database management with proper relationships
+
+# Data Types and Storage:
+The module supports storing different types of imported data:
+- Simple lists (documents, specifications, incidents)
+- Complex nested structures (budget with items and summary)
+- Hierarchical data (schedule with tasks and summary information)
+
+# Database Schema:
+- ImportedDataset: Tracks import metadata (platform, date, count)
+- ImportedDataItem: Stores individual data items with source information
+
+# Fallback Mechanism:
+If a database connection isn't available, data is stored in session state
+to ensure no data loss occurs during temporary database outages.
 """
 
 import streamlit as st

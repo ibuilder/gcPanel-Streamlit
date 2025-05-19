@@ -3,6 +3,72 @@ Data Importers for External Integration Services.
 
 This module provides functionality to import data from external construction management
 platforms such as Procore, PlanGrid, FieldWire, and BuildingConnected.
+
+# Overview
+The importers module handles the actual communication with external platforms'
+APIs to retrieve construction project data. It provides specialized functions
+for different data types and platforms, with standardized responses for
+consistent handling in the application.
+
+# Usage Example:
+```python
+from modules.integrations.importers import (
+    import_documents,
+    import_specifications,
+    import_bids,
+    import_daily_reports
+)
+
+# Import documents from Procore
+documents_result = import_documents("procore")
+if "error" not in documents_result:
+    documents_data = documents_result["data"]
+    documents_source = documents_result["source"]
+    # Process documents...
+
+# Import specifications from Procore
+specs_result = import_specifications("procore")
+if "error" not in specs_result:
+    specs_data = specs_result["data"]
+    # Process specifications...
+```
+
+# Supported Platforms and Data Types:
+
+1. Procore:
+   - Documents
+   - Specifications
+   - Bids
+   - Daily Reports
+   - Budget
+   - Schedule
+   - Incidents
+
+2. PlanGrid:
+   - Documents
+   - Daily Reports
+
+3. FieldWire:
+   - Documents
+   - Daily Reports
+
+4. BuildingConnected:
+   - Bids
+
+# Data Formats:
+Each import function returns a standardized response dictionary:
+- On success: {"data": [items], "source": "platform_name"}
+- On error: {"error": "error_message"}
+
+# Authentication:
+This module relies on the authentication module to provide credentials
+for API requests. Make sure authentication is properly configured before
+using the import functions.
+
+# Mock Data:
+For development and demonstration purposes, this module includes mock data 
+generators that simulate API responses. These are used when actual API
+connections aren't available or during testing.
 """
 
 import streamlit as st

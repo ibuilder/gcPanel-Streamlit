@@ -70,8 +70,9 @@ def render_analytics():
     
     # Custom Reports tab
     with tabs[2]:
-        from modules.analytics.reports import render_report_generator
-        render_report_generator()
+        # Since reports module is not available yet, create a simple placeholder
+        st.header("Custom Reports Generator")
+        st.info("Report generator module is under development. This feature will be available in the next update.")
 
 def render_predictive_analytics():
     """Render the predictive analytics section."""

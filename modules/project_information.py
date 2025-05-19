@@ -102,30 +102,30 @@ def render_project_overview():
     cpi = 1.05  # >1 means under budget, <1 means over budget
     
     with col1:
-        st.markdown("""<div style="text-align: center;">
-            <div style="font-size: 14px; color: #6c757d; margin-bottom: 5px;">Project Completion</div>
-            <div style="font-size: 22px; font-weight: 600; color: #3e79f7;">42%</div>
-        </div>""", unsafe_allow_html=True)
+        st.metric(label="Project Completion", value="42%")
     
     with col2:
-        st.markdown(f"""<div style="text-align: center;">
-            <div style="font-size: 14px; color: #6c757d; margin-bottom: 5px;">Time Progress</div>
-            <div style="font-size: 22px; font-weight: 600; color: #3e79f7;">{time_progress_pct:.1f}%</div>
-        </div>""", unsafe_allow_html=True)
+        st.metric(label="Time Progress", value=f"{time_progress_pct:.1f}%")
     
     with col3:
-        cpi_color = "#38d39f" if cpi >= 1.0 else "#ff5b5b"
-        st.markdown(f"""<div style="text-align: center;">
-            <div style="font-size: 14px; color: #6c757d; margin-bottom: 5px;">Cost Performance</div>
-            <div style="font-size: 22px; font-weight: 600; color: {cpi_color};">{cpi:.2f}</div>
-        </div>""", unsafe_allow_html=True)
+        # We can't directly set colors with st.metric, but we can use delta to indicate positive/negative
+        delta = "On budget" if cpi >= 1.0 else "Over budget"
+        delta_color = "normal" if cpi >= 1.0 else "inverse"
+        st.metric(label="Cost Performance", value=f"{cpi:.2f}", delta=delta, delta_color=delta_color)
     
     with col4:
-        days_color = "#38d39f" if days_remaining > 30 else "#f9c851" if days_remaining > 0 else "#ff5b5b"
-        st.markdown(f"""<div style="text-align: center;">
-            <div style="font-size: 14px; color: #6c757d; margin-bottom: 5px;">Days Remaining</div>
-            <div style="font-size: 22px; font-weight: 600; color: {days_color};">{days_remaining}</div>
-        </div>""", unsafe_allow_html=True)
+        # For days remaining, use appropriate delta indicators
+        if days_remaining > 30:
+            delta = "On schedule"
+            delta_color = "normal"
+        elif days_remaining > 0:
+            delta = "Approaching deadline"
+            delta_color = "off"
+        else:
+            delta = "Past deadline"
+            delta_color = "inverse"
+        
+        st.metric(label="Days Remaining", value=days_remaining, delta=delta, delta_color=delta_color)
     
     # Project details in two columns
     col1, col2 = st.columns(2)

@@ -41,9 +41,27 @@ def render_header():
         logo_col, info_col = st.columns([1, 3])
         
         with logo_col:
-            # The pure Streamlit way - use a button that looks like text
+            # Make the logo bolder with custom styling
+            st.markdown("""
+            <style>
+            .logo-button {
+                font-weight: 800 !important;
+                font-size: 18px !important;
+                background: none !important;
+                border: none !important;
+                padding: 0.4rem !important;
+                box-shadow: none !important;
+                color: #2c3e50 !important;
+            }
+            .logo-button:hover {
+                background-color: rgba(0,0,0,0.05) !important;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+            
+            # Bolder logo button
             if st.button("🏗️ gcPanel", key="logo_button", use_container_width=True, 
-                      type="primary", help="Return to dashboard"):
+                      help="Return to dashboard"):
                 st.session_state.logo_clicked = True
                 st.rerun()
                 
@@ -75,63 +93,104 @@ def render_header():
         # Find current menu's formatted option
         current_formatted = f"{menu_options[current_menu]['icon']} {menu_options[current_menu]['label']}"
         
-        # Add a sleek, professional header for the navigation
+        # Modern, elegant navigation header
         st.markdown("""
-        <div style="text-align: center; padding: 8px 0; margin-top: 5px; 
-                    background: linear-gradient(to right, #2c3e50, #4a6572); 
-                    border-radius: 4px 4px 0 0; border: none;">
-            <span style="font-size: 14px; color: #ffffff; font-weight: 500; letter-spacing: 0.5px; 
-                   text-transform: uppercase;">
-               Navigation
-            </span>
+        <style>
+        /* Elegant Navigation Header */
+        .navigation-header {
+            margin-top: 5px;
+            padding: 6px 0;
+            background: linear-gradient(135deg, #1a2a6c, #2a4858);
+            border-radius: 4px 4px 0 0;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .navigation-header:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+        }
+        
+        .nav-title {
+            font-size: 13px;
+            color: #ffffff;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-align: center;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        </style>
+        
+        <div class="navigation-header">
+            <div class="nav-title">Navigation</div>
         </div>
         """, unsafe_allow_html=True)
         
-        # Add custom CSS to improve dropdown appearance with more professional styling
+        # Enhanced stylish dropdown menu
         st.markdown("""
         <style>
+        /* Elegant Dropdown Styling */
         div[data-baseweb="select"] {
             border-radius: 0 0 4px 4px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-            transition: all 0.2s ease;
-            border: 1px solid #dfe1e5;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px solid #e0e7ee;
+            border-top: none;
             background-color: #ffffff;
         }
+        
         div[data-baseweb="select"]:hover {
-            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
+        
         div[data-baseweb="select"] > div {
             font-weight: 500;
-            padding: 12px 16px;
-            font-size: 15px;
-            color: #333333;
+            padding: 13px 16px;
+            font-size: 14px;
+            color: #1a2a6c;
+            letter-spacing: 0.2px;
         }
+        
         div[data-baseweb="select"] svg {
-            color: #4a6572 !important;
-            width: 20px;
-            height: 20px;
+            color: #1a2a6c !important;
+            width: 18px;
+            height: 18px;
         }
+        
         div[data-baseweb="menu"] {
             max-height: 450px !important;
             overflow-y: auto;
-            border-radius: 4px;
-            box-shadow: 0 3px 14px rgba(0,0,0,0.12);
-            border: 1px solid #dfe1e5;
+            border-radius: 6px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            border: 1px solid #e0e7ee;
         }
+        
         div[data-baseweb="menu"] ul {
-            padding: 4px 0;
+            padding: 6px 0;
         }
+        
         div[data-baseweb="menu"] li {
             padding: 10px 16px !important;
             font-size: 14px;
-        }
-        div[data-baseweb="menu"] li:hover {
-            background-color: #f5f7fa !important;
+            transition: all 0.2s ease;
         }
         
-        /* Make logo and header more professional */
-        .company-logo {
-            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+        div[data-baseweb="menu"] li:hover {
+            background-color: #f0f7ff !important;
+            transform: translateX(2px);
+        }
+        
+        /* Add subtle dividers between menu items */
+        div[data-baseweb="menu"] li:not(:last-child) {
+            border-bottom: 1px solid #f5f5f8;
         }
         </style>
         """, unsafe_allow_html=True)

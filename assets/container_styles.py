@@ -28,12 +28,18 @@ def apply_container_styles():
         padding: 0.5rem 0.75rem;
     }
     
-    /* Full screen container */
+    /* Full screen container with minimal top padding */
     .main .block-container {
         padding-left: 2rem;
         padding-right: 2rem;
+        padding-top: 0.5rem !important;
         max-width: 100%;
         width: 100%;
+    }
+    
+    /* Remove extra top margins */
+    .stApp header {
+        margin-top: -2rem;
     }
     
     /* Card-style containers with proper padding */

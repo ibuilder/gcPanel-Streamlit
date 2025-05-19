@@ -752,17 +752,45 @@ def render_forecasting():
         line=dict(color='red', width=2, dash='dash')
     ))
     
-    # Add vertical line for current date
+    # Add current date marker more safely using a shape instead of vline
     if current_month < total_duration_months:
-        # Convert timestamp to string to avoid arithmetic issues
-        current_date_str = df.loc[current_month, "month"].strftime('%Y-%m-%d')
-        fig.add_vline(
-            x=current_date_str,
-            line_dash="dash",
-            line_color="gray",
-            annotation_text="Current Date",
-            annotation_position="top right"
-        )
+        try:
+            # Add a vertical line as a shape (more flexible than vline)
+            fig.update_layout(
+                shapes=[
+                    dict(
+                        type="line",
+                        xref="x",
+                        yref="paper",
+                        x0=current_month,
+                        y0=0,
+                        x1=current_month,
+                        y1=1,
+                        line=dict(
+                            color="gray",
+                            width=2,
+                            dash="dash"
+                        )
+                    )
+                ],
+                annotations=[
+                    dict(
+                        x=current_month,
+                        y=1.05,
+                        xref="x",
+                        yref="paper",
+                        text="Current Date",
+                        showarrow=False,
+                        font=dict(
+                            size=12,
+                            color="gray"
+                        )
+                    )
+                ]
+            )
+        except Exception as e:
+            # If adding the current date line fails, continue without it
+            print(f"Error displaying current date line: {e}")
     
     fig.update_layout(
         title="Project Cost S-Curve",

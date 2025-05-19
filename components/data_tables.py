@@ -79,45 +79,71 @@ def data_table(
     if title:
         st.markdown(f"<h3>{title}</h3>", unsafe_allow_html=True)
     
-    # Create filter controls
+    # Create filter controls with improved UX
     if filterable:
-        with st.expander("Filters", expanded=False):
-            # Create columns for filter controls, up to 3 per row
-            max_cols = 3
-            col_groups = [columns[i:i+max_cols] for i in range(0, len(columns), max_cols)]
-            
-            # Create filter widgets for each column group
-            for col_group in col_groups:
-                filter_cols = st.columns(len(col_group))
+        filter_container = st.container()
+        with filter_container:
+            # Choose filter position based on parameter
+            if filter_position == "top":
+                st.markdown("""
+                <div class="table-filter-container">
+                    <div class="table-filter-title">🔍 Data Filters</div>
+                </div>
+                """, unsafe_allow_html=True)
                 
-                for i, column in enumerate(col_group):
-                    field = column["field"]
-                    title = column.get("title", field.replace("_", " ").title())
+                # Create columns for filter controls, up to 3 per row
+                max_cols = 3
+                col_groups = [columns[i:i+max_cols] for i in range(0, len(columns), max_cols)]
+                
+                # Create filter widgets for each column group
+                for col_group in col_groups:
+                    filter_cols = st.columns(len(col_group))
                     
-                    with filter_cols[i]:
-                        # Create appropriate filter widget based on data type
-                        if field in df.columns:
-                            col_type = str(df[field].dtype)
-                            
-                            if "datetime" in col_type or "date" in col_type:
-                                # Date range filter
-                                min_date = df[field].min() if not pd.isna(df[field].min()) else None
-                                max_date = df[field].max() if not pd.isna(df[field].max()) else None
+                    for i, column in enumerate(col_group):
+                        field = column["field"]
+                        title = column.get("title", field.replace("_", " ").title())
+                        
+                        with filter_cols[i]:
+                            # Create appropriate filter widget based on data type
+                            if field in df.columns:
+                                col_type = str(df[field].dtype)
                                 
-                                if min_date and max_date:
-                                    filter_date = st.date_input(
-                                        f"Filter by {title}",
-                                        value=(min_date, max_date),
-                                        key=f"{key}_filter_{field}"
-                                    )
+                                if "datetime" in col_type or "date" in col_type:
+                                    # Enhanced date range filter with clearer labels
+                                    min_date = df[field].min() if not pd.isna(df[field].min()) else None
+                                    max_date = df[field].max() if not pd.isna(df[field].max()) else None
                                     
-                                    if len(filter_date) == 2 and filter_date[0] and filter_date[1]:
-                                        df = df[(df[field].dt.date >= filter_date[0]) & 
-                                                (df[field].dt.date <= filter_date[1])]
-                            
-                            elif "float" in col_type or "int" in col_type:
-                                # Numeric range filter
-                                min_val = float(df[field].min()) if not pd.isna(df[field].min()) else 0
+                                    if min_date and max_date:
+                                        st.markdown(f"<small><strong>{title}</strong></small>", unsafe_allow_html=True)
+                                        
+                                        # Convert to date objects if datetime
+                                        if hasattr(min_date, 'date'):
+                                            min_date = min_date.date()
+                                        if hasattr(max_date, 'date'):
+                                            max_date = max_date.date()
+                                            
+                                        filter_date = st.date_input(
+                                            f"Range",
+                                            value=(min_date, max_date),
+                                            key=f"{key}_filter_{field}",
+                                            help=f"Filter {title} by date range",
+                                            label_visibility="collapsed"
+                                        )
+                                        
+                                        if len(filter_date) == 2 and filter_date[0] and filter_date[1]:
+                                            # Handle different date column types
+                                            if hasattr(df[field], 'dt'):
+                                                # For datetime columns
+                                                df = df[(df[field].dt.date >= filter_date[0]) & 
+                                                        (df[field].dt.date <= filter_date[1])]
+                                            else:
+                                                # For date columns
+                                                df = df[(df[field] >= filter_date[0]) & 
+                                                        (df[field] <= filter_date[1])]
+                                
+                                elif "float" in col_type or "int" in col_type:
+                                    # Enhanced numeric range filter with better UX
+                                    min_val = float(df[field].min()) if not pd.isna(df[field].min()) else 0
                                 max_val = float(df[field].max()) if not pd.isna(df[field].max()) else 100
                                 
                                 filter_range = st.slider(

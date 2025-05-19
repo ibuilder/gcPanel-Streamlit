@@ -63,32 +63,72 @@ def render_header():
     
     # Middle column for quick access buttons
     with col2:
-        # Add quick access buttons for most common features
+        # Use Streamlit native components for quick access instead of HTML
         st.markdown("""
-        <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px;">
-            <a href="#" onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', key: 'quicknav_dashboard', value: true}, '*')" 
-               style="text-decoration: none; color: #4b5563; display: flex; flex-direction: column; align-items: center; width: 65px; transition: transform 0.2s;"
-               onmouseover="this.style.transform='translateY(-2px)'; this.style.color='#3b82f6';" 
-               onmouseout="this.style.transform=''; this.style.color='#4b5563';">
-                <div style="font-size: 22px; margin-bottom: 3px;">📊</div>
-                <div style="font-size: 11px; text-align: center;">Dashboard</div>
-            </a>
-            <a href="#" onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', key: 'quicknav_docs', value: true}, '*')" 
-               style="text-decoration: none; color: #4b5563; display: flex; flex-direction: column; align-items: center; width: 65px; transition: transform 0.2s;"
-               onmouseover="this.style.transform='translateY(-2px)'; this.style.color='#3b82f6';" 
-               onmouseout="this.style.transform=''; this.style.color='#4b5563';">
-                <div style="font-size: 22px; margin-bottom: 3px;">📄</div>
-                <div style="font-size: 11px; text-align: center;">Documents</div>
-            </a>
-            <a href="#" onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', key: 'quicknav_schedule', value: true}, '*')" 
-               style="text-decoration: none; color: #4b5563; display: flex; flex-direction: column; align-items: center; width: 65px; transition: transform 0.2s;"
-               onmouseover="this.style.transform='translateY(-2px)'; this.style.color='#3b82f6';" 
-               onmouseout="this.style.transform=''; this.style.color='#4b5563';">
-                <div style="font-size: 22px; margin-bottom: 3px;">📅</div>
-                <div style="font-size: 11px; text-align: center;">Schedule</div>
-            </a>
+        <style>
+        .quick-nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        .quick-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 65px;
+            text-decoration: none;
+            color: #4b5563;
+            transition: all 0.2s ease;
+        }
+        .quick-nav-item:hover {
+            transform: translateY(-2px);
+        }
+        .quick-nav-icon {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        .quick-nav-label {
+            font-size: 11px;
+            text-align: center;
+            color: #4b5563;
+        }
+        </style>
+        <div class="quick-nav">
+            <div class="quick-nav-item" id="quicknav_dashboard">
+                <div class="quick-nav-icon">📊</div>
+                <div class="quick-nav-label">Dashboard</div>
+            </div>
+            <div class="quick-nav-item" id="quicknav_docs">
+                <div class="quick-nav-icon">📄</div>
+                <div class="quick-nav-label">Documents</div>
+            </div>
+            <div class="quick-nav-item" id="quicknav_schedule">
+                <div class="quick-nav-icon">📅</div>
+                <div class="quick-nav-label">Schedule</div>
+            </div>
         </div>
         """, unsafe_allow_html=True)
+        
+        # Add actual buttons for proper interaction
+        quick_nav_cols = st.columns(3)
+        with quick_nav_cols[0]:
+            if st.button("Dashboard", key="btn_dashboard", use_container_width=True, 
+                          help="Go to Dashboard", type="secondary"):
+                st.session_state.current_menu = "Dashboard"
+                st.rerun()
+        
+        with quick_nav_cols[1]:
+            if st.button("Documents", key="btn_docs", use_container_width=True, 
+                          help="Go to Documents", type="secondary"):
+                st.session_state.current_menu = "Documents"
+                st.rerun()
+                
+        with quick_nav_cols[2]:
+            if st.button("Schedule", key="btn_schedule", use_container_width=True, 
+                          help="Go to Schedule", type="secondary"):
+                st.session_state.current_menu = "Schedule"
+                st.rerun()
 
         # Handle quick navigation clicks
         for quicknav in ['dashboard', 'docs', 'schedule']:

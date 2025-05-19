@@ -38,7 +38,15 @@ from modules.documents import render_documents
 from modules.mobile_companion import render_mobile_companion
 from modules.analytics import render_analytics
 from modules.ai_assistant import render_ai_assistant
-from modules.features_showcase import render_features_showcase
+
+# Import feature showcase module
+try:
+    from modules.features_showcase import render_features_showcase
+except ImportError:
+    # Define fallback function if module is not found
+    def render_features_showcase():
+        import streamlit as st
+        st.warning("Features showcase module is currently unavailable.")
 
 def initialize_session_state():
     """Initialize session state variables."""

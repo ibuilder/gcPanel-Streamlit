@@ -241,9 +241,9 @@ def render_appearance_settings():
         </div>
         """, unsafe_allow_html=True)
         
-        if st.button("Light Mode", key="btn_light_mode", label_visibility="collapsed"):
+        if st.button("Light Mode", key="btn_light_mode"):
             st.session_state.theme_mode = 'light'
-            st.experimental_rerun()
+            st.rerun()
     
     with col2:
         # Dark Mode
@@ -260,9 +260,9 @@ def render_appearance_settings():
         </div>
         """, unsafe_allow_html=True)
         
-        if st.button("Dark Mode", key="btn_dark_mode", label_visibility="collapsed"):
+        if st.button("Dark Mode", key="btn_dark_mode"):
             st.session_state.theme_mode = 'dark'
-            st.experimental_rerun()
+            st.rerun()
     
     # Apply visual changes
     if st.button("Apply Visual Changes", key="apply_visual", type="primary"):

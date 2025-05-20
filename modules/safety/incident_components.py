@@ -523,10 +523,11 @@ def render_incident_form(is_edit=False):
                            "Chemical Exposure", "Fall From Height", "Equipment Failure", 
                            "Fire/Explosion", "Environmental Release", "Other"]
             
-            # Set default index
+            # Set default index (safely)
             default_type_index = 0
-            if incident.get('type') in type_options:
-                default_type_index = type_options.index(incident.get('type'))
+            incident_type = incident.get('type', '')
+            if isinstance(incident_type, str) and incident_type in type_options:
+                default_type_index = type_options.index(incident_type)
                 
             incident_type = st.selectbox(
                 "Type *",

@@ -49,6 +49,9 @@ def render_safety():
                 if st.button("📊 View Analysis", key="view_analysis", use_container_width=True):
                     st.session_state.safety_view = "analysis"
                     st.rerun()
+            
+            # Show a clear message about what to do
+            st.info("Click on an incident title below to view detailed information")
                     
             # Show list view with incidents table
             render_incident_list()

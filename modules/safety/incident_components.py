@@ -184,11 +184,15 @@ def render_incident_list():
                     st.caption(f"ID: {incident['ID']}")
                 
                 with col2:
-                    # Make the title clickable
-                    if st.button(f"📋 {incident['Title']}", key=f"incident_title_{incident['ID']}", use_container_width=True):
-                        st.session_state.selected_incident_id = incident['ID']
-                        st.session_state.safety_view = "view"
-                        st.rerun()
+                    # Create a direct link to the incident detail view
+                    col_link, col_empty = st.columns([5, 1])
+                    with col_link:
+                        if st.button(f"📋 {incident['Title']}", key=f"incident_title_{incident['ID']}", use_container_width=True):
+                            # Store the incident ID and switch view
+                            st.session_state.selected_incident_id = incident['ID']
+                            st.session_state.incident_detail_data = incident  # Store the entire incident data
+                            st.session_state.safety_view = "view"
+                            st.rerun()
                 
                 with col3:
                     st.write(f"**Location:**")
@@ -246,11 +250,25 @@ def render_incident_details():
             st.rerun()
         return
     
-    # Get the selected incident ID
-    incident_id = st.session_state.selected_incident_id
-    
-    # Find the incident in the sample data
-    incident = next((inc for inc in generate_sample_incidents() if inc["id"] == incident_id), None)
+    # Use the stored incident data if available
+    if "incident_detail_data" in st.session_state:
+        incident = st.session_state.incident_detail_data
+    else:
+        # Get the selected incident ID
+        incident_id = st.session_state.selected_incident_id
+        
+        # Generate sample incidents
+        all_incidents = generate_sample_incidents()
+        
+        # Find the incident by ID - handle case where ID could be string or int
+        if isinstance(incident_id, str) and incident_id.isdigit():
+            incident_id = int(incident_id)
+            
+        incident = None
+        for inc in all_incidents:
+            if inc["id"] == incident_id:
+                incident = inc
+                break
     
     if not incident:
         st.error("Incident not found. Please select an incident from the List View.")

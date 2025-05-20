@@ -17,53 +17,155 @@ def render_safety():
     # Header
     st.title("Safety Management")
     
-    # Tab navigation for safety sections
+    # Tab navigation for safety sections - main module categories
     tab1, tab2, tab3 = st.tabs(["Incidents", "Inspections", "Training"])
     
     # Incidents Tab
     with tab1:
-        render_incidents()
+        # Sub-navigation for Incidents with proper CRUD separation
+        incident_tabs = st.tabs(["List View", "View Record", "Add New", "Analysis"])
+        
+        with incident_tabs[0]:  # List View
+            render_incidents_list()
+        
+        with incident_tabs[1]:  # View Record
+            render_incident_details()
+            
+        with incident_tabs[2]:  # Add New
+            render_incident_form(is_edit=False)
+            
+        with incident_tabs[3]:  # Analysis
+            render_incidents_analysis()
     
     # Inspections Tab
     with tab2:
-        render_inspections()
+        # Sub-navigation for Inspections with proper CRUD separation
+        inspection_tabs = st.tabs(["List View", "View Record", "Add New", "Analysis"])
+        
+        with inspection_tabs[0]:  # List View
+            render_inspections_list()
+        
+        with inspection_tabs[1]:  # View Record
+            render_inspection_details()
+            
+        with inspection_tabs[2]:  # Add New
+            render_inspection_form(is_edit=False)
+            
+        with inspection_tabs[3]:  # Analysis
+            render_inspections_analysis()
     
     # Training Tab
     with tab3:
-        render_training()
+        # Sub-navigation for Training with proper CRUD separation
+        training_tabs = st.tabs(["List View", "View Record", "Add New", "Analysis"])
+        
+        with training_tabs[0]:  # List View
+            render_training_list()
+        
+        with training_tabs[1]:  # View Record
+            render_training_details()
+            
+        with training_tabs[2]:  # Add New
+            render_training_form(is_edit=False)
+            
+        with training_tabs[3]:  # Analysis
+            render_training_analysis()
 
-def render_incidents():
-    """Render the incidents section"""
+def render_incidents_list():
+    """Render the incidents list view with filtering and sorting"""
     
-    # Header with action button
-    col1, col2, col3 = st.columns([2, 1, 1])
-    
-    with col1:
-        st.header("Incident Management")
-    
-    with col3:
-        if st.button("Create New Incident", type="primary", key="create_incident_btn_top", use_container_width=True):
-            st.session_state.show_incident_form = True
-            st.session_state.edit_incident_id = None
+    st.header("Incidents List")
     
     # Filters in columns
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        # Date range selector
-        start_date = st.date_input("Start Date", datetime.now() - timedelta(days=90), key="incident_start_date")
-    
+    with st.expander("Filters", expanded=True):
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            # Date range selector
+            start_date = st.date_input("Start Date", datetime.now() - timedelta(days=90), key="incident_start_date")
+        
+        with col2:
+            end_date = st.date_input("End Date", datetime.now(), key="incident_end_date")
+        
+        with col3:
+            # Filter by severity
+            severity = st.multiselect(
+                "Severity", 
+                ["Near Miss", "Minor", "Moderate", "Serious", "Critical"],
+                default=["Minor", "Moderate", "Serious", "Critical"],
+                key="incident_severity"
+            )
+            
+        # Additional filters in second row
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            # Filter by location
+            location = st.multiselect(
+                "Location",
+                ["Building A", "Building B", "Site Work", "Staging Area", "All Locations"],
+                default=["All Locations"],
+                key="incident_location_filter"
+            )
+            
+        with col2:
+            # Filter by status
+            status = st.multiselect(
+                "Status",
+                ["Open", "Under Investigation", "Closed", "Resolved"],
+                default=["Open", "Under Investigation"],
+                key="incident_status_filter"
+            )
+            
+        with col3:
+            # Search by keyword
+            search = st.text_input("Search", key="incident_search")
+            
+    # Clear filters button
+    col1, col2 = st.columns([5, 1])
     with col2:
-        end_date = st.date_input("End Date", datetime.now(), key="incident_end_date")
+        if st.button("Clear Filters", key="clear_incident_filters"):
+            # Reset all filter values in session state
+            st.session_state.incident_start_date = datetime.now() - timedelta(days=90)
+            st.session_state.incident_end_date = datetime.now()
+            st.session_state.incident_severity = ["Minor", "Moderate", "Serious", "Critical"]
+            st.session_state.incident_location_filter = ["All Locations"]
+            st.session_state.incident_status_filter = ["Open", "Under Investigation"]
+            st.session_state.incident_search = ""
+            st.rerun()
     
-    with col3:
-        # Filter by severity
-        severity = st.multiselect(
-            "Severity", 
-            ["Near Miss", "Minor", "Moderate", "Serious", "Critical"],
-            default=["Minor", "Moderate", "Serious", "Critical"],
-            key="incident_severity"
-        )
+    # Add incident button - only displayed in list view
+    add_col1, add_col2 = st.columns([5, 1])
+    with add_col2:
+        if st.button("➕ Add Incident", key="add_incident_btn", type="primary", use_container_width=True):
+            # Set session state to switch to the Add New tab
+            if "safety_tab_selection" not in st.session_state:
+                st.session_state.safety_tab_selection = {}
+            st.session_state.safety_tab_selection["incidents"] = 2  # Index for Add New tab
+            st.rerun()
+    
+    # Datatable styling for better appearance
+    st.markdown("""
+    <style>
+    .st-emotion-cache-13oz8n3 {
+        padding: 0.5rem;
+    }
+    .st-emotion-cache-13oz8n3 th {
+        background-color: #f1f5f9;
+        color: #334155;
+        font-weight: 600;
+        text-align: left;
+        padding: 0.75rem 0.5rem;
+    }
+    .st-emotion-cache-13oz8n3 td {
+        padding: 0.75rem 0.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .st-emotion-cache-13oz8n3 tr:hover {
+        background-color: #f8fafc;
+    }
+    </style>
+    """, unsafe_allow_html=True)
     
     # Sample data for incidents
     incidents = [

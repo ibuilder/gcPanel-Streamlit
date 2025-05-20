@@ -548,8 +548,8 @@ def render_incidents_analysis():
         st.subheader("Incident Trends")
         
         # Incidents by month
-        df['month'] = df['date'].dt.strftime('%Y-%m')
-        incidents_by_month = df.groupby('month').size().reset_index(name='count')
+        df['month'] = pd.to_datetime(df['date']).dt.strftime('%Y-%m')
+        incidents_by_month = df.groupby('month').size().rename('count').reset_index()
         
         if not incidents_by_month.empty:
             fig = px.bar(

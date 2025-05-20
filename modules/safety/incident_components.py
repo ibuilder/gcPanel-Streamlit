@@ -183,11 +183,11 @@ def render_incident_list():
                 if i > 0:
                     st.markdown("<hr style='margin: 0.5rem 0; opacity: 0.2;'>", unsafe_allow_html=True)
                     
-                # Make the entire row clickable by wrapping it in a container
+                # Create a row with columns for the incident data and action buttons
                 row_container = st.container()
                 
-                # Create columns for the summary row
-                col1, col2, col3, col4 = row_container.columns([2, 3, 2, 2])
+                # Create columns for the summary row and actions
+                col1, col2, col3, col4, col_view, col_edit = row_container.columns([1.5, 2.5, 1.5, 1.5, 0.5, 0.5])
                 
                 with col1:
                     st.write(f"**{incident['Date']}**")
@@ -212,13 +212,23 @@ def render_incident_list():
                     st.markdown(f"<span style='color:{severity_color};'>**{incident['Severity']}**</span>", unsafe_allow_html=True)
                     st.write(f"Status: {incident['Status']}")
                 
-                # Add a button below the summary that spans the entire row
-                if st.button(f"View Full Details", key=f"view_details_{incident['ID']}", use_container_width=True):
-                    # Store incident data and navigate to detail view
-                    st.session_state.selected_incident_id = incident['ID']
-                    st.session_state.selected_incident_data = incident
-                    st.session_state.safety_view = "view"
-                    st.rerun()
+                # Add View button
+                with col_view:
+                    if st.button("👁️", key=f"view_{incident['ID']}", help="View incident details"):
+                        # Store incident data and navigate to detail view
+                        st.session_state.selected_incident_id = incident['ID']
+                        st.session_state.selected_incident_data = incident
+                        st.session_state.safety_view = "view"
+                        st.rerun()
+                
+                # Add Edit button
+                with col_edit:
+                    if st.button("✏️", key=f"edit_{incident['ID']}", help="Edit incident"):
+                        # Store incident data and navigate to edit form
+                        st.session_state.edit_incident_id = incident['ID']
+                        st.session_state.edit_incident_data = incident
+                        st.session_state.safety_view = "edit"
+                        st.rerun()
                 
 
                 

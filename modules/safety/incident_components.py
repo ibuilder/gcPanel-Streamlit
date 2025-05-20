@@ -216,8 +216,8 @@ def render_incident_list():
                 button_cols = st.columns([4, 2, 2])
                 
                 with button_cols[1]:
-                    # Simple View button for direct access
-                    if st.button("👁️ View Details", key=f"view_{incident['ID']}", use_container_width=True):
+                    # Icon-only View button
+                    if st.button("👁️", key=f"view_{incident['ID']}", use_container_width=True, help="View incident details"):
                         # Store incident details in session state
                         st.session_state.selected_incident_id = incident['ID'] 
                         st.session_state.selected_incident_data = incident
@@ -227,8 +227,8 @@ def render_incident_list():
                         st.rerun()
                 
                 with button_cols[2]:
-                    # Simple Edit button
-                    if st.button("✏️ Edit", key=f"edit_{incident['ID']}", use_container_width=True):
+                    # Icon-only Edit button
+                    if st.button("✏️", key=f"edit_{incident['ID']}", use_container_width=True, help="Edit incident"):
                         # Store incident data for editing
                         st.session_state.edit_incident_id = incident['ID']
                         st.session_state.edit_incident_data = incident

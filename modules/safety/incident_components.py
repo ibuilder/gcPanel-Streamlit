@@ -212,22 +212,34 @@ def render_incident_list():
                     st.markdown(f"<span style='color:{severity_color};'>**{incident['Severity']}**</span>", unsafe_allow_html=True)
                     st.write(f"Status: {incident['Status']}")
                 
-                # Add View button
+                # Add View button with direct URL navigation
                 with col_view:
+                    view_url = f"?view=view&incident_id={incident['ID']}"
                     if st.button("👁️", key=f"view_{incident['ID']}", help="View incident details"):
-                        # Store incident data and navigate to detail view
+                        # Use both direct URL navigation and session state
                         st.session_state.selected_incident_id = incident['ID']
                         st.session_state.selected_incident_data = incident
                         st.session_state.safety_view = "view"
+                        # Set URL parameters for direct navigation
+                        st.experimental_set_query_params(
+                            view="view",
+                            incident_id=str(incident['ID'])
+                        )
                         st.rerun()
                 
-                # Add Edit button
+                # Add Edit button with direct URL navigation
                 with col_edit:
+                    edit_url = f"?view=edit&incident_id={incident['ID']}"
                     if st.button("✏️", key=f"edit_{incident['ID']}", help="Edit incident"):
-                        # Store incident data and navigate to edit form
+                        # Use both direct URL navigation and session state
                         st.session_state.edit_incident_id = incident['ID']
                         st.session_state.edit_incident_data = incident
                         st.session_state.safety_view = "edit"
+                        # Set URL parameters for direct navigation
+                        st.experimental_set_query_params(
+                            view="edit",
+                            incident_id=str(incident['ID'])
+                        )
                         st.rerun()
                 
 

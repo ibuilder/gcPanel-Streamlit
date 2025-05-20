@@ -186,8 +186,8 @@ def render_incident_list():
                 # Create a row with columns for the incident data and action buttons
                 row_container = st.container()
                 
-                # Create columns for the data display with action buttons inline - maximized use of space
-                col1, col2, col3, col4, col_view, col_edit = row_container.columns([0.8, 4.5, 1.2, 1, 0.25, 0.25])
+                # Create columns for the data display with action buttons inline - tighter spacing
+                col1, col2, col3, col4, col_view, col_edit = row_container.columns([0.8, 5.5, 0.9, 0.8, 0.2, 0.2])
                 
                 with col1:
                     st.write(f"**{incident['Date']}**")

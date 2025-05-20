@@ -126,10 +126,8 @@ def render_header():
     </style>
     """, unsafe_allow_html=True)
     
-    # Add a content area container with better styling
-    st.markdown("""
-    <div style="padding: 0.5rem 1.5rem; background-color: white; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-bottom: 1rem;">
-    """, unsafe_allow_html=True)
+    # Content area is now styled through CSS classes
+    st.markdown('<div class="gc-content-container">', unsafe_allow_html=True)
     
     # Breadcrumb and notification row with better spacing and visual hierarchy
     brow_col1, brow_col2 = st.columns([9, 3])

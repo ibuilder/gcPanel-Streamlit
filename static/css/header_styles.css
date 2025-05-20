@@ -270,26 +270,37 @@ div[data-testid="stButton"] > button:hover {
 
 /* Fix for top spacing in Streamlit - critical styling */
 .main .block-container {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    margin-top: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
     max-width: none !important;
 }
 
-/* Remove white space above header */
-.stApp {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
+/* Remove ALL padding and margins - essential for removing white boxes */
+.stApp, .stApp > header, .stApp > div, .main > div {
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-/* Remove all white boxes above and below header */
-div.element-container:empty {
+/* Force removal of all space around the header */
+div[data-testid="stDecoration"], 
+div[data-testid="stToolbar"],
+div.stDeployButton {
+    display: none !important;
+}
+
+/* Remove all white boxes above and below header - more aggressive approach */
+div.element-container:empty,
+div.stMarkdown div:empty,
+div[data-testid="stVerticalBlock"] > div:empty {
     display: none !important;
     margin: 0 !important;
     padding: 0 !important;
     height: 0 !important;
     min-height: 0 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
     visibility: hidden !important;
+    opacity: 0 !important;
 }
 
 /* Hide streamlit's main menu */
@@ -342,4 +353,13 @@ div[data-testid="stVerticalBlock"] {
 div[data-testid="stMarkdownContainer"] > div {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
+}
+
+/* Content container styling */
+.gc-content-container {
+    padding: 0.5rem 1.5rem;
+    background-color: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1rem;
 }

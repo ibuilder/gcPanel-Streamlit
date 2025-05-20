@@ -10,6 +10,36 @@ def render_header():
     """
     Render a simple, clean header using only Streamlit components.
     """
+    # Apply overall header spacing fixes
+    st.markdown("""
+    <style>
+    /* Remove all spacing above header */
+    .main .block-container {
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
+    
+    /* Remove default Streamlit spacing */
+    .stApp {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+    
+    /* Force header to the very top */
+    .element-container:first-child {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+    
+    /* Eliminate any residual spacing */
+    header {
+        visibility: hidden !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
     # Menu options for dropdown with icons
     menu_options = {
         "Dashboard": {"label": "Dashboard", "icon": "📊"},
@@ -213,9 +243,22 @@ def render_header():
         # Enhanced navigation styling with vertical alignment fix
         st.markdown("""
         <style>
-        /* Fix vertical alignment with the rest of the header */
+        /* Fix vertical alignment with the rest of the header - reduced margin */
         div[data-baseweb="select"] {
-            margin-top: 18px !important; /* Align with logo and project info */
+            margin-top: 10px !important; /* Reduced from 18px to align better */
+        }
+        
+        /* Remove label spacing above Navigation dropdown */
+        label[data-baseweb="label"] {
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 1 !important;
+        }
+        
+        /* Reduce selectbox containers spacing */
+        div.row-widget.stSelectbox {
+            margin: 0 !important;
+            padding: 0 !important;
         }
         
         /* Mobile responsive adjustments */
@@ -228,7 +271,7 @@ def render_header():
             /* Make dropdown take full width on mobile */
             div[data-baseweb="select"] {
                 width: 100% !important;
-                margin-top: 10px !important; /* Reduced margin for mobile */
+                margin-top: 5px !important; /* Further reduced margin for mobile */
             }
             
             /* Larger touch target on mobile */

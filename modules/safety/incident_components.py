@@ -82,15 +82,7 @@ def render_incident_list():
             st.session_state.incident_search = ""
             st.rerun()
     
-    # Add incident button - only displayed in list view
-    add_col1, add_col2 = st.columns([5, 1])
-    with add_col2:
-        if st.button("➕ Add Incident", key="add_incident_btn", type="primary", use_container_width=True):
-            # Set session state to switch to the Add New tab
-            if "safety_tab_selection" not in st.session_state:
-                st.session_state.safety_tab_selection = {}
-            st.session_state.safety_tab_selection["incidents"] = 2  # Index for Add New tab
-            st.rerun()
+    # Action buttons now handled in the main Safety module
     
     # Datatable styling for better appearance
     st.markdown("""
@@ -164,8 +156,21 @@ def render_incident_list():
         # Convert to DataFrame for display
         df = pd.DataFrame(display_data)
         
-        # Create table with incident list
-        for i, incident in enumerate(display_data):
+        # Pagination controls
+        if "incidents_page" not in st.session_state:
+            st.session_state.incidents_page = 0
+            
+        # Define items per page
+        items_per_page = 5
+        total_pages = len(display_data) // items_per_page + (1 if len(display_data) % items_per_page > 0 else 0)
+        
+        # Determine which items to show on current page
+        start_idx = st.session_state.incidents_page * items_per_page
+        end_idx = min(start_idx + items_per_page, len(display_data))
+        current_page_data = display_data[start_idx:end_idx]
+        
+        # Create table with incident list for current page
+        for i, incident in enumerate(current_page_data):
             # Create a row for each incident with clickable title
             with st.container():
                 # Add a subtle divider between incidents
@@ -200,6 +205,25 @@ def render_incident_list():
                     
                     st.markdown(f"<span style='color:{severity_color};'>**{incident['Severity']}**</span>", unsafe_allow_html=True)
                     st.write(f"Status: {incident['Status']}")
+                    
+        # Add pagination controls
+        st.markdown("<hr>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 3, 1])
+        
+        with col1:
+            if st.session_state.incidents_page > 0:
+                if st.button("← Previous", key="prev_page", use_container_width=True):
+                    st.session_state.incidents_page -= 1
+                    st.rerun()
+        
+        with col2:
+            st.markdown(f"<div style='text-align: center'>Page {st.session_state.incidents_page + 1} of {total_pages}</div>", unsafe_allow_html=True)
+            
+        with col3:
+            if st.session_state.incidents_page < total_pages - 1:
+                if st.button("Next →", key="next_page", use_container_width=True):
+                    st.session_state.incidents_page += 1
+                    st.rerun()
             
 
         

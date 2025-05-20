@@ -38,13 +38,20 @@ def render_safety():
         current_view = st.session_state.safety_view
         
         if current_view == "list":
+            # Action buttons at the top of the list
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("➕ Add Incident", key="add_incident_btn", type="primary", use_container_width=True):
+                    st.session_state.safety_view = "add"
+                    st.rerun()
+                    
+            with col2:
+                if st.button("📊 View Analysis", key="view_analysis", use_container_width=True):
+                    st.session_state.safety_view = "analysis"
+                    st.rerun()
+                    
             # Show list view with incidents table
             render_incident_list()
-            
-            # Add Analysis button on top of list
-            if st.button("📊 View Analysis", key="view_analysis"):
-                st.session_state.safety_view = "analysis"
-                st.rerun()
                 
         elif current_view == "view":
             # Show detailed view of a specific incident

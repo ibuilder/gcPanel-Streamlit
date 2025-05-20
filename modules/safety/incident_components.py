@@ -165,23 +165,18 @@ def render_incident_list():
         df = pd.DataFrame(display_data)
         
         # Add row click handler for the dataframe
+        # Convert the Date column to string to avoid type compatibility issues
+        df['Date'] = df['Date'].astype(str)
+        
         selected_rows = st.data_editor(
             df,
             column_config={
                 "ID": st.column_config.TextColumn("ID", width="small"),
-                "Date": st.column_config.DateColumn("Date", width="small"),
+                "Date": st.column_config.TextColumn("Date", width="small"),
                 "Title": st.column_config.TextColumn("Title", width="medium"),
                 "Location": st.column_config.TextColumn("Location", width="medium"),
-                "Severity": st.column_config.SelectboxColumn(
-                    "Severity",
-                    options=["Near Miss", "Minor", "Moderate", "Serious", "Critical"],
-                    width="medium",
-                ),
-                "Status": st.column_config.SelectboxColumn(
-                    "Status", 
-                    options=["Open", "Under Investigation", "Closed", "Resolved"],
-                    width="medium",
-                ),
+                "Severity": st.column_config.TextColumn("Severity", width="medium"),
+                "Status": st.column_config.TextColumn("Status", width="medium"),
                 "Reported By": st.column_config.TextColumn("Reported By", width="medium"),
             },
             hide_index=True,

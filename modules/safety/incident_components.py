@@ -237,7 +237,7 @@ def render_incident_details():
         
         # Back button to return to list view
         if st.button("Return to List View", key="return_to_list_from_error"):
-            st.session_state.safety_tab_selection = {"incidents": 0}  # Switch to List View tab
+            st.session_state.safety_view = "list"  # Switch to list view
             st.rerun()
         return
     
@@ -280,7 +280,12 @@ def render_incident_details():
                 st.markdown(f"- {witness}")
     
     with col2:
-        # Action buttons - only edit button shown in details view
+        # Back button to return to list view
+        if st.button("← Back to List", key="back_to_list_from_details", use_container_width=True):
+            st.session_state.safety_view = "list"  # Switch to list view
+            st.rerun()
+            
+        # Edit button for this incident
         if st.button("✏️ Edit Incident", key="edit_incident_details", use_container_width=True):
             st.session_state.edit_incident_id = incident_id
             st.session_state.safety_view = "edit"  # Switch to edit mode

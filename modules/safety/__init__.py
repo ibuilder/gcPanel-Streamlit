@@ -25,20 +25,30 @@ def render_safety():
     # Header
     st.title("Safety Management")
     
+    # Make sure session state variables are initialized
+    if "safety_view" not in st.session_state:
+        st.session_state.safety_view = "list"
+    
+    if "selected_incident_id" not in st.session_state:
+        st.session_state.selected_incident_id = None
+    
     # Tab navigation for safety sections - main module categories
     tab1, tab2, tab3 = st.tabs(["Incidents", "Inspections", "Training"])
     
     # Incidents Tab
     with tab1:
-        # Initialize view state
-        if "safety_view" not in st.session_state:
-            st.session_state.safety_view = "list"
-            
-        # Check which view to show
+        # Use a clean direct approach for view state management
         current_view = st.session_state.safety_view
         
-        if current_view == "list":
-            # Action buttons at the top of the list
+        # Add navigation buttons at the top
+        if current_view != "list":
+            # Back button at the top of any non-list view
+            if st.button("← Back to Incidents List", key="top_back_to_list", use_container_width=True):
+                st.session_state.safety_view = "list"
+                st.session_state.selected_incident_id = None
+                st.rerun()
+        else:
+            # Action buttons at the top of the list view
             col1, col2 = st.columns(2)
             with col1:
                 if st.button("➕ Add Incident", key="add_incident_btn", type="primary", use_container_width=True):
@@ -49,37 +59,25 @@ def render_safety():
                 if st.button("📊 View Analysis", key="view_analysis", use_container_width=True):
                     st.session_state.safety_view = "analysis"
                     st.rerun()
-            
-            # Show a clear message about what to do
-            st.info("Click on an incident title below to view detailed information")
-                    
+        
+        # Render the appropriate view
+        if current_view == "list":
             # Show list view with incidents table
+            st.info("Click on an incident title below to view detailed information")
             render_incident_list()
-                
+            
         elif current_view == "view":
             # Show detailed view of a specific incident
             render_incident_details()
             
-            # Back button to return to list
-            if st.button("← Back to List", key="back_to_list"):
-                st.session_state.safety_view = "list"
-                st.rerun()
-                
         elif current_view == "add" or current_view == "edit":
             # Show add/edit form
             is_edit = (current_view == "edit")
             render_incident_form(is_edit=is_edit)
             
-            # Back button is handled in the form component
-            
         elif current_view == "analysis":
             # Show analysis charts and metrics
             render_incidents_analysis()
-            
-            # Back button to return to list
-            if st.button("← Back to List", key="back_to_list_from_analysis"):
-                st.session_state.safety_view = "list"
-                st.rerun()
     
     # Inspections Tab - Placeholder for similar CRUD structure as above
     with tab2:

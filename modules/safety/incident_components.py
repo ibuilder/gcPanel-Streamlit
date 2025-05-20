@@ -17,15 +17,9 @@ import random
 def render_incident_list():
     """Render the incidents list view with filtering and sorting"""
     
-    # Debug: Print safety_view value to understand navigation
-    st.write(f"Current safety view: {st.session_state.get('safety_view', 'not set')}")
-    
     # Initialize session state variables if they don't exist
-    if "show_incident_modal" not in st.session_state:
-        st.session_state.show_incident_modal = False
-        
-    if "modal_incident_data" not in st.session_state:
-        st.session_state.modal_incident_data = None
+    if "incidents_page" not in st.session_state:
+        st.session_state.incidents_page = 0
     
     st.header("Incidents List")
     
@@ -198,9 +192,13 @@ def render_incident_list():
                 with col2:
                     # Create a clickable title that navigates to the detail view
                     if st.button(f"📋 {incident['Title']}", key=f"incident_title_{incident['ID']}", use_container_width=True):
-                        # Store the incident ID and switch view
+                        # Store the ID and all the data
                         st.session_state.selected_incident_id = incident['ID']
+                        # Include a timestamp to force a refresh
+                        st.session_state.last_selection = datetime.now().isoformat()
                         st.session_state.safety_view = "view"
+                        # Store the incident data in session state to avoid data mismatch
+                        st.session_state.selected_incident_data = incident
                         st.rerun()
                 
                 with col3:
@@ -287,10 +285,11 @@ def render_incident_details():
     except:
         pass
         
-    # Find the matching incident
+    # Find the matching incident - use string comparison for consistency
     for inc in display_data:
-        if inc["ID"] == incident_id:
+        if str(inc["ID"]) == str(incident_id):
             incident = inc
+            st.success(f"Found incident: {inc['Title']}")
             break
     
     # Handle case where incident isn't found

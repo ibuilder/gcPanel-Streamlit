@@ -54,3 +54,34 @@ div.element-container.element-container.st-emotion-cache-171r8tt {
 div.element-container[data-testid="stElementContainer"] {
     margin-bottom: 1rem !important;
 }
+
+/* Fix for the header area with multiple element containers above Navigation */
+div.stElementContainer[data-stale="false"] + div.stElementContainer[data-stale="false"] {
+    display: contents !important;
+}
+
+/* Fix for multiple st-key-header_nav_dropdown elements */
+div[class*="st-key-header_nav_dropdown"] {
+    display: contents !important;
+}
+
+/* Make the Navigation label container single */
+div.stElementContainer[data-stale="false"][width="auto"] {
+    display: contents !important;
+}
+
+/* Target the specific pattern above Navigation */
+div.stElementContainer.element-container.st-emotion-cache-171r8tt[data-testid="stElementContainer"][data-stale="false"][width="auto"] {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Remove excess containers in navigation area */
+div[class*="st-emotion-cache-v1xntx"] > div.stElementContainer:not(:last-child) {
+    display: contents !important;
+}
+
+/* Fix header vertical columns */
+div.stColumn[data-testid="stVerticalBlock"] > div:not(:last-child) {
+    display: contents !important;
+}

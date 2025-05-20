@@ -164,11 +164,9 @@ def render_incident_list():
         # Convert to DataFrame for display
         df = pd.DataFrame(display_data)
         
-        # Add row click handler for the dataframe
-        # Convert the Date column to string to avoid type compatibility issues
-        df['Date'] = df['Date'].astype(str)
-        
-        selected_rows = st.data_editor(
+        # Create a dataframe for display with all incident records
+        # Show the standard table first
+        st.dataframe(
             df,
             column_config={
                 "ID": st.column_config.TextColumn("ID", width="small"),
@@ -177,21 +175,38 @@ def render_incident_list():
                 "Location": st.column_config.TextColumn("Location", width="medium"),
                 "Severity": st.column_config.TextColumn("Severity", width="medium"),
                 "Status": st.column_config.TextColumn("Status", width="medium"),
-                "Reported By": st.column_config.TextColumn("Reported By", width="medium"),
+                "Reported By": st.column_config.TextColumn("Reported By", width="medium")
             },
-            hide_index=True,
             use_container_width=True,
-            num_rows="dynamic",
-            key="incident_table",
-            disabled=True
+            hide_index=True
         )
         
-        # Get selected row if any
-        if selected_rows is not None and len(selected_rows) > 0:
-            selected_id = selected_rows.iloc[0]["ID"]
-            st.session_state.selected_incident_id = selected_id
-            st.session_state.safety_view = "view"
-            st.rerun()
+        # Add a separate list with clickable titles
+        st.subheader("Select an incident to view details")
+        
+        # Create a clean list of incidents with clickable titles
+        for incident in display_data:
+            col1, col2, col3 = st.columns([3, 2, 2])
+            with col1:
+                # Make the title clickable
+                if st.button(f"📋 {incident['Title']}", key=f"incident_title_{incident['ID']}"):
+                    st.session_state.selected_incident_id = incident['ID']
+                    st.session_state.safety_view = "view"
+                    st.rerun()
+                    
+            with col2:
+                st.write(f"**Location:** {incident['Location']}")
+                    
+            with col3:
+                severity_color = {
+                    "Critical": "red",
+                    "Serious": "orange",
+                    "Moderate": "gold",
+                    "Minor": "lightgreen",
+                    "Near Miss": "green"
+                }.get(incident['Severity'], "grey")
+                
+                st.markdown(f"<span style='color:{severity_color};'>**{incident['Severity']}**</span> • {incident['Status']}", unsafe_allow_html=True)
             
 
         

@@ -165,7 +165,7 @@ def render_incident_list():
         df = pd.DataFrame(display_data)
         
         # Create interactive datatable with click to view
-        selected_rows = st.data_editor(
+        st.data_editor(
             df,
             column_config={
                 "ID": st.column_config.TextColumn(
@@ -202,24 +202,26 @@ def render_incident_list():
             hide_index=True,
             use_container_width=True,
             disabled=["ID", "Date", "Title", "Location", "Severity", "Status", "Reported By"],
-            on_selection_change=lambda selected_rows: st.session_state.update({"selected_rows": selected_rows}),
             key="incident_table"
         )
         
-        # Handle row selection
-        if st.session_state.get("selected_rows"):
-            # Get the first selected row
-            selected_index = next(iter(st.session_state["selected_rows"].items()))[0]
-            selected_incident_id = df.iloc[selected_index]["ID"]
-            
-            # Set the selected incident ID in session state
+        # Allow users to select an incident by ID for viewing details
+        incident_ids = [inc["ID"] for inc in display_data]
+        selected_incident_id = st.selectbox(
+            "Select an incident to view details",
+            options=incident_ids,
+            format_func=lambda x: f"{x} - {next((i['Title'] for i in display_data if i['ID'] == x), '')}",
+            key="incident_select_box"
+        )
+        
+        # Set the selected incident ID in session state and provide a button to view details
+        if st.button("View Selected Incident", key="view_selected_incident"):
+            # Save selection to session state
             st.session_state.selected_incident_id = selected_incident_id
             
-            # Show a button to view incident details
-            if st.button("View Selected Incident", key="view_selected_incident"):
-                # Switch to incident details tab
-                st.session_state.safety_tab_selection = {"incidents": 1}  # Index 1 is View Record tab
-                st.rerun()
+            # Switch to incident details tab
+            st.session_state.safety_tab_selection = {"incidents": 1}  # Index 1 is View Record tab
+            st.rerun()
     else:
         st.info("No incidents match the selected filters")
 

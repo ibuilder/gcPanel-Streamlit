@@ -186,19 +186,19 @@ def render_incident_list():
                 # Create a row with columns for the incident data and action buttons
                 row_container = st.container()
                 
-                # Create columns for the data display with action buttons inline - optimized spacing
-                col1, col2, col3, col4, col_view, col_edit = row_container.columns([1, 5, 1.5, 1.2, 0.15, 0.15])
+                # Create columns for the data display with action buttons inline - maximized use of space
+                col1, col2, col3, col4, col_view, col_edit = row_container.columns([0.8, 4.5, 1.2, 1, 0.25, 0.25])
                 
                 with col1:
                     st.write(f"**{incident['Date']}**")
-                    st.caption(f"ID: {incident['ID']}")
+                    st.caption(f"{incident['ID']}", unsafe_allow_html=True)
                 
                 with col2:
                     st.write(f"📋 **{incident['Title']}**")
                 
                 with col3:
-                    st.write(f"**Location:**")
-                    st.write(f"{incident['Location']}")
+                    # Combine location text into one line
+                    st.markdown(f"<small><b>Location:</b><br>{incident['Location']}</small>", unsafe_allow_html=True)
                 
                 with col4:
                     severity_color = {
@@ -209,8 +209,11 @@ def render_incident_list():
                         "Near Miss": "green"
                     }.get(incident['Severity'], "grey")
                     
-                    st.markdown(f"<span style='color:{severity_color};'>**{incident['Severity']}**</span>", unsafe_allow_html=True)
-                    st.write(f"Status: {incident['Status']}")
+                    # Combine severity and status into one block
+                    st.markdown(f"""
+                    <span style='color:{severity_color};'><b>{incident['Severity']}</b></span><br>
+                    <small>{incident['Status']}</small>
+                    """, unsafe_allow_html=True)
                 
                 # View button column
                 with col_view:

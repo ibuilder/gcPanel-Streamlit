@@ -186,8 +186,8 @@ def render_incident_list():
                 # Create a row with columns for the incident data and action buttons
                 row_container = st.container()
                 
-                # Create columns for the summary row and actions
-                col1, col2, col3, col4, col_view, col_edit = row_container.columns([1.5, 2.5, 1.5, 1.5, 0.5, 0.5])
+                # Create columns for the data display
+                col1, col2, col3, col4 = row_container.columns([2, 3, 2, 2])
                 
                 with col1:
                     st.write(f"**{incident['Date']}**")
@@ -212,30 +212,29 @@ def render_incident_list():
                     st.markdown(f"<span style='color:{severity_color};'>**{incident['Severity']}**</span>", unsafe_allow_html=True)
                     st.write(f"Status: {incident['Status']}")
                 
-                # Add View button with direct URL navigation
-                with col_view:
-                    view_url = f"?view=view&incident_id={incident['ID']}"
-                    if st.button("👁️", key=f"view_{incident['ID']}", help="View incident details"):
-                        # Use both direct URL navigation and session state
-                        st.session_state.selected_incident_id = incident['ID']
+                # Add a row for buttons below each incident
+                button_cols = st.columns([4, 2, 2])
+                
+                with button_cols[1]:
+                    # Simple View button for direct access
+                    if st.button("👁️ View Details", key=f"view_{incident['ID']}", use_container_width=True):
+                        # Store incident details in session state
+                        st.session_state.selected_incident_id = incident['ID'] 
                         st.session_state.selected_incident_data = incident
-                        st.session_state.safety_view = "view"
-                        # Set URL parameters for direct navigation using current API
-                        st.query_params.view = "view"
-                        st.query_params.incident_id = str(incident['ID'])
+                        # Set view mode
+                        st.session_state["safety_view"] = "view"
+                        # Force refresh
                         st.rerun()
                 
-                # Add Edit button with direct URL navigation
-                with col_edit:
-                    edit_url = f"?view=edit&incident_id={incident['ID']}"
-                    if st.button("✏️", key=f"edit_{incident['ID']}", help="Edit incident"):
-                        # Use both direct URL navigation and session state
+                with button_cols[2]:
+                    # Simple Edit button
+                    if st.button("✏️ Edit", key=f"edit_{incident['ID']}", use_container_width=True):
+                        # Store incident data for editing
                         st.session_state.edit_incident_id = incident['ID']
                         st.session_state.edit_incident_data = incident
-                        st.session_state.safety_view = "edit"
-                        # Set URL parameters for direct navigation using current API
-                        st.query_params.view = "edit"
-                        st.query_params.incident_id = str(incident['ID'])
+                        # Set edit mode 
+                        st.session_state["safety_view"] = "edit"
+                        # Force refresh
                         st.rerun()
                 
 

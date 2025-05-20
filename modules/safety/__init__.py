@@ -51,7 +51,13 @@ def render_safety():
     
     # Incidents Tab
     with tab1:
-        # Use a clean direct approach for view state management
+        # For debugging: Print what the current view should be
+        if st.checkbox("🔍 Debug state", value=False, key="debug_state"):
+            st.write(f"Current safety view: {st.session_state.get('safety_view')}")
+            st.write(f"Selected incident ID: {st.session_state.get('selected_incident_id')}")
+            st.write(f"Edit incident ID: {st.session_state.get('edit_incident_id')}")
+        
+        # Get current view from session state
         current_view = st.session_state.safety_view
         
         # Add navigation buttons at the top

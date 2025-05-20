@@ -183,6 +183,7 @@ def render_incident_list():
                 if i > 0:
                     st.markdown("<hr style='margin: 0.5rem 0; opacity: 0.2;'>", unsafe_allow_html=True)
                     
+                # First show a summary row
                 col1, col2, col3, col4 = st.columns([2, 3, 2, 2])
                 
                 with col1:
@@ -190,27 +191,7 @@ def render_incident_list():
                     st.caption(f"ID: {incident['ID']}")
                 
                 with col2:
-                    # Add an expander instead of a button
-                    with st.expander(f"📋 {incident['Title']}", expanded=False):
-                        # Show incident details directly in the expander
-                        st.markdown(f"**ID:** {incident['ID']}")
-                        st.markdown(f"**Date:** {incident['Date']}")
-                        st.markdown(f"**Location:** {incident['Location']}")
-                        st.markdown(f"**Severity:** {incident['Severity']}")
-                        st.markdown(f"**Status:** {incident['Status']}")
-                        st.markdown(f"**Reported By:** {incident['Reported By']}")
-                        
-                        # Description section
-                        st.markdown("### Description")
-                        st.write("Detailed description of what happened would appear here.")
-                        
-                        # Actions section
-                        st.markdown("### Actions Taken")
-                        st.write("Immediate actions taken to address the incident would be listed here.")
-                        
-                        # Add edit button
-                        if st.button("✏️ Edit", key=f"edit_incident_{incident['ID']}"):
-                            st.info("Edit functionality would be implemented here")
+                    st.write(f"📋 **{incident['Title']}**")
                 
                 with col3:
                     st.write(f"**Location:**")
@@ -227,6 +208,59 @@ def render_incident_list():
                     
                     st.markdown(f"<span style='color:{severity_color};'>**{incident['Severity']}**</span>", unsafe_allow_html=True)
                     st.write(f"Status: {incident['Status']}")
+                
+                # Then add an expander for the full width
+                with st.expander("View Incident Details", expanded=False):
+                    # Create two columns for the details
+                    col_left, col_right = st.columns([3, 1])
+                    
+                    with col_left:
+                        # Title and basic info
+                        st.subheader(f"{incident['Title']}")
+                        
+                        # Show incident details
+                        st.markdown(f"**ID:** {incident['ID']}")
+                        st.markdown(f"**Date:** {incident['Date']}")
+                        st.markdown(f"**Location:** {incident['Location']}")
+                        st.markdown(f"**Severity:** {incident['Severity']}")
+                        st.markdown(f"**Status:** {incident['Status']}")
+                        st.markdown(f"**Reported By:** {incident['Reported By']}")
+                        
+                        # Description section
+                        st.markdown("### Description")
+                        st.write("Detailed description of what happened would appear here, including the circumstances, contributing factors, and immediate observations.")
+                        
+                        # Actions section
+                        st.markdown("### Actions Taken")
+                        st.write("Immediate actions taken to address the incident would be listed here, including containment measures, notifications, and preliminary responses.")
+                    
+                    with col_right:
+                        # Add edit button
+                        if st.button("✏️ Edit Incident", key=f"edit_incident_{incident['ID']}", use_container_width=True):
+                            st.info("Edit functionality would be implemented here")
+                            
+                        # Status update section
+                        st.markdown("### Update Status")
+                        statuses = ["Open", "Under Investigation", "Closed", "Resolved"]
+                        current_status = incident['Status']
+                        status_index = statuses.index(current_status) if current_status in statuses else 0
+                        
+                        new_status = st.selectbox(
+                            "New Status",
+                            statuses,
+                            index=status_index,
+                            key=f"status_{incident['ID']}"
+                        )
+                        
+                        if st.button("Update Status", key=f"update_{incident['ID']}", use_container_width=True):
+                            st.success(f"Status updated to: {new_status}")
+                        
+                        # Attachments section
+                        st.markdown("### Attachments")
+                        st.write("No attachments found")
+                        
+                        # Upload button for attachments
+                        st.file_uploader("Add Attachment", key=f"upload_{incident['ID']}")
                 
                 # No longer need the expandable details section as we're using expanders
                     

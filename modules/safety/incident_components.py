@@ -186,8 +186,8 @@ def render_incident_list():
                 # Create a row with columns for the incident data and action buttons
                 row_container = st.container()
                 
-                # Create columns for the data display
-                col1, col2, col3, col4 = row_container.columns([2, 3, 2, 2])
+                # Create columns for the data display with action buttons inline
+                col1, col2, col3, col4, col_view, col_edit = row_container.columns([2, 3, 2, 1.5, 0.25, 0.25])
                 
                 with col1:
                     st.write(f"**{incident['Date']}**")
@@ -212,12 +212,10 @@ def render_incident_list():
                     st.markdown(f"<span style='color:{severity_color};'>**{incident['Severity']}**</span>", unsafe_allow_html=True)
                     st.write(f"Status: {incident['Status']}")
                 
-                # Add a row for buttons below each incident
-                button_cols = st.columns([4, 2, 2])
-                
-                with button_cols[1]:
+                # View button column
+                with col_view:
                     # Icon-only View button
-                    if st.button("👁️", key=f"view_{incident['ID']}", use_container_width=True, help="View incident details"):
+                    if st.button("👁️", key=f"view_{incident['ID']}", help="View incident details"):
                         # Store incident details in session state
                         st.session_state.selected_incident_id = incident['ID'] 
                         st.session_state.selected_incident_data = incident
@@ -226,9 +224,10 @@ def render_incident_list():
                         # Force refresh
                         st.rerun()
                 
-                with button_cols[2]:
+                # Edit button column
+                with col_edit:
                     # Icon-only Edit button
-                    if st.button("✏️", key=f"edit_{incident['ID']}", use_container_width=True, help="Edit incident"):
+                    if st.button("✏️", key=f"edit_{incident['ID']}", help="Edit incident"):
                         # Store incident data for editing
                         st.session_state.edit_incident_id = incident['ID']
                         st.session_state.edit_incident_data = incident

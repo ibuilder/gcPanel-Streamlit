@@ -10,33 +10,64 @@ def render_header():
     """
     Render a simple, clean header using only Streamlit components.
     """
-    # Apply overall header spacing fixes
+    # Apply much more aggressive header spacing fixes
     st.markdown("""
     <style>
-    /* Remove all spacing above header */
-    .main .block-container {
-        padding-top: 0 !important;
-        margin-top: 0 !important;
+    /* Extreme reset - remove ALL margins and padding from Streamlit components */
+    .main .block-container, 
+    .stApp, 
+    [data-testid="stHeader"],
+    [data-testid="stToolbar"],
+    [data-testid="stDecoration"],
+    [data-testid="stAppViewContainer"],
+    .css-18e3th9,
+    .css-1d391kg,
+    .css-1wrcr25,
+    .stApp > header,
+    .stApp > div,
+    .main, 
+    div[class*="st-emotion-cache"],
+    div[data-testid="stVerticalBlock"],
+    div[data-baseweb] {
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
     }
     
-    /* Remove default Streamlit spacing */
-    .stApp {
-        margin-top: 0 !important;
-        padding-top: 0 !important;
+    /* Completely eliminate Streamlit header */
+    header {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        max-height: 0 !important;
+        overflow: hidden !important;
+        opacity: 0 !important;
     }
     
-    /* Force header to the very top */
+    /* Fix first element spacing */
+    .stElementContainer:first-child,
+    [data-testid="stVerticalBlock"] > div:first-child,
     .element-container:first-child {
         margin-top: 0 !important;
         padding-top: 0 !important;
     }
     
-    /* Eliminate any residual spacing */
-    header {
-        visibility: hidden !important;
-        height: 0 !important;
-        padding: 0 !important;
+    /* Reduce all row spacing */
+    div.row-widget {
         margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Fix all stElementContainer spacing */
+    div.stElementContainer {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Aggressive fix for top spacing */
+    .main div.block-container {
+        margin-top: -5rem !important; /* Pull everything up */
     }
     </style>
     """, unsafe_allow_html=True)
@@ -89,8 +120,29 @@ def render_header():
     </style>
     """, unsafe_allow_html=True)
     
-    # Responsive column layout - adjusts for mobile
-    col1, col3 = st.columns([5, 5])
+    # Custom CSS for the entire header container
+    st.markdown("""
+    <style>
+    /* Custom header container to eliminate all space */
+    .stHeader {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Target dropdown container directly */
+    .stSelectbox {
+        margin-top: -25px !important; /* Negative margin to pull it up */
+    }
+    
+    /* Ensure dropdown is visible and not clipped */
+    div[data-baseweb="select"] {
+        z-index: 100 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Tight responsive column layout - adjusts for mobile
+    col1, col3 = st.columns([5, 5], gap="small")
     
     with col1:
         # Use Streamlit's native components instead of HTML with event handlers
@@ -243,9 +295,9 @@ def render_header():
         # Enhanced navigation styling with vertical alignment fix
         st.markdown("""
         <style>
-        /* Fix vertical alignment with the rest of the header - reduced margin */
+        /* Fix vertical alignment with the rest of the header - removed margin */
         div[data-baseweb="select"] {
-            margin-top: 10px !important; /* Reduced from 18px to align better */
+            margin-top: 0 !important; /* Completely removed margin */
         }
         
         /* Remove label spacing above Navigation dropdown */

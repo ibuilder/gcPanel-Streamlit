@@ -17,6 +17,9 @@ import random
 def render_incident_list():
     """Render the incidents list view with filtering and sorting"""
     
+    # Debug: Print safety_view value to understand navigation
+    st.write(f"Current safety view: {st.session_state.get('safety_view', 'not set')}")
+    
     # Initialize session state variables if they don't exist
     if "show_incident_modal" not in st.session_state:
         st.session_state.show_incident_modal = False

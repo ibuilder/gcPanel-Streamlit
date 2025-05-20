@@ -215,13 +215,21 @@ def render_incident_list():
         )
         
         # Set the selected incident ID in session state and provide a button to view details
-        if st.button("View Selected Incident", key="view_selected_incident"):
-            # Save selection to session state
-            st.session_state.selected_incident_id = selected_incident_id
-            
-            # Switch to incident details tab
-            st.session_state.safety_tab_selection = {"incidents": 1}  # Index 1 is View Record tab
-            st.rerun()
+        col1, col2 = st.columns([1,1])
+        with col1:
+            if st.button("👁️ View Selected Incident", key="view_selected_incident", use_container_width=True):
+                # Save selection to session state
+                st.session_state.selected_incident_id = selected_incident_id
+                
+                # Switch to view mode
+                st.session_state.safety_view = "view"
+                st.rerun()
+        
+        with col2:
+            if st.button("➕ Add New Incident", key="add_new_incident", type="primary", use_container_width=True):
+                # Switch to add mode
+                st.session_state.safety_view = "add"
+                st.rerun()
     else:
         st.info("No incidents match the selected filters")
 
@@ -295,17 +303,10 @@ def render_incident_details():
     
     with col2:
         # Action buttons - only edit button shown in details view
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("✏️ Edit", key="edit_incident_details", use_container_width=True):
-                st.session_state.edit_incident_id = incident_id
-                st.session_state.safety_tab_selection = {"incidents": 2}  # Switch to Add/Edit tab
-                st.rerun()
-        
-        with col2:
-            if st.button("⬅️ Back", key="back_to_list", use_container_width=True):
-                st.session_state.safety_tab_selection = {"incidents": 0}  # Switch to List View tab
-                st.rerun()
+        if st.button("✏️ Edit Incident", key="edit_incident_details", use_container_width=True):
+            st.session_state.edit_incident_id = incident_id
+            st.session_state.safety_view = "edit"  # Switch to edit mode
+            st.rerun()
         
         # Status update button
         st.markdown("### Update Status")
@@ -471,10 +472,10 @@ def render_incident_form(is_edit=False):
         if back_button:
             if is_edit:
                 # If editing, return to details view
-                st.session_state.safety_tab_selection = {"incidents": 1}  # Switch to View Record tab
+                st.session_state.safety_view = "view"
             else:
                 # If adding new, return to list view
-                st.session_state.safety_tab_selection = {"incidents": 0}  # Switch to List View tab
+                st.session_state.safety_view = "list"
             st.rerun()
             
         if submit_button:
@@ -493,12 +494,12 @@ def render_incident_form(is_edit=False):
                 # Clear form state or return to appropriate view
                 if is_edit:
                     # Return to details view of this incident
-                    st.session_state.safety_tab_selection = {"incidents": 1}  # Switch to View Record tab
+                    st.session_state.safety_view = "view"
                     st.rerun()
                 else:
                     # Set a flag to show success message on list view
                     st.session_state.show_incident_success = True
-                    st.session_state.safety_tab_selection = {"incidents": 0}  # Switch to List View tab
+                    st.session_state.safety_view = "list"
                     st.rerun()
 
 def render_incidents_analysis():

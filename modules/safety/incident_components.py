@@ -186,8 +186,8 @@ def render_incident_list():
                 # Create a row with columns for the incident data and action buttons
                 row_container = st.container()
                 
-                # Create columns for the data display with action buttons inline - tighter spacing
-                col1, col2, col3, col4, col_view, col_edit = row_container.columns([0.8, 5.5, 0.9, 0.8, 0.2, 0.2])
+                # Create a more balanced row layout with condensed columns
+                col1, col2, col3, col4, col_actions = row_container.columns([0.8, 3, 2, 1.5, 0.7])
                 
                 with col1:
                     st.write(f"**{incident['Date']}**")
@@ -215,29 +215,32 @@ def render_incident_list():
                     <small>{incident['Status']}</small>
                     """, unsafe_allow_html=True)
                 
-                # View button column
-                with col_view:
-                    # Icon-only View button
-                    if st.button("👁️", key=f"view_{incident['ID']}", help="View incident details"):
-                        # Store incident details in session state
-                        st.session_state.selected_incident_id = incident['ID'] 
-                        st.session_state.selected_incident_data = incident
-                        # Set view mode
-                        st.session_state["safety_view"] = "view"
-                        # Force refresh
-                        st.rerun()
-                
-                # Edit button column
-                with col_edit:
-                    # Icon-only Edit button
-                    if st.button("✏️", key=f"edit_{incident['ID']}", help="Edit incident"):
-                        # Store incident data for editing
-                        st.session_state.edit_incident_id = incident['ID']
-                        st.session_state.edit_incident_data = incident
-                        # Set edit mode 
-                        st.session_state["safety_view"] = "edit"
-                        # Force refresh
-                        st.rerun()
+                # Action buttons in a single column
+                with col_actions:
+                    # Create two buttons side by side in the actions column
+                    action_btn_cols = st.columns(2)
+                    
+                    # View button
+                    with action_btn_cols[0]:
+                        if st.button("👁️", key=f"view_{incident['ID']}", help="View incident details"):
+                            # Store incident details in session state
+                            st.session_state.selected_incident_id = incident['ID'] 
+                            st.session_state.selected_incident_data = incident
+                            # Set view mode
+                            st.session_state["safety_view"] = "view"
+                            # Force refresh
+                            st.rerun()
+                    
+                    # Edit button
+                    with action_btn_cols[1]:
+                        if st.button("✏️", key=f"edit_{incident['ID']}", help="Edit incident"):
+                            # Store incident data for editing
+                            st.session_state.edit_incident_id = incident['ID']
+                            st.session_state.edit_incident_data = incident
+                            # Set edit mode 
+                            st.session_state["safety_view"] = "edit"
+                            # Force refresh
+                            st.rerun()
                 
 
                 

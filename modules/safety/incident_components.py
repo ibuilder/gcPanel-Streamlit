@@ -220,11 +220,9 @@ def render_incident_list():
                         st.session_state.selected_incident_id = incident['ID']
                         st.session_state.selected_incident_data = incident
                         st.session_state.safety_view = "view"
-                        # Set URL parameters for direct navigation
-                        st.experimental_set_query_params(
-                            view="view",
-                            incident_id=str(incident['ID'])
-                        )
+                        # Set URL parameters for direct navigation using current API
+                        st.query_params.view = "view"
+                        st.query_params.incident_id = str(incident['ID'])
                         st.rerun()
                 
                 # Add Edit button with direct URL navigation
@@ -235,11 +233,9 @@ def render_incident_list():
                         st.session_state.edit_incident_id = incident['ID']
                         st.session_state.edit_incident_data = incident
                         st.session_state.safety_view = "edit"
-                        # Set URL parameters for direct navigation
-                        st.experimental_set_query_params(
-                            view="edit",
-                            incident_id=str(incident['ID'])
-                        )
+                        # Set URL parameters for direct navigation using current API
+                        st.query_params.view = "edit"
+                        st.query_params.incident_id = str(incident['ID'])
                         st.rerun()
                 
 

@@ -30,15 +30,14 @@ def render_safety():
         st.write(f"Current view: {st.session_state.get('safety_view', 'not set')}")
         st.write(f"Selected incident ID: {st.session_state.get('selected_incident_id', 'none')}")
         st.write(f"Edit incident ID: {st.session_state.get('edit_incident_id', 'none')}")
-        st.write(f"View query params: {st.experimental_get_query_params()}")
+        st.write(f"View query params: {dict(st.query_params)}")
     
     # Hard-coded URI parameters for direct navigation
-    query_params = st.experimental_get_query_params()
-    if "view" in query_params:
-        st.session_state.safety_view = query_params["view"][0]
-    if "incident_id" in query_params:
-        st.session_state.selected_incident_id = query_params["incident_id"][0]
-        st.session_state.edit_incident_id = query_params["incident_id"][0]
+    if "view" in st.query_params:
+        st.session_state.safety_view = st.query_params["view"]
+    if "incident_id" in st.query_params:
+        st.session_state.selected_incident_id = st.query_params["incident_id"]
+        st.session_state.edit_incident_id = st.query_params["incident_id"]
     
     # Make sure session state variables are initialized
     if "safety_view" not in st.session_state:

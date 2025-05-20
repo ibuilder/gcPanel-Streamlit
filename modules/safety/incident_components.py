@@ -17,6 +17,13 @@ import random
 def render_incident_list():
     """Render the incidents list view with filtering and sorting"""
     
+    # Initialize session state variables if they don't exist
+    if "show_incident_modal" not in st.session_state:
+        st.session_state.show_incident_modal = False
+        
+    if "modal_incident_data" not in st.session_state:
+        st.session_state.modal_incident_data = None
+    
     st.header("Incidents List")
     
     # Show success message if coming from form submission
@@ -110,6 +117,105 @@ def render_incident_list():
     # Get sample incident data
     incidents = generate_sample_incidents()
     
+    # Check if we need to show a modal with incident details
+    if st.session_state.get("show_incident_modal", False) and st.session_state.get("modal_incident_data") is not None:
+        incident_data = st.session_state.modal_incident_data
+        
+        # Create a modal dialog
+        with st.container():
+            st.markdown("""
+            <style>
+            .incident-modal {
+                background-color: white;
+                border-radius: 10px;
+                box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                margin: 10px 0;
+                border: 1px solid #ddd;
+                position: relative;
+            }
+            .modal-close-btn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                cursor: pointer;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+            
+            st.markdown("<div class='incident-modal'>", unsafe_allow_html=True)
+            
+            # Close button
+            col_title, col_close = st.columns([5, 1])
+            with col_close:
+                if st.button("✖", key="close_incident_modal"):
+                    st.session_state.show_incident_modal = False
+                    st.session_state.modal_incident_data = None
+                    st.rerun()
+            
+            # Incident details
+            with col_title:
+                st.subheader(f"Incident #{incident_data['ID']}: {incident_data['Title']}")
+            
+            # Layout in columns for clean presentation
+            col1, col2 = st.columns([3, 1])
+            
+            with col1:
+                # Status indicator with appropriate color
+                status_colors = {
+                    "Open": "🔴",
+                    "Under Investigation": "🟠",
+                    "Closed": "🟢",
+                    "Resolved": "🟢"
+                }
+                # Safely access the status with fallback
+                status = incident_data.get("Status", "Unknown")
+                status_icon = status_colors.get(status, "⚪")
+                st.markdown(f"**Status**: {status_icon} {status}")
+                
+                # Incident metadata - use safe get method with defaults
+                st.markdown(f"**Date**: {incident_data.get('Date', 'Not specified')}")
+                st.markdown(f"**Location**: {incident_data.get('Location', 'Not specified')}")
+                st.markdown(f"**Severity**: {incident_data.get('Severity', 'Not specified')}")
+                st.markdown(f"**Reported By**: {incident_data.get('Reported By', 'Not specified')}")
+                
+                # Description - use a sample description since it's not in the original data
+                st.markdown("### Description")
+                st.write("This is a detailed description of the incident that would typically include information about what happened, the circumstances, and initial observations.")
+                
+                # Actions Taken
+                st.markdown("### Actions Taken")
+                st.write("Immediate actions taken in response to the incident would be listed here.")
+            
+            with col2:
+                # Edit button for this incident
+                if st.button("✏️ Edit Incident", key="edit_incident_modal", use_container_width=True):
+                    # In a real implementation, this would set up edit mode
+                    st.info("Edit functionality would be implemented here")
+                
+                # Status update section
+                st.markdown("### Update Status")
+                statuses = ["Open", "Under Investigation", "Closed", "Resolved"]
+                current_status_index = statuses.index(status) if status in statuses else 0
+                new_status = st.selectbox(
+                    "New Status",
+                    statuses,
+                    index=current_status_index,
+                    key="modal_status_update"
+                )
+                
+                if st.button("Update Status", key="modal_update_status_btn", use_container_width=True):
+                    st.success(f"Status updated to: {new_status}")
+                    
+                # Attachments section
+                st.markdown("### Attachments")
+                st.write("No attachments")
+                
+                # Upload new attachment button
+                st.file_uploader("Upload New Attachment", key="modal_upload_attachment")
+            
+            st.markdown("</div>", unsafe_allow_html=True)
+    
     # Apply filters to incidents
     filtered_incidents = []
     for incident in incidents:
@@ -184,15 +290,12 @@ def render_incident_list():
                     st.caption(f"ID: {incident['ID']}")
                 
                 with col2:
-                    # Create a direct link to the incident detail view
-                    col_link, col_empty = st.columns([5, 1])
-                    with col_link:
-                        if st.button(f"📋 {incident['Title']}", key=f"incident_title_{incident['ID']}", use_container_width=True):
-                            # Store the incident ID and switch view
-                            st.session_state.selected_incident_id = incident['ID']
-                            st.session_state.incident_detail_data = incident  # Store the entire incident data
-                            st.session_state.safety_view = "view"
-                            st.rerun()
+                    # Create a clickable title that opens a modal with incident details
+                    if st.button(f"📋 {incident['Title']}", key=f"incident_title_{incident['ID']}", use_container_width=True):
+                        # Set up the modal for this incident
+                        st.session_state.show_incident_modal = True
+                        st.session_state.modal_incident_data = incident
+                        st.rerun()
                 
                 with col3:
                     st.write(f"**Location:**")
@@ -249,6 +352,9 @@ def render_incident_details():
             st.session_state.safety_view = "list"  # Switch to list view
             st.rerun()
         return
+        
+    # Initialize incident_id variable
+    incident_id = st.session_state.selected_incident_id
     
     # Use the stored incident data if available
     if "incident_detail_data" in st.session_state:
@@ -325,7 +431,7 @@ def render_incident_details():
             
         # Edit button for this incident
         if st.button("✏️ Edit Incident", key="edit_incident_details", use_container_width=True):
-            st.session_state.edit_incident_id = incident_id
+            st.session_state.edit_incident_id = incident['id']  # Use incident dictionary value
             st.session_state.safety_view = "edit"  # Switch to edit mode
             st.rerun()
         
@@ -335,10 +441,10 @@ def render_incident_details():
             "New Status",
             ["Open", "Under Investigation", "Closed", "Resolved"],
             index=["Open", "Under Investigation", "Closed", "Resolved"].index(incident['status']),
-            key=f"status_update_{incident_id}"
+            key="status_update_detail"
         )
         
-        if st.button("Update Status", key=f"update_status_btn_{incident_id}", use_container_width=True):
+        if st.button("Update Status", key="update_status_btn_detail", use_container_width=True):
             st.success(f"Status updated to: {new_status}")
             
         # Attachments section
@@ -350,7 +456,7 @@ def render_incident_details():
             st.write("No attachments")
         
         # Upload new attachment button
-        st.file_uploader("Upload New Attachment", key=f"upload_attachment_{incident_id}")
+        st.file_uploader("Upload New Attachment", key="upload_attachment_detail")
 
 def render_incident_form(is_edit=False):
     """Render the incident creation/edit form"""

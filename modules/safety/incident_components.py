@@ -227,11 +227,7 @@ def render_incident_list():
             
 
         
-        # Button to add new incident
-        if st.button("➕ Add New Incident", key="add_new_incident", type="primary", use_container_width=True):
-                # Switch to add mode
-                st.session_state.safety_view = "add"
-                st.rerun()
+        # Action buttons now handled in the parent component
     else:
         st.info("No incidents match the selected filters")
 
@@ -246,7 +242,7 @@ def render_incident_details():
         
         # Back button to return to list view
         if st.button("Return to List View", key="return_to_list_from_details"):
-            st.session_state.safety_tab_selection = {"incidents": 0}  # Switch to List View tab
+            st.session_state.safety_view = "list"  # Switch to list view
             st.rerun()
         return
     

@@ -2,7 +2,7 @@
 Safety module for the gcPanel Construction Management Dashboard.
 
 This module provides safety management features including incident tracking,
-safety inspections, and safety metrics visualization. 
+safety inspections, safety metrics visualization, and gamified safety badges. 
 
 This module follows a clear CRUD pattern with:
 1. List views for viewing all records with filtering/searching/sorting
@@ -18,6 +18,7 @@ from modules.safety.incident_components import (
     render_incident_form, 
     render_incidents_analysis
 )
+from modules.safety.badges import render_badges
 
 def render_safety():
     """Render the safety module"""
@@ -47,7 +48,7 @@ def render_safety():
         st.session_state.selected_incident_id = None
     
     # Tab navigation for safety sections - main module categories
-    tab1, tab2, tab3 = st.tabs(["Incidents", "Inspections", "Training"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Incidents", "Inspections", "Training", "Safety Badges"])
     
     # Incidents Tab
     with tab1:
@@ -120,3 +121,7 @@ def render_safety():
         - **Add/Edit**: Form for creating and updating training records
         - **Analysis**: Charts and metrics for training data analysis
         """)
+        
+    # Safety Badges Tab
+    with tab4:
+        render_badges()

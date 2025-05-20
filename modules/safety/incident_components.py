@@ -164,69 +164,44 @@ def render_incident_list():
         # Convert to DataFrame for display
         df = pd.DataFrame(display_data)
         
-        # Create interactive datatable with click to view
-        st.data_editor(
+        # Add row click handler for the dataframe
+        selected_rows = st.data_editor(
             df,
             column_config={
-                "ID": st.column_config.TextColumn(
-                    "ID",
-                    width="small",
-                ),
-                "Date": st.column_config.DateColumn(
-                    "Date",
-                    width="small",
-                ),
-                "Title": st.column_config.TextColumn(
-                    "Title",
-                    width="medium",
-                ),
-                "Location": st.column_config.TextColumn(
-                    "Location", 
-                    width="medium",
-                ),
+                "ID": st.column_config.TextColumn("ID", width="small"),
+                "Date": st.column_config.DateColumn("Date", width="small"),
+                "Title": st.column_config.TextColumn("Title", width="medium"),
+                "Location": st.column_config.TextColumn("Location", width="medium"),
                 "Severity": st.column_config.SelectboxColumn(
                     "Severity",
                     options=["Near Miss", "Minor", "Moderate", "Serious", "Critical"],
                     width="medium",
                 ),
                 "Status": st.column_config.SelectboxColumn(
-                    "Status",
+                    "Status", 
                     options=["Open", "Under Investigation", "Closed", "Resolved"],
                     width="medium",
                 ),
-                "Reported By": st.column_config.TextColumn(
-                    "Reported By",
-                    width="medium",
-                )
+                "Reported By": st.column_config.TextColumn("Reported By", width="medium"),
             },
             hide_index=True,
             use_container_width=True,
-            disabled=["ID", "Date", "Title", "Location", "Severity", "Status", "Reported By"],
-            key="incident_table"
+            num_rows="dynamic",
+            key="incident_table",
+            disabled=True
         )
         
-        # Allow users to select an incident by ID for viewing details
-        incident_ids = [inc["ID"] for inc in display_data]
-        selected_incident_id = st.selectbox(
-            "Select an incident to view details",
-            options=incident_ids,
-            format_func=lambda x: f"{x} - {next((i['Title'] for i in display_data if i['ID'] == x), '')}",
-            key="incident_select_box"
-        )
+        # Get selected row if any
+        if selected_rows is not None and len(selected_rows) > 0:
+            selected_id = selected_rows.iloc[0]["ID"]
+            st.session_state.selected_incident_id = selected_id
+            st.session_state.safety_view = "view"
+            st.rerun()
+            
+
         
-        # Set the selected incident ID in session state and provide a button to view details
-        col1, col2 = st.columns([1,1])
-        with col1:
-            if st.button("👁️ View Selected Incident", key="view_selected_incident", use_container_width=True):
-                # Save selection to session state
-                st.session_state.selected_incident_id = selected_incident_id
-                
-                # Switch to view mode
-                st.session_state.safety_view = "view"
-                st.rerun()
-        
-        with col2:
-            if st.button("➕ Add New Incident", key="add_new_incident", type="primary", use_container_width=True):
+        # Button to add new incident
+        if st.button("➕ Add New Incident", key="add_new_incident", type="primary", use_container_width=True):
                 # Switch to add mode
                 st.session_state.safety_view = "add"
                 st.rerun()
@@ -549,7 +524,11 @@ def render_incidents_analysis():
         
         # Incidents by month
         df['month'] = pd.to_datetime(df['date']).dt.strftime('%Y-%m')
-        incidents_by_month = df.groupby('month').size().rename('count').reset_index()
+        monthly_counts = df.groupby('month').size()
+        incidents_by_month = pd.DataFrame({
+            'month': monthly_counts.index,
+            'count': monthly_counts.values
+        })
         
         if not incidents_by_month.empty:
             fig = px.bar(

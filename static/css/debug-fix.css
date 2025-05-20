@@ -1,0 +1,67 @@
+/* CSS Fix for debugging visualization purple lines */
+
+/* Target all debug visualizations in Streamlit that might be showing */
+[data-testid="StyledLinkIconContainer"],
+[data-testid="StyledFullScreenButton"],
+[data-testid="baseButton-headerNoPadding"],
+.element-container::before,
+.element-container::after,
+.stButton::before,
+.stButton::after,
+.stMarkdown::before,
+.stMarkdown::after,
+div::before,
+div::after {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+}
+
+/* Hide specific Streamlit debug visuals */
+div.stBlock {
+    border: none !important;
+    background-color: transparent !important;
+}
+
+/* Target streamlit debugger visuals by their CSS class patterns */
+div[class*="debugElement"],
+div[class*="st-d"],
+div[class*="-debug-"],
+[data-testid*="debug"],
+div[style*="background-color:rgba(151,166,195,0.25)"],
+div[style*="background-color:purple"],
+div[style*="border:1px"] {
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+}
+
+/* Hide Streamlit's development mode visual indicators */
+.stDebuggingMode,
+.stDevelopmentMode,
+div[data-stdev="true"] {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+/* Force no background or borders on all elements */
+div[class*="st-"] {
+    background: none !important;
+    border: none !important;
+    background-image: none !important;
+}
+
+/* Hide common debugging overlays and guides */
+div[style*="background-color"] {
+    background-color: transparent !important;
+}
+
+/* Target any debug CSS that uses stripes */
+div[style*="repeating-linear-gradient"] {
+    background-image: none !important;
+}
+
+/* Override any outline that might be present */
+* {
+    outline: none !important;
+}

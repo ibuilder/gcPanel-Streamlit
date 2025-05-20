@@ -183,8 +183,11 @@ def render_incident_list():
                 if i > 0:
                     st.markdown("<hr style='margin: 0.5rem 0; opacity: 0.2;'>", unsafe_allow_html=True)
                     
-                # First show a summary row
-                col1, col2, col3, col4 = st.columns([2, 3, 2, 2])
+                # Make the entire row clickable by wrapping it in a container
+                row_container = st.container()
+                
+                # Create columns for the summary row
+                col1, col2, col3, col4 = row_container.columns([2, 3, 2, 2])
                 
                 with col1:
                     st.write(f"**{incident['Date']}**")
@@ -209,58 +212,15 @@ def render_incident_list():
                     st.markdown(f"<span style='color:{severity_color};'>**{incident['Severity']}**</span>", unsafe_allow_html=True)
                     st.write(f"Status: {incident['Status']}")
                 
-                # Then add an expander for the full width
-                with st.expander("View Incident Details", expanded=False):
-                    # Create two columns for the details
-                    col_left, col_right = st.columns([3, 1])
-                    
-                    with col_left:
-                        # Title and basic info
-                        st.subheader(f"{incident['Title']}")
-                        
-                        # Show incident details
-                        st.markdown(f"**ID:** {incident['ID']}")
-                        st.markdown(f"**Date:** {incident['Date']}")
-                        st.markdown(f"**Location:** {incident['Location']}")
-                        st.markdown(f"**Severity:** {incident['Severity']}")
-                        st.markdown(f"**Status:** {incident['Status']}")
-                        st.markdown(f"**Reported By:** {incident['Reported By']}")
-                        
-                        # Description section
-                        st.markdown("### Description")
-                        st.write("Detailed description of what happened would appear here, including the circumstances, contributing factors, and immediate observations.")
-                        
-                        # Actions section
-                        st.markdown("### Actions Taken")
-                        st.write("Immediate actions taken to address the incident would be listed here, including containment measures, notifications, and preliminary responses.")
-                    
-                    with col_right:
-                        # Add edit button
-                        if st.button("✏️ Edit Incident", key=f"edit_incident_{incident['ID']}", use_container_width=True):
-                            st.info("Edit functionality would be implemented here")
-                            
-                        # Status update section
-                        st.markdown("### Update Status")
-                        statuses = ["Open", "Under Investigation", "Closed", "Resolved"]
-                        current_status = incident['Status']
-                        status_index = statuses.index(current_status) if current_status in statuses else 0
-                        
-                        new_status = st.selectbox(
-                            "New Status",
-                            statuses,
-                            index=status_index,
-                            key=f"status_{incident['ID']}"
-                        )
-                        
-                        if st.button("Update Status", key=f"update_{incident['ID']}", use_container_width=True):
-                            st.success(f"Status updated to: {new_status}")
-                        
-                        # Attachments section
-                        st.markdown("### Attachments")
-                        st.write("No attachments found")
-                        
-                        # Upload button for attachments
-                        st.file_uploader("Add Attachment", key=f"upload_{incident['ID']}")
+                # Add a button below the summary that spans the entire row
+                if st.button(f"View Full Details", key=f"view_details_{incident['ID']}", use_container_width=True):
+                    # Store incident data and navigate to detail view
+                    st.session_state.selected_incident_id = incident['ID']
+                    st.session_state.selected_incident_data = incident
+                    st.session_state.safety_view = "view"
+                    st.rerun()
+                
+
                 
                 # No longer need the expandable details section as we're using expanders
                     
@@ -294,68 +254,80 @@ def render_incident_details():
     
     st.header("Incident Details")
     
-    # Check if an incident ID is selected in session state
-    if "selected_incident_id" not in st.session_state or not st.session_state.selected_incident_id:
-        st.info("Please select an incident from the List View to see details")
+    # Check if data is available in session state
+    if "selected_incident_data" in st.session_state and st.session_state.selected_incident_data:
+        # Use the data directly from session state
+        incident = st.session_state.selected_incident_data
+    else:
+        # Fall back to ID lookup if needed
+        if "selected_incident_id" not in st.session_state or not st.session_state.selected_incident_id:
+            st.info("Please select an incident from the List View to see details")
+            
+            # Back button to return to list view
+            if st.button("Return to List View", key="return_to_list_from_details"):
+                st.session_state.safety_view = "list"
+                st.rerun()
+            return
         
-        # Back button to return to list view
-        if st.button("Return to List View", key="return_to_list_from_details"):
-            st.session_state.safety_view = "list"  # Switch to list view
-            st.rerun()
-        return
-    
-    # Get all incidents data for lookup
-    all_incidents = generate_sample_incidents()
-    display_data = []
-    for inc in all_incidents:
-        display_data.append({
-            "ID": inc['id'],
-            "Date": inc['date'].strftime("%Y-%m-%d"),
-            "Title": inc['title'],
-            "Location": inc['location'],
-            "Severity": inc['severity'],
-            "Status": inc['status'],
-            "Reported By": inc['reported_by'],
-            "Description": inc['description'],
-            "Actions": inc.get('actions_taken', 'No actions recorded'),
-            "Type": inc.get('type', 'Not specified')
-        })
-    
-    # Find the incident in our dataset
-    incident_id = st.session_state.selected_incident_id
-    incident = None
-    
-    try:
-        # Try to convert to int if it's a string number
-        if isinstance(incident_id, str) and incident_id.isdigit():
-            incident_id = int(incident_id)
-    except:
-        pass
+        # Get data from the selected ID
+        incident_id = st.session_state.selected_incident_id
         
-    # Find the matching incident - use string comparison for consistency
-    for inc in display_data:
-        if str(inc["ID"]) == str(incident_id):
-            incident = inc
-            st.success(f"Found incident: {inc['Title']}")
-            break
+        # Get all incidents data for lookup
+        all_incidents = generate_sample_incidents()
+        display_data = []
+        for inc in all_incidents:
+            display_data.append({
+                "ID": inc['id'],
+                "Date": inc['date'].strftime("%Y-%m-%d"),
+                "Title": inc['title'],
+                "Location": inc['location'],
+                "Severity": inc['severity'],
+                "Status": inc['status'],
+                "Reported By": inc['reported_by'],
+                "Description": inc['description'],
+                "Actions": inc.get('actions_taken', 'No actions recorded'),
+                "Type": inc.get('type', 'Not specified')
+            })
+        
+        # Find the incident with matching ID
+        incident = None
+        for inc in display_data:
+            if str(inc["ID"]) == str(incident_id):
+                incident = inc
+                break
     
     # Handle case where incident isn't found
     if not incident:
-        st.error(f"Incident with ID {incident_id} not found. Please select an incident from the List View.")
+        st.error("Incident not found. Please select an incident from the list view.")
         
         # Back button to return to list view
         if st.button("Return to List View", key="return_to_list_from_error"):
-            st.session_state.safety_view = "list"  # Switch to list view
+            st.session_state.safety_view = "list"
             st.rerun()
         return
+    
+    # Add a card-like container for the incident details
+    st.markdown("""
+    <style>
+    .incident-detail-card {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<div class='incident-detail-card'>", unsafe_allow_html=True)
+    
+    # Incident title header
+    st.subheader(f"Incident #{incident['ID']}: {incident['Title']}")
     
     # Layout in columns for clean presentation
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        # Incident information 
-        st.subheader(f"Incident #{incident['ID']}: {incident['Title']}")
-        
         # Status indicator with appropriate color
         status_colors = {
             "Open": "🔴",
@@ -366,22 +338,36 @@ def render_incident_details():
         status_icon = status_colors.get(incident['Status'], "⚪")
         st.markdown(f"**Status**: {status_icon} {incident['Status']}")
         
-        # Incident metadata
+        # Basic incident metadata
         st.markdown(f"**Date**: {incident['Date']}")
         st.markdown(f"**Location**: {incident['Location']}")
-        st.markdown(f"**Type**: {incident['Type']}")
+        st.markdown(f"**Type**: {incident.get('Type', 'Not specified')}")
         st.markdown(f"**Severity**: {incident['Severity']}")
         st.markdown(f"**Reported By**: {incident['Reported By']}")
         
         # Description
         st.markdown("### Description")
-        st.write(incident['Description'])
+        st.write(incident.get('Description', 'Detailed description of what happened would appear here, including the circumstances, contributing factors, and immediate observations.'))
         
         # Actions Taken
         st.markdown("### Actions Taken")
-        st.write(incident['Actions'])
+        st.write(incident.get('Actions', 'Immediate actions taken to address the incident would be listed here, including containment measures, notifications, and preliminary responses.'))
     
     with col2:
+        # Action buttons container with styling
+        st.markdown("""
+        <style>
+        .action-buttons {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("<div class='action-buttons'>", unsafe_allow_html=True)
+        
         # Back button to return to list view
         if st.button("← Back to List", key="back_to_list_from_details", use_container_width=True):
             st.session_state.safety_view = "list"  # Switch to list view
@@ -389,49 +375,85 @@ def render_incident_details():
             
         # Edit button for this incident
         if st.button("✏️ Edit Incident", key="edit_incident_details", use_container_width=True):
-            st.session_state.edit_incident_id = incident['ID']  # Use incident dictionary value
+            # Store the incident data for editing
+            st.session_state.edit_incident_id = incident['ID']
+            st.session_state.edit_incident_data = incident
             st.session_state.safety_view = "edit"  # Switch to edit mode
             st.rerun()
         
-        # Status update button
+        st.markdown("</div>", unsafe_allow_html=True)
+        
+        # Status update section
         st.markdown("### Update Status")
+        statuses = ["Open", "Under Investigation", "Closed", "Resolved"]
+        current_status = incident['Status']
+        status_index = statuses.index(current_status) if current_status in statuses else 0
+        
         new_status = st.selectbox(
             "New Status",
-            ["Open", "Under Investigation", "Closed", "Resolved"],
-            index=["Open", "Under Investigation", "Closed", "Resolved"].index(incident['Status']),
+            statuses,
+            index=status_index,
             key="status_update_detail"
         )
         
         if st.button("Update Status", key="update_status_btn_detail", use_container_width=True):
+            # In a real application, this would persist the change
             st.success(f"Status updated to: {new_status}")
+            # Update the status in the current incident data
+            incident['Status'] = new_status
+            st.session_state.selected_incident_data = incident
             
         # Attachments section
         st.markdown("### Attachments")
-        st.write("No attachments")
+        st.write("No attachments found")
         
         # Upload new attachment button
         st.file_uploader("Upload New Attachment", key="upload_attachment_detail")
+    
+    st.markdown("</div>", unsafe_allow_html=True)
 
 def render_incident_form(is_edit=False):
     """Render the incident creation/edit form"""
     
     if is_edit:
         st.header("Edit Incident")
-        editing_id = st.session_state.get("edit_incident_id")
-        if not editing_id:
-            st.warning("No incident selected for editing")
-            st.button("Return to List View", key="return_to_list_from_edit_error", 
-                     on_click=lambda: st.session_state.update({"safety_tab_selection": {"incidents": 0}}))
-            return
         
-        # Find the incident data for editing
-        incidents = generate_sample_incidents()
-        incident = next((inc for inc in incidents if inc["id"] == editing_id), None)
-        if not incident:
-            st.error("Incident not found")
-            st.button("Return to List View", key="return_to_list_from_no_incident", 
-                     on_click=lambda: st.session_state.update({"safety_tab_selection": {"incidents": 0}}))
-            return
+        # First, check if we have the edit data in session state
+        if "edit_incident_data" in st.session_state and st.session_state.edit_incident_data:
+            # Use the incident data from session state (passed from the detail view)
+            incident_data = st.session_state.edit_incident_data
+            
+            # Convert the incident data to the format expected by the form
+            incident = {
+                "id": incident_data.get("ID"),
+                "title": incident_data.get("Title", ""),
+                "date": datetime.strptime(incident_data.get("Date", datetime.now().strftime("%Y-%m-%d")), "%Y-%m-%d"),
+                "location": incident_data.get("Location", ""),
+                "severity": incident_data.get("Severity", "Minor"),
+                "status": incident_data.get("Status", "Open"),
+                "reported_by": incident_data.get("Reported By", ""),
+                "description": incident_data.get("Description", ""),
+                "actions_taken": incident_data.get("Actions", "")
+            }
+        else:
+            # Try to get the incident ID from session state
+            editing_id = st.session_state.get("edit_incident_id")
+            if not editing_id:
+                st.warning("No incident selected for editing")
+                if st.button("Return to List View", key="return_to_list_from_edit_error"):
+                    st.session_state.safety_view = "list"
+                    st.rerun()
+                return
+            
+            # Find the incident data for editing
+            incidents = generate_sample_incidents()
+            incident = next((inc for inc in incidents if inc["id"] == editing_id), None)
+            if not incident:
+                st.error("Incident not found")
+                if st.button("Return to List View", key="return_to_list_from_no_incident"):
+                    st.session_state.safety_view = "list"
+                    st.rerun()
+                return
         
         form_title = "Edit Incident"
         submit_label = "Update Incident"
@@ -440,41 +462,59 @@ def render_incident_form(is_edit=False):
         incident = {
             "date": datetime.now(),
             "status": "Open",
-            "severity": "Minor"
+            "severity": "Minor",
+            "title": "",
+            "location": "",
+            "reported_by": "",
+            "description": "",
+            "actions_taken": ""
         }
         form_title = "New Incident"
         submit_label = "Create Incident"
     
-    # Form implementation
+    # Form implementation with improved layout and navigation
     with st.form(key=f"incident_form_{'edit' if is_edit else 'new'}"):
         st.subheader(form_title)
+        
+        # Add form instructions
+        st.info("Complete all required fields (*) and submit to save the incident record.")
         
         # Layout in columns for better organization
         col1, col2 = st.columns(2)
         
         with col1:
             incident_date = st.date_input(
-                "Date", 
+                "Date *", 
                 value=incident.get('date', datetime.now()),
                 key="incident_form_date"
             )
             
             incident_title = st.text_input(
-                "Incident Title",
+                "Incident Title *",
                 value=incident.get('title', ''),
                 key="incident_form_title"
             )
             
             incident_location = st.text_input(
-                "Location",
+                "Location *",
                 value=incident.get('location', ''),
                 key="incident_form_location"
             )
             
+            # Get type options
+            type_options = ["Slip/Trip/Fall", "Struck By", "Caught In/Between", "Electrical", 
+                           "Chemical Exposure", "Fall From Height", "Equipment Failure", 
+                           "Fire/Explosion", "Environmental Release", "Other"]
+            
+            # Set default index
+            default_type_index = 0
+            if incident.get('type') in type_options:
+                default_type_index = type_options.index(incident.get('type'))
+                
             incident_type = st.selectbox(
-                "Type",
-                ["Slip/Trip/Fall", "Struck By", "Caught In/Between", "Electrical", "Chemical Exposure", "Ergonomic", "Other"],
-                index=["Slip/Trip/Fall", "Struck By", "Caught In/Between", "Electrical", "Chemical Exposure", "Ergonomic", "Other"].index(incident.get('type', 'Other')) if incident.get('type') else 0,
+                "Type *",
+                type_options,
+                index=default_type_index,
                 key="incident_form_type"
             )
         

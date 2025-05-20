@@ -10,67 +10,75 @@ def render_header():
     """
     Render a simple, clean header using only Streamlit components.
     """
-    # Apply much more aggressive header spacing fixes
+    # Apply a more balanced header layout with better visual hierarchy
     st.markdown("""
     <style>
-    /* Extreme reset - remove ALL margins and padding from Streamlit components */
-    .main .block-container, 
-    .stApp, 
-    [data-testid="stHeader"],
-    [data-testid="stToolbar"],
-    [data-testid="stDecoration"],
-    [data-testid="stAppViewContainer"],
-    .css-18e3th9,
-    .css-1d391kg,
-    .css-1wrcr25,
-    .stApp > header,
-    .stApp > div,
-    .main, 
-    div[class*="st-emotion-cache"],
-    div[data-testid="stVerticalBlock"],
-    div[data-baseweb] {
-        margin: 0 !important;
-        padding: 0 !important;
-        border: none !important;
+    /* Clean header reset - more balanced approach */
+    .main .block-container {
+        padding-top: 0.5rem !important; /* Small padding for breathing room */
+        max-width: 100% !important; /* Full width */
     }
     
-    /* Completely eliminate Streamlit header */
-    header {
+    /* Hide Streamlit default header */
+    [data-testid="stHeader"] {
         display: none !important;
-        visibility: hidden !important;
-        height: 0 !important;
-        min-height: 0 !important;
-        max-height: 0 !important;
-        overflow: hidden !important;
-        opacity: 0 !important;
     }
     
-    /* Fix first element spacing */
-    .stElementContainer:first-child,
-    [data-testid="stVerticalBlock"] > div:first-child,
-    .element-container:first-child {
-        margin-top: 0 !important;
-        padding-top: 0 !important;
+    /* Main app container */
+    .stApp {
+        background-color: #f8f9fa !important; /* Light gray background */
     }
     
-    /* Reduce all row spacing */
-    div.row-widget {
-        margin: 0 !important;
-        padding: 0 !important;
+    /* Improve container structure */
+    .stElementContainer {
+        margin-bottom: 0.5rem !important; /* Better spacing between elements */
     }
     
-    /* Fix all stElementContainer spacing */
-    div.stElementContainer {
-        margin: 0 !important;
-        padding: 0 !important;
+    /* Custom header area */
+    .header-area {
+        background-color: white !important;
+        border-bottom: 1px solid #e9ecef !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+        padding: 0.75rem 1.5rem !important;
+        margin-bottom: 1rem !important;
     }
     
-    /* Aggressive fix for top spacing */
-    .main div.block-container {
-        margin-top: -5rem !important; /* Pull everything up */
+    /* Improve navigation controls */
+    div[data-baseweb="select"] {
+        background-color: white !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 4px !important;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    div[data-baseweb="select"]:hover {
+        border-color: #adb5bd !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* Visual hierarchy for page content */
+    h1, h2, h3 {
+        margin-top: 0.5rem !important;
+        margin-bottom: 1rem !important;
+        color: #212529 !important;
+    }
+    
+    /* Main content spacing */
+    [data-testid="stVerticalBlock"] {
+        padding: 0 1rem !important;
+    }
+    
+    /* Breadcrumb style improvements */
+    .breadcrumb-container {
+        font-size: 0.85rem !important;
+        margin-bottom: 0.5rem !important;
     }
     </style>
     """, unsafe_allow_html=True)
+    
+    # Add a container class for the header
+    st.markdown('<div class="header-area">', unsafe_allow_html=True)
     # Menu options for dropdown with icons
     menu_options = {
         "Dashboard": {"label": "Dashboard", "icon": "📊"},
@@ -120,29 +128,38 @@ def render_header():
     </style>
     """, unsafe_allow_html=True)
     
-    # Custom CSS for the entire header container
+    # Better layout for header content
     st.markdown("""
     <style>
-    /* Custom header container to eliminate all space */
-    .stHeader {
-        margin: 0 !important;
-        padding: 0 !important;
+    /* Cleaner header structure */
+    .header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 0;
     }
     
-    /* Target dropdown container directly */
-    .stSelectbox {
-        margin-top: -25px !important; /* Negative margin to pull it up */
-    }
-    
-    /* Ensure dropdown is visible and not clipped */
+    /* Improve dropdown usability */
     div[data-baseweb="select"] {
         z-index: 100 !important;
+        min-width: 200px !important;
+    }
+    
+    /* Make navigation more prominent */
+    label[data-baseweb="label"] {
+        font-weight: 500 !important;
+        color: #495057 !important;
+    }
+    
+    /* Remove excess space between elements */
+    .stColumn > div {
+        margin-bottom: 0 !important;
     }
     </style>
     """, unsafe_allow_html=True)
     
-    # Tight responsive column layout - adjusts for mobile
-    col1, col3 = st.columns([5, 5], gap="small")
+    # More readable column layout with better proportions
+    col1, col3 = st.columns([6, 4], gap="small")
     
     with col1:
         # Use Streamlit's native components instead of HTML with event handlers
@@ -352,20 +369,25 @@ def render_header():
             st.session_state.current_menu = selected
             st.rerun()
     
-    # Display a subtle, elegant divider
+    # Close the header-area div
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Add a more subtle divider
     st.markdown("""
     <style>
     .elegant-divider {
-        height: 1px;
-        background: linear-gradient(to right, rgba(220,220,220,0.1), rgba(220,220,220,0.7), rgba(220,220,220,0.1));
-        margin: 10px 0 12px 0;
+        display: none; /* Remove the divider - now using header-area border */
     }
     </style>
-    <div class="elegant-divider"></div>
     """, unsafe_allow_html=True)
     
-    # Breadcrumb and notification row with better spacing
-    brow_col1, brow_col2 = st.columns([11, 1])
+    # Add a content area container with better styling
+    st.markdown("""
+    <div style="padding: 0.5rem 1.5rem; background-color: white; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-bottom: 1rem;">
+    """, unsafe_allow_html=True)
+    
+    # Breadcrumb and notification row with better spacing and visual hierarchy
+    brow_col1, brow_col2 = st.columns([9, 3])
     
     with brow_col1:
         # Show breadcrumb for the current page

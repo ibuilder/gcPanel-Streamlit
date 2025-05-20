@@ -1,0 +1,56 @@
+/* Fix for multiple emotion-cache instances */
+
+/* This CSS helps consolidate multiple emotion-cache instances into cleaner markup */
+
+/* Remove repeating emotion cache containers when possible */
+div.st-emotion-cache-171r8tt div.st-emotion-cache-171r8tt,
+div.stElementContainer div.stElementContainer,
+div[class*="st-emotion-cache"] div[class*="st-emotion-cache"] {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+/* Reduce nesting of containers */
+div.st-emotion-cache-1307eu2 {
+    /* Target the specific parent container we saw in the screenshot */
+    display: contents !important;
+}
+
+/* Simplify border wrapper containers */
+div[data-testid="stVerticalBlockBorderWrapper"] {
+    display: contents !important;
+}
+
+/* Force single container for stHorizontalBlock */
+div.stHorizontalBlock {
+    overflow: visible !important;
+    display: flex !important;
+}
+
+/* Eliminate duplicate emotion cache containers */
+div[class*="st-emotion-cache"] div[class*="st-emotion-cache"]:not([data-testid]) {
+    display: contents !important;
+}
+
+/* Streamline page container structure */
+div.element-container.st-emotion-cache-1r6slb0 > div.element-container,
+div.st-emotion-cache-1r6slb0 > div.st-emotion-cache-1r6slb0 {
+    display: contents !important;
+}
+
+/* Force direct rendering for key containers to avoid nesting */
+div.stVerticalBlock {
+    display: block !important;
+}
+
+/* Target the specific containers we want to consolidate */
+div.element-container.element-container.st-emotion-cache-171r8tt {
+    /* Avoid the duplicated wrappers */
+    display: contents !important;
+}
+
+/* Ensure content still renders properly */
+div.element-container[data-testid="stElementContainer"] {
+    margin-bottom: 1rem !important;
+}

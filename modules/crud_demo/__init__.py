@@ -289,6 +289,9 @@ def render_demo_list():
                 if 'crud_demo_filter' in st.session_state:
                     st.session_state['crud_demo_filter'] = 'All'
                 st.rerun()
+        
+        # Close the filter section div tags
+        st.markdown('</div></div>', unsafe_allow_html=True)
     else:
         st.info("No items found. Create a new item using the Add button above.")
     

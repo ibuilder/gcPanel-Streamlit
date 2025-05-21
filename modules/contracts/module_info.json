@@ -1,0 +1,26 @@
+{
+    "id": "contracts",
+    "display_name": "Contracts",
+    "entry_point": "__init__.py",
+    "render_function": "render_contracts",
+    "position": 4,
+    "category": "Main",
+    "requires_action_buttons": false,
+    "metadata": {
+        "description": "Comprehensive contract management with digital signature support",
+        "version": "1.0.0",
+        "dependencies": ["digital_signatures"],
+        "features": [
+            "Change orders management",
+            "Subcontract tracking",
+            "Invoice processing",
+            "Digital signature integration"
+        ],
+        "database_tables": [
+            "contracts",
+            "subcontracts",
+            "invoices",
+            "change_orders"
+        ]
+    }
+}

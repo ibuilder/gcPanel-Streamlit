@@ -1,0 +1,27 @@
+{
+    "id": "digital_signatures",
+    "display_name": "Digital Signatures",
+    "entry_point": "__init__.py",
+    "render_function": "render_digital_signatures",
+    "position": 8,
+    "category": "Main",
+    "requires_action_buttons": false,
+    "metadata": {
+        "description": "Digital signature management with multiple options including drawing, DocuSign, and SignNow",
+        "version": "1.0.0",
+        "dependencies": [],
+        "features": [
+            "On-screen signature drawing",
+            "DocuSign integration",
+            "SignNow integration",
+            "Signature storage and retrieval"
+        ],
+        "database_tables": [
+            "signatures"
+        ],
+        "apis": [
+            "DocuSign API",
+            "SignNow API"
+        ]
+    }
+}

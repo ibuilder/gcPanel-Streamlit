@@ -3,6 +3,13 @@ import streamlit as st
 def apply_styles():
     """Apply custom styles to the application"""
     
+    # Load improved layout CSS file
+    with open('assets/improved_layout.css', 'r') as f:
+        improved_layout_css = f.read()
+    
+    # Apply the improved layout CSS
+    st.markdown(f"<style>{improved_layout_css}</style>", unsafe_allow_html=True)
+    
     # Inline styles for a more professional and modern look
     st.markdown("""
     <style>

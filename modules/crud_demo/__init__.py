@@ -222,7 +222,7 @@ def render_demo_list():
                     if col_name == 'status':
                         status_html = f"""
                         <div style="display: flex; align-items: center; justify-content: center;">
-                            <span class='crud-status crud-status-{get_status_class(value)}'>{value}</span>
+                            <span class='crud-status crud-status-{get_status_class(value)}' style="outline: none; box-shadow: none;">{value}</span>
                         </div>
                         """
                         st.markdown(status_html, unsafe_allow_html=True)

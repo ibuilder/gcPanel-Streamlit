@@ -269,6 +269,8 @@
     text-transform: uppercase;
     margin: 0.25rem 0;
     white-space: nowrap;
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 .crud-status-success {

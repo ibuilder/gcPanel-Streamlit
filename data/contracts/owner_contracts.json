@@ -1,0 +1,86 @@
+[
+  {
+    "contract_id": "OC-001",
+    "title": "Highland Tower Development",
+    "type": "GMP",
+    "owner_name": "Highland Properties LLC",
+    "contractor_name": "GC Construction, Inc.",
+    "value": 45500000.0,
+    "execution_date": "2025-01-15",
+    "commencement_date": "2025-02-01",
+    "substantial_completion_date": "2027-04-30",
+    "final_completion_date": "2027-06-30",
+    "retainage_percentage": 5.0,
+    "status": "Active",
+    "description": "Construction of 15-story mixed-use building with 120 residential units and 8 retail spaces.",
+    "signatures": [],
+    "documents": [
+      {
+        "name": "Owner Contract.pdf",
+        "date_uploaded": "2025-01-10",
+        "size": "2.4 MB"
+      },
+      {
+        "name": "Exhibit A - Scope of Work.pdf",
+        "date_uploaded": "2025-01-10",
+        "size": "1.1 MB"
+      },
+      {
+        "name": "Exhibit B - Schedule of Values.pdf",
+        "date_uploaded": "2025-01-10",
+        "size": "0.8 MB"
+      }
+    ]
+  },
+  {
+    "contract_id": "OC-002",
+    "title": "Sample Project 2",
+    "type": "GMP",
+    "owner_name": "Owner Company 2",
+    "contractor_name": "GC Construction, Inc.",
+    "value": 39075617.24,
+    "execution_date": "2025-03-24",
+    "commencement_date": "2025-04-23",
+    "substantial_completion_date": "2026-11-12",
+    "final_completion_date": "2027-01-20",
+    "retainage_percentage": 7.5,
+    "status": "Draft",
+    "description": "Sample construction project 2 with general description.",
+    "signatures": [],
+    "documents": []
+  },
+  {
+    "contract_id": "OC-003",
+    "title": "Sample Project 3",
+    "type": "CMAR",
+    "owner_name": "Owner Company 3",
+    "contractor_name": "GC Construction, Inc.",
+    "value": 5716169.22,
+    "execution_date": "2024-12-09",
+    "commencement_date": "2024-12-26",
+    "substantial_completion_date": "2025-11-10",
+    "final_completion_date": "2025-12-31",
+    "retainage_percentage": 7.5,
+    "status": "Executed",
+    "description": "Sample construction project 3 with general description.",
+    "signatures": [],
+    "documents": []
+  },
+  {
+    "contract_id": "OC-004",
+    "title": "Sample Project 4",
+    "type": "CMAR",
+    "owner_name": "Owner Company 4",
+    "contractor_name": "GC Construction, Inc.",
+    "value": 12496115.18,
+    "execution_date": "2025-02-08",
+    "commencement_date": "2025-03-06",
+    "substantial_completion_date": "2026-11-03",
+    "final_completion_date": "2027-01-08",
+    "retainage_percentage": 7.5,
+    "status": "Draft",
+    "description": "Sample construction project 4 with general description.",
+    "signatures": [],
+    "documents": []
+  }
+]

@@ -260,7 +260,7 @@ class CrudModule:
                         sort_label = f"{display_name} ⇅"
                     
                     # Sort button
-                    if st.button(sort_label, key=f"sort_{field_name}"):
+                    if st.button(sort_label, key=f"sort_{base_key}_{field_name}"):
                         # Toggle sort direction if clicking on the same column
                         if sort_col == field_name:
                             new_direction = 'desc' if sort_direction == 'asc' else 'asc'

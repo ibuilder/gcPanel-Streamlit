@@ -41,6 +41,7 @@ from modules.mobile_companion import render_mobile_companion
 from modules.analytics import render_analytics
 from modules.ai_assistant import render_ai_assistant
 from modules.integrations import render_integrations
+from modules.digital_signatures import render_digital_signatures
 
 # Import feature showcase module
 from modules.features_showcase import render_features_showcase
@@ -181,6 +182,7 @@ def render_selected_module(current_menu):
         "Engineering": render_engineering,
         "Field Operations": render_field_operations,
         "Documents": render_documents,
+        "Digital Signatures": render_digital_signatures,
         "AI Assistant": render_ai_assistant,
         "Features Showcase": render_features_showcase,
         "Mobile Companion": render_mobile_companion,

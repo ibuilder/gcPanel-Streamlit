@@ -1,0 +1,20 @@
+{
+    "id": "crud_demo",
+    "display_name": "CRUD Style Demo",
+    "entry_point": "__init__.py",
+    "render_function": "render_crud_demo",
+    "position": 17,
+    "category": "Development",
+    "requires_action_buttons": false,
+    "metadata": {
+        "description": "Demonstrates standardized CRUD styling for gcPanel",
+        "version": "1.0.0",
+        "dependencies": [],
+        "features": [
+            "Standardized list views",
+            "Detail views with forms",
+            "Search and filter functionality",
+            "Consistent styling across modules"
+        ]
+    }
+}

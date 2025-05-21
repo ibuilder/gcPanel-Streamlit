@@ -37,6 +37,7 @@ MENU_OPTIONS = [
     "✅ Closeout",
     "🤖 AI Assistant",
     "✨ Features Showcase",
+    "🎨 CRUD Style Demo",
     "⚙️ Settings"
 ]
 
@@ -58,6 +59,7 @@ MENU_MAP = {
     "✅ Closeout": "Closeout",
     "🤖 AI Assistant": "AI Assistant",
     "✨ Features Showcase": "Features Showcase",
+    "🎨 CRUD Style Demo": "CRUD Style Demo",
     "⚙️ Settings": "Settings"
 }
 

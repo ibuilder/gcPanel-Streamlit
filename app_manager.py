@@ -7,9 +7,13 @@ and module rendering.
 
 import streamlit as st
 from datetime import datetime
+import importlib
 
 # Import app configuration
 from app_config import MENU_MAP, DEFAULT_SESSION_STATE, PAGES_WITH_ACTIONS
+
+# Import modules dynamically
+import modules.crud_demo
 
 # Import utility functions
 from utils.ui_manager import load_external_resources, render_notification_button
@@ -188,6 +192,7 @@ def render_selected_module(current_menu):
         "Mobile Companion": render_mobile_companion,
         "Closeout": render_closeout,
         "Integrations": render_integrations,
+        "CRUD Style Demo": lambda: modules.crud_demo.render_crud_demo(),
         "Settings": render_settings
     }
     

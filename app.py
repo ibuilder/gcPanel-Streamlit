@@ -45,12 +45,11 @@ from assets.header_fix import apply_header_fixes
 def main():
     """Main application entry point."""
     try:
-        # Set page configuration with favicon
+        # Set page configuration with favicon (PWA support is now integrated in set_page_config)
         set_page_config()
         
-        # Enable mobile optimizations and PWA support
+        # Enable mobile optimizations
         add_mobile_styles()
-        setup_pwa()
         
         # Apply improved container styles to fix spacing issues
         apply_container_styles()

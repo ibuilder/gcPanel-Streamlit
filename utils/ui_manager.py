@@ -178,3 +178,35 @@ def set_page_config():
         layout="wide",
         initial_sidebar_state="expanded"
     )
+    
+    # Add PWA meta tags directly in the page config
+    # This is the correct place to add them so they appear in the head
+    pwa_tags = """
+    <meta name="application-name" content="gcPanel Construction Management">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="gcPanel">
+    <meta name="description" content="Comprehensive construction management platform for project management and field operations.">
+    <meta name="theme-color" content="#2E86C1">
+    <link rel="apple-touch-icon" href="/static/icon-192x192.png">
+    <link rel="manifest" href="/static/manifest.json">
+    """
+    st.markdown(pwa_tags, unsafe_allow_html=True)
+    
+    # Add service worker registration script
+    service_worker_script = """
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/static/service-worker.js')
+                    .then(function(registration) {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+    """
+    st.markdown(service_worker_script, unsafe_allow_html=True)

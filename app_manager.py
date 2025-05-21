@@ -34,7 +34,6 @@ from modules.standalone_bim import render_bim_standalone
 from modules.field_operations import render_field_operations
 from modules.scheduling import render_scheduling
 from modules.safety import render_safety
-from modules.contracts import render_contracts
 from modules.cost_management import render_cost_management
 from modules.closeout import render_closeout
 from modules.engineering import render_engineering
@@ -45,6 +44,9 @@ from modules.ai_assistant import render_ai_assistant
 from modules.integrations import render_integrations
 from modules.digital_signatures import render_digital_signatures
 from modules.features_showcase import render_features_showcase
+
+# Import CRUD modules
+import modules.contracts
 
 # Import CRUD demo and newly added CRUD modules
 import modules.crud_demo
@@ -234,7 +236,7 @@ def render_selected_module(current_menu):
         "Project Information": render_project_information,
         "Schedule": render_scheduling,
         "Safety": render_safety,
-        "Contracts": render_contracts,
+        "Contracts": lambda: modules.contracts.render(),
         "Cost Management": render_cost_management,
         "Analytics": render_analytics,
         "Engineering": render_engineering,

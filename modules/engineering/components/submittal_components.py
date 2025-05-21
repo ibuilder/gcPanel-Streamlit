@@ -181,7 +181,7 @@ def render_submittal_list():
             st.rerun()
     
     # Analysis button
-    if st.button("📊 View Analysis", use_container_width=True):
+    if st.button("📊 View Analysis", key="submittal_analysis_button", use_container_width=True):
         st.session_state.submittal_view = "analysis"
         st.rerun()
     

@@ -274,27 +274,27 @@
 }
 
 .crud-status-success {
-    background-color: transparent;
+    background-color: rgba(76, 175, 80, 0.1);
     color: #2e7d32;
-    border: 1px solid rgba(76, 175, 80, 0.5);
+    border: none;
 }
 
 .crud-status-info {
-    background-color: transparent;
+    background-color: rgba(33, 150, 243, 0.1);
     color: #1565c0;
-    border: 1px solid rgba(33, 150, 243, 0.5);
+    border: none;
 }
 
 .crud-status-warning {
-    background-color: transparent;
+    background-color: rgba(255, 152, 0, 0.1);
     color: #ef6c00;
-    border: 1px solid rgba(255, 152, 0, 0.5);
+    border: none;
 }
 
 .crud-status-danger {
-    background-color: transparent;
+    background-color: rgba(244, 67, 54, 0.1);
     color: #c62828;
-    border: 1px solid rgba(244, 67, 54, 0.5);
+    border: none;
 }
 
 /* === Utility Classes === */

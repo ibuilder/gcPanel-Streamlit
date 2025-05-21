@@ -28,45 +28,30 @@ def apply_container_styles():
         padding: 0.5rem 0.75rem;
     }
     
-    /* Aggressive reset of all container paddings */
+    /* More balanced container padding */
     .main .block-container {
         padding-left: 2rem;
         padding-right: 2rem;
-        padding-top: 0 !important;
-        max-width: 100%;
-        width: 100%;
-        margin-top: -6rem !important;
+        padding-top: 1rem;
+        max-width: 1400px;
+        margin: 0 auto;
     }
     
-    /* Remove header spacing completely */
+    /* Improve header spacing */
     .stApp header {
         margin-top: 0;
-        padding-top: 0;
-        visibility: hidden;
-        height: 0;
+        padding-top: 0.5rem;
     }
     
-    /* Eliminate all top spacing in Streamlit containers */
+    /* Restore proper spacing in Streamlit containers */
     .stApp {
         margin-top: 0;
-        padding-top: 0;
+        padding-top: 0.5rem;
     }
     
-    /* Target main content container */
-    .css-18e3th9 {
-        padding-top: 0 !important;
-        margin-top: 0 !important;
-    }
-    
-    /* Target Streamlit's header area */
+    /* Ensure consistent sidebar spacing */
     section[data-testid="stSidebar"] {
-        padding-top: 0 !important;
-        margin-top: 0 !important;
-    }
-    
-    /* Hide the default Streamlit top bar */
-    header[data-testid="stHeader"] {
-        display: none;
+        padding-top: 1rem !important;
     }
     
     /* Card-style containers with proper padding */

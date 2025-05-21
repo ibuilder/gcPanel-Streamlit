@@ -68,7 +68,12 @@ def render_standalone_bim():
         st.subheader("3D Viewer")
         with st.container():
             st.markdown("<div class='bim-viewer-container'>", unsafe_allow_html=True)
-            st.image("attached_assets/TallBuilding.ifc", caption="BIM Model Preview")
+            # Use a placeholder image instead since IFC files cannot be displayed directly as images
+            try:
+                st.image("gcpanel.png", caption="BIM Model Preview (Sample Visualization)")
+            except:
+                st.warning("Model visualization could not be loaded. Please upload a model image.")
+                st.file_uploader("Upload a model preview image", type=["png", "jpg", "jpeg"])
             st.markdown("</div>", unsafe_allow_html=True)
         
         # Properties and clash detection in tabs
@@ -109,25 +114,10 @@ def render_standalone_bim():
             
             clash_df = pd.DataFrame(clash_data)
             
-            # Display clashes in a table
-            st.markdown("<table class='clash-results'>", unsafe_allow_html=True)
-            st.markdown("<tr><th>ID</th><th>Type</th><th>Elements</th><th>Location</th><th>Status</th><th>Severity</th></tr>", unsafe_allow_html=True)
+            # Display clashes using Streamlit's native table component instead of HTML
+            st.table(clash_df)
             
-            for i, row in clash_df.iterrows():
-                status = row['Status']
-                status_class = f"clash-status-{status.lower().replace(' ', '-')}"
-                st.markdown(f"""
-                <tr>
-                    <td>{row['ID']}</td>
-                    <td>{row['Type']}</td>
-                    <td>{row['Elements']}</td>
-                    <td>{row['Location']}</td>
-                    <td class='{status_class}'>{status}</td>
-                    <td>{row['Severity']}</td>
-                </tr>
-                """, unsafe_allow_html=True)
-            
-            st.markdown("</table>", unsafe_allow_html=True)
+            # Removed closing table tag as we're using st.table instead of custom HTML
             st.markdown("</div>", unsafe_allow_html=True)
         
         st.markdown("</div>", unsafe_allow_html=True)

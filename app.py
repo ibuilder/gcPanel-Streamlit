@@ -48,9 +48,8 @@ def main():
     # Apply improved container styles to fix spacing issues
     apply_container_styles()
     
-    # Initialize session state variables if needed
-    if "current_menu" not in st.session_state:
-        st.session_state["current_menu"] = "Dashboard"
+    # Initialize session state variables from app_manager
+    app_manager.initialize_session_state()
     
     # Add a toggle for mobile field companion view
     is_mobile = False
@@ -61,15 +60,8 @@ def main():
     if is_mobile:
         render_mobile_field_companion()
     else:
-        # Check if feature showcase is selected
-        if st.session_state.get("current_menu") == "Features Showcase":
-            render_features_showcase()
-        else:
-            # Get current menu selection
-            current_menu = st.session_state.get("current_menu", "Dashboard")
-            
-            # Render the selected module
-            app_manager.render_selected_module(current_menu)
+        # Render the entire application with the app manager
+        app_manager.render_application()
 
 if __name__ == "__main__":
     main()

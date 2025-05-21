@@ -1,196 +1,129 @@
 """
-Simple breadcrumbs component for navigation.
+Simple breadcrumbs component for gcPanel.
 
-This module provides a simple breadcrumb trail using Streamlit's native components.
+This module provides a simplified breadcrumb navigation component.
 """
 
 import streamlit as st
-from typing import List, Dict, Any
+from app_config import MENU_MAP
 
-def simple_breadcrumbs(items: List[Dict[str, Any]]) -> None:
+def simple_breadcrumbs(current_page, previous_pages=None):
     """
-    Display a simplified breadcrumb navigation trail using Streamlit components.
+    Display simple breadcrumb navigation component.
     
     Args:
-        items: List of breadcrumb items, each with keys 'label' and 'path'
+        current_page (str): Current page name
+        previous_pages (list, optional): List of previous pages in the navigation hierarchy
     """
-    # Apply elegant, modern breadcrumb styling
-    st.markdown("""
+    if previous_pages is None:
+        previous_pages = ["Home"]
+    
+    # Create the breadcrumb HTML
+    breadcrumb_html = """
+    <div class="breadcrumb-container">
+        <div class="breadcrumbs">
+    """
+    
+    # Add Home link
+    breadcrumb_html += """<span class="breadcrumb-item"><a href="javascript:void(0);" onclick="homeClick()">Home</a></span>"""
+    
+    # Add previous pages
+    for page in previous_pages[1:]:
+        breadcrumb_html += f"""<span class="breadcrumb-separator">›</span>
+        <span class="breadcrumb-item"><a href="javascript:void(0);">{page}</a></span>"""
+    
+    # Add current page
+    breadcrumb_html += f"""<span class="breadcrumb-separator">›</span>
+    <span class="breadcrumb-item breadcrumb-active">{current_page}</span>"""
+    
+    # Close breadcrumb container
+    breadcrumb_html += """
+        </div>
+    </div>
+    """
+    
+    # Add JavaScript for Home button
+    breadcrumb_html += """
+    <script>
+    function homeClick() {
+        window.parent.postMessage({
+            type: "streamlit:setComponentValue",
+            value: {"current_menu": "Dashboard"}
+        }, "*");
+    }
+    </script>
+    """
+    
+    # Add CSS for breadcrumbs
+    breadcrumb_html += """
     <style>
     .breadcrumb-container {
+        margin-bottom: 1rem;
+    }
+    .breadcrumbs {
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
-        margin-bottom: 10px;
-        overflow-x: auto;
-        white-space: nowrap;
-        padding: 6px 0;
-        position: relative;
+        padding: 0.5rem 0;
     }
-    
     .breadcrumb-item {
-        display: inline-flex;
-        align-items: center;
-        font-size: 13px;
-        font-weight: 400;
-        color: #6b7280;
-        transition: all 0.25s ease;
-        padding: 3px 10px;
-        border-radius: 20px;
-        margin-right: 4px;
-        letter-spacing: 0.2px;
+        font-size: 0.9rem;
     }
-    
-    .breadcrumb-item.active {
-        font-weight: 500;
-        color: #2563eb;
-        background-color: rgba(37, 99, 235, 0.07);
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    .breadcrumb-item a {
+        color: #4b5563;
+        text-decoration: none;
     }
-    
-    .breadcrumb-item:not(.active):hover {
-        color: #2563eb;
-        background-color: rgba(37, 99, 235, 0.04);
-        transform: translateX(1px);
+    .breadcrumb-item a:hover {
+        color: #1a1a1a;
+        text-decoration: underline;
     }
-    
     .breadcrumb-separator {
-        margin: 0 2px;
-        color: #d1d5db;
-        font-size: 14px;
-        user-select: none;
+        margin: 0 0.5rem;
+        color: #9ca3af;
     }
-    
-    .stButton button {
-        background: none !important;
-        border: none !important;
-        box-shadow: none !important;
-        color: #6b7280 !important;
-        font-size: 13px;
-        padding: 2px 8px !important;
-        height: auto !important;
-        transition: all 0.2s ease;
-        margin: 0 !important;
-        min-width: auto !important;
-    }
-    
-    .stButton button:hover {
-        color: #2563eb !important;
-        background-color: rgba(37, 99, 235, 0.04) !important;
-        transform: translateX(1px) !important;
+    .breadcrumb-active {
+        color: #1a1a1a;
+        font-weight: 600;
     }
     </style>
-    """, unsafe_allow_html=True)
-    
-    # Create HTML for breadcrumbs
-    breadcrumb_html = '<div class="breadcrumb-container">'
-    
-    # Add each breadcrumb item
-    for i, item in enumerate(items):
-        is_last = i == len(items) - 1
-        label = item.get('label', '')
-        path = item.get('path', 'Dashboard')
-        
-        # Generate unique ID for each breadcrumb
-        item_id = f"breadcrumb_{path.lower().replace(' ', '_')}_{i}"
-        
-        if is_last:
-            # Current page (no click action)
-            breadcrumb_html += f'<div class="breadcrumb-item active" id="{item_id}">{label}</div>'
-        else:
-            # Clickable breadcrumb
-            breadcrumb_html += f'<div class="breadcrumb-item" id="{item_id}" onclick="window.parent.postMessage({{type: \'streamlit:setComponentValue\', key: \'{item_id}_clicked\', value: true}}, \'*\')" style="cursor: pointer;">{label}</div>'
-        
-        # Add separator
-        if not is_last:
-            breadcrumb_html += '<div class="breadcrumb-separator">›</div>'
-    
-    breadcrumb_html += '</div>'
-    
-    # Render the breadcrumb container
-    st.markdown(breadcrumb_html, unsafe_allow_html=True)
-    
-    # Handle breadcrumb clicks
-    for i, item in enumerate(items):
-        if i == len(items) - 1:  # Skip the last (current) item
-            continue
-            
-        path = item.get('path', 'Dashboard')
-        item_id = f"breadcrumb_{path.lower().replace(' ', '_')}_{i}_clicked"
-        
-        if st.session_state.get(item_id, False):
-            st.session_state[item_id] = False
-            st.session_state.current_menu = path
-            st.rerun()
-
-def get_breadcrumbs_for_page(page: str) -> List[Dict[str, Any]]:
     """
-    Get breadcrumb trail for a specific page.
+    
+    # Render breadcrumbs
+    st.markdown(breadcrumb_html, unsafe_allow_html=True)
+
+def get_breadcrumbs_for_page(page):
+    """
+    Get breadcrumb hierarchy for a specific page.
     
     Args:
-        page: The current page name
+        page (str): Page name
         
     Returns:
-        List of breadcrumb items for the current page
+        list: Breadcrumb hierarchy with Home as the first item
     """
-    # Base breadcrumb (Home)
-    breadcrumb_items = [{"label": "Home", "path": "Dashboard"}]
+    breadcrumbs = ["Home"]
     
-    # Define breadcrumb paths for different sections
-    if page == "Dashboard":
-        return breadcrumb_items
+    # Define breadcrumb hierarchies for different pages
+    hierarchies = {
+        "Project Information": ["Home"],
+        "Schedule": ["Home"],
+        "Safety": ["Home"],
+        "Contracts": ["Home"],
+        "Cost Management": ["Home"],
+        "Analytics": ["Home"],
+        "Engineering": ["Home"],
+        "Field Operations": ["Home"],
+        "Documents": ["Home"],
+        "StandaloneBIM": ["Home"],
+        "Mobile Companion": ["Home"],
+        "Closeout": ["Home"],
+        "AI Assistant": ["Home"],
+        "Features Showcase": ["Home"],
+        "Settings": ["Home"]
+    }
     
-    elif page == "Project Information":
-        breadcrumb_items.append({"label": "Project Information", "path": "Project Information"})
-        
-    elif page == "Engineering & Documents" or page.startswith("Engineering & Documents"):
-        breadcrumb_items.append({"label": "Engineering & Documents", "path": "Engineering & Documents"})
-        
-        if page == "Engineering & Documents/RFIs":
-            breadcrumb_items.append({"label": "RFIs", "path": "Engineering & Documents/RFIs"})
-        elif page == "Engineering & Documents/Submittals":
-            breadcrumb_items.append({"label": "Submittals", "path": "Engineering & Documents/Submittals"})
-        elif page == "Engineering & Documents/Drawings":
-            breadcrumb_items.append({"label": "Drawings", "path": "Engineering & Documents/Drawings"})
-            
-    elif page == "BIM":
-        breadcrumb_items.append({"label": "BIM", "path": "BIM"})
-        
-    elif page == "StandaloneBIM":
-        breadcrumb_items.append({"label": "BIM Viewer", "path": "StandaloneBIM"})
-            
-    elif page.startswith("Field Operations"):
-        breadcrumb_items.append({"label": "Field Operations", "path": "Field Operations"})
-        
-        if page == "Field Operations/Daily Reports":
-            breadcrumb_items.append({"label": "Daily Reports", "path": "Field Operations/Daily Reports"})
-        elif page == "Field Operations/Quality Control":
-            breadcrumb_items.append({"label": "Quality Control", "path": "Field Operations/Quality Control"})
-    
-    elif page.startswith("Safety"):
-        breadcrumb_items.append({"label": "Safety", "path": "Safety"})
-        
-        if page == "Safety/Incidents":
-            breadcrumb_items.append({"label": "Incidents", "path": "Safety/Incidents"})
-        elif page == "Safety/Training":
-            breadcrumb_items.append({"label": "Training", "path": "Safety/Training"})
-    
-    elif page.startswith("Contracts"):
-        breadcrumb_items.append({"label": "Contracts", "path": "Contracts"})
-        
-        if page == "Contracts/Subcontracts":
-            breadcrumb_items.append({"label": "Subcontracts", "path": "Contracts/Subcontracts"})
-        elif page == "Contracts/Change Orders":
-            breadcrumb_items.append({"label": "Change Orders", "path": "Contracts/Change Orders"})
-    
-    elif page.startswith("Cost Management"):
-        breadcrumb_items.append({"label": "Cost Management", "path": "Cost Management"})
-        
-        if page == "Cost Management/Budget":
-            breadcrumb_items.append({"label": "Budget", "path": "Cost Management/Budget"})
-        elif page == "Cost Management/Forecasting":
-            breadcrumb_items.append({"label": "Forecasting", "path": "Cost Management/Forecasting"})
-    
-    elif page == "Settings":
-        breadcrumb_items.append({"label": "Settings", "path": "Settings"})
-    
-    return breadcrumb_items
+    # Return appropriate hierarchy or just Home + page
+    if page in hierarchies:
+        return hierarchies[page] + [page]
+    else:
+        return ["Home", page]

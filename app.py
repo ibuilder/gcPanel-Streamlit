@@ -36,6 +36,9 @@ from utils.mobile.pwa_support import setup_pwa
 # Import improved container styling for better spacing
 from assets.container_styles import apply_container_styles
 
+# Import header fixes to remove white box 
+from assets.header_fix import apply_header_fixes
+
 def main():
     """Main application entry point."""
     # Set page configuration with favicon
@@ -47,6 +50,9 @@ def main():
     
     # Apply improved container styles to fix spacing issues
     apply_container_styles()
+    
+    # Apply header fixes to remove white box at the top
+    apply_header_fixes()
     
     # Initialize session state variables from app_manager
     app_manager.initialize_session_state()

@@ -142,12 +142,12 @@ def _setup_database_connection_pool():
     if 'db_pool' not in st.session_state:
         try:
             import os
-            from sqlalchemy import create_engine
+            from sqlalchemy import create_engine, text
             from sqlalchemy.pool import QueuePool
             
             # Check if we have a database connection string
             database_url = os.environ.get('DATABASE_URL')
-            if database_url:
+            if database_url and not database_url.startswith('https://'):
                 # Create connection pool with appropriate settings for production
                 engine = create_engine(
                     database_url,
@@ -161,9 +161,9 @@ def _setup_database_connection_pool():
                 # Store in session state for reuse
                 st.session_state.db_pool = engine
                 
-                # Test connection
+                # Test connection with proper SQLAlchemy 2.0 syntax
                 with engine.connect() as conn:
-                    conn.execute("SELECT 1")
+                    conn.execute(text("SELECT 1"))
         except Exception as e:
             import logging
             logging.error(f"Database connection pool initialization error: {str(e)}")

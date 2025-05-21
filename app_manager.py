@@ -27,6 +27,7 @@ from modules.project_information import render_project_information
 from modules.pdf_viewer.pdf_viewer import render_pdf_viewer
 from modules.bim_viewer.basic_viewer import render_basic_bim_viewer
 from modules.bim_viewer.advanced_viewer import render_advanced_bim_viewer
+from modules.bim import render_bim
 from modules.field_operations import render_field_operations
 from modules.scheduling import render_scheduling
 from modules.safety import render_safety
@@ -191,11 +192,14 @@ def render_selected_module(current_menu):
     if current_menu == "BIM":
         viewer_type = st.radio(
             "Select BIM Viewer Type", 
-            ["Basic Floor Stacks", "Advanced 3D Viewer"],
-            horizontal=True
+            ["Enhanced 3D Model Viewer", "Basic Floor Stacks", "Advanced 3D Viewer"],
+            horizontal=True,
+            index=0
         )
         
-        if viewer_type == "Basic Floor Stacks":
+        if viewer_type == "Enhanced 3D Model Viewer":
+            render_bim()
+        elif viewer_type == "Basic Floor Stacks":
             render_basic_bim_viewer()
         else:
             render_advanced_bim_viewer()

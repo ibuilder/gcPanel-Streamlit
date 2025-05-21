@@ -5,13 +5,16 @@ This is the main application file for the gcPanel Construction Management
 Dashboard, a comprehensive project management tool for construction projects.
 Featuring advanced modules for document management, BIM integration, and more.
 
-The application now includes enhanced features for production readiness:
+The application includes production-ready features:
 - Integration with external services
 - Advanced analytics with visualization and prediction
 - Mobile optimization with PWA support
 - Real-time collaboration tools
 - AI-powered features
 - Improved spacing and UI consistency
+- Document management for drawings, specs, and project files
+- BIM model visualization and clash detection
+- Comprehensive Field Operations tracking
 """
 
 import streamlit as st
@@ -62,8 +65,11 @@ def main():
         if st.session_state.get("current_menu") == "Features Showcase":
             render_features_showcase()
         else:
-            # Render the main application
-            app_manager.render_application()
+            # Get current menu selection
+            current_menu = st.session_state.get("current_menu", "Dashboard")
+            
+            # Render the selected module
+            app_manager.render_selected_module(current_menu)
 
 if __name__ == "__main__":
     main()

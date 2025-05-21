@@ -18,6 +18,18 @@ from modules.contracts.components.contract_components import (
     render_contract_form, 
     render_contract_analysis
 )
+from modules.contracts.components.subcontract_components import (
+    render_subcontract_list, 
+    render_subcontract_details, 
+    render_subcontract_form, 
+    render_subcontract_analysis
+)
+from modules.contracts.components.change_order_components import (
+    render_change_order_list, 
+    render_change_order_details, 
+    render_change_order_form, 
+    render_change_order_analysis
+)
 
 def render_contracts():
     """Render the contracts module"""
@@ -70,8 +82,68 @@ def render_contracts():
     
     # Subcontracts Tab
     with tab2:
-        st.write("Subcontracts module (Coming Soon)")
+        # Initialize subcontract session state variables if not present
+        if "subcontract_view" not in st.session_state:
+            st.session_state.subcontract_view = "list"
+        
+        if "selected_subcontract_id" not in st.session_state:
+            st.session_state.selected_subcontract_id = None
+        
+        if "edit_subcontract_id" not in st.session_state:
+            st.session_state.edit_subcontract_id = None
+            
+        # Get current view from session state
+        current_view = st.session_state.subcontract_view
+        
+        # Add navigation buttons at the top for non-list views
+        if current_view != "list":
+            # Back button at the top of any non-list view
+            if st.button("← Back to Subcontracts List", key="back_to_subcontract_list"):
+                st.session_state.subcontract_view = "list"
+                st.rerun()
+        
+        # Render the appropriate view based on session state
+        if current_view == "list":
+            render_subcontract_list()
+        elif current_view == "view":
+            render_subcontract_details()
+        elif current_view == "edit":
+            render_subcontract_form(is_edit=True)
+        elif current_view == "add":
+            render_subcontract_form(is_edit=False)
+        elif current_view == "analysis":
+            render_subcontract_analysis()
     
     # Change Orders Tab
     with tab3:
-        st.write("Change Orders module (Coming Soon)")
+        # Initialize change order session state variables if not present
+        if "change_order_view" not in st.session_state:
+            st.session_state.change_order_view = "list"
+        
+        if "selected_change_order_id" not in st.session_state:
+            st.session_state.selected_change_order_id = None
+        
+        if "edit_change_order_id" not in st.session_state:
+            st.session_state.edit_change_order_id = None
+            
+        # Get current view from session state
+        current_view = st.session_state.change_order_view
+        
+        # Add navigation buttons at the top for non-list views
+        if current_view != "list":
+            # Back button at the top of any non-list view
+            if st.button("← Back to Change Orders List", key="back_to_change_order_list"):
+                st.session_state.change_order_view = "list"
+                st.rerun()
+        
+        # Render the appropriate view based on session state
+        if current_view == "list":
+            render_change_order_list()
+        elif current_view == "view":
+            render_change_order_details()
+        elif current_view == "edit":
+            render_change_order_form(is_edit=True)
+        elif current_view == "add":
+            render_change_order_form(is_edit=False)
+        elif current_view == "analysis":
+            render_change_order_analysis()

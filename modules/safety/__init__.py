@@ -770,7 +770,8 @@ def render_toolbox_talks():
     st.header("Toolbox Talks")
     
     # Get toolbox talks data
-    toolbox_talks = SafetyService._load_from_file(SafetyService.TOOLBOX_TALKS_FILE)
+    from modules.safety.service import TOOLBOX_TALKS_FILE
+    toolbox_talks = SafetyService._load_from_file(TOOLBOX_TALKS_FILE)
     
     # Initialize session state for toolbox talks management
     if "toolbox_view" not in st.session_state:
@@ -993,7 +994,8 @@ def render_hazards():
     st.header("Hazard Management")
     
     # Get hazards data
-    hazards = SafetyService._load_from_file(SafetyService.HAZARDS_FILE)
+    from modules.safety.service import HAZARDS_FILE
+    hazards = SafetyService._load_from_file(HAZARDS_FILE)
     
     # Initialize session state for hazard management
     if "hazard_view" not in st.session_state:

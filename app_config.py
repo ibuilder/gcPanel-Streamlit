@@ -80,18 +80,8 @@ DEFAULT_SESSION_STATE = {
 
 # Pages that should display action buttons (Add/Edit/Delete)
 # The value is the item type label used in the buttons
-PAGES_WITH_ACTIONS = {
-    "Project Information": "Information", 
-    "Schedule": "Schedule Item",
-    "Safety": "Safety Item",
-    "Contracts": "Contract", 
-    "Cost Management": "Cost Item",
-    "Engineering": "Drawing",
-    "Field Operations": "Field Item",
-    "Documents": "Document",
-    "Mobile Companion": "Feature",
-    "Closeout": "Closeout Item"
-}
+# We're removing all action buttons since they've been replaced with the CRUD functionality
+PAGES_WITH_ACTIONS = {}
 
 # ============================================================================
 # PROJECT INFORMATION

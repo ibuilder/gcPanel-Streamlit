@@ -1,0 +1,37 @@
+[
+  {
+    "id": "INC-2025-001",
+    "date": "2025-02-10",
+    "status": "Closed",
+    "type": "Near Miss",
+    "location": "Floor 5, East Wing",
+    "description": "Worker nearly slipped on wet floor",
+    "reported_by": "John Smith",
+    "severity": "Low",
+    "corrective_action": "Area was cordoned off and dried",
+    "photos": [],
+    "witnesses": [
+      "Jane Doe"
+    ],
+    "created_at": "2025-02-10",
+    "updated_at": "2025-02-12"
+  },
+  {
+    "id": "INC-2025-002",
+    "date": "2025-03-15",
+    "status": "Open",
+    "type": "Injury",
+    "location": "Basement Level, Electrical Room",
+    "description": "Minor electrical shock when connecting temporary power",
+    "reported_by": "Robert Johnson",
+    "severity": "Medium",
+    "corrective_action": "Investigation in progress",
+    "photos": [],
+    "witnesses": [
+      "Maria Garcia",
+      "David Wilson"
+    ],
+    "created_at": "2025-03-15",
+    "updated_at": "2025-03-15"
+  }
+]

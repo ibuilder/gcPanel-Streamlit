@@ -153,24 +153,42 @@ def _draw_signature_area(key):
     </script>
     """, unsafe_allow_html=True)
     
-    # Add clear button
-    col1, col2 = st.columns([1, 4])
-    with col1:
-        if st.button("Clear", key=f"{key}_clear"):
-            # Clear the pad using JavaScript
-            st.markdown(f"""
-            <script>
-                if (typeof {key}_signaturePad !== 'undefined') {{
-                    {key}_signaturePad.clear();
-                }}
-            </script>
-            """, unsafe_allow_html=True)
-            
-            # Also clear from session state
-            st.session_state[f"{key}_data"]["image"] = None
-            st.session_state[f"{key}_data"]["timestamp"] = ""
-            st.session_state[f"{key}_data"]["method"] = "draw"
-            st.rerun()
+    # Instead of using a button inside the form (which causes errors),
+    # we'll add a JavaScript clear button directly
+    st.markdown(f"""
+    <div style="margin-bottom: 10px;">
+        <button type="button" onclick="clearSignature_{key}()" 
+                style="background-color: #f8f9fa; border: 1px solid #ced4da; 
+                border-radius: 4px; padding: 4px 8px; cursor: pointer;">
+            Clear Signature
+        </button>
+    </div>
+    
+    <script>
+        function clearSignature_{key}() {{
+            if (typeof {key}_signaturePad !== 'undefined') {{
+                {key}_signaturePad.clear();
+                
+                // Send a message to Streamlit to clear the session state
+                window.parent.postMessage({{
+                    type: "streamlit:setComponentValue",
+                    value: {{
+                        {key}_clear: true
+                    }}
+                }}, "*");
+            }}
+        }}
+    </script>
+    """, unsafe_allow_html=True)
+    
+    # Check if the clear button was clicked via the custom event
+    if f"{key}_clear" in st.session_state and st.session_state[f"{key}_clear"]:
+        # Clear the signature data
+        st.session_state[f"{key}_data"]["image"] = None
+        st.session_state[f"{key}_data"]["timestamp"] = ""
+        st.session_state[f"{key}_data"]["method"] = "draw"
+        # Reset the clear flag
+        st.session_state[f"{key}_clear"] = False
     
     # Handle the signature data received from JS
     # This would be updated to handle the actual data from the component message passing

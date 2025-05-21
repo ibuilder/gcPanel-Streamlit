@@ -1,0 +1,58 @@
+[
+  {
+    "id": "INS-2025-001",
+    "date": "2025-01-15",
+    "status": "Completed",
+    "type": "Weekly Site Inspection",
+    "location": "Entire Site",
+    "inspector": "Safety Manager",
+    "findings": [
+      {
+        "item": "Fall protection",
+        "status": "Compliant",
+        "notes": "All workers properly using harnesses"
+      },
+      {
+        "item": "Fire extinguishers",
+        "status": "Non-compliant",
+        "notes": "Two extinguishers missing monthly inspection tags"
+      },
+      {
+        "item": "Housekeeping",
+        "status": "Partially compliant",
+        "notes": "Some debris in stairwells"
+      }
+    ],
+    "score": 85,
+    "created_at": "2025-01-15",
+    "updated_at": "2025-01-15"
+  },
+  {
+    "id": "INS-2025-002",
+    "date": "2025-02-01",
+    "status": "Completed",
+    "type": "Monthly Equipment Inspection",
+    "location": "Equipment Yard",
+    "inspector": "Maintenance Supervisor",
+    "findings": [
+      {
+        "item": "Crane inspection",
+        "status": "Compliant",
+        "notes": "All certifications current"
+      },
+      {
+        "item": "Forklift maintenance",
+        "status": "Compliant",
+        "notes": "Regular maintenance up to date"
+      },
+      {
+        "item": "Scaffolding components",
+        "status": "Non-compliant",
+        "notes": "Some damaged components identified"
+      }
+    ],
+    "score": 90,
+    "created_at": "2025-02-01",
+    "updated_at": "2025-02-01"
+  }
+]

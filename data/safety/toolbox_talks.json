@@ -1,0 +1,56 @@
+[
+  {
+    "id": "TBT-2025-001",
+    "date": "2025-01-10",
+    "topic": "Fall Protection",
+    "presenter": "Safety Manager",
+    "duration": 30,
+    "attendees": [
+      {
+        "name": "John Smith",
+        "company": "GC Construction",
+        "signature": true
+      },
+      {
+        "name": "Jane Doe",
+        "company": "GC Construction",
+        "signature": true
+      },
+      {
+        "name": "Robert Johnson",
+        "company": "Electrical Subcontractor",
+        "signature": true
+      }
+    ],
+    "notes": "Discussed proper use of harnesses and anchor points",
+    "created_at": "2025-01-10",
+    "updated_at": "2025-01-10"
+  },
+  {
+    "id": "TBT-2025-002",
+    "date": "2025-01-17",
+    "topic": "Hazard Communication",
+    "presenter": "Project Manager",
+    "duration": 20,
+    "attendees": [
+      {
+        "name": "John Smith",
+        "company": "GC Construction",
+        "signature": true
+      },
+      {
+        "name": "Jane Doe",
+        "company": "GC Construction",
+        "signature": true
+      },
+      {
+        "name": "Maria Garcia",
+        "company": "Concrete Subcontractor",
+        "signature": true
+      }
+    ],
+    "notes": "Reviewed SDS for new epoxy product being used",
+    "created_at": "2025-01-17",
+    "updated_at": "2025-01-17"
+  }
+]

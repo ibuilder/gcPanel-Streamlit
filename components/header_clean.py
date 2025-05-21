@@ -10,23 +10,50 @@ from app_config import MENU_OPTIONS, MENU_MAP, PROJECT_INFO
 def render_header():
     """Render the clean header component."""
     
+    # Add some custom CSS for professional header styling
+    st.markdown("""
+    <style>
+    .header-container {
+        padding: 1rem 0;
+        border-bottom: 1px solid #e0e0e0;
+        margin-bottom: 1rem;
+    }
+    .project-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+        color: #333;
+    }
+    .project-details {
+        font-size: 14px;
+        color: #666;
+        margin: 0;
+    }
+    .stButton button {
+        border: none;
+        background: none;
+        padding: 0;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
     # Use the simpler approach with direct Streamlit components
     # This will ensure the layout works consistently
     with st.container():
         cols = st.columns([1, 3, 1])
         
-        # Left column - Logo
+        # Left column - Logo (larger)
         with cols[0]:
-            st.image("gcpanel.png", width=80)
+            st.image("gcpanel.png", width=110)
         
-        # Middle column - Project Info
+        # Middle column - Project Info (smaller project name)
         with cols[1]:
-            st.markdown(f"### {PROJECT_INFO['name']}")
-            st.markdown(f"{PROJECT_INFO['value']} • {PROJECT_INFO['size']} • {PROJECT_INFO['floors']}")
+            st.markdown(f'<p class="project-title">{PROJECT_INFO["name"]}</p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="project-details">{PROJECT_INFO["value"]} • {PROJECT_INFO["size"]} • {PROJECT_INFO["floors"]}</p>', unsafe_allow_html=True)
         
         # Right column - Navigation
         with cols[2]:
-            st.markdown("Navigation")
+            st.markdown('<p style="font-size:13px; color:#666; margin-bottom:5px;">Navigation</p>', unsafe_allow_html=True)
             selected_menu = st.selectbox(
                 "Select Module",
                 options=MENU_OPTIONS,

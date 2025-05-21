@@ -9,6 +9,13 @@ import streamlit as st
 
 def apply_safety_styles():
     """Apply custom styles to improve the Safety Management layout."""
+    # First, load the dedicated CSS file for removing header buttons
+    with open('assets/remove_header_buttons.css', 'r') as f:
+        remove_buttons_css = f.read()
+    
+    st.markdown(f"<style>{remove_buttons_css}</style>", unsafe_allow_html=True)
+    
+    # Apply the regular safety styles
     st.markdown("""
     <style>
     /* Remove extra whitespace above headers */
@@ -72,7 +79,14 @@ def apply_safety_styles():
     }
     
     /* Remove bottom buttons or unnecessary elements below header */
-    div.stHeader + div.stButton {
+    div.stHeader + div.stButton,
+    div.stHeader + div.row-widget.stButton,
+    div.stHeader + div div.stButton,
+    div.stHeader ~ div.stButton,
+    div.stMarkdown + div.stButton,
+    /* Target specific button patterns that appear after headers */
+    div.stHeader ~ div.row-widget.stButton,
+    div.stHeader + div.element-container div.stButton {
         display: none !important;
     }
     

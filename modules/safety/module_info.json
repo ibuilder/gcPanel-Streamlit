@@ -1,0 +1,29 @@
+{
+    "id": "safety",
+    "display_name": "Safety Management",
+    "entry_point": "__init__.py",
+    "render_function": "render_safety",
+    "position": 3,
+    "category": "Main",
+    "requires_action_buttons": false,
+    "metadata": {
+        "description": "Comprehensive safety management system for construction projects",
+        "version": "1.0.0",
+        "dependencies": [],
+        "features": [
+            "Incident tracking and reporting",
+            "Safety inspections",
+            "Toolbox talks",
+            "Safety metrics and analytics",
+            "Hazard identification",
+            "Safety training records"
+        ],
+        "database_tables": [
+            "safety_incidents",
+            "inspections",
+            "toolbox_talks",
+            "safety_metrics",
+            "hazards"
+        ]
+    }
+}

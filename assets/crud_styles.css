@@ -267,6 +267,7 @@
     font-size: 0.75rem;
     font-weight: 500;
     text-transform: uppercase;
+    margin: 0.25rem 0;
 }
 
 .crud-status-success {
@@ -392,6 +393,46 @@
 /* Fix for Streamlit elements */
 div[data-testid="stVerticalBlock"] > div:first-child {
     margin-top: 0 !important;
+}
+
+/* Section headers for CRUD forms and detail views */
+.crud-section-header {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--primary-color);
+    margin: 1.5rem 0 0.75rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--divider-color);
+}
+
+/* Value container for read-only detail view */
+.crud-value-box {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--divider-color);
+    border-radius: 4px;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    min-height: 2rem;
+}
+
+/* Label style for field labels in detail view */
+.crud-label {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    color: var(--text-secondary);
+}
+
+/* Styles for action buttons in tables */
+button[key^="view_"], button[key^="edit_"] {
+    padding: 0.25rem !important;
+    min-width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+}
+
+/* Row hover effect for tables */
+div.row-widget:hover {
+    background-color: rgba(25, 118, 210, 0.05);
 }
 
 /* Better button styling for Streamlit buttons */

@@ -838,12 +838,15 @@ class SubcontractModule(CrudModule):
         end_crud_detail_container()
 
 
+# Import Change Orders functionality
+from modules.contracts.change_orders import ChangeOrderModule
+
 def render():
     """Render the Contracts Management module."""
     st.title("Contracts Management")
     
     # Create tabs for different contract types
-    tab1, tab2 = st.tabs(["Owner Contracts", "Subcontracts"])
+    tab1, tab2, tab3 = st.tabs(["Owner Contracts", "Subcontracts", "Change Orders"])
     
     # Owner Contracts Tab
     with tab1:
@@ -852,5 +855,16 @@ def render():
     
     # Subcontracts Tab
     with tab2:
+        # Initialize Subcontracts module
         subcontracts = SubcontractModule()
+        
+        # Make sure demo data exists
+        if not os.path.exists(subcontracts.data_file_path) or len(subcontracts._get_items()) == 0:
+            subcontracts._initialize_demo_data()
+            
         subcontracts.render()
+    
+    # Change Orders Tab
+    with tab3:
+        change_orders = ChangeOrderModule()
+        change_orders.render()

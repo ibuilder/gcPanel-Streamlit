@@ -34,7 +34,7 @@ from modules.standalone_bim import render_bim_standalone
 from modules.field_operations import render_field_operations
 from modules.scheduling import render_scheduling
 from modules.safety import render_safety
-from modules.cost_management import render_cost_management
+from modules.cost_management import render
 from modules.closeout import render_closeout
 from modules.engineering import render_engineering
 from modules.documents import render_documents
@@ -237,7 +237,7 @@ def render_selected_module(current_menu):
         "Schedule": render_scheduling,
         "Safety": render_safety,
         "Contracts": lambda: modules.contracts.render(),
-        "Cost Management": render_cost_management,
+        "Cost Management": render,
         "Analytics": render_analytics,
         "Engineering": render_engineering,
         "Field Operations": render_field_operations,

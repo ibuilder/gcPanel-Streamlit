@@ -31,7 +31,7 @@ def render_header():
         "Engineering": {"label": "Engineering", "icon": "🔧"},
         "Field Operations": {"label": "Field Operations", "icon": "🏗️"},
         "Documents": {"label": "Documents", "icon": "📄"},
-        "BIM Viewer": {"label": "BIM", "icon": "🏢"},
+        "BIM Viewer": {"label": "StandaloneBIM", "icon": "🏢"},
         "Mobile Companion": {"label": "Mobile Companion", "icon": "📱"},
         "Closeout": {"label": "Closeout", "icon": "✅"},
         "Integrations": {"label": "Integrations", "icon": "🔄"},

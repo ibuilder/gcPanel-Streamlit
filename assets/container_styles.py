@@ -37,10 +37,13 @@ def apply_container_styles():
         margin: 0 auto;
     }
     
-    /* Improve header spacing */
+    /* Restore header visibility and improve spacing */
     .stApp header {
         margin-top: 0;
         padding-top: 0.5rem;
+        visibility: visible !important;
+        height: auto !important;
+        display: block !important;
     }
     
     /* Restore proper spacing in Streamlit containers */

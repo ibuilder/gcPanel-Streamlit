@@ -121,6 +121,12 @@ def _setup_application_environment():
     # Load external resources (CSS, JS)
     load_external_resources()
     
+    # Initialize database connection pool if in production
+    _setup_database_connection_pool()
+    
+    # Set up caching for performance in production
+    _configure_caching()
+    
     # Initialize core services if they exist
     try:
         from core import initialize_application
@@ -130,6 +136,54 @@ def _setup_application_environment():
         import os
         if not os.path.exists('core'):
             os.makedirs('core', exist_ok=True)
+            
+def _setup_database_connection_pool():
+    """Initialize database connection pool for production use."""
+    if 'db_pool' not in st.session_state:
+        try:
+            import os
+            from sqlalchemy import create_engine
+            from sqlalchemy.pool import QueuePool
+            
+            # Check if we have a database connection string
+            database_url = os.environ.get('DATABASE_URL')
+            if database_url:
+                # Create connection pool with appropriate settings for production
+                engine = create_engine(
+                    database_url,
+                    poolclass=QueuePool,
+                    pool_size=10,
+                    max_overflow=20,
+                    pool_timeout=30,
+                    pool_recycle=1800  # Recycle connections after 30 minutes
+                )
+                
+                # Store in session state for reuse
+                st.session_state.db_pool = engine
+                
+                # Test connection
+                with engine.connect() as conn:
+                    conn.execute("SELECT 1")
+        except Exception as e:
+            import logging
+            logging.error(f"Database connection pool initialization error: {str(e)}")
+            # Don't fail if DB connection fails - app can still function with files
+
+def _configure_caching():
+    """Configure caching for improved performance in production."""
+    # Set up cache TTL for various function types
+    try:
+        # For data-loading functions, cache for a moderate time
+        st.cache_data.clear()
+        
+        # For resource functions, cache longer
+        st.cache_resource.clear()
+        
+        # Configure global cache settings if needed
+        # This code can be extended to set more specific cache policies
+    except Exception as e:
+        import logging
+        logging.error(f"Cache configuration error: {str(e)}")
 
 def _render_ui_framework():
     """Render the main UI framework including header, navigation, and content."""

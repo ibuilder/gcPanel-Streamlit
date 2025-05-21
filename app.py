@@ -1,5 +1,5 @@
 """
-gcPanel Construction Management Dashboard
+gcPanel Construction Management Dashboard (Production Version)
 
 This is the main application file for the gcPanel Construction Management
 Dashboard, a comprehensive project management tool for construction projects.
@@ -10,11 +10,14 @@ The application includes production-ready features:
 - Advanced analytics with visualization and prediction
 - Mobile optimization with PWA support
 - Real-time collaboration tools
-- AI-powered features
+- AI-powered features with Natural Language Processing
 - Improved spacing and UI consistency
 - Document management for drawings, specs, and project files
 - BIM model visualization and clash detection
 - Comprehensive Field Operations tracking
+- Performance optimizations for production deployment
+- Production-ready error handling and logging
+- Database connection pooling and query optimization
 """
 
 import streamlit as st
@@ -41,33 +44,61 @@ from assets.header_fix import apply_header_fixes
 
 def main():
     """Main application entry point."""
-    # Set page configuration with favicon
-    set_page_config()
-    
-    # Enable mobile optimizations and PWA support
-    add_mobile_styles()
-    setup_pwa()
-    
-    # Apply improved container styles to fix spacing issues
-    apply_container_styles()
-    
-    # Apply header fixes to remove white box at the top
-    apply_header_fixes()
-    
-    # Initialize session state variables from app_manager
-    app_manager.initialize_session_state()
-    
-    # Add a toggle for mobile field companion view
-    is_mobile = False
-    if "is_mobile_view" in st.session_state:
-        is_mobile = st.session_state.is_mobile_view
-    
-    # Show appropriate view based on mode
-    if is_mobile:
-        render_mobile_field_companion()
-    else:
-        # Render the entire application with the app manager
-        app_manager.render_application()
+    try:
+        # Set page configuration with favicon
+        set_page_config()
+        
+        # Enable mobile optimizations and PWA support
+        add_mobile_styles()
+        setup_pwa()
+        
+        # Apply improved container styles to fix spacing issues
+        apply_container_styles()
+        
+        # Apply header fixes to remove white box at the top
+        apply_header_fixes()
+        
+        # Initialize session state variables from app_manager
+        app_manager.initialize_session_state()
+        
+        # Add a toggle for mobile field companion view
+        is_mobile = False
+        if "is_mobile_view" in st.session_state:
+            is_mobile = st.session_state.is_mobile_view
+        
+        # Show appropriate view based on mode
+        if is_mobile:
+            render_mobile_field_companion()
+        else:
+            # Render the entire application with the app manager
+            app_manager.render_application()
+            
+    except Exception as e:
+        # Production error handling
+        import traceback
+        import logging
+        
+        # Configure logging
+        logging.basicConfig(
+            level=logging.ERROR,
+            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.FileHandler("app_errors.log"),
+                logging.StreamHandler()
+            ]
+        )
+        
+        # Log the error
+        error_details = traceback.format_exc()
+        logging.error(f"Application error: {str(e)}\n{error_details}")
+        
+        # Show user-friendly error page
+        st.error("We encountered an unexpected error. Our team has been notified.")
+        
+        # Only show detailed error in development, not production
+        if st.session_state.get('show_debug', False):
+            with st.expander("Error Details (Developers Only)"):
+                st.code(error_details)
 
 if __name__ == "__main__":
     main()

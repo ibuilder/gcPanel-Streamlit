@@ -221,8 +221,8 @@ def render_demo_list():
                     # For status column, display with HTML formatting
                     if col_name == 'status':
                         status_html = f"""
-                        <div style="display: flex; align-items: center; justify-content: center;">
-                            <span class='crud-status crud-status-{get_status_class(value)}' style="outline: none; box-shadow: none;">{value}</span>
+                        <div style="display: flex; align-items: center; justify-content: center; background: transparent; border: none; outline: none; box-shadow: none;">
+                            <span class='crud-status crud-status-{get_status_class(value)}' style="outline: none; box-shadow: none; border: none;">{value}</span>
                         </div>
                         """
                         st.markdown(status_html, unsafe_allow_html=True)
@@ -245,8 +245,16 @@ def render_demo_list():
                         st.session_state['crud_demo_edit_mode'] = True
                         st.rerun()
         
-        # Add a filter section
-        st.subheader("Advanced Filters")
+        # Add a filter section with white background
+        filter_html = """
+        <div style="background-color: #fff; border: 1px solid #e0e0e0; border-radius: 8px; margin: 1rem 0;">
+            <div style="padding: 0.75rem 1rem; border-bottom: 1px solid #e0e0e0; background-color: #fff;">
+                <h3 style="margin: 0; font-size: 1.1rem; font-weight: 500;">Advanced Filters</h3>
+            </div>
+            <div style="padding: 1rem;">
+        """
+        st.markdown(filter_html, unsafe_allow_html=True)
+        
         filter_col1, filter_col2, filter_col3 = st.columns(3)
         
         with filter_col1:

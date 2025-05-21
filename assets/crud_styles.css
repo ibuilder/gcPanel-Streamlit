@@ -6,10 +6,11 @@
 .crud-list-container {
     background-color: var(--surface-color);
     border-radius: 8px;
-    padding: 1rem;
+    padding: 0;
     margin-bottom: 1rem;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     border: 1px solid var(--divider-color);
+    overflow: hidden;
 }
 
 /* List header with action buttons */
@@ -18,8 +19,10 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
+    padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--divider-color);
+    background-color: #ffffff;
+    border-radius: 4px 4px 0 0;
 }
 
 .crud-list-title {
@@ -180,8 +183,10 @@
     justify-content: flex-end;
     gap: 0.75rem;
     margin-top: 1.5rem;
-    padding-top: 1rem;
+    padding: 1rem;
     border-top: 1px solid var(--divider-color);
+    background-color: #ffffff;
+    border-radius: 0 0 4px 4px;
 }
 
 /* === Action Buttons === */
@@ -445,6 +450,8 @@ div.row-widget:hover {
     border-radius: 4px !important;
     font-size: 0.875rem !important;
     transition: all 0.2s ease !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 /* Make Streamlit widgets look like our CRUD styles */

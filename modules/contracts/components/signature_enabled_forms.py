@@ -9,8 +9,14 @@ import pandas as pd
 from datetime import datetime
 from components.form_signature_field import signature_field, save_signature
 
-def change_order_with_signatures():
-    """Render a change order form with integrated signature fields."""
+def change_order_with_signatures(edit_mode=False, contract_data=None):
+    """
+    Render a change order form with integrated signature fields.
+    
+    Args:
+        edit_mode (bool): Whether the form is in edit mode
+        contract_data (dict): Existing contract data for editing
+    """
     st.header("Change Order Form")
     
     with st.form("change_order_form"):
@@ -137,8 +143,14 @@ def change_order_with_signatures():
                 else:
                     st.warning("Change Order saved as draft. No signatures were provided.")
 
-def subcontract_with_signatures():
-    """Render a subcontract form with integrated signature fields."""
+def subcontract_with_signatures(edit_mode=False, contract_data=None):
+    """
+    Render a subcontract form with integrated signature fields.
+    
+    Args:
+        edit_mode (bool): Whether the form is in edit mode
+        contract_data (dict): Existing contract data for editing
+    """
     st.header("Subcontract Agreement")
     
     with st.form("subcontract_form"):
@@ -255,8 +267,14 @@ def subcontract_with_signatures():
                 else:
                     st.warning("Subcontract saved as draft. No signatures were provided.")
 
-def invoice_with_signatures():
-    """Render an invoice form with integrated signature fields."""
+def invoice_with_signatures(edit_mode=False, contract_data=None):
+    """
+    Render an invoice form with integrated signature fields.
+    
+    Args:
+        edit_mode (bool): Whether the form is in edit mode
+        contract_data (dict): Existing contract data for editing
+    """
     st.header("Invoice Form")
     
     with st.form("invoice_form"):

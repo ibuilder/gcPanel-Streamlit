@@ -24,6 +24,12 @@ from modules.engineering.components.submittal_components import (
     render_submittal_form,
     render_submittal_analysis
 )
+from modules.engineering.components.document_components import (
+    render_document_list,
+    render_document_details,
+    render_document_form,
+    render_document_analysis
+)
 
 def render_engineering():
     """Render the engineering module"""
@@ -39,6 +45,9 @@ def render_engineering():
         st.write(f"Current Submittal view: {st.session_state.get('submittal_view')}")
         st.write(f"Selected Submittal ID: {st.session_state.get('selected_submittal_id')}")
         st.write(f"Edit Submittal ID: {st.session_state.get('edit_submittal_id')}")
+        st.write(f"Current Document view: {st.session_state.get('document_view')}")
+        st.write(f"Selected Document ID: {st.session_state.get('selected_document_id')}")
+        st.write(f"Edit Document ID: {st.session_state.get('edit_document_id')}")
     
     # Initialize session state variables for RFIs if not present
     if "rfi_view" not in st.session_state:
@@ -59,6 +68,22 @@ def render_engineering():
     
     if "edit_submittal_id" not in st.session_state:
         st.session_state.edit_submittal_id = None
+    
+    # Initialize session state variables for Documents if not present
+    if "document_view" not in st.session_state:
+        st.session_state.document_view = "list"
+    
+    if "selected_document_id" not in st.session_state:
+        st.session_state.selected_document_id = None
+    
+    if "edit_document_id" not in st.session_state:
+        st.session_state.edit_document_id = None
+    
+    if "is_revision" not in st.session_state:
+        st.session_state.is_revision = False
+    
+    if "revision_document_id" not in st.session_state:
+        st.session_state.revision_document_id = None
     
     # Tab navigation for engineering management sections
     tab1, tab2, tab3 = st.tabs(["RFIs", "Submittals", "Document Library"])
@@ -113,4 +138,27 @@ def render_engineering():
     
     # Document Library Tab
     with tab3:
-        st.write("Document Library module (Coming Soon)")
+        # Get current view from session state
+        current_view = st.session_state.document_view
+        
+        # Add navigation buttons at the top for non-list views
+        if current_view != "list":
+            # Back button at the top of any non-list view
+            if st.button("← Back to Document Library", key="back_to_document_list"):
+                st.session_state.document_view = "list"
+                # Clear revision flags if returning to list
+                st.session_state.is_revision = False
+                st.session_state.revision_document_id = None
+                st.rerun()
+        
+        # Render the appropriate view based on session state
+        if current_view == "list":
+            render_document_list()
+        elif current_view == "view":
+            render_document_details()
+        elif current_view == "edit":
+            render_document_form(is_edit=True)
+        elif current_view == "add":
+            render_document_form(is_edit=False)
+        elif current_view == "analysis":
+            render_document_analysis()

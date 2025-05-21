@@ -81,9 +81,9 @@ def render_standalone_bim():
             for i, model in enumerate(models):
                 # Alternate between columns
                 with col1 if i % 2 == 0 else col2:
-                    # Create a card for the model
+                    # Create a card for the model using st.container()
                     with st.container():
-                        # Apply card styling
+                        # Create a bordered container with CSS
                         st.markdown("""
                         <style>
                         .model-card {
@@ -103,7 +103,7 @@ def render_standalone_bim():
                         
                         # Model info
                         st.subheader(model["name"])
-                        st.caption(f"Type: {model['type']} | Rev: {model['revision']} | Updated: {model['date']}")
+                        st.write(f"Type: {model['type']} | Rev: {model['revision']} | Updated: {model['date']}")
                         
                         # Action buttons
                         col1a, col2a = st.columns(2)
@@ -166,7 +166,7 @@ def render_standalone_bim():
         
         # Convert to DataFrame for display
         props_df = pd.DataFrame({"Property": element_props.keys(), "Value": element_props.values()})
-        st.dataframe(props_df, use_column_width=True)
+        st.table(props_df)
     
     # Tab 3: Clash Detection
     with tab3:
@@ -204,7 +204,7 @@ def render_standalone_bim():
         clash_df = pd.DataFrame(clash_data)
         
         # Display the clash list
-        st.dataframe(clash_df, use_column_width=True)
+        st.table(clash_df)
         
         # Summary statistics
         col1, col2, col3 = st.columns(3)

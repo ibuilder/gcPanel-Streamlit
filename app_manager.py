@@ -28,6 +28,7 @@ from modules.pdf_viewer.pdf_viewer import render_pdf_viewer
 from modules.bim_viewer.basic_viewer import render_basic_bim_viewer
 from modules.bim_viewer.advanced_viewer import render_advanced_bim_viewer
 from modules.bim import render_bim
+from modules.standalone_bim import render_bim_standalone
 from modules.field_operations import render_field_operations
 from modules.scheduling import render_scheduling
 from modules.safety import render_safety
@@ -203,6 +204,9 @@ def render_selected_module(current_menu):
             render_basic_bim_viewer()
         else:
             render_advanced_bim_viewer()
+    # Handle our new standalone BIM viewer
+    elif current_menu == "StandaloneBIM":
+        render_bim_standalone()
     # For regular modules, use the mapping to find and call the appropriate function
     elif current_menu in module_mapping:
         module_mapping[current_menu]()

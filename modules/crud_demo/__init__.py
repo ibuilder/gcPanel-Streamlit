@@ -220,7 +220,12 @@ def render_demo_list():
                 with cols[i]:
                     # For status column, display with HTML formatting
                     if col_name == 'status':
-                        st.markdown(f"<span class='crud-status crud-status-{get_status_class(value)}'>{value}</span>", unsafe_allow_html=True)
+                        status_html = f"""
+                        <div style="display: flex; align-items: center; justify-content: center;">
+                            <span class='crud-status crud-status-{get_status_class(value)}'>{value}</span>
+                        </div>
+                        """
+                        st.markdown(status_html, unsafe_allow_html=True)
                     else:
                         st.write(value)
             

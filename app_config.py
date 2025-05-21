@@ -51,7 +51,7 @@ MENU_MAP = {
     "🔧 Engineering": "Engineering",
     "🚧 Field Operations": "Field Operations",
     "📄 Documents": "Documents",
-    "🏢 BIM Viewer": "BIM",
+    "🏢 BIM Viewer": "StandaloneBIM",
     "📱 Mobile Companion": "Mobile Companion",
     "✅ Closeout": "Closeout",
     "🤖 AI Assistant": "AI Assistant",

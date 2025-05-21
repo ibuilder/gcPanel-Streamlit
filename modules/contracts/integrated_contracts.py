@@ -128,7 +128,7 @@ def initialize_contract_data():
 
 def load_contract_data(contract_type):
     """
-    Load contract data from JSON file.
+    Load contract data.
     
     Args:
         contract_type (str): Type of contract ("change_orders", "subcontracts", or "invoices")
@@ -136,46 +136,63 @@ def load_contract_data(contract_type):
     Returns:
         list: List of contract dictionaries
     """
-    file_map = {
-        "change_orders": CHANGE_ORDERS_FILE,
-        "subcontracts": SUBCONTRACTS_FILE,
-        "invoices": INVOICES_FILE
-    }
+    from modules.contracts.service import ContractsService
     
-    file_path = file_map.get(contract_type)
-    if not file_path or not os.path.exists(file_path):
-        return []
-    
-    try:
-        with open(file_path, 'r') as f:
-            return json.load(f)
-    except Exception as e:
-        st.error(f"Error loading contract data: {e}")
+    if contract_type == "change_orders":
+        return ContractsService.get_change_orders()
+    elif contract_type == "subcontracts":
+        return ContractsService.get_subcontracts()
+    elif contract_type == "invoices":
+        return ContractsService.get_invoices()
+    else:
         return []
 
 def save_contract_data(contract_type, data):
     """
-    Save contract data to JSON file.
+    Save contract data.
     
     Args:
         contract_type (str): Type of contract ("change_orders", "subcontracts", or "invoices")
         data (list): List of contract dictionaries
     """
-    file_map = {
-        "change_orders": CHANGE_ORDERS_FILE,
-        "subcontracts": SUBCONTRACTS_FILE,
-        "invoices": INVOICES_FILE
-    }
+    from modules.contracts.service import ContractsService
     
-    file_path = file_map.get(contract_type)
-    if not file_path:
-        return
+    # This method overwrites the entire file with the provided data
+    # In a real application, we would use more specific CRUD operations
+    # But for compatibility with the existing code, we'll just save the entire list
     
-    try:
-        with open(file_path, 'w') as f:
-            json.dump(data, f, indent=2)
-    except Exception as e:
-        st.error(f"Error saving contract data: {e}")
+    if contract_type == "change_orders":
+        # Delete all existing change orders and re-create them
+        existing = ContractsService.get_change_orders()
+        for co in existing:
+            ContractsService.delete_change_order(co.get("id"))
+        
+        # Create the new change orders
+        for co in data:
+            if "id" in co:
+                ContractsService.create_change_order(co)
+    
+    elif contract_type == "subcontracts":
+        # Delete all existing subcontracts and re-create them
+        existing = ContractsService.get_subcontracts()
+        for sc in existing:
+            ContractsService.delete_subcontract(sc.get("id"))
+        
+        # Create the new subcontracts
+        for sc in data:
+            if "id" in sc:
+                ContractsService.create_subcontract(sc)
+    
+    elif contract_type == "invoices":
+        # Delete all existing invoices and re-create them
+        existing = ContractsService.get_invoices()
+        for inv in existing:
+            ContractsService.delete_invoice(inv.get("id"))
+        
+        # Create the new invoices
+        for inv in data:
+            if "id" in inv:
+                ContractsService.create_invoice(inv)
 
 def render_integrated_contracts():
     """

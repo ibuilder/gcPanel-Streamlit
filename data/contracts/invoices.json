@@ -1,0 +1,22 @@
+[
+  {
+    "id": "INV-2025-087",
+    "project": "Highland Tower Development",
+    "date": "2025-04-15",
+    "status": "Paid",
+    "description": "March Progress",
+    "company": "Superior Concrete Solutions",
+    "contract_amount": 3750000.0,
+    "approved_changes": 0.0,
+    "previously_billed": 0.0,
+    "current_billed": 450000.0,
+    "retainage": 45000.0,
+    "amount_due": 405000.0,
+    "signatures": [
+      "Contractor: Sarah Williams",
+      "Owner/CM: Jane Smith"
+    ],
+    "created_at": "2025-04-15",
+    "updated_at": "2025-04-22"
+  }
+]

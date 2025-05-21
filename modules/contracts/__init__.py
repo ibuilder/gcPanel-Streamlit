@@ -6,9 +6,11 @@ with integrated digital signature capabilities.
 """
 
 import streamlit as st
+from modules.contracts.service import ContractsService
 from modules.contracts.integrated_contracts import render_integrated_contracts
 
 def render_contracts():
     """Render the contracts module with integrated digital signatures."""
-    # Use the new integrated contracts module that includes signature capabilities
+    # Initialize contract data and pass to the render function
+    ContractsService.initialize_data_files()
     render_integrated_contracts()

@@ -1,0 +1,40 @@
+[
+  {
+    "id": "SC-2025-001",
+    "project": "Highland Tower Development",
+    "date": "2025-01-15",
+    "status": "Executed",
+    "company": "Deep Excavation Inc.",
+    "contact": "Mike Johnson",
+    "email": "mike@deepexcavation.com",
+    "scope": "Excavation",
+    "amount": 1250000.0,
+    "start_date": "2025-02-01",
+    "completion_date": "2025-04-15",
+    "signatures": [
+      "Subcontractor: Mike Johnson",
+      "General Contractor: John Doe"
+    ],
+    "created_at": "2025-01-10",
+    "updated_at": "2025-01-15"
+  },
+  {
+    "id": "SC-2025-038",
+    "project": "Highland Tower Development",
+    "date": "2025-03-22",
+    "status": "Executed",
+    "company": "Superior Concrete Solutions",
+    "contact": "Sarah Williams",
+    "email": "sarah@superiorconcrete.com",
+    "scope": "Concrete",
+    "amount": 3750000.0,
+    "start_date": "2025-04-01",
+    "completion_date": "2025-08-15",
+    "signatures": [
+      "Subcontractor: Sarah Williams",
+      "General Contractor: John Doe"
+    ],
+    "created_at": "2025-03-15",
+    "updated_at": "2025-03-22"
+  }
+]

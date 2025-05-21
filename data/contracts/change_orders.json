@@ -1,0 +1,37 @@
+[
+  {
+    "id": "CO-2025-001",
+    "project": "Highland Tower Development",
+    "date": "2025-02-10",
+    "status": "Approved",
+    "description": "Added Roof Drains",
+    "reason": "Owner Request",
+    "original_amount": 45500000.0,
+    "previous_changes": 0.0,
+    "this_change": 28500.0,
+    "days_added": 2,
+    "signatures": [
+      "Contractor: John Doe",
+      "Owner: Jane Smith"
+    ],
+    "created_at": "2025-02-10",
+    "updated_at": "2025-02-15"
+  },
+  {
+    "id": "CO-2025-042",
+    "project": "Highland Tower Development",
+    "date": "2025-05-10",
+    "status": "Pending Approval",
+    "description": "Added Security Equipment",
+    "reason": "Owner Request",
+    "original_amount": 45500000.0,
+    "previous_changes": 124500.0,
+    "this_change": 36750.0,
+    "days_added": 3,
+    "signatures": [
+      "Contractor: John Doe"
+    ],
+    "created_at": "2025-05-10",
+    "updated_at": "2025-05-10"
+  }
+]

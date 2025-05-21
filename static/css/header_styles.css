@@ -1,365 +1,72 @@
-/* Global variables */
-:root {
-    --primary-color: #0f5cad;
-    --primary-light: #e6f2ff;
-    --primary-hover: #0e4b8b;
-    --text-dark: #1f2937;
-    --text-medium: #4b5563;
-    --text-light: #6b7280;
-    --border-color: #e5e7eb;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-    --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-    --bg-gray-light: #f8fafc;
-    --success-color: #10b981;
-    --warning-color: #f59e0b;
-    --danger-color: #ef4444;
-    --radius-sm: 4px;
-    --radius-md: 6px;
-    --radius-lg: 8px;
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --transition-fast: 0.15s ease-in-out;
-}
+/* 
+Header styles for gcPanel application
+This CSS file contains all styling related to the application header
+*/
 
-/* Main header container styling */
+/* Header container */
 .gc-header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
     background-color: #ffffff;
-    padding: 0.75rem var(--spacing-md);
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 0;
-    box-shadow: var(--shadow-sm);
-    position: sticky;
-    top: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    position: relative;
     z-index: 100;
 }
 
-/* Branding container */
-.gc-branding {
-    display: flex;
-    align-items: center;
-    padding: 0;
-    margin: 0;
-}
-
-/* Logo styling */
-.gc-logo img {
-    height: 30px;
-    width: auto;
-    transition: transform var(--transition-fast);
-}
-
-.gc-logo img:hover {
-    transform: scale(1.05);
-}
-
-/* Project info styling */
+/* Project information styling */
 .gc-project-info {
-    padding-left: var(--spacing-sm);
-    border-left: 1px solid var(--border-color);
-    margin-left: var(--spacing-sm);
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
 }
 
-/* Project label styling */
 .gc-project-label {
-    font-size: 0.75rem;
-    color: var(--text-light);
+    font-size: 11px;
+    color: #6b7280;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin: 0;
-    padding: 0;
-    line-height: 1;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
 }
 
-/* Project title styling */
 .gc-project-title {
-    font-size: 1rem;
+    font-size: 16px;
     font-weight: 600;
-    color: var(--text-dark);
-    margin: 0.1rem 0 0 0;
-    padding: 0;
-    line-height: 1.2;
+    color: #1f2937;
+    margin-bottom: 2px;
 }
 
-/* Project stats styling */
 .gc-project-stats {
-    font-size: 0.75rem;
-    color: var(--text-light);
-    margin: 0.1rem 0 0 0;
-    padding: 0;
-    line-height: 1.2;
+    font-size: 12px;
+    color: #4b5563;
 }
 
-/* Navigation styling */
-/* Fix vertical alignment with the rest of the header */
-div[data-baseweb="select"] {
-    margin-top: 0 !important;
+/* Content container */
+.gc-content-container {
+    padding: 16px;
 }
 
-/* Navigation label styling */
-label[data-testid="stText"] {
-    color: var(--text-medium) !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
-    margin-bottom: var(--spacing-xs) !important;
-}
-
-/* Remove label spacing above Navigation dropdown */
-label[data-baseweb="label"] {
-    margin: 0 !important;
-    padding: 0 !important;
-    line-height: 1 !important;
-    color: var(--text-medium) !important;
-}
-
-/* Reduce selectbox containers spacing */
-div.row-widget.stSelectbox {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* Style the navigation dropdown */
-div[data-baseweb="select"] > div {
-    border-color: var(--border-color) !important;
-    border-radius: var(--radius-sm) !important;
-    transition: all var(--transition-fast) !important;
-}
-
-div[data-baseweb="select"] > div:hover {
-    border-color: var(--primary-color) !important;
-    box-shadow: 0 0 0 2px var(--primary-light) !important;
-}
-
-/* Styling the dropdown menu */
-div[data-baseweb="menu"] {
-    border-radius: var(--radius-sm) !important;
-    box-shadow: var(--shadow-md) !important;
-    border: 1px solid var(--border-color) !important;
-    padding: 4px 0 !important;
-    overflow: hidden !important;
-}
-
-/* Menu item styling */
-div[data-baseweb="menu"] li {
-    transition: all var(--transition-fast) !important;
-    padding: 10px 16px !important;
-    color: var(--text-medium) !important;
-    font-size: 0.9rem !important;
-}
-
-/* Menu item hover effect */
-div[data-baseweb="menu"] li:hover {
-    background-color: var(--primary-light) !important;
-    color: var(--primary-color) !important;
-    transform: translateX(2px);
-}
-
-/* Add subtle dividers between menu items */
-div[data-baseweb="menu"] li:not(:last-child) {
-    border-bottom: 1px solid var(--border-color);
-}
-
-/* Selected menu item */
-div[data-baseweb="menu"] li[aria-selected="true"] {
-    background-color: var(--primary-light) !important;
-    color: var(--primary-color) !important;
-    font-weight: 500 !important;
-}
-
-/* Mobile responsive adjustments */
+/* Media queries for responsive design */
 @media (max-width: 768px) {
-    /* Hide the label on mobile */
-    label[data-baseweb="label"] {
-        display: none !important;
-    }
-    
-    /* Make dropdown take full width on mobile */
-    div[data-baseweb="select"] {
-        width: 100% !important;
-        margin-top: 5px !important;
-    }
-    
-    /* Larger touch target on mobile */
-    div[data-baseweb="select"] > div {
-        min-height: 44px !important;
-        padding: 10px 14px !important;
-    }
-    
-    /* Adjust project info on mobile */
-    .gc-project-info {
-        border-left: none;
-        padding-left: 0;
-        margin-top: var(--spacing-xs);
-    }
-    
-    /* Stack header elements on mobile */
     .gc-header-container {
         flex-direction: column;
         align-items: flex-start;
+        padding: 12px;
     }
     
-    /* Smaller font size for project title on mobile */
-    .gc-project-title {
-        font-size: 0.9rem;
+    .gc-project-info {
+        margin-left: 0;
+        margin-top: 10px;
     }
     
-    /* Smaller project stats on mobile */
+    /* Simplify project details on mobile */
     .gc-project-stats {
-        font-size: 0.7rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
     }
-}
-
-/* Notification button styling */
-div[data-testid="stButton"] > button {
-    background-color: transparent;
-    border: none;
-    color: #6b7280;
-    padding: 0;
-    font-size: 1.2rem;
-    position: relative;
-}
-
-div[data-testid="stButton"] > button:hover {
-    background-color: rgba(0,0,0,0.05);
-    color: #3b82f6;
-}
-
-/* Badge for notification button */
-.notification-badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    width: 18px;
-    height: 18px;
-    background-color: #ef4444;
-    color: white;
-    border-radius: 50%;
-    font-size: 11px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* Simple breadcrumb styling */
-.simple-breadcrumb {
-    display: flex;
-    align-items: center;
-    font-size: 0.85rem;
-    color: #6b7280;
-    padding: 0;
-    margin: 0;
-}
-
-.simple-breadcrumb-item {
-    display: inline-flex;
-    align-items: center;
-}
-
-.simple-breadcrumb-separator {
-    margin: 0 0.3rem;
-    color: #9ca3af;
-}
-
-.simple-breadcrumb-current {
-    color: #4b5563;
-    font-weight: 500;
-}
-
-/* Fix for top spacing in Streamlit - critical styling */
-.main .block-container {
-    padding: 0 !important;
-    margin: 0 !important;
-    max-width: none !important;
-}
-
-/* Remove ALL padding and margins - essential for removing white boxes */
-.stApp, .stApp > header, .stApp > div, .main > div {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* Force removal of all space around the header */
-div[data-testid="stDecoration"], 
-div[data-testid="stToolbar"],
-div.stDeployButton {
-    display: none !important;
-}
-
-/* Remove all white boxes above and below header - more aggressive approach */
-div.element-container:empty,
-div.stMarkdown div:empty,
-div[data-testid="stVerticalBlock"] > div:empty {
-    display: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    height: 0 !important;
-    min-height: 0 !important;
-    max-height: 0 !important;
-    overflow: hidden !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-}
-
-/* Hide streamlit's main menu */
-#MainMenu {
-    visibility: hidden !important;
-}
-
-/* Fix for Streamlit default padding */
-section[data-testid="stSidebar"] {
-    background-color: var(--bg-gray-light);
-    border-right: 1px solid var(--border-color);
-}
-
-/* Remove all default dividers */
-hr {
-    display: none !important;
-}
-
-/* Hide default header */
-header[data-testid="stHeader"] {
-    display: none !important;
-}
-
-/* Remove all vertical stacking space between elements */
-div[data-testid="stVerticalBlock"] {
-    gap: 0 !important;
-}
-
-/* Improve container spacing */
-.stMarkdown {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-}
-
-/* Remove top margin from the first element after a header */
-.gc-header-container + div {
-    margin-top: 0 !important;
-}
-
-/* Remove all empty element containers */
-.element-container:empty {
-    display: none !important;
-    height: 0 !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* Fix unwanted content containers */
-div[data-testid="stMarkdownContainer"] > div {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-}
-
-/* Content container styling */
-.gc-content-container {
-    padding: 0.5rem 1.5rem;
-    background-color: white;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 1rem;
 }

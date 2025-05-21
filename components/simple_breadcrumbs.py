@@ -154,6 +154,9 @@ def get_breadcrumbs_for_page(page: str) -> List[Dict[str, Any]]:
             
     elif page == "BIM":
         breadcrumb_items.append({"label": "BIM", "path": "BIM"})
+        
+    elif page == "StandaloneBIM":
+        breadcrumb_items.append({"label": "BIM Viewer", "path": "StandaloneBIM"})
             
     elif page.startswith("Field Operations"):
         breadcrumb_items.append({"label": "Field Operations", "path": "Field Operations"})

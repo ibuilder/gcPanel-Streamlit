@@ -7,6 +7,37 @@ features for gcPanel in production environments.
 
 import streamlit as st
 import os
+import json
+
+def check_offline_status():
+    """
+    Check if the application is currently running in offline mode.
+    
+    Returns:
+        bool: True if app is in offline mode, False otherwise
+    """
+    # This is a simplified approach that would need to be implemented with JS
+    return False
+
+def cache_file_for_offline(file_path):
+    """
+    Register a file to be cached for offline use with the service worker.
+    
+    Args:
+        file_path (str): Path to the file to cache
+    """
+    # In a real implementation, this would communicate with the service worker
+    pass
+
+def get_cached_files():
+    """
+    Get a list of files that are currently cached for offline use.
+    
+    Returns:
+        list: List of cached file paths
+    """
+    # In a real implementation, this would communicate with the service worker
+    return []
 
 def setup_pwa():
     """

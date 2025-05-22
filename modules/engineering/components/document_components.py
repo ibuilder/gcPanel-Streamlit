@@ -269,7 +269,7 @@ def render_document_list():
             st.rerun()
     
     # Analysis button
-    if st.button("📊 View Analysis", use_container_width=True):
+    if st.button("📊 View Analysis", use_container_width=True, key="view_analysis_documents"):
         st.session_state.document_view = "analysis"
         st.rerun()
     

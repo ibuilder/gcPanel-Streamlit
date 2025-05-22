@@ -81,42 +81,42 @@ def render_login_form():
     # Initialize security state
     _init_security_state()
     
-    # Production-grade CSS with accessibility and security enhancements
+    # Streamlined production CSS
     st.markdown("""
     <style>
-    /* Base container with improved accessibility */
+    /* Main login container */
     .login-container {
-        max-width: 480px;
-        margin: 0 auto;
-        padding: 40px 35px;
+        max-width: 460px;
+        margin: 2rem auto;
+        padding: 2.5rem;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 16px;
-        box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
         color: white;
         position: relative;
-        overflow: hidden;
     }
     
-    /* Security indicator */
+    /* Security badge */
     .security-badge {
         position: absolute;
-        top: 15px;
-        right: 15px;
+        top: 1rem;
+        right: 1rem;
         background: rgba(255,255,255,0.2);
-        padding: 5px 10px;
-        border-radius: 20px;
+        padding: 0.4rem 0.8rem;
+        border-radius: 15px;
         font-size: 0.7rem;
         font-weight: 600;
         backdrop-filter: blur(10px);
     }
     
-    /* Enhanced accessibility for form elements */
+    /* Form elements */
     .stTextInput > div > div > input {
         border: 2px solid rgba(255,255,255,0.3) !important;
-        border-radius: 8px !important;
+        border-radius: 10px !important;
         background: rgba(255,255,255,0.1) !important;
         color: white !important;
-        font-size: 16px !important; /* Prevents zoom on mobile */
+        font-size: 16px !important;
+        padding: 0.75rem !important;
     }
     
     .stTextInput > div > div > input:focus {
@@ -128,23 +128,26 @@ def render_login_form():
         color: rgba(255,255,255,0.7) !important;
     }
     
-    /* Enhanced button styling */
+    /* Button improvements */
     .stButton > button {
-        font-size: 16px !important;
+        width: 100% !important;
+        padding: 0.75rem 1.5rem !important;
+        border-radius: 10px !important;
         font-weight: 600 !important;
-        padding: 12px 24px !important;
-        border-radius: 8px !important;
+        font-size: 16px !important;
         transition: all 0.3s ease !important;
+        border: none !important;
     }
     
     .stButton > button:hover {
-        transform: translateY(-1px) !important;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.2) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important;
     }
     
+    /* Header styles */
     .login-header {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 2rem;
     }
     
     .login-title {
@@ -294,7 +297,7 @@ def render_login_form():
     st.markdown('<div class="login-container">', unsafe_allow_html=True)
     st.markdown('<div class="security-badge">🔒 Secure Login</div>', unsafe_allow_html=True)
     
-    # Enhanced header section
+    # Streamlined header
     st.markdown("""
     <div class="login-header">
         <div class="login-title">gcPanel</div>
@@ -302,7 +305,7 @@ def render_login_form():
     </div>
     """, unsafe_allow_html=True)
     
-    # Project information with environment indicator
+    # Project info
     environment = "DEMO" if st.session_state.get('demo_mode', True) else "PRODUCTION"
     st.markdown(f"""
     <div class="project-info">
@@ -367,12 +370,12 @@ def render_login_form():
     # Production login form section
     st.markdown("### 🔐 Sign In to Your Account")
     
-    # Enhanced login form with validation
+    # Login form
     username = st.text_input(
         "📧 Email or Username", 
         key="username_input", 
-        placeholder="Enter your email or username",
-        help="Use your company email address or assigned username"
+        placeholder="Enter your email",
+        help="Use your company email address"
     )
     
     password = st.text_input(
@@ -380,15 +383,15 @@ def render_login_form():
         type="password", 
         key="password_input", 
         placeholder="Enter your password",
-        help="Minimum 8 characters required"
+        help="Minimum 8 characters"
     )
     
-    # Enhanced options row
+    # Options row
     col1, col2 = st.columns([1, 1])
     with col1:
-        remember = st.checkbox("Remember me for 30 days", value=False)
+        remember = st.checkbox("Remember me", value=False)
     with col2:
-        st.markdown('<div class="forgot-password" style="text-align: right; margin-top: 8px;"><a href="#" onclick="alert(\'Contact your system administrator for password reset.\')">Forgot password?</a></div>', 
+        st.markdown('<div class="forgot-password" style="text-align: right; margin-top: 8px;"><a href="#" onclick="alert(\'Contact IT for password reset\')">Forgot password?</a></div>', 
                     unsafe_allow_html=True)
     
     # Show remaining attempts if any failures
@@ -419,11 +422,11 @@ def render_login_form():
                 st.session_state.login_attempts = 0
                 _log_security_event("LOGIN_ATTEMPT", username, True)
                 
-                # Show a loading message
-                with st.spinner("🔄 Authenticating securely..."):
-                    time.sleep(1.5)  # Simulate secure authentication process
-                st.success("✅ Authentication successful! Redirecting...")
-                time.sleep(0.5)
+                # Show loading
+                with st.spinner("🔄 Authenticating..."):
+                    time.sleep(1.2)
+                st.success("✅ Login successful!")
+                time.sleep(0.3)
                 st.rerun()
         
         # Check if account should be locked
@@ -447,33 +450,30 @@ def render_login_form():
     
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("🌐 Google Workspace", use_container_width=True, key="google_sso"):
-            st.info("🔧 Contact your IT administrator to enable Google Workspace SSO")
+        if st.button("🌐 Google", use_container_width=True, key="google_sso"):
+            st.info("🔧 Contact IT to enable Google SSO")
             _log_security_event("SSO_ATTEMPT", "google_workspace", False)
             
     with col2:
-        if st.button("💼 Microsoft 365", use_container_width=True, key="microsoft_sso"):
-            st.info("🔧 Contact your IT administrator to enable Microsoft 365 SSO")
+        if st.button("💼 Microsoft", use_container_width=True, key="microsoft_sso"):
+            st.info("🔧 Contact IT to enable Microsoft SSO")
             _log_security_event("SSO_ATTEMPT", "microsoft_365", False)
     
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Enhanced footer with compliance and security information
+    # Simplified footer
     st.markdown("""
-    <div style="margin-top: 30px; text-align: center; font-size: 0.8rem; opacity: 0.7;">
-        <div style="margin-bottom: 10px;">
-            🔒 SSL/TLS Encrypted • 🌍 SOC 2 Compliant • 📱 Mobile Optimized
-        </div>
-        <div style="margin-bottom: 8px;">
-            🔐 Multi-Factor Authentication • 🛡️ Enterprise Security
+    <div style="margin-top: 2rem; text-align: center; font-size: 0.8rem; opacity: 0.7;">
+        <div style="margin-bottom: 0.8rem;">
+            🔒 SSL Encrypted • 🌍 SOC 2 Compliant • 📱 Mobile Ready
         </div>
         <div>
-            Need help? Contact <a href="mailto:support@gcpanel.com" style="color: rgba(255,255,255,0.8);">support@gcpanel.com</a> | 
-            <a href="#" style="color: rgba(255,255,255,0.8);">Privacy Policy</a> | 
-            <a href="#" style="color: rgba(255,255,255,0.8);">Terms of Service</a>
+            <a href="mailto:support@gcpanel.com" style="color: rgba(255,255,255,0.8);">Support</a> • 
+            <a href="#" style="color: rgba(255,255,255,0.8);">Privacy</a> • 
+            <a href="#" style="color: rgba(255,255,255,0.8);">Terms</a>
         </div>
-        <div style="margin-top: 10px; font-size: 0.7rem;">
-            © 2025 gcPanel. All rights reserved. Version 2.1.0
+        <div style="margin-top: 0.8rem; font-size: 0.7rem;">
+            © 2025 gcPanel v2.1.0
         </div>
     </div>
     """, unsafe_allow_html=True)

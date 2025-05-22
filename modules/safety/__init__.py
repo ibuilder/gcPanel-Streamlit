@@ -93,8 +93,8 @@ def render_safety_dashboard():
         'Compliance': compliance_pct
     })
     
-    # Display as a table
-    st.table(df_inspections.style.background_gradient(subset=['Compliance'], cmap='RdYlGn'))
+    # Display as a standard table instead of styled gradient (which requires matplotlib)
+    st.table(df_inspections)
     
     # Close the white container
     st.markdown("</div>", unsafe_allow_html=True)

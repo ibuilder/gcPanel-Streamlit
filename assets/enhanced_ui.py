@@ -285,51 +285,37 @@ def apply_enhanced_styles():
     </style>
     """, unsafe_allow_html=True)
 
-def create_project_header(project_name, project_number, address, status="In Progress"):
+def create_project_header(project_name, project_number="", address="", status="In Progress"):
     """
-    Create a professional project header similar to Procore.
+    Create a professional project header with clean modern design.
     
     Args:
         project_name (str): Name of the project
-        project_number (str): Project number/ID
-        address (str): Project address
-        status (str): Project status
+        project_number (str, optional): Project number/ID
+        address (str, optional): Project address
+        status (str, optional): Project status
     """
-    status_color = {
-        "In Progress": "#2e86de",
-        "On Hold": "#f39c12",
-        "Complete": "#27ae60",
-        "Delayed": "#e74c3c"
-    }.get(status, "#2e86de")
+    # Format project details
+    project_details = "$45.5M • 168,500 sq ft • 15 stories above ground, 2 below"
     
     header_html = f"""
-    <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
-                padding: 15px; margin-bottom: 20px; border: 1px solid #f0f0f0;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div>
-                <h2 style="margin: 0; color: #2c3e50; font-weight: 600;">{project_name}</h2>
-                <div style="color: #7f8c8d; font-size: 0.9rem; margin-top: 5px;">Project #{project_number}</div>
+    <div style="display: flex; justify-content: space-between; align-items: center; 
+                background-color: white; padding: 12px 16px; border-bottom: 1px solid #e0e0e0;
+                margin: -1rem -1rem 1rem -1rem;">
+        <div style="display: flex; align-items: center; width: 100%;">
+            <div style="display: flex; align-items: center; justify-content: center; width: 150px; margin-right: 20px; text-align: center;">
+                <div style="display: flex; align-items: center; justify-content: center;">
+                    <img src="https://i.ibb.co/5M9ySmF/gcpanel-icon.png" alt="gcPanel" width="30" height="30">
+                    <span style="color: #2e86de; font-weight: 600; margin-left: 5px;">gcPanel</span>
+                </div>
             </div>
-            <div style="background-color: {status_color}; color: white; padding: 5px 10px; 
-                     border-radius: 4px; font-size: 0.8rem; font-weight: 600;">
-                {status}
+            <div>
+                <div style="font-weight: 600; color: #2c3e50; font-size: 1.1rem;">{project_name}</div>
+                <div style="color: #7f8c8d; font-size: 0.8rem;">{project_details}</div>
             </div>
         </div>
-        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #f0f0f0;">
-            <div style="display: flex; gap: 30px;">
-                <div>
-                    <div style="font-size: 0.75rem; color: #7f8c8d; text-transform: uppercase; letter-spacing: 0.5px; 
-                             margin-bottom: 3px; font-weight: 500;">Address</div>
-                    <div style="font-size: 0.9rem; color: #2c3e50;">{address}</div>
-                </div>
-                <div>
-                    <div style="font-size: 0.75rem; color: #7f8c8d; text-transform: uppercase; letter-spacing: 0.5px; 
-                             margin-bottom: 3px; font-weight: 500;">Progress</div>
-                    <div style="width: 150px; height: 6px; background-color: #ecf0f1; border-radius: 3px; overflow: hidden;">
-                        <div style="width: 65%; height: 100%; background-color: {status_color};"></div>
-                    </div>
-                </div>
-            </div>
+        <div style="color: #7f8c8d; font-size: 0.85rem; font-weight: 500; padding: 5px 10px;">
+            Navigation
         </div>
     </div>
     """

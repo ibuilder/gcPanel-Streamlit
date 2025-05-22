@@ -117,20 +117,14 @@ def render_oauth_login_page():
     st.markdown("""
     <style>
     .login-container {
-        max-width: 500px;
-        margin: 0 auto;
-        padding: 2rem;
+        padding: 1rem;
         background-color: white;
         border-radius: 10px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     .login-header {
         text-align: center;
-        margin-bottom: 2rem;
-    }
-    .login-header img {
-        max-width: 200px;
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
     }
     .divider {
         display: flex;
@@ -150,48 +144,31 @@ def render_oauth_login_page():
     </style>
     """, unsafe_allow_html=True)
     
-    # Login container
+    # Email and password form (simplified layout)
+    with st.form("login_form"):
+        st.subheader("Sign in to your account")
+        st.text_input("Email", placeholder="Enter your email")
+        st.text_input("Password", placeholder="Enter your password", type="password")
+        
+        # Remember me checkbox and forgot password link
+        st.checkbox("Remember me")
+        st.markdown('<div style="text-align: right;"><a href="#">Forgot password?</a></div>', unsafe_allow_html=True)
+        
+        # Submit button
+        st.form_submit_button("Sign In", use_container_width=True)
+    
+    # Divider
+    st.markdown('<div class="divider"><span>OR</span></div>', unsafe_allow_html=True)
+    
+    # OAuth buttons
+    render_oauth_buttons()
+    
+    # Registration link
     st.markdown("""
-    <div class="login-container">
-        <div class="login-header">
-            <img src="https://gcpanel.com/logo" alt="gcPanel Logo">
-            <h2>Welcome to gcPanel</h2>
-            <p>Sign in to access your construction management dashboard</p>
-        </div>
+    <div style="text-align: center; margin-top: 20px;">
+        <p>Don't have an account? <a href="#">Contact your project administrator</a></p>
     </div>
     """, unsafe_allow_html=True)
-    
-    # Create columns for layout
-    col1, col2, col3 = st.columns([1, 3, 1])
-    
-    with col2:
-        # Email and password form
-        with st.form("login_form"):
-            st.text_input("Email", placeholder="Enter your email")
-            st.text_input("Password", placeholder="Enter your password", type="password")
-            
-            # Remember me and forgot password
-            cols = st.columns([1, 1])
-            with cols[0]:
-                st.checkbox("Remember me")
-            with cols[1]:
-                st.markdown('<div style="text-align: right;"><a href="#">Forgot password?</a></div>', unsafe_allow_html=True)
-            
-            # Submit button
-            st.form_submit_button("Sign In", use_container_width=True)
-        
-        # Divider
-        st.markdown('<div class="divider"><span>OR</span></div>', unsafe_allow_html=True)
-        
-        # OAuth buttons
-        render_oauth_buttons()
-        
-        # Registration link
-        st.markdown("""
-        <div style="text-align: center; margin-top: 20px;">
-            <p>Don't have an account? <a href="#">Contact your project administrator</a></p>
-        </div>
-        """, unsafe_allow_html=True)
 
 def handle_oauth_callback():
     """

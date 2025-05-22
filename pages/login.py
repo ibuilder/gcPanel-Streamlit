@@ -78,10 +78,8 @@ def login_page():
         tabs = st.tabs(["Login", "Register"])
         
         with tabs[0]:
-            col1, col2, col3 = st.columns([1, 2, 1])
-            
-            with col2:
-                render_oauth_login_page()
+            # Use a simplified version without nested columns
+            render_oauth_login_page()
         
         with tabs[1]:
             col1, col2, col3 = st.columns([1, 2, 1])

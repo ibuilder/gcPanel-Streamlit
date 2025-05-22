@@ -15,6 +15,8 @@ from app_config import MENU_MAP, DEFAULT_SESSION_STATE, PAGES_WITH_ACTIONS
 
 # Import utility functions
 from utils.ui_manager import load_external_resources, render_notification_button
+from utils.cache_manager import CacheManager
+from utils.responsive_ui import apply_all_responsive_styles, detect_mobile
 
 # Import components
 from components.action_bar import render_action_bar
@@ -58,10 +60,12 @@ def initialize_session_state():
     This function initializes:
     1. Default session state variables from app_config
     2. Notification system state
-    3. Any other required application state variables
+    3. Application cache for performance optimization
+    4. Any other required application state variables
     """
     _initialize_default_state()
     _initialize_notifications()
+    _initialize_cache_system()
     
 def _initialize_default_state():
     """Initialize the basic session state variables from configuration."""
@@ -78,6 +82,14 @@ def _initialize_notifications():
     # Initialize notification toggle state if not already present
     if 'show_notifications' not in st.session_state:
         st.session_state.show_notifications = False
+        
+def _initialize_cache_system():
+    """Initialize the application cache for improved performance."""
+    # Use the cache manager to initialize the cache system
+    CacheManager.initialize_cache()
+    
+    # Run cache cleanup on startup to ensure a clean state
+    CacheManager.cleanup_cache(force=True)
 
 def render_application():
     """
@@ -98,6 +110,16 @@ def _setup_application_environment():
     """Set up the application environment and initialize core services."""
     # Load CSS and JavaScript files
     load_external_resources()
+    
+    # Apply responsive UI improvements
+    apply_all_responsive_styles()
+    
+    # Initialize screen size tracking
+    if "_screen_width" not in st.session_state:
+        st.session_state._screen_width = 1200  # Default desktop width
+    
+    # Track if device is mobile
+    st.session_state.is_mobile = detect_mobile()
     
     # Initialize database connection pool for production
     _setup_database_connection_pool()

@@ -16,6 +16,7 @@ from io import BytesIO
 import re
 
 from modules.crud_template import CrudModule
+from components.digital_signature import render_digital_signature_section, get_signature_summary, validate_required_signatures
 from assets.crud_styler import (
     apply_crud_styles, 
     render_form_actions, 

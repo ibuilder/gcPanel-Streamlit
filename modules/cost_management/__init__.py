@@ -732,6 +732,9 @@ class InvoiceModule(CrudModule):
                 
                 render_crud_fieldset("Dates & Approval", render_dates)
                 
+                # Add digital signatures section
+                signatures = render_digital_signature_section("invoice", ["Vendor Representative", "Project Manager"])
+                
                 # Form Actions
                 form_actions = render_form_actions(
                     save_label="Save Invoice",
@@ -741,33 +744,39 @@ class InvoiceModule(CrudModule):
                 )
                 
                 if form_actions['save_clicked']:
-                    # Update item with form values
-                    updated_item = {
-                        'invoice_id': invoice_id,
-                        'vendor': vendor,
-                        'invoice_number': invoice_number,
-                        'description': description,
-                        'amount': float(amount),
-                        'tax': float(tax),
-                        'total_amount': float(amount) + float(tax),
-                        'invoice_date': invoice_date.strftime('%Y-%m-%d'),
-                        'due_date': due_date.strftime('%Y-%m-%d'),
-                        'payment_date': payment_date.strftime('%Y-%m-%d') if payment_date else None,
-                        'payment_method': payment_method,
-                        'status': status,
-                        'notes': notes,
-                        'budget_item': budget_item,
-                        'cost_code': cost_code,
-                        'approver': approver
-                    }
-                    
-                    # Save the updated item
-                    self._save_item(updated_item)
-                    
-                    # Show success message and return to list view
-                    st.success("Invoice saved successfully")
-                    st.session_state[f'{base_key}_view'] = 'list'
-                    st.rerun()
+                    # Validate signatures before saving
+                    is_valid, message = validate_required_signatures(signatures, ["Vendor Representative", "Project Manager"])
+                    if not is_valid:
+                        st.error(f"Cannot save invoice: {message}")
+                    else:
+                        # Update item with form values
+                        updated_item = {
+                            'invoice_id': invoice_id,
+                            'vendor': vendor,
+                            'invoice_number': invoice_number,
+                            'description': description,
+                            'amount': float(amount),
+                            'tax': float(tax),
+                            'total_amount': float(amount) + float(tax),
+                            'invoice_date': invoice_date.strftime('%Y-%m-%d'),
+                            'due_date': due_date.strftime('%Y-%m-%d'),
+                            'payment_date': payment_date.strftime('%Y-%m-%d') if payment_date else None,
+                            'payment_method': payment_method,
+                            'status': status,
+                            'notes': notes,
+                            'budget_item': budget_item,
+                            'cost_code': cost_code,
+                            'approver': approver,
+                            'signatures': get_signature_summary(signatures)
+                        }
+                        
+                        # Save the updated item
+                        self._save_item(updated_item)
+                        
+                        # Show success message and return to list view
+                        st.success("Invoice saved successfully with digital signatures!")
+                        st.session_state[f'{base_key}_view'] = 'list'
+                        st.rerun()
                 
                 if form_actions['cancel_clicked']:
                     st.session_state[f'{base_key}_view'] = 'list'
@@ -847,6 +856,11 @@ class InvoiceModule(CrudModule):
                 st.markdown(f"**Notes:**")
                 st.markdown(f"```{item.get('notes', '')}```")
             st.markdown("</div>", unsafe_allow_html=True)
+            
+            # Digital Signatures Section (for viewing existing signatures)
+            if item.get('signatures'):
+                from components.digital_signature import render_signature_verification
+                render_signature_verification(item['signatures'])
         
         end_crud_detail_container()
 

@@ -44,12 +44,17 @@ def render_header():
         
         # Left column - Logo with tower crane icon (clickable)
         with cols[0]:
-            # Create an enhanced professional logo with tower crane icon
+            # Create a cleaner, more professional logo based on the reference image
             st.markdown("""
             <div style="display: flex; align-items: center; cursor: pointer;" onclick="window.location.href='/?view=Dashboard'">
-                <div style="display: flex; align-items: center; background: linear-gradient(135deg, #2c3e50, #34495e); padding: 8px 12px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                    <span style="font-size: 28px; font-weight: 700; color: #fff; letter-spacing: -1px;">gc<span style="color: #3498db">Panel</span></span>
-                    <span style="font-size: 24px; margin-left: 8px; color: #e74c3c; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">🏗️</span>
+                <div style="display: flex; align-items: center;">
+                    <div style="background-color: #0099ff; padding: 10px; border-radius: 5px;">
+                        <span style="font-size: 24px; font-weight: 700; color: white; letter-spacing: -0.5px;">gc</span>
+                    </div>
+                    <div style="margin-left: 8px;">
+                        <span style="font-size: 20px; font-weight: 600; color: #4a4a4a;">Panel</span>
+                        <div style="color: #0099ff; font-size: 18px; margin-top: -5px; text-align: center;">🏗️</div>
+                    </div>
                 </div>
             </div>
             """, unsafe_allow_html=True)

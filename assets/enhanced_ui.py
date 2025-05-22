@@ -295,7 +295,40 @@ def create_project_header(project_name, project_number="", address="", status="I
         address (str, optional): Project address
         status (str, optional): Project status
     """
-    # Remove default streamlit padding and margin
+    # Apply styling using Python code
+    apply_header_styles()
+    
+    # Project details defined in Python
+    project_details = "$45.5M • 168,500 sq ft • 15 stories above ground, 2 below"
+    
+    # Get current menu from session state using Python
+    current_menu = st.session_state.get("current_menu", "Dashboard")
+    
+    # Create navigation menu using Python
+    nav_html = create_navigation_menu(current_menu)
+    
+    # Create the different header components using Python
+    logo_html = create_logo_component()
+    project_info_html = create_project_info_component(project_name, project_details)
+    navigation_component = create_navigation_component(current_menu, nav_html)
+    
+    # Assemble header using Python components
+    header_html = f"""
+    <div style="display: flex; justify-content: space-between; align-items: center; 
+                background-color: white; padding: 12px 16px; border-bottom: 1px solid #e0e0e0;
+                width: 100%; box-sizing: border-box;">
+        {logo_html}
+        {project_info_html}
+        {navigation_component}
+    </div>
+    """
+    
+    # Render the header using Streamlit
+    st.markdown(header_html, unsafe_allow_html=True)
+
+
+def apply_header_styles():
+    """Apply header styles using Python"""
     st.markdown("""
         <style>
             .block-container {
@@ -357,33 +390,27 @@ def create_project_header(project_name, project_number="", address="", status="I
         </style>
     """, unsafe_allow_html=True)
     
-    # Define navigation JavaScript function in Python
-    # This creates a proper connection between Python code and JavaScript
-    navigation_js = """
+    # Add JavaScript through Python
+    st.markdown("""
     <script>
     function navigateTo(menu) {
-        // Set the session state
         window.parent.postMessage({
             type: "streamlit:setSessionState",
             key: "current_menu",
             value: menu
         }, "*");
         
-        // Force a rerun
         window.parent.postMessage({
             type: "streamlit:forceRerun"
         }, "*");
     }
     </script>
-    """
-    
-    # Project details to display
-    project_details = "$45.5M • 168,500 sq ft • 15 stories above ground, 2 below"
-    
-    # Get current menu from session state
-    current_menu = st.session_state.get("current_menu", "Dashboard")
-    
-    # Tower crane SVG icon defined in Python
+    """, unsafe_allow_html=True)
+
+
+def create_logo_component():
+    """Create the logo component using Python"""
+    # Define tower crane SVG in Python
     tower_crane_svg = """
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="6" y="4" width="4" height="6"></rect>
@@ -395,7 +422,33 @@ def create_project_header(project_name, project_number="", address="", status="I
     </svg>
     """
     
-    # Navigation menu items - Python dictionary
+    # Assemble logo HTML with Python
+    return f"""
+    <div style="display: flex; align-items: center;">
+        <div style="background-color: #00a8e8; padding: 8px; border-radius: 4px; margin-right: 5px;">
+            <span style="color: white; font-weight: bold; font-size: 14px;">gc</span>
+        </div>
+        <span style="color: #2e86de; font-weight: 600; margin-left: 2px;">Panel</span>
+        <div style="margin-left: 8px; color: #2e86de;">
+            {tower_crane_svg}
+        </div>
+    </div>
+    """
+
+
+def create_project_info_component(project_name, project_details):
+    """Create the project info component using Python"""
+    return f"""
+    <div style="text-align: center;">
+        <div style="font-weight: 600; color: #2c3e50; font-size: 0.95rem;">{project_name}</div>
+        <div style="color: #7f8c8d; font-size: 0.75rem;">{project_details}</div>
+    </div>
+    """
+
+
+def create_navigation_menu(current_menu):
+    """Create navigation menu HTML using Python"""
+    # Define navigation items in Python
     nav_items = {
         "Dashboard": "Dashboard",
         "Pre-Construction": "PreConstruction",
@@ -409,59 +462,43 @@ def create_project_header(project_name, project_number="", address="", status="I
         "Resources": "Resources"
     }
     
-    # Create navigation menu HTML - Building HTML in Python
+    # Build menu items in Python
     nav_menu = ""
     for label, value in nav_items.items():
-        # Using Python string formatting to build HTML
-        menu_item = f"""
+        nav_menu += f"""
         <a href="#" onclick="navigateTo('{value}')" 
            style="display: block; padding: 8px 12px; text-decoration: none; color: #333; font-size: 13px; text-align: left;">
             {label}
         </a>
         """
-        nav_menu += menu_item
     
-    # Create the header HTML using Python f-strings
-    header_html = f"""
-    {navigation_js}
-    <div style="display: flex; justify-content: space-between; align-items: center; 
-                background-color: white; padding: 12px 16px; border-bottom: 1px solid #e0e0e0;
-                width: 100%; box-sizing: border-box;">
-                
-        <div style="display: flex; align-items: center;">
-            <div style="background-color: #00a8e8; padding: 8px; border-radius: 4px; margin-right: 5px;">
-                <span style="color: white; font-weight: bold; font-size: 14px;">gc</span>
+    return nav_menu
+
+
+def create_navigation_component(current_menu, nav_html):
+    """Create the navigation component using Python"""
+    # Create dropdown chevron with Python
+    dropdown_chevron = """
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down">
+        <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+    """
+    
+    # Assemble navigation HTML with Python
+    return f"""
+    <div style="display: flex; align-items: center;">
+        <span style="color: #7f8c8d; font-size: 0.8rem; margin-right: 5px;">Navigation</span>
+        <div class="dropdown">
+            <div style="display: flex; align-items: center; background-color: #f0f3f6; border-radius: 4px; padding: 3px 8px; cursor: pointer;">
+                <span style="color: #4a90e2; margin-right: 5px;">{current_menu}</span>
+                {dropdown_chevron}
             </div>
-            <span style="color: #2e86de; font-weight: 600; margin-left: 2px;">Panel</span>
-            <div style="margin-left: 8px; color: #2e86de;">
-                {tower_crane_svg}
-            </div>
-        </div>
-        
-        <div style="text-align: center;">
-            <div style="font-weight: 600; color: #2c3e50; font-size: 0.95rem;">{project_name}</div>
-            <div style="color: #7f8c8d; font-size: 0.75rem;">{project_details}</div>
-        </div>
-        
-        <div style="display: flex; align-items: center;">
-            <span style="color: #7f8c8d; font-size: 0.8rem; margin-right: 5px;">Navigation</span>
-            <div class="dropdown">
-                <div style="display: flex; align-items: center; background-color: #f0f3f6; border-radius: 4px; padding: 3px 8px; cursor: pointer;">
-                    <span style="color: #4a90e2; margin-right: 5px;">{current_menu}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </div>
-                <div class="dropdown-content">
-                    {nav_menu}
-                </div>
+            <div class="dropdown-content">
+                {nav_html}
             </div>
         </div>
     </div>
     """
-    
-    # Render the header at the top using Streamlit's markdown function
-    st.markdown(header_html, unsafe_allow_html=True)
 
 def create_metrics_dashboard(metrics_data):
     """

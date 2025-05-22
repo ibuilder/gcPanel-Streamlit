@@ -137,7 +137,7 @@ def render_fixed_header():
         from app_config import MENU_OPTIONS
         
         selected_menu = st.selectbox(
-            label="Navigation", # Adding a proper label for accessibility
+            label="Navigation", # Adding a proper label for accessibility that won't be empty
             options=MENU_OPTIONS,
             index=MENU_OPTIONS.index(current_menu) if current_menu in MENU_OPTIONS else 0,
             key="nav_dropdown",

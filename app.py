@@ -98,7 +98,9 @@ def main():
         st.error("We encountered an unexpected error. Our team has been notified.")
         
         # Only show detailed error in development, not production
-        if st.session_state.get('show_debug', False):
+        # In production, this should be False by default
+        is_development = False
+        if st.session_state.get('show_debug', is_development):
             with st.expander("Error Details (Developers Only)"):
                 st.code(error_details)
 

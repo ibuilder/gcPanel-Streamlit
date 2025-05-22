@@ -187,37 +187,61 @@ def render_oauth_login_page():
     </style>
     """, unsafe_allow_html=True)
     
-    # Construction-themed header icon
+    # Login header - simplified without icon
     st.markdown("""
-    <div style="text-align: center; margin-bottom: 15px;">
-        <div style="display: inline-block; background-color: #f9a01b; border-radius: 50%; padding: 15px; box-shadow: 0 3px 6px rgba(0,0,0,0.1);">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
-                <path d="M13.5,10A1.5,1.5 0 0,1 12,8.5A1.5,1.5 0 0,1 13.5,7A1.5,1.5 0 0,1 15,8.5A1.5,1.5 0 0,1 13.5,10M22,1V11H21V19A1,1 0 0,1 20,20H4A1,1 0 0,1 3,19V11H2V1H11V8.31C10.36,8.55 9.97,9.17 10,9.83C10.05,10.5 10.56,11 11.25,11H12.75A1.25,1.25 0 0,0 14,9.75C14,9.29 13.71,8.9 13.28,8.77L13,8.31V1H22Z" />
-            </svg>
-        </div>
-    </div>
-    <h2 style="text-align: center; margin-bottom: 20px; color: #333; font-weight: 600;">Project Access</h2>
+    <h2 style="text-align: center; margin-bottom: 25px; color: #333; font-weight: 600;">Project Access</h2>
     """, unsafe_allow_html=True)
     
-    # Email and password form (simplified layout)
+    # Email and password form with functional login
     with st.form("login_form"):
-        st.text_input("Email", key="login_email", placeholder="Enter your email")
-        st.text_input("Password", key="login_password", placeholder="Enter your password", type="password")
+        username = st.text_input("Email or Username", key="login_username", placeholder="Enter your email or username")
+        password = st.text_input("Password", key="login_password", placeholder="Enter your password", type="password")
         
         # Remember me and forgot password in a single row
         col1, col2 = st.columns(2)
         with col1:
-            st.checkbox("Remember me", key="remember_me")
+            remember = st.checkbox("Remember me", key="remember_me")
         with col2:
             st.markdown('<div style="text-align: right;"><a href="#" style="color: #2b579a;">Forgot password?</a></div>', unsafe_allow_html=True)
         
-        # Submit button - explicitly added to fix the form error
+        # Submit button with processing
         submit_clicked = st.form_submit_button("Sign In", use_container_width=True)
         
         # Process form submission
         if submit_clicked:
-            # In a real app, we would validate credentials here
-            st.warning("Traditional login is not yet implemented. Please use corporate login options below.")
+            if not username or not password:
+                st.error("Please enter both username/email and password")
+            else:
+                # Check for admin credentials
+                if username.lower() == "admin" and password == "admin123":
+                    # Set authentication in session state
+                    st.session_state.authenticated = True
+                    st.session_state.user = {
+                        "username": "admin",
+                        "email": "admin@gcpanel.com",
+                        "full_name": "Admin User",
+                        "role": "admin"
+                    }
+                    st.session_state.remember_me = remember
+                    st.success("Login successful! Redirecting to dashboard...")
+                    # Force page reload to show the dashboard
+                    st.rerun()
+                # Add any other hardcoded users here if needed
+                elif username.lower() == "demo" and password == "demo123":
+                    st.session_state.authenticated = True
+                    st.session_state.user = {
+                        "username": "demo",
+                        "email": "demo@gcpanel.com",
+                        "full_name": "Demo User",
+                        "role": "viewer"
+                    }
+                    st.session_state.remember_me = remember
+                    st.success("Login successful! Redirecting to dashboard...")
+                    # Force page reload to show the dashboard
+                    st.rerun()
+                else:
+                    # In a production app, this would check against a database
+                    st.error("Invalid username or password")
     
     # Divider with construction theme
     st.markdown("""

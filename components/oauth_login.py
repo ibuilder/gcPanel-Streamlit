@@ -161,17 +161,16 @@ def render_oauth_login_page():
         vertical-align: middle;
     }
     
-    /* Form styling */
-    input[type="text"], input[type="password"] {
-        border: 1px solid #ddd !important;
-        border-radius: 4px !important;
-        padding: 12px 10px !important;
-        background-color: #f9f9f9 !important;
+    /* Form styling - simplified to avoid conflicts */
+    .stTextInput > div > div > input {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #f9f9f9;
     }
     
-    input[type="text"]:focus, input[type="password"]:focus {
-        border-color: #f9a01b !important;
-        box-shadow: 0 0 0 1px #f9a01b !important;
+    .stTextInput > div > div > input:focus {
+        border-color: #f9a01b;
+        box-shadow: 0 0 0 1px #f9a01b;
     }
     
     .oauth-button {
@@ -192,34 +191,47 @@ def render_oauth_login_page():
     <h2 style="text-align: center; margin-bottom: 25px; color: #333; font-weight: 600;">Project Access</h2>
     """, unsafe_allow_html=True)
     
-    # Email and password form with functional login
-    with st.form("login_form"):
-        username = st.text_input("Email or Username", key="login_username", placeholder="Enter your email or username")
-        password = st.text_input("Password", key="login_password", placeholder="Enter your password", type="password")
+    # Simple email and password form with functional login
+    with st.form(key="simple_login_form"):
+        # Create basic input fields
+        username = st.text_input("Email or Username", key="user_input", help="Try 'admin' or 'demo'")
+        password = st.text_input("Password", type="password", key="pass_input", help="Try 'admin123' or 'demo123'")
         
-        # Remember me and forgot password in a single row
-        col1, col2 = st.columns(2)
-        with col1:
-            remember = st.checkbox("Remember me", key="remember_me")
-        with col2:
-            st.markdown('<div style="text-align: right;"><a href="#" style="color: #2b579a;">Forgot password?</a></div>', unsafe_allow_html=True)
+        # Simple remember me checkbox
+        remember = st.checkbox("Remember me", value=False)
         
         # Submit button 
-        submit_clicked = st.form_submit_button("Sign In", use_container_width=True)
+        submitted = st.form_submit_button("Sign In", use_container_width=True)
         
         # Process form submission
-        if submit_clicked:
+        if submitted:
             if not username or not password:
                 st.error("Please enter both username/email and password")
             else:
-                # Store credentials in session state for processing
-                st.session_state.login_username = username
-                st.session_state.login_password = password
-                st.session_state.login_form_submitted = True
-                
-                # Show a message and trigger the rerun
-                st.success("Signing in...")
-                st.rerun()
+                # Admin login
+                if username.lower() == "admin" and password == "admin123":
+                    st.session_state.authenticated = True
+                    st.session_state.user = {
+                        "username": "admin",
+                        "email": "admin@gcpanel.com",
+                        "full_name": "Admin User",
+                        "role": "admin"
+                    }
+                    st.success("Login successful! Redirecting to dashboard...")
+                    st.experimental_rerun()
+                # Demo login
+                elif username.lower() == "demo" and password == "demo123":
+                    st.session_state.authenticated = True
+                    st.session_state.user = {
+                        "username": "demo",
+                        "email": "demo@gcpanel.com",
+                        "full_name": "Demo User",
+                        "role": "viewer"
+                    }
+                    st.success("Login successful! Redirecting to dashboard...")
+                    st.experimental_rerun()
+                else:
+                    st.error("Invalid username or password")
     
     # Divider with construction theme
     st.markdown("""
@@ -243,9 +255,9 @@ def render_oauth_login_page():
             <svg width="20" height="20" viewBox="0 0 24 24" fill="#555" style="margin-right: 8px;">
                 <path d="M13,9H11V7H13V9M13,17H11V11H13V17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
             </svg>
-            <span style="font-weight: 600; color: #444;">New to Highland Tower Development?</span>
+            <span style="font-weight: 600; color: #444;">New to gcPanel?</span>
         </div>
-        <p style="color: #666; font-size: 0.9rem;">Contact your project manager to request access credentials</p>
+        <p style="color: #666; font-size: 0.9rem;">Get more information at <a href="http://www.gcpanel.co" target="_blank" style="color: #2b579a; font-weight: 500;">www.gcPanel.co</a></p>
     </div>
     """, unsafe_allow_html=True)
 

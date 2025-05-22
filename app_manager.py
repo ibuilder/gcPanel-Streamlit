@@ -28,6 +28,7 @@ from modules.settings import render_settings
 from modules.project_information import render_project_information
 from modules.pdf_viewer.pdf_viewer import render_pdf_viewer
 from modules.bim_viewer.basic_viewer import render_basic_bim_viewer
+from modules.collaboration import render_collaboration_hub  # Import the collaboration module function
 from modules.bim_viewer.advanced_viewer import render_advanced_bim_viewer
 from modules.bim import render_bim
 from modules.standalone_bim import render_bim_standalone
@@ -221,8 +222,8 @@ def render_selected_module(current_menu):
         "BIM": render_bim,
         "✅ Closeout": render_closeout,
         "Closeout": render_closeout,
-        "👥 Collaboration": lambda: modules.collaboration.render_collaboration_hub(),
-        "Collaboration": lambda: modules.collaboration.render_collaboration_hub(),
+        "👥 Collaboration": render_collaboration_hub,
+        "Collaboration": render_collaboration_hub,
         "📱 Mobile Companion": render_mobile_companion,
         "Mobile Companion": render_mobile_companion,
         "🤖 AI Assistant": render_ai_assistant,

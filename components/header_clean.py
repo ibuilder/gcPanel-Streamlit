@@ -44,16 +44,15 @@ def render_header():
         
         # Left column - Logo with tower crane icon (clickable)
         with cols[0]:
-            # Create a cleaner, more professional logo based on the reference image
+            # Create a logo with tower crane to the left of gcPanel text
             st.markdown("""
             <div style="display: flex; align-items: center; cursor: pointer;" onclick="window.location.href='/?view=Dashboard'">
                 <div style="display: flex; align-items: center;">
-                    <div style="background-color: #0099ff; padding: 10px; border-radius: 5px;">
-                        <span style="font-size: 24px; font-weight: 700; color: white; letter-spacing: -0.5px;">gc</span>
-                    </div>
-                    <div style="margin-left: 8px;">
-                        <span style="font-size: 20px; font-weight: 600; color: #4a4a4a;">Panel</span>
-                        <div style="color: #0099ff; font-size: 18px; margin-top: -5px; text-align: center;">🏗️</div>
+                    <div style="font-size: 24px; color: #0099ff; margin-right: 6px;">🏗️</div>
+                    <div>
+                        <span style="font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">
+                            <span style="color: #2c3e50;">gc</span><span style="color: #0099ff;">Panel</span>
+                        </span>
                     </div>
                 </div>
             </div>

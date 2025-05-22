@@ -184,92 +184,96 @@ def render_login_form():
     </div>
     """, unsafe_allow_html=True)
     
-    # Multi-tab interface with demo accounts first
-    demo_tab, login_tab = st.tabs(["🎯 Demo Accounts", "🔐 User Login"])
+    # Quick Access Demo Accounts Section
+    st.markdown("### 🎭 Quick Access Demo Accounts")
+    st.markdown("Choose a role to instantly explore different permission levels:")
     
-    with login_tab:
-        st.markdown("### Sign In to Your Account")
-        
-        # Standard login form
-        username = st.text_input("📧 Email or Username", key="username_input", placeholder="Enter your email or username")
-        password = st.text_input("🔒 Password", type="password", key="password_input", placeholder="Enter your password")
-        
-        # Remember me checkbox
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            remember = st.checkbox("Remember me", value=False)
-        
-        # Login button
-        if st.button("🚀 Sign In", use_container_width=True, type="primary", key="signin_btn"):
-            if not username or not password:
-                st.error("⚠️ Please enter both username/email and password")
-            else:
+    # Create enhanced demo accounts with better organization
+    demo_accounts = [
+        {"Role": "👑 Admin", "Username": "admin", "Password": "admin123", "Access": "Complete system control"},
+        {"Role": "🏗️ Project Manager", "Username": "pm", "Password": "pm123", "Access": "Full project oversight"},
+        {"Role": "🦺 Superintendent", "Username": "super", "Password": "super123", "Access": "Field operations control"},
+        {"Role": "📊 Estimator", "Username": "estimator", "Password": "est123", "Access": "Cost management focus"},
+        {"Role": "📐 Architect", "Username": "architect", "Password": "arch123", "Access": "Design and documentation"},
+        {"Role": "⚙️ Engineer", "Username": "engineer", "Password": "eng123", "Access": "Technical specifications"},
+        {"Role": "🔨 Subcontractor", "Username": "sub", "Password": "sub123", "Access": "Trade-specific access"},
+        {"Role": "🏢 Owner", "Username": "owner", "Password": "owner123", "Access": "Executive dashboard"},
+        {"Role": "👁️ Viewer", "Username": "demo", "Password": "demo123", "Access": "Read-only access"}
+    ]
+    
+    # Display as enhanced cards in a grid
+    cols = st.columns(3)
+    for i, account in enumerate(demo_accounts):
+        with cols[i % 3]:
+            card_html = f"""
+            <div class="demo-card">
+                <div class="role-title">{account['Role']}</div>
+                <div class="credentials">
+                    👤 User: <strong>{account['Username']}</strong><br>
+                    🔑 Pass: <strong>{account['Password']}</strong>
+                </div>
+                <div class="access-info">{account['Access']}</div>
+            </div>
+            """
+            st.markdown(card_html, unsafe_allow_html=True)
+            if st.button(f"Login as {account['Role']}", key=f"demo_login_{i}", use_container_width=True, type="secondary"):
                 # Store the form submission in session state for processing in the main app
-                st.session_state.login_username = username
-                st.session_state.login_password = password
+                st.session_state.login_username = account['Username']
+                st.session_state.login_password = account['Password']
                 st.session_state.login_form_submitted = True
                 
                 # Show a loading message
-                with st.spinner("🔄 Authenticating..."):
+                with st.spinner(f"🔄 Logging in as {account['Role']}..."):
                     time.sleep(1)
-                st.success("✅ Authentication successful! Redirecting...")
+                st.success(f"✅ Successfully logged in as {account['Role']}!")
                 time.sleep(0.5)
                 st.rerun()
-        
-        # Display "forgot password" link
-        st.markdown('<div class="forgot-password"><a href="#">Forgot your password?</a></div>', 
-                    unsafe_allow_html=True)
-    
-    with demo_tab:
-        st.markdown("### 🎭 Demo Account Options")
-        st.markdown("Choose a role to explore different permission levels and features:")
-        
-        # Create enhanced demo accounts with better organization
-        demo_accounts = [
-            {"Role": "👑 Admin", "Username": "admin", "Password": "admin123", "Access": "Complete system control", "Icon": "👑", "Color": "#e74c3c"},
-            {"Role": "🏗️ Project Manager", "Username": "pm", "Password": "pm123", "Access": "Full project oversight", "Icon": "🏗️", "Color": "#3498db"},
-            {"Role": "🦺 Superintendent", "Username": "super", "Password": "super123", "Access": "Field operations control", "Icon": "🦺", "Color": "#f39c12"},
-            {"Role": "📊 Estimator", "Username": "estimator", "Password": "est123", "Access": "Cost management focus", "Icon": "📊", "Color": "#27ae60"},
-            {"Role": "📐 Architect", "Username": "architect", "Password": "arch123", "Access": "Design and documentation", "Icon": "📐", "Color": "#9b59b6"},
-            {"Role": "⚙️ Engineer", "Username": "engineer", "Password": "eng123", "Access": "Technical specifications", "Icon": "⚙️", "Color": "#34495e"},
-            {"Role": "🔨 Subcontractor", "Username": "sub", "Password": "sub123", "Access": "Trade-specific access", "Icon": "🔨", "Color": "#e67e22"},
-            {"Role": "🏢 Owner", "Username": "owner", "Password": "owner123", "Access": "Executive dashboard", "Icon": "🏢", "Color": "#2c3e50"},
-            {"Role": "👁️ Viewer", "Username": "demo", "Password": "demo123", "Access": "Read-only access", "Icon": "👁️", "Color": "#7f8c8d"}
-        ]
-        
-        # Display as enhanced cards in a grid
-        cols = st.columns(3)
-        for i, account in enumerate(demo_accounts):
-            with cols[i % 3]:
-                card_html = f"""
-                <div class="demo-card">
-                    <div class="role-title">{account['Role']}</div>
-                    <div class="credentials">
-                        👤 User: <strong>{account['Username']}</strong><br>
-                        🔑 Pass: <strong>{account['Password']}</strong>
-                    </div>
-                    <div class="access-info">{account['Access']}</div>
-                </div>
-                """
-                st.markdown(card_html, unsafe_allow_html=True)
-                if st.button(f"Login as {account['Role']}", key=f"demo_login_{i}", use_container_width=True, type="secondary"):
-                    # Store the form submission in session state for processing in the main app
-                    st.session_state.login_username = account['Username']
-                    st.session_state.login_password = account['Password']
-                    st.session_state.login_form_submitted = True
-                    
-                    # Show a loading message
-                    with st.spinner(f"🔄 Logging in as {account['Role']}..."):
-                        time.sleep(1)
-                    st.success(f"✅ Successfully logged in as {account['Role']}!")
-                    time.sleep(0.5)
-                    st.rerun()
     
     # Divider
     st.markdown("""
     <div class="divider">
         <hr>
-        <span>OR CONTINUE WITH</span>
+        <span>OR SIGN IN WITH YOUR ACCOUNT</span>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Standard login form section
+    st.markdown("### 🔐 Sign In to Your Account")
+    
+    # Standard login form
+    username = st.text_input("📧 Email or Username", key="username_input", placeholder="Enter your email or username")
+    password = st.text_input("🔒 Password", type="password", key="password_input", placeholder="Enter your password")
+    
+    # Remember me checkbox and forgot password in same row
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        remember = st.checkbox("Remember me", value=False)
+    with col2:
+        st.markdown('<div class="forgot-password" style="text-align: right; margin-top: 8px;"><a href="#">Forgot password?</a></div>', 
+                    unsafe_allow_html=True)
+    
+    # Login button
+    if st.button("🚀 Sign In", use_container_width=True, type="primary", key="signin_btn"):
+        if not username or not password:
+            st.error("⚠️ Please enter both username/email and password")
+        else:
+            # Store the form submission in session state for processing in the main app
+            st.session_state.login_username = username
+            st.session_state.login_password = password
+            st.session_state.login_form_submitted = True
+            
+            # Show a loading message
+            with st.spinner("🔄 Authenticating..."):
+                time.sleep(1)
+            st.success("✅ Authentication successful! Redirecting...")
+            time.sleep(0.5)
+            st.rerun()
+    
+    # Final divider for OAuth
+    st.markdown("""
+    <div class="divider">
+        <hr>
+        <span>OR CONTINUE WITH SSO</span>
     </div>
     """, unsafe_allow_html=True)
                 

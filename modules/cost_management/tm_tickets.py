@@ -221,7 +221,7 @@ class TMTicketsModule(CrudModule):
         
         # Handle the back button
         if actions['back_clicked']:
-            self._return_to_list_view()
+            self.return_to_list_view()
             return
         
         # Create the form

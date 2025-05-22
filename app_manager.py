@@ -17,6 +17,7 @@ from app_config import MENU_MAP, DEFAULT_SESSION_STATE, PAGES_WITH_ACTIONS
 from utils.ui_manager import load_external_resources, render_notification_button
 from utils.cache_manager import CacheManager
 from utils.responsive_ui import apply_all_responsive_styles, detect_mobile
+from utils.search_manager import SearchManager
 
 # Import components
 from components.action_bar import render_action_bar
@@ -61,11 +62,15 @@ def initialize_session_state():
     1. Default session state variables from app_config
     2. Notification system state
     3. Application cache for performance optimization
-    4. Any other required application state variables
+    4. Search system state
+    5. Any other required application state variables
     """
     _initialize_default_state()
     _initialize_notifications()
     _initialize_cache_system()
+    
+    # Initialize search system
+    SearchManager.initialize()
     
 def _initialize_default_state():
     """Initialize the basic session state variables from configuration."""

@@ -8,6 +8,7 @@ Following modular design principles with separate styles and templates.
 import streamlit as st
 import os
 from app_config import MENU_OPTIONS, MENU_MAP, PROJECT_INFO
+from utils.search_manager import SearchManager
 
 def get_css():
     """Return CSS for header styling."""
@@ -55,6 +56,20 @@ def get_css():
         margin-bottom: 5px;
     }
     
+    /* Search bar styling */
+    .search-container {
+        margin-top: 5px;
+    }
+    .search-container .stTextInput input {
+        border-radius: 20px;
+        padding-left: 15px;
+        border: 1px solid #ddd;
+    }
+    .search-container .stTextInput input:focus {
+        border-color: #0099ff;
+        box-shadow: 0 0 0 1px rgba(0, 153, 255, 0.5);
+    }
+    
     /* Remove extra padding from the logo button */
     .stButton button {
         padding: 0;
@@ -85,10 +100,10 @@ def render_header():
     # Start the header container
     st.markdown(get_header_container_html(), unsafe_allow_html=True)
     
-    # Use Streamlit column layout
-    cols = st.columns([1, 3, 1])
+    # Use Streamlit column layout with adjusted ratios to accommodate search
+    cols = st.columns([1, 2, 2, 1])
     
-    # Left column - No logo
+    # Left column - Home button
     with cols[0]:
         # Empty space where logo used to be
         st.markdown('<div style="height: 30px;"></div>', unsafe_allow_html=True)
@@ -102,7 +117,7 @@ def render_header():
             on_click=lambda: st.session_state.update({"current_menu": "Dashboard"})
         )
     
-    # Middle column - Project Info
+    # Middle-left column - Project Info
     with cols[1]:
         # Project name - using Streamlit's text formatting
         st.subheader(PROJECT_INFO["name"])
@@ -111,8 +126,38 @@ def render_header():
         details = f"{PROJECT_INFO['value']} • {PROJECT_INFO['size']} • {PROJECT_INFO['floors']}"
         st.caption(details)
     
-    # Right column - Navigation with icons
+    # Middle-right column - Search
     with cols[2]:
+        # Search container
+        st.markdown('<div class="search-container">', unsafe_allow_html=True)
+        
+        # Initialize search system if needed
+        if "show_search_results" not in st.session_state:
+            st.session_state.show_search_results = False
+            
+        # Add search input
+        search_query = st.text_input(
+            "Global Search",
+            placeholder="🔍 Search across all modules...",
+            key="header_search_input",
+            label_visibility="collapsed",
+            value=st.session_state.get("global_search_query", "")
+        )
+        
+        # Update session state with current query
+        if search_query != st.session_state.get("global_search_query", ""):
+            st.session_state.global_search_query = search_query
+            
+            # Toggle search results display when search is performed
+            if search_query:
+                st.session_state.show_search_results = True
+            else:
+                st.session_state.show_search_results = False
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Right column - Navigation with icons
+    with cols[3]:
         # Navigation label
         st.markdown('<div class="nav-label">Navigation</div>', unsafe_allow_html=True)
         
@@ -146,3 +191,41 @@ def render_header():
     
     # Close the header container
     st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Handle search results display
+    if st.session_state.get("show_search_results", False) and st.session_state.get("global_search_query", ""):
+        # Add a container for search results
+        search_results_container = st.container()
+        
+        with search_results_container:
+            st.markdown("""
+            <style>
+            .search-results {
+                border: 1px solid #eee;
+                border-radius: 5px;
+                padding: 15px;
+                margin-bottom: 20px;
+                background-color: white;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            }
+            </style>
+            <div class="search-results">
+            """, unsafe_allow_html=True)
+            
+            # Perform the search using the search manager
+            with st.spinner("Searching..."):
+                results = SearchManager.perform_global_search(st.session_state.global_search_query)
+            
+            # Display close button for search results
+            col1, col2 = st.columns([5, 1])
+            with col1:
+                st.markdown(f"### Search Results for: '{st.session_state.global_search_query}'")
+            with col2:
+                if st.button("❌ Close", key="close_search_results"):
+                    st.session_state.show_search_results = False
+                    st.rerun()
+            
+            # Render search results
+            SearchManager.render_search_results(results)
+            
+            st.markdown("</div>", unsafe_allow_html=True)

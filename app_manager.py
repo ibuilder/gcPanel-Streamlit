@@ -35,11 +35,11 @@ from modules.field_operations import render as render_field_operations
 from modules.scheduling import render_scheduling
 from modules.safety import render_safety
 from modules.cost_management import render as render_cost_management
-from modules.closeout import render_closeout
+from modules.closeout import render as render_closeout
 from modules.engineering import render as render_engineering
 from modules.documents import render_documents
 from modules.mobile_companion import render_mobile_companion
-from modules.analytics import render_analytics
+from modules.analytics import render as render_analytics
 from modules.ai_assistant import render_ai_assistant
 from modules.integrations import render_integrations
 

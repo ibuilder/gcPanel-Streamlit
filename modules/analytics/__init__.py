@@ -1,105 +1,162 @@
 """
-Analytics Module for gcPanel.
+Analytics Module for gcPanel
 
-This module provides advanced data visualization, predictive analytics,
-and custom reporting capabilities for construction project management.
+This module provides comprehensive analytics and reporting functionality for the construction management dashboard.
+It includes submodules for different types of analysis and reporting.
 """
 
 import streamlit as st
-from modules.analytics.visualizations import dashboard
-from modules.analytics.predictive import timeline_predictor, budget_predictor
+from modules.analytics.analysis import render as render_analysis
 
-# Simple function to render the report generator directly
-def render_report_generator():
-    """Render the report generator interface."""
-    st.header("Custom Report Generator")
-    st.info("Report generator module is being initialized. Full functionality coming soon.")
+def render_analytics_dashboard():
+    """Render the analytics dashboard overview."""
+    st.subheader("Analytics Dashboard")
     
-    # Project selector
-    project = st.selectbox(
-        "Select Project",
-        ["Highland Tower Development", "Project B", "Project C"],
-        index=0
-    )
+    # Create container with white background
+    st.markdown(f"<div style='background-color: white; padding: 15px; border-radius: 5px; margin-bottom: 15px;'>", unsafe_allow_html=True)
     
-    # Report type selector
-    report_type = st.selectbox(
-        "Report Type",
-        ["Executive Summary", "Detailed Progress Report", "Financial Report", "Schedule Analysis", "Custom Report"]
-    )
+    # Key Performance Indicators
+    st.markdown("### Key Performance Indicators")
     
-    # Date range selector
-    col1, col2 = st.columns(2)
+    col1, col2, col3, col4 = st.columns(4)
+    
     with col1:
-        st.date_input("Start Date", value=None)
-    with col2:
-        st.date_input("End Date", value=None)
+        st.metric(
+            "Schedule",
+            "On Track",
+            "+2 days",
+            delta_color="normal"
+        )
     
-    # Create a placeholder for report preview
-    st.subheader("Report Preview")
-    st.write("Report content will appear here.")
-    
-    # Export options
-    st.subheader("Export Options")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.button("Export as PDF")
     with col2:
-        st.button("Export as Excel")
+        st.metric(
+            "Budget",
+            "$45.5M",
+            "-3.2%",
+            delta_color="normal"
+        )
+    
     with col3:
-        st.button("Export as CSV")
+        st.metric(
+            "Safety",
+            "2 Incidents",
+            "-1",
+            delta_color="normal"
+        )
+    
+    with col4:
+        st.metric(
+            "Quality",
+            "87%",
+            "+2%",
+            delta_color="normal"
+        )
+    
+    st.markdown("</div>", unsafe_allow_html=True)
+    
+    # Recent Reports
+    st.markdown(f"<div style='background-color: white; padding: 15px; border-radius: 5px; margin-bottom: 15px;'>", unsafe_allow_html=True)
+    
+    st.markdown("### Recent Reports")
+    
+    recent_reports = [
+        {
+            "title": "Monthly Progress Report - April 2025",
+            "date": "May 5, 2025",
+            "type": "Progress",
+            "status": "Approved"
+        },
+        {
+            "title": "Financial Forecast Q2 2025",
+            "date": "May 2, 2025",
+            "type": "Financial",
+            "status": "Draft"
+        },
+        {
+            "title": "Safety Performance Review",
+            "date": "April 30, 2025",
+            "type": "Safety",
+            "status": "Approved"
+        },
+        {
+            "title": "Quality Assurance Audit",
+            "date": "April 28, 2025",
+            "type": "Quality",
+            "status": "Under Review"
+        }
+    ]
+    
+    for report in recent_reports:
+        col1, col2, col3, col4, col5 = st.columns([3, 2, 2, 2, 1])
+        
+        with col1:
+            st.markdown(f"**{report['title']}**")
+        
+        with col2:
+            st.markdown(f"{report['date']}")
+        
+        with col3:
+            st.markdown(f"{report['type']}")
+        
+        with col4:
+            status_color = {
+                "Approved": "green",
+                "Draft": "blue",
+                "Under Review": "orange"
+            }.get(report['status'], "gray")
+            
+            st.markdown(f"<span style='color: {status_color};'>{report['status']}</span>", unsafe_allow_html=True)
+        
+        with col5:
+            st.button("View", key=f"view_report_{report['title']}")
+        
+        st.markdown("---")
+    
+    # Create a new report button
+    if st.button("+ Create New Report", type="primary"):
+        st.session_state.create_new_report = True
+    
+    if st.session_state.get("create_new_report", False):
+        with st.form("new_report_form"):
+            st.subheader("Create New Report")
+            
+            report_title = st.text_input("Report Title")
+            report_type = st.selectbox("Report Type", ["Progress", "Financial", "Safety", "Quality", "Custom"])
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                report_date = st.date_input("Report Date")
+            with col2:
+                report_period = st.selectbox("Reporting Period", ["Weekly", "Monthly", "Quarterly", "Annual", "Custom"])
+            
+            report_description = st.text_area("Description")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                submit_button = st.form_submit_button("Create Report")
+            with col2:
+                cancel_button = st.form_submit_button("Cancel")
+            
+            if submit_button and report_title:
+                st.success(f"Report '{report_title}' created successfully")
+                st.session_state.create_new_report = False
+                st.rerun()
+            
+            if cancel_button:
+                st.session_state.create_new_report = False
+                st.rerun()
+    
+    st.markdown("</div>", unsafe_allow_html=True)
 
-def render_analytics():
-    """Render the analytics module interface."""
-    st.title("Project Analytics")
+def render():
+    """Render the Analytics module."""
+    st.title("Analytics & Reporting")
     
-    # Create tabs for different analytics sections
-    tabs = st.tabs([
-        "Dashboard", 
-        "Predictive Analytics", 
-        "Custom Reports"
-    ])
+    # Create tabs for different analytics views
+    tab1, tab2 = st.tabs(["Dashboard", "Analysis"])
     
-    # Dashboard tab
-    with tabs[0]:
-        dashboard.render_analytics_dashboard()
+    with tab1:
+        render_analytics_dashboard()
     
-    # Predictive Analytics tab
-    with tabs[1]:
-        render_predictive_analytics()
-    
-    # Custom Reports tab
-    with tabs[2]:
-        # Since reports module is not available yet, create a simple placeholder
-        st.header("Custom Reports Generator")
-        st.info("Report generator module is under development. This feature will be available in the next update.")
-
-def render_predictive_analytics():
-    """Render the predictive analytics section."""
-    st.header("Predictive Analytics")
-    
-    # Add subheader with description
-    st.subheader("Project Timeline and Budget Predictions")
-    st.markdown("""
-    Predictive analytics uses historical project data and statistical models to forecast:
-    * Project completion dates
-    * Budget overruns or savings
-    * Risk factors and potential delays
-    
-    Select a prediction type below to generate forecasts for your project.
-    """)
-    
-    # Create columns for timeline and budget predictions
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("### Timeline Prediction")
-        st.markdown("Forecast project completion dates and milestone timelines")
-        if st.button("Analyze Timeline", key="analyze_timeline"):
-            timeline_predictor.render_timeline_prediction()
-    
-    with col2:
-        st.markdown("### Budget Prediction")
-        st.markdown("Forecast project costs and identify budget risk areas")
-        if st.button("Analyze Budget", key="analyze_budget"):
-            budget_predictor.render_budget_prediction()
+    with tab2:
+        render_analysis()

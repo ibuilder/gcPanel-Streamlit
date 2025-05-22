@@ -20,4 +20,6 @@ dependencies = [
     "statsmodels>=0.14.4",
     "scikit-learn>=1.6.1",
     "anthropic>=0.51.0",
+    "requests>=2.32.3",
+    "authlib>=1.5.2",
 ]

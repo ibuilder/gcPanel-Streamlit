@@ -15,8 +15,8 @@ def render_login_form():
     st.markdown("<h2 style='text-align: center; margin-bottom: 25px; color: #333; font-weight: 600;'>Project Access</h2>", 
                 unsafe_allow_html=True)
     
-    # Multi-tab interface for regular login vs demo accounts
-    login_tab, demo_tab = st.tabs(["Login", "Demo Accounts"])
+    # Multi-tab interface with demo accounts first
+    demo_tab, login_tab = st.tabs(["Demo Accounts", "Login"])
     
     with login_tab:
         # Standard login form

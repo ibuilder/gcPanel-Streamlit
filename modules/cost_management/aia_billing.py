@@ -724,47 +724,53 @@ class AIABillingModule(CrudModule):
                 )
                 
                 if form_actions['save_clicked']:
-                    # Update item with form values
-                    updated_item = {
-                        "payment_app_id": item['payment_app_id'],
-                        "application_number": int(app_number),
-                        "period_from": period_from.strftime('%Y-%m-%d'),
-                        "period_to": period_to.strftime('%Y-%m-%d'),
-                        "project_name": project_name,
-                        "owner_name": owner_name,
-                        "contractor_name": contractor_name,
-                        "architect_name": architect_name,
-                        "contract_date": contract_date.strftime('%Y-%m-%d'),
-                        "project_number": project_number,
-                        "contract_number": contract_number,
-                        "total_contract_sum": float(total_contract_sum),
-                        "net_change_orders": float(net_change_orders),
-                        "contract_sum_to_date": float(contract_sum_to_date),
-                        "total_completed": float(total_completed),
-                        "total_stored_materials": float(total_stored_materials),
-                        "total_completed_stored": float(total_completed_stored),
-                        "retainage_percentage": float(retainage_percentage),
-                        "retainage_amount": float(retainage_amount),
-                        "total_earned_less_retainage": float(total_earned_less_retainage),
-                        "previous_payments": float(previous_payments),
-                        "payment_due": float(payment_due),
-                        "status": status,
-                        "date_created": item['date_created'],
-                        "created_by": item['created_by'],
-                        "date_submitted": date_submitted,
-                        "submitted_by": submitted_by,
-                        "date_approved": date_approved,
-                        "approved_by": approved_by,
-                        "schedule_of_values": updated_sov
-                    }
-                    
-                    # Save the updated item
-                    self._save_item(updated_item)
-                    
-                    # Show success message and return to list view
-                    st.success("Payment application saved successfully")
-                    st.session_state[f'{base_key}_view'] = 'list'
-                    st.rerun()
+                    # Validate signatures before saving
+                    is_valid, message = validate_required_signatures(signatures, ["Project Manager", "Owner Representative"])
+                    if not is_valid:
+                        st.error(f"Cannot save payment application: {message}")
+                    else:
+                        # Update item with form values
+                        updated_item = {
+                            "payment_app_id": item['payment_app_id'],
+                            "application_number": int(app_number),
+                            "period_from": period_from.strftime('%Y-%m-%d'),
+                            "period_to": period_to.strftime('%Y-%m-%d'),
+                            "project_name": project_name,
+                            "owner_name": owner_name,
+                            "contractor_name": contractor_name,
+                            "architect_name": architect_name,
+                            "contract_date": contract_date.strftime('%Y-%m-%d'),
+                            "project_number": project_number,
+                            "contract_number": contract_number,
+                            "total_contract_sum": float(total_contract_sum),
+                            "net_change_orders": float(net_change_orders),
+                            "contract_sum_to_date": float(contract_sum_to_date),
+                            "total_completed": float(total_completed),
+                            "total_stored_materials": float(total_stored_materials),
+                            "total_completed_stored": float(total_completed_stored),
+                            "retainage_percentage": float(retainage_percentage),
+                            "retainage_amount": float(retainage_amount),
+                            "total_earned_less_retainage": float(total_earned_less_retainage),
+                            "previous_payments": float(previous_payments),
+                            "payment_due": float(payment_due),
+                            "status": status,
+                            "date_created": item['date_created'],
+                            "created_by": item['created_by'],
+                            "date_submitted": date_submitted,
+                            "submitted_by": submitted_by,
+                            "date_approved": date_approved,
+                            "approved_by": approved_by,
+                            "schedule_of_values": updated_sov,
+                            "signatures": get_signature_summary(signatures)
+                        }
+                        
+                        # Save the updated item
+                        self._save_item(updated_item)
+                        
+                        # Show success message and return to list view
+                        st.success("Payment application saved successfully with digital signatures!")
+                        st.session_state[f'{base_key}_view'] = 'list'
+                        st.rerun()
                 
                 if form_actions['cancel_clicked']:
                     st.session_state[f'{base_key}_view'] = 'list'

@@ -103,3 +103,56 @@ PROJECT_INFO = {
     "start_date": "2025-01-15",
     "completion_date": "2027-06-30"
 }
+
+# ============================================================================
+# COMPANY INFORMATION
+# ============================================================================
+
+# Project companies information
+PROJECT_COMPANIES = [
+    {
+        "id": "comp_001",
+        "name": "Highland Properties LLC",
+        "role": "Owner/Developer",
+        "contact_name": "Jessica Taylor",
+        "contact_email": "jtaylor@highlandproperties.com",
+        "contact_phone": "555-123-4567",
+        "address": "100 Main Street, Highland, CA 92346"
+    },
+    {
+        "id": "comp_002",
+        "name": "GC Prime Contractors",
+        "role": "General Contractor",
+        "contact_name": "John Smith",
+        "contact_email": "jsmith@gcprime.com",
+        "contact_phone": "555-987-6543",
+        "address": "200 Construction Way, Highland, CA 92346"
+    },
+    {
+        "id": "comp_003",
+        "name": "Design Partners",
+        "role": "Architecture",
+        "contact_name": "Sarah Johnson",
+        "contact_email": "sjohnson@designpartners.com",
+        "contact_phone": "555-456-7890",
+        "address": "300 Design Boulevard, Highland, CA 92346"
+    },
+    {
+        "id": "comp_004",
+        "name": "Structure Solutions",
+        "role": "Structural Engineering",
+        "contact_name": "Michael Chen",
+        "contact_email": "mchen@structuresolutions.com",
+        "contact_phone": "555-789-0123",
+        "address": "400 Engineering Lane, Highland, CA 92346"
+    },
+    {
+        "id": "comp_005",
+        "name": "Power Systems Inc.",
+        "role": "Electrical Contractor",
+        "contact_name": "Robert Williams",
+        "contact_email": "rwilliams@powersystems.com",
+        "contact_phone": "555-234-5678",
+        "address": "500 Energy Street, Highland, CA 92346"
+    }
+]

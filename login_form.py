@@ -81,11 +81,12 @@ def render_login_form():
     # Initialize security state
     _init_security_state()
     
-    # Streamlined production CSS
+    # Import pure Python registration component
+    from components.registration_pure import render_registration_request, render_demo_accounts_pure
+    
+    # Minimal CSS for essential styling only
     st.markdown("""
     <style>
-    /* Main container styling removed */
-    
     /* Security badge */
     .security-badge {
         position: fixed;
@@ -288,9 +289,97 @@ def render_login_form():
     # Security badge
     st.markdown('<div class="security-badge">🔒 Secure Login</div>', unsafe_allow_html=True)
     
-
+    # Create tabs for different login options
+    tabs = st.tabs(["🔐 Login", "🎯 Demo Accounts", "📝 Register"])
     
-    # Quick Access Demo Accounts Section
+    with tabs[0]:
+        # Production login form section
+        st.markdown("### 🔐 Sign In to Your Account")
+        
+        # Login form
+        username = st.text_input(
+            "📧 Email or Username", 
+            key="username_input", 
+            placeholder="Enter your email",
+            help="Use your company email address"
+        )
+        
+        password = st.text_input(
+            "🔒 Password", 
+            type="password", 
+            key="password_input", 
+            placeholder="Enter your password",
+            help="Minimum 8 characters"
+        )
+        
+        # Options row
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            remember = st.checkbox("Remember me", value=False)
+        with col2:
+            if st.button("Forgot password?", type="secondary"):
+                st.info("Contact IT for password reset")
+        
+        # Show remaining attempts if any failures
+        if st.session_state.login_attempts > 0:
+            remaining_attempts = 5 - st.session_state.login_attempts
+            if remaining_attempts > 0:
+                st.warning(f"⚠️ {remaining_attempts} login attempts remaining before temporary lockout")
+        
+        # Enhanced login button with validation
+        if st.button("🚀 Sign In Securely", use_container_width=True, type="primary", key="signin_btn"):
+            if not username or not password:
+                st.error("⚠️ Please enter both username/email and password")
+                st.session_state.login_attempts += 1
+            else:
+                # Validate input security
+                is_valid, error_msg = _validate_input_security(username, password)
+                if not is_valid:
+                    st.error(f"⚠️ {error_msg}")
+                    st.session_state.login_attempts += 1
+                    _log_security_event("INVALID_INPUT", username, False)
+                else:
+                    # Store the form submission in session state for processing in the main app
+                    st.session_state.login_username = username
+                    st.session_state.login_password = password
+                    st.session_state.login_form_submitted = True
+                    
+                    # Reset attempts on valid input
+                    st.session_state.login_attempts = 0
+                    _log_security_event("LOGIN_ATTEMPT", username, True)
+                    
+                    # Show loading
+                    with st.spinner("🔄 Authenticating..."):
+                        time.sleep(1.2)
+                    st.success("✅ Login successful!")
+                    time.sleep(0.3)
+                    st.rerun()
+            
+            # Check if account should be locked
+            if st.session_state.login_attempts >= 5:
+                st.session_state.account_locked = True
+                st.session_state.lock_until = datetime.now() + timedelta(minutes=15)
+                _log_security_event("ACCOUNT_LOCKED", username, False)
+                st.error("🔒 Account locked for 15 minutes due to multiple failed attempts")
+                st.rerun()
+        
+        # OAuth section
+        st.markdown("---")
+        st.markdown("**Or continue with SSO:**")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🌐 Google", use_container_width=True, key="google_sso"):
+                st.info("🔧 Contact IT to enable Google SSO")
+                _log_security_event("SSO_ATTEMPT", "google_workspace", False)
+                
+        with col2:
+            if st.button("💼 Microsoft", use_container_width=True, key="microsoft_sso"):
+                st.info("🔧 Contact IT to enable Microsoft SSO")
+                _log_security_event("SSO_ATTEMPT", "microsoft_365", False)
+    
+    with tabs[1]:
+        # Pure Python demo accounts section
     st.markdown("### 🎭 Quick Access Demo Accounts")
     st.markdown("Choose a role to instantly explore different permission levels:")
     

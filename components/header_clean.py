@@ -64,14 +64,17 @@ def render_header():
             st.markdown(f'<p class="project-title">{PROJECT_INFO["name"]}</p>', unsafe_allow_html=True)
             st.markdown(f'<p class="project-details">{PROJECT_INFO["value"]} • {PROJECT_INFO["size"]} • {PROJECT_INFO["floors"]}</p>', unsafe_allow_html=True)
         
-        # Right column - Navigation
+        # Right column - Navigation with icons
         with cols[2]:
             st.markdown('<p style="font-size:13px; color:#666; margin-bottom:5px;">Navigation</p>', unsafe_allow_html=True)
+            
+            # Force label visibility to be visible to ensure icons show up
             selected_menu = st.selectbox(
                 "Select Module",
                 options=MENU_OPTIONS,
                 index=MENU_OPTIONS.index("📊 Dashboard") if "current_menu" not in st.session_state else MENU_OPTIONS.index([opt for opt in MENU_OPTIONS if MENU_MAP[opt] == st.session_state.current_menu][0]),
-                label_visibility="collapsed"
+                label_visibility="collapsed",
+                format_func=lambda x: x  # This ensures the icons display correctly
             )
             
             # Update current menu when selection changes

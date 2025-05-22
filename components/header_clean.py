@@ -88,22 +88,10 @@ def render_header():
     # Use Streamlit column layout
     cols = st.columns([1, 3, 1])
     
-    # Left column - Logo with tower crane icon
+    # Left column - No logo
     with cols[0]:
-        # Create a simple 2-column layout for the logo
-        logo_cols = st.columns([1, 3])
-        
-        # Add logo components
-        with logo_cols[0]:
-            st.markdown('<div class="crane-icon">🏗️</div>', unsafe_allow_html=True)
-        
-        with logo_cols[1]:
-            st.markdown(
-                '<span class="logo-text">'
-                '<span class="gc-text">gc</span><span class="panel-text">Panel</span>'
-                '</span>', 
-                unsafe_allow_html=True
-            )
+        # Empty space where logo used to be
+        st.markdown('<div style="height: 30px;"></div>', unsafe_allow_html=True)
         
         # Home navigation button
         st.button(

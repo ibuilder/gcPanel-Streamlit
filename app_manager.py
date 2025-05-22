@@ -117,32 +117,31 @@ def _configure_caching():
     pass
 
 def _render_ui_framework():
-    """Render the main UI framework including header, navigation, and content."""
+    """Render the main UI framework including navigation, and content."""
     # Get current menu from session state
     current_menu = st.session_state.get("current_menu", "Dashboard")
     
-    # Set up custom CSS to fix header positioning
+    # No need to render header here - it's now handled in app.py
+    # This prevents duplicate headers
+    
+    # Set up custom CSS for proper spacing of content
     st.markdown("""
     <style>
-        /* Fix for header positioning */
-        div[data-testid="stVerticalBlock"] > div:first-child {
-            margin-top: 0 !important;
+        /* Proper content spacing */
+        .streamlit-container {
             padding-top: 0 !important;
         }
-        /* Fix breadcrumbs spacing */
-        .breadcrumb-container {
-            margin-top: 5px;
-            margin-bottom: 15px;
+        /* Fix navigation dropdown positioning */
+        .stSelectbox {
+            margin-top: 0 !important;
         }
     </style>
     """, unsafe_allow_html=True)
     
-    # Render clean header component with project info and navigation
-    render_header()
-    
-    # Render simple breadcrumbs for navigation context
-    breadcrumbs = get_breadcrumbs_for_page(current_menu)
-    simple_breadcrumbs(breadcrumbs)
+    # Render simple breadcrumbs for navigation context (only if needed)
+    if current_menu != "Dashboard" and current_menu != "Home":
+        breadcrumbs = get_breadcrumbs_for_page(current_menu)
+        simple_breadcrumbs(breadcrumbs)
     
     # Handle notifications display
     _handle_notification_display()

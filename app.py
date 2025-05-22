@@ -39,11 +39,11 @@ from utils.mobile.pwa_support import setup_pwa
 # Import improved container styling for better spacing
 from assets.container_styles import apply_container_styles
 
-# Import header fixes to remove white box 
-from assets.header_fix import apply_header_fixes
+# Import new fixed header component that positions correctly
+from components.fixed_header import render_fixed_header
 
 # Import enhanced UI components for professional styling
-from assets.enhanced_ui import apply_enhanced_styles, create_project_header
+from assets.enhanced_ui import apply_enhanced_styles
 
 def main():
     """Main application entry point."""
@@ -57,8 +57,8 @@ def main():
         # Apply enhanced UI styles for professional, enterprise-grade appearance
         apply_enhanced_styles()
         
-        # Header is now managed by the app_manager.render_application() function
-        # Removed duplicate header creation
+        # Render the fixed header at the top of the page
+        render_fixed_header()
         
         # Initialize session state variables from app_manager
         app_manager.initialize_session_state()

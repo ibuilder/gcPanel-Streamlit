@@ -57,13 +57,8 @@ def main():
         # Apply enhanced UI styles for professional, enterprise-grade appearance
         apply_enhanced_styles()
         
-        # Always show the beautiful header at the top of every page
-        create_project_header(
-            project_name="Highland Tower Development",
-            project_number="HT-2025-001",
-            address="11 Highland Dr, Boston, MA 02120, United States",
-            status="In Progress"
-        )
+        # Header is now managed by the app_manager.render_application() function
+        # Removed duplicate header creation
         
         # Initialize session state variables from app_manager
         app_manager.initialize_session_state()

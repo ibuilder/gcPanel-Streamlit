@@ -211,14 +211,16 @@ def render_purchase_orders():
         status_filter = st.multiselect(
             "Status",
             options=["Draft", "Issued", "Acknowledged", "In Progress", "Complete"],
-            default=["Issued", "Acknowledged", "In Progress"]
+            default=["Issued", "Acknowledged", "In Progress"],
+            key="procurement_status_filter"
         )
     
     with filter_col2:
         division_filter = st.multiselect(
             "Division",
             options=["Div 03-05", "Div 06-09", "Div 21-23", "Div 26-28", "Other"],
-            default=[]
+            default=[],
+            key="procurement_division_filter"
         )
     
     with filter_col3:

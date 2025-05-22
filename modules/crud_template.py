@@ -310,14 +310,18 @@ class CrudModule:
                     with view_col:
                         item_id = item.get(self.id_field, f"unknown_{hash(str(item))}")
                         if st.button("👁️", key=f"view_{item_id}", help="View details"):
-                            st.session_state[f'{base_key}_selected_id'] = item[self.id_field]
+                            # Use the safe item_id instead of direct field access
+                            actual_id = item.get(self.id_field, item_id)
+                            st.session_state[f'{base_key}_selected_id'] = actual_id
                             st.session_state[f'{base_key}_view'] = 'detail'
                             st.session_state[f'{base_key}_edit_mode'] = False
                             st.rerun()
                     with edit_col:
                         item_id = item.get(self.id_field, f"unknown_{hash(str(item))}")
                         if st.button("✏️", key=f"edit_{item_id}", help="Edit"):
-                            st.session_state[f'{base_key}_selected_id'] = item[self.id_field]
+                            # Use the safe item_id instead of direct field access
+                            actual_id = item.get(self.id_field, item_id)
+                            st.session_state[f'{base_key}_selected_id'] = actual_id
                             st.session_state[f'{base_key}_view'] = 'detail'
                             st.session_state[f'{base_key}_edit_mode'] = True
                             st.rerun()

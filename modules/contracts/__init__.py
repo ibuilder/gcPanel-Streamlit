@@ -463,9 +463,9 @@ class SubcontractModule(CrudModule):
         super().__init__(
             module_name="Subcontracts",
             data_file_path="data/contracts/subcontracts.json",
-            id_field="subcontract_id",
-            list_columns=["subcontract_id", "subcontractor_name", "trade", "value", "execution_date", "status"],
-            default_sort_field="subcontract_id",
+            id_field="id",
+            list_columns=["id", "company", "scope", "amount", "date", "status"],
+            default_sort_field="id",
             default_sort_direction="asc",
             status_field="status",
             filter_options=["Draft", "Issued", "Executed", "In Progress", "Complete", "Terminated"]

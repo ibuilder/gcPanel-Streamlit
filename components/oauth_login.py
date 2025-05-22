@@ -265,9 +265,10 @@ def handle_oauth_callback():
             # Store authentication in session state
             st.session_state.authenticated = True
             st.session_state.user = user
-            st.session_state.token = tokens.get("access_token")
+            if tokens and "access_token" in tokens:
+                st.session_state.token = tokens["access_token"]
             st.session_state.current_menu = "Dashboard"
             
             # Clear query parameters by redirecting
-            st.experimental_set_query_params()
-            st.experimental_rerun()
+            st.query_params.clear()
+            st.rerun()

@@ -24,7 +24,7 @@ def login_component():
     
     with col1:
         with st.form("login_form", clear_on_submit=False):
-            username = st.text_input("Username", placeholder="Enter your username")
+            username = st.text_input("Username or Email", placeholder="Enter your username or email")
             password = st.text_input("Password", type="password", placeholder="Enter your password")
             remember = st.checkbox("Remember me")
             submit = st.form_submit_button("Log In")
@@ -45,7 +45,7 @@ def login_component():
                         st.session_state.token = token
                         st.session_state.remember_me = remember
                         # Set default menu to Dashboard
-                        st.session_state.menu = "Dashboard"
+                        st.session_state.current_menu = "Dashboard"
                         st.success(f"Welcome back, {user.full_name}!")
                         # Force a page reload to show the dashboard
                         st.rerun()
@@ -57,21 +57,29 @@ def login_component():
                     st.error(f"Login error: {str(e)}")
                     return False
         
+        # Divider for OAuth options
+        st.markdown("<div style='text-align: center; margin: 15px 0;'><span style='color: #666; font-size: 14px;'>— OR —</span></div>", unsafe_allow_html=True)
+        
+        # OAuth login buttons
+        from components.oauth_login import render_oauth_buttons
+        render_oauth_buttons()
+        
         # Reset password link
         st.markdown("<div style='text-align: center; margin-top: 10px;'><a href='#' style='color: #2a9fd6;'>Forgot Password?</a></div>", unsafe_allow_html=True)
     
     with col2:
-        st.markdown("### Quick Access")
+        st.markdown("### Project Directory Login")
         st.markdown("""
+        If your email is included in the project directory, you can log in using:
+        
+        - Your corporate email address
+        - OAuth authentication with Google, Office 365, or Procore
+        
+        These login methods provide secure, seamless access to your project dashboard without requiring separate credentials.
+        
         **Default Admin Login:**
         - Username: admin
-        - Password: admin
-        
-        Once logged in, you'll be able to:
-        - Create and manage projects
-        - Review RFIs and submittals
-        - Monitor project statuses
-        - Generate reports
+        - Password: admin123
         """)
     
     return False

@@ -380,6 +380,14 @@ def render_login_form():
     
     with tabs[1]:
         # Pure Python demo accounts section
+        render_demo_accounts_pure()
+    
+    with tabs[2]:
+        # Pure Python registration section
+        render_registration_request()
+
+def render_demo_accounts_pure():
+    """Render demo accounts section in pure Python."""
     st.markdown("### 🎭 Quick Access Demo Accounts")
     st.markdown("Choose a role to instantly explore different permission levels:")
     

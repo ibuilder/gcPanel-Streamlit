@@ -1,216 +1,195 @@
 """
-Security utilities for gcPanel.
+Security utilities for gcPanel production deployment.
 
-This module provides security hardening functions to protect 
-against common web vulnerabilities.
+This module provides security functions for authentication, validation,
+and protection against common web vulnerabilities.
 """
-
-import re
-import html
+import hashlib
 import secrets
+import re
 import logging
-from urllib.parse import urlparse
+import os
+from datetime import datetime, timedelta
+from typing import Dict, List, Tuple, Optional
+import streamlit as st
 
-# Setup logging
 logger = logging.getLogger(__name__)
 
-def generate_csrf_token():
-    """
-    Generate a secure CSRF token.
+class SecurityManager:
+    """Manages security operations for the application."""
     
-    Returns:
-        str: A secure random token
-    """
-    return secrets.token_hex(32)
-
-def validate_csrf_token(session_token, request_token):
-    """
-    Validate CSRF token using constant time comparison.
-    
-    Args:
-        session_token: Token stored in session
-        request_token: Token from request
+    def __init__(self):
+        self.failed_attempts = {}
+        self.blocked_ips = {}
         
-    Returns:
-        bool: True if valid, False otherwise
-    """
-    if not session_token or not request_token:
-        return False
-    
-    # Use constant time comparison to prevent timing attacks
-    return secrets.compare_digest(session_token, request_token)
-
-def sanitize_input(input_string):
-    """
-    Sanitize user input to prevent XSS attacks.
-    
-    Args:
-        input_string: String to sanitize
+    def validate_input(self, input_text: str, input_type: str = "general") -> Tuple[bool, str]:
+        """
+        Validate input for security issues.
         
-    Returns:
-        str: Sanitized string
-    """
-    if not input_string:
-        return ""
-    
-    # Convert to string if not already
-    if not isinstance(input_string, str):
-        input_string = str(input_string)
-    
-    # HTML escape
-    return html.escape(input_string)
-
-def validate_url(url):
-    """
-    Validate URL to prevent open redirect vulnerabilities.
-    
-    Args:
-        url: URL to validate
-        
-    Returns:
-        bool: True if safe, False otherwise
-    """
-    if not url:
-        return False
-    
-    try:
-        # Parse URL
-        parsed = urlparse(url)
-        
-        # Only allow http and https schemes
-        if parsed.scheme not in ('http', 'https'):
-            return False
-        
-        # Check if domain and path exist
-        if not parsed.netloc or parsed.netloc == '':
-            return False
+        Args:
+            input_text: The input to validate
+            input_type: Type of input (email, password, general)
             
+        Returns:
+            Tuple of (is_valid, error_message)
+        """
+        if not input_text:
+            return False, "Input cannot be empty"
+            
+        # Check for SQL injection patterns
+        sql_patterns = [
+            r'\bunion\b', r'\bselect\b', r'\bdrop\b', r'\bdelete\b',
+            r'\binsert\b', r'\bupdate\b', r'--', r';', r'\bor\b.*=.*=',
+            r'\band\b.*=.*=', r'\/\*', r'\*\/'
+        ]
+        
+        for pattern in sql_patterns:
+            if re.search(pattern, input_text, re.IGNORECASE):
+                logger.warning(f"SQL injection attempt detected: {pattern}")
+                return False, "Invalid characters detected"
+        
+        # Check for XSS patterns
+        xss_patterns = [
+            r'<script', r'javascript:', r'onload=', r'onerror=',
+            r'onclick=', r'onmouseover=', r'<iframe', r'<object',
+            r'<embed', r'<link', r'<meta'
+        ]
+        
+        for pattern in xss_patterns:
+            if re.search(pattern, input_text, re.IGNORECASE):
+                logger.warning(f"XSS attempt detected: {pattern}")
+                return False, "Invalid content detected"
+        
+        # Email validation
+        if input_type == "email":
+            email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+            if not re.match(email_pattern, input_text):
+                return False, "Invalid email format"
+        
+        # Password validation
+        if input_type == "password":
+            if len(input_text) < 8:
+                return False, "Password must be at least 8 characters"
+            if not re.search(r'[A-Z]', input_text):
+                return False, "Password must contain uppercase letter"
+            if not re.search(r'[a-z]', input_text):
+                return False, "Password must contain lowercase letter"
+            if not re.search(r'\d', input_text):
+                return False, "Password must contain number"
+        
+        return True, ""
+    
+    def hash_password(self, password: str) -> str:
+        """Hash password using secure method."""
+        salt = secrets.token_hex(32)
+        pwdhash = hashlib.pbkdf2_hmac('sha256',
+                                     password.encode('utf-8'),
+                                     salt.encode('utf-8'),
+                                     100000)
+        return salt + pwdhash.hex()
+    
+    def verify_password(self, stored_password: str, provided_password: str) -> bool:
+        """Verify password against stored hash."""
+        salt = stored_password[:64]
+        stored_hash = stored_password[64:]
+        pwdhash = hashlib.pbkdf2_hmac('sha256',
+                                     provided_password.encode('utf-8'),
+                                     salt.encode('utf-8'),
+                                     100000)
+        return stored_hash == pwdhash.hex()
+    
+    def check_rate_limit(self, identifier: str, limit: int = 60, window: int = 60) -> bool:
+        """
+        Check if identifier exceeds rate limit.
+        
+        Args:
+            identifier: IP address or user identifier
+            limit: Maximum requests per window
+            window: Time window in seconds
+            
+        Returns:
+            True if within limit, False if exceeded
+        """
+        now = datetime.now()
+        
+        if identifier not in self.failed_attempts:
+            self.failed_attempts[identifier] = []
+        
+        # Remove old attempts outside window
+        self.failed_attempts[identifier] = [
+            attempt for attempt in self.failed_attempts[identifier]
+            if now - attempt < timedelta(seconds=window)
+        ]
+        
+        if len(self.failed_attempts[identifier]) >= limit:
+            logger.warning(f"Rate limit exceeded for {identifier}")
+            return False
+        
+        self.failed_attempts[identifier].append(now)
         return True
-    except Exception as e:
-        logger.error(f"URL validation error: {str(e)}")
-        return False
-
-def validate_redirect_url(url, allowed_domains=None):
-    """
-    Validate redirect URL to prevent open redirect vulnerabilities.
     
-    Args:
-        url: Redirect URL to validate
-        allowed_domains: List of allowed domains
-        
-    Returns:
-        bool: True if safe, False otherwise
-    """
-    if not url:
-        return False
+    def sanitize_filename(self, filename: str) -> str:
+        """Sanitize filename for safe storage."""
+        # Remove potentially dangerous characters
+        sanitized = re.sub(r'[<>:"/\\|?*]', '', filename)
+        # Remove leading/trailing dots and spaces
+        sanitized = sanitized.strip('. ')
+        # Limit length
+        if len(sanitized) > 255:
+            name, ext = os.path.splitext(sanitized)
+            sanitized = name[:251-len(ext)] + ext
+        return sanitized
     
-    try:
-        # Parse URL
-        parsed = urlparse(url)
+    def validate_file_upload(self, file, allowed_extensions: List[str], max_size_mb: int) -> Tuple[bool, str]:
+        """
+        Validate uploaded file for security.
         
-        # Allow relative URLs
-        if not parsed.netloc:
-            return True
+        Args:
+            file: Uploaded file object
+            allowed_extensions: List of allowed file extensions
+            max_size_mb: Maximum file size in MB
             
-        # Check against allowed domains
-        if allowed_domains and parsed.netloc in allowed_domains:
-            return True
-            
-        # Disallow external domains by default
-        return False
-    except Exception as e:
-        logger.error(f"Redirect URL validation error: {str(e)}")
-        return False
-
-def validate_filename(filename):
-    """
-    Validate filenames to prevent path traversal attacks.
-    
-    Args:
-        filename: Filename to validate
+        Returns:
+            Tuple of (is_valid, error_message)
+        """
+        if not file:
+            return False, "No file provided"
         
-    Returns:
-        bool: True if safe, False otherwise
-    """
-    if not filename:
-        return False
-    
-    # Check for directory traversal patterns
-    if '..' in filename or '/' in filename or '\\' in filename:
-        return False
-    
-    # Only allow alphanumeric, dash, underscore, and period
-    if not re.match(r'^[\w\-\.]+$', filename):
-        return False
+        # Check file extension
+        file_ext = '.' + file.name.split('.')[-1].lower()
+        if file_ext not in allowed_extensions:
+            return False, f"File type {file_ext} not allowed"
         
-    return True
+        # Check file size
+        if hasattr(file, 'size') and file.size > max_size_mb * 1024 * 1024:
+            return False, f"File size exceeds {max_size_mb}MB limit"
+        
+        return True, ""
 
-def set_security_headers():
-    """
-    Get security headers for HTTP response.
+def get_client_ip() -> str:
+    """Get client IP address (mock implementation for demo)."""
+    # In production, this would extract real IP from headers
+    return "127.0.0.1"
+
+def log_security_event(event_type: str, details: Dict, severity: str = "INFO"):
+    """Log security events for monitoring."""
+    timestamp = datetime.now().isoformat()
+    client_ip = get_client_ip()
     
-    Returns:
-        dict: Security headers
-    """
-    headers = {
-        'X-Content-Type-Options': 'nosniff',
-        'X-Frame-Options': 'SAMEORIGIN',
-        'X-XSS-Protection': '1; mode=block',
-        'Referrer-Policy': 'strict-origin-when-cross-origin',
-        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;",
-        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-        'Cache-Control': 'no-store, max-age=0'
+    log_entry = {
+        'timestamp': timestamp,
+        'event_type': event_type,
+        'client_ip': client_ip,
+        'details': details,
+        'severity': severity
     }
     
-    # Return headers to be applied as needed
-    return headers
+    if severity == "CRITICAL":
+        logger.critical(f"Security Event: {log_entry}")
+    elif severity == "WARNING":
+        logger.warning(f"Security Event: {log_entry}")
+    else:
+        logger.info(f"Security Event: {log_entry}")
 
-def apply_security_headers():
-    """
-    Apply security headers using Streamlit.
-    """
-    headers = set_security_headers()
-    
-    # Apply headers through HTML since Streamlit doesn't provide direct header control
-    header_html = '<meta http-equiv="Content-Security-Policy" content="default-src \'self\'; script-src \'self\' \'unsafe-inline\' \'unsafe-eval\'; style-src \'self\' \'unsafe-inline\'; img-src \'self\' data:;">'
-    header_html += '<meta http-equiv="X-Content-Type-Options" content="nosniff">'
-    header_html += '<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">'
-    header_html += '<meta http-equiv="X-XSS-Protection" content="1; mode=block">'
-    header_html += '<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">'
-    
-    import streamlit as st
-    st.markdown(header_html, unsafe_allow_html=True)
-
-def secure_file_upload(uploaded_file):
-    """
-    Securely handle file uploads.
-    
-    Args:
-        uploaded_file: File from streamlit file_uploader
-        
-    Returns:
-        tuple: (is_safe, message)
-    """
-    if not uploaded_file:
-        return False, "No file provided"
-    
-    # Validate filename
-    if not validate_filename(uploaded_file.name):
-        return False, "Invalid filename. Only alphanumeric characters, dashes, underscores, and periods are allowed."
-    
-    # Check file size (limit to 10MB)
-    if uploaded_file.size > 10 * 1024 * 1024:
-        return False, "File too large. Maximum size is 10MB."
-    
-    # Basic content type validation
-    allowed_types = {
-        'text/plain', 'text/csv', 'application/pdf',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'image/jpeg', 'image/png', 'image/gif'
-    }
-    
-    if uploaded_file.type not in allowed_types:
-        return False, f"Unsupported file type: {uploaded_file.type}"
-    
-    return True, "File is safe"
+# Global security manager instance
+security_manager = SecurityManager()

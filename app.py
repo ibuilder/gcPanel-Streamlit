@@ -21,8 +21,17 @@ The application includes production-ready features:
 """
 
 import streamlit as st
+import logging
+import os
 from utils.ui_manager import set_page_config
 import app_manager
+
+# Import production configuration
+from config.production import ProductionConfig, setup_logging
+from utils.security import log_security_event
+
+# Setup logging for production
+logger = setup_logging()
 
 # Import feature showcase
 from modules.features_showcase import render_features_showcase
@@ -48,6 +57,15 @@ from assets.enhanced_ui import apply_enhanced_styles
 def main():
     """Main application entry point."""
     try:
+        # Validate production configuration
+        config_errors = ProductionConfig.validate_config()
+        if config_errors and ProductionConfig.ENVIRONMENT == 'production':
+            logger.critical(f"Production configuration errors: {config_errors}")
+            st.error("Application configuration error. Please contact administrator.")
+            return
+        
+        # Log application start
+        log_security_event("APPLICATION_START", {"environment": ProductionConfig.ENVIRONMENT})
         # Set page configuration with favicon (PWA support is now integrated in set_page_config)
         set_page_config()
         

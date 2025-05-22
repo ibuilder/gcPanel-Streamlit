@@ -95,25 +95,121 @@ def main():
             # Reset the form submission flag
             st.session_state.login_form_submitted = False
             
-            # Check for admin credentials
+            # Check user credentials for various roles
+            # Admin - Full system access
             if username.lower() == "admin" and password == "admin123":
-                # Set authentication in session state
                 st.session_state.authenticated = True
                 st.session_state.user = {
                     "username": "admin",
                     "email": "admin@gcpanel.com",
                     "full_name": "Admin User",
-                    "role": "admin"
+                    "role": "admin",
+                    "company": "GC Prime Contractors",
+                    "access_level": "full"
                 }
                 is_authenticated = True
-            # Add demo user credentials
+            
+            # Project Manager - Full project access
+            elif username.lower() == "pm" and password == "pm123":
+                st.session_state.authenticated = True
+                st.session_state.user = {
+                    "username": "pm",
+                    "email": "pm@gcpanel.com",
+                    "full_name": "Project Manager",
+                    "role": "project_manager",
+                    "company": "GC Prime Contractors",
+                    "access_level": "full_project"
+                }
+                is_authenticated = True
+            
+            # Superintendent - Field operations focus
+            elif username.lower() == "super" and password == "super123":
+                st.session_state.authenticated = True
+                st.session_state.user = {
+                    "username": "super",
+                    "email": "super@gcpanel.com",
+                    "full_name": "Site Superintendent",
+                    "role": "superintendent",
+                    "company": "GC Prime Contractors",
+                    "access_level": "field_ops"
+                }
+                is_authenticated = True
+            
+            # Estimator - Preconstruction and cost focus
+            elif username.lower() == "estimator" and password == "est123":
+                st.session_state.authenticated = True
+                st.session_state.user = {
+                    "username": "estimator",
+                    "email": "estimator@gcpanel.com",
+                    "full_name": "Senior Estimator",
+                    "role": "estimator",
+                    "company": "GC Prime Contractors",
+                    "access_level": "cost_precon"
+                }
+                is_authenticated = True
+            
+            # Architect - Design focus
+            elif username.lower() == "architect" and password == "arch123":
+                st.session_state.authenticated = True
+                st.session_state.user = {
+                    "username": "architect",
+                    "email": "arch@designpartners.com",
+                    "full_name": "Design Architect",
+                    "role": "architect",
+                    "company": "Design Partners",
+                    "access_level": "design"
+                }
+                is_authenticated = True
+            
+            # Engineer - Engineering focus
+            elif username.lower() == "engineer" and password == "eng123":
+                st.session_state.authenticated = True
+                st.session_state.user = {
+                    "username": "engineer",
+                    "email": "engineer@structuresolutions.com",
+                    "full_name": "Structural Engineer",
+                    "role": "engineer",
+                    "company": "Structure Solutions",
+                    "access_level": "engineering"
+                }
+                is_authenticated = True
+            
+            # Subcontractor - Limited access
+            elif username.lower() == "sub" and password == "sub123":
+                st.session_state.authenticated = True
+                st.session_state.user = {
+                    "username": "sub",
+                    "email": "foreman@powersystems.com",
+                    "full_name": "Electrical Foreman",
+                    "role": "subcontractor",
+                    "company": "Power Systems Inc.",
+                    "access_level": "limited"
+                }
+                is_authenticated = True
+            
+            # Owner - Owner view
+            elif username.lower() == "owner" and password == "owner123":
+                st.session_state.authenticated = True
+                st.session_state.user = {
+                    "username": "owner",
+                    "email": "owner@highlandproperties.com",
+                    "full_name": "Project Owner",
+                    "role": "owner",
+                    "company": "Highland Properties LLC",
+                    "access_level": "owner_view"
+                }
+                is_authenticated = True
+            
+            # Demo User - Viewer access (kept for backward compatibility)
             elif username.lower() == "demo" and password == "demo123":
                 st.session_state.authenticated = True
                 st.session_state.user = {
                     "username": "demo",
                     "email": "demo@gcpanel.com",
                     "full_name": "Demo User",
-                    "role": "viewer"
+                    "role": "viewer",
+                    "company": "GC Prime Contractors",
+                    "access_level": "view_only"
                 }
                 is_authenticated = True
         

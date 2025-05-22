@@ -121,6 +121,22 @@ def _render_ui_framework():
     # Get current menu from session state
     current_menu = st.session_state.get("current_menu", "Dashboard")
     
+    # Set up custom CSS to fix header positioning
+    st.markdown("""
+    <style>
+        /* Fix for header positioning */
+        div[data-testid="stVerticalBlock"] > div:first-child {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+        /* Fix breadcrumbs spacing */
+        .breadcrumb-container {
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+    
     # Render clean header component with project info and navigation
     render_header()
     

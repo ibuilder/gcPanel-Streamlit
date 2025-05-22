@@ -14,11 +14,15 @@ def get_css():
     return """
     /* Header styling for gcPanel */
     
-    /* Add a subtle border at the bottom of the header */
+    /* Add a subtle border at the bottom of the header and ensure it's at the top */
     .header-container {
         border-bottom: 1px solid #f0f0f0;
         margin-bottom: 1rem;
         padding-bottom: 0.5rem;
+        position: relative;
+        top: 0;
+        margin-top: 0;
+        padding-top: 0.5rem;
     }
     
     /* Crane icon styling */

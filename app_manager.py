@@ -221,6 +221,8 @@ def render_selected_module(current_menu):
         "BIM": render_bim,
         "✅ Closeout": render_closeout,
         "Closeout": render_closeout,
+        "👥 Collaboration": lambda: modules.collaboration.render_collaboration_hub(),
+        "Collaboration": lambda: modules.collaboration.render_collaboration_hub(),
         "📱 Mobile Companion": render_mobile_companion,
         "Mobile Companion": render_mobile_companion,
         "🤖 AI Assistant": render_ai_assistant,

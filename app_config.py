@@ -57,6 +57,7 @@ MENU_MAP = {
     "📄 Documents": "Documents",
     "🏢 BIM": "BIM",
     "✅ Closeout": "Closeout",
+    "👥 Collaboration": "Collaboration",
     "🤖 AI Assistant": "AI Assistant",
     "📱 Mobile Companion": "Mobile Companion",
     "🔄 Integrations": "Integrations",

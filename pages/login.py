@@ -98,7 +98,7 @@ def login_page():
     query_params = st.query_params
     if "code" in query_params and "state" in query_params:
         # Determine which provider this is based on URL path components
-        current_url = st.get_option("server.baseUrlPath", "")
+        current_url = st.experimental_get_query_params()
         provider = None
         
         if "google" in current_url:

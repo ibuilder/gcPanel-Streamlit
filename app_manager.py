@@ -33,7 +33,7 @@ from modules.bim import render_bim
 from modules.standalone_bim import render_bim_standalone
 from modules.field_operations import render as render_field_operations
 from modules.scheduling import render_scheduling
-from modules.safety import render_safety
+from modules.safety import render as render_safety
 from modules.cost_management import render as render_cost_management
 from modules.closeout import render as render_closeout
 from modules.engineering import render as render_engineering

@@ -43,11 +43,18 @@ def render_fixed_header():
         padding-top: 0 !important;
         margin-top: 0 !important;
     }
+    
+    /* Style for our custom navigation container */
+    .nav-dropdown-container {
+        width: 100%;
+        text-align: right;
+        padding-right: 10px;
+    }
     </style>
     """, unsafe_allow_html=True)
     
-    # Create the fixed header with HTML for the logo and project info
-    header_html = f"""
+    # Create the first part of the header (logo and project info)
+    st.markdown("""
     <div style="position:relative; top:0; left:0; right:0; z-index:999; background:#f8f9fa; padding:5px 10px; border-bottom:1px solid #e9ecef; margin:0;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center;">
@@ -60,18 +67,12 @@ def render_fixed_header():
                 <div style="font-weight:bold; font-size:18px;">Highland Tower Development</div>
                 <div style="font-size:12px; color:#666;">$45.5M • 168,500 sq ft • 15 stories above ground, 2 below</div>
             </div>
-            <div style="text-align:right;">
-                <!-- Navigation dropdown will be placed here -->
-            </div>
-        </div>
-    </div>
-    """
+    """, unsafe_allow_html=True)
     
-    # Render the header
-    st.markdown(header_html, unsafe_allow_html=True)
+    # Create a column layout for the third part (navigation)
+    col1, col2, col3 = st.columns([7, 1, 2])
     
-    # Add the navigation dropdown directly where the "Navigation" text was
-    col1, col2, col3 = st.columns([1, 3, 1])
+    # In the third column, place the navigation dropdown
     with col3:
         current_menu = st.session_state.get("current_menu", "Dashboard")
         from app_config import MENU_OPTIONS
@@ -88,3 +89,9 @@ def render_fixed_header():
         if selected_menu != current_menu:
             st.session_state.current_menu = selected_menu
             st.rerun()
+    
+    # Close the header div
+    st.markdown("""
+        </div>
+    </div>
+    """, unsafe_allow_html=True)

@@ -15,9 +15,6 @@ def simple_breadcrumbs(current_page, previous_pages=None):
         current_page (str): Current page name
         previous_pages (list, optional): List of previous pages in the navigation hierarchy
     """
-    if previous_pages is None:
-        previous_pages = ["Home"]
-    
     # Create the breadcrumb HTML
     breadcrumb_html = """
     <div class="breadcrumb-container">
@@ -27,14 +24,10 @@ def simple_breadcrumbs(current_page, previous_pages=None):
     # Add Home link
     breadcrumb_html += """<span class="breadcrumb-item"><a href="javascript:void(0);" onclick="homeClick()">Home</a></span>"""
     
-    # Add previous pages
-    for page in previous_pages[1:]:
+    # If current_page is not Dashboard or Home, add it with separator
+    if current_page != "Dashboard" and current_page != "Home" and current_page != "📊 Dashboard":
         breadcrumb_html += f"""<span class="breadcrumb-separator">›</span>
-        <span class="breadcrumb-item"><a href="javascript:void(0);">{page}</a></span>"""
-    
-    # Add current page
-    breadcrumb_html += f"""<span class="breadcrumb-separator">›</span>
-    <span class="breadcrumb-item breadcrumb-active">{current_page}</span>"""
+        <span class="breadcrumb-item breadcrumb-active">{current_page}</span>"""
     
     # Close breadcrumb container
     breadcrumb_html += """

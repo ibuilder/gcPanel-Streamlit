@@ -139,8 +139,8 @@ def _render_ui_framework():
     """, unsafe_allow_html=True)
     
     # Always render breadcrumbs for navigation context
-    breadcrumbs = get_breadcrumbs_for_page(current_menu)
-    simple_breadcrumbs(breadcrumbs)
+    # Pass the menu directly instead of a list to avoid showing brackets
+    simple_breadcrumbs(current_menu)
     
     # Handle notifications display
     _handle_notification_display()

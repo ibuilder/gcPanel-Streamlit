@@ -57,11 +57,25 @@ def main():
         # Apply enhanced UI styles for professional, enterprise-grade appearance
         apply_enhanced_styles()
         
-        # Render the fixed header at the top of the page
-        render_fixed_header()
-        
         # Initialize session state variables from app_manager
         app_manager.initialize_session_state()
+        
+        # Check authentication
+        is_authenticated = False
+        if "authenticated" in st.session_state:
+            is_authenticated = st.session_state.authenticated
+        
+        # Show login page if not authenticated
+        if not is_authenticated:
+            # Import and render login page
+            from pages.login import login_page
+            login_page()
+            return
+            
+        # User is authenticated, continue with regular app
+        
+        # Render the fixed header at the top of the page
+        render_fixed_header()
         
         # Add a toggle for mobile field companion view
         is_mobile = False

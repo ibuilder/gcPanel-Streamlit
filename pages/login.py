@@ -29,11 +29,13 @@ def login_page():
         max-width: 1000px;
         margin: 0 auto;
     }
-    /* Hide default header, footer, and sidebar */
+    /* Hide default header, footer, sidebar and collapse button */
     header {display: none !important;}
     footer {display: none !important;}
     #MainMenu {display: none !important;}
     [data-testid="stSidebar"] {display: none !important;}
+    .st-emotion-cache-1c7y2kd {display: none !important;} /* Hide the sidebar collapse button */
+    button[kind="headerNoPadding"] {display: none !important;} /* Additional sidebar button hide */
     
     /* Improve form spacing */
     div.stForm > div {

@@ -357,13 +357,45 @@ def create_project_header(project_name, project_number="", address="", status="I
         </style>
     """, unsafe_allow_html=True)
     
+    # Define navigation JavaScript function in Python
+    # This creates a proper connection between Python code and JavaScript
+    navigation_js = """
+    <script>
+    function navigateTo(menu) {
+        // Set the session state
+        window.parent.postMessage({
+            type: "streamlit:setSessionState",
+            key: "current_menu",
+            value: menu
+        }, "*");
+        
+        // Force a rerun
+        window.parent.postMessage({
+            type: "streamlit:forceRerun"
+        }, "*");
+    }
+    </script>
+    """
+    
     # Project details to display
     project_details = "$45.5M • 168,500 sq ft • 15 stories above ground, 2 below"
     
     # Get current menu from session state
     current_menu = st.session_state.get("current_menu", "Dashboard")
     
-    # Navigation menu items
+    # Tower crane SVG icon defined in Python
+    tower_crane_svg = """
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="6" y="4" width="4" height="6"></rect>
+        <line x1="8" y1="1" x2="8" y2="4"></line>
+        <line x1="8" y1="10" x2="8" y2="23"></line>
+        <line x1="8" y1="4" x2="16" y2="4"></line>
+        <line x1="16" y1="4" x2="16" y2="10"></line>
+        <line x1="16" y1="10" x2="20" y2="10"></line>
+    </svg>
+    """
+    
+    # Navigation menu items - Python dictionary
     nav_items = {
         "Dashboard": "Dashboard",
         "Pre-Construction": "PreConstruction",
@@ -377,9 +409,10 @@ def create_project_header(project_name, project_number="", address="", status="I
         "Resources": "Resources"
     }
     
-    # Create navigation menu HTML - Using simpler approach for JavaScript in f-strings
+    # Create navigation menu HTML - Building HTML in Python
     nav_menu = ""
     for label, value in nav_items.items():
+        # Using Python string formatting to build HTML
         menu_item = f"""
         <a href="#" onclick="navigateTo('{value}')" 
            style="display: block; padding: 8px 12px; text-decoration: none; color: #333; font-size: 13px; text-align: left;">
@@ -388,8 +421,9 @@ def create_project_header(project_name, project_number="", address="", status="I
         """
         nav_menu += menu_item
     
-    # Create the header HTML
+    # Create the header HTML using Python f-strings
     header_html = f"""
+    {navigation_js}
     <div style="display: flex; justify-content: space-between; align-items: center; 
                 background-color: white; padding: 12px 16px; border-bottom: 1px solid #e0e0e0;
                 width: 100%; box-sizing: border-box;">
@@ -400,14 +434,7 @@ def create_project_header(project_name, project_number="", address="", status="I
             </div>
             <span style="color: #2e86de; font-weight: 600; margin-left: 2px;">Panel</span>
             <div style="margin-left: 8px; color: #2e86de;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="6" y="4" width="4" height="6"></rect>
-                    <line x1="8" y1="1" x2="8" y2="4"></line>
-                    <line x1="8" y1="10" x2="8" y2="23"></line>
-                    <line x1="8" y1="4" x2="16" y2="4"></line>
-                    <line x1="16" y1="4" x2="16" y2="10"></line>
-                    <line x1="16" y1="10" x2="20" y2="10"></line>
-                </svg>
+                {tower_crane_svg}
             </div>
         </div>
         
@@ -431,25 +458,9 @@ def create_project_header(project_name, project_number="", address="", status="I
             </div>
         </div>
     </div>
-    
-    <script>
-    function navigateTo(menu) {{
-        // Set the session state
-        window.parent.postMessage({{
-            type: "streamlit:setSessionState",
-            key: "current_menu",
-            value: menu
-        }}, "*");
-        
-        // Force a rerun
-        window.parent.postMessage({{
-            type: "streamlit:forceRerun"
-        }}, "*");
-    }}
-    </script>
     """
     
-    # Render the header at the top
+    # Render the header at the top using Streamlit's markdown function
     st.markdown(header_html, unsafe_allow_html=True)
 
 def create_metrics_dashboard(metrics_data):

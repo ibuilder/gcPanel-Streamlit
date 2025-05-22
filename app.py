@@ -54,14 +54,16 @@ def main():
         # Enable mobile optimizations
         add_mobile_styles()
         
-        # Apply improved container styles to fix spacing issues
-        apply_container_styles()
-        
-        # Apply header fixes to remove white box at the top
-        apply_header_fixes()
-        
         # Apply enhanced UI styles for professional, enterprise-grade appearance
         apply_enhanced_styles()
+        
+        # Always show the beautiful header at the top of every page
+        create_project_header(
+            project_name="Highland Tower Development",
+            project_number="HT-2025-001",
+            address="11 Highland Dr, Boston, MA 02120, United States",
+            status="In Progress"
+        )
         
         # Initialize session state variables from app_manager
         app_manager.initialize_session_state()
@@ -75,15 +77,6 @@ def main():
         if is_mobile:
             render_mobile_field_companion()
         else:
-            # Add professional project header on Dashboard
-            if "current_menu" in st.session_state and st.session_state["current_menu"] == "Dashboard":
-                create_project_header(
-                    project_name="Highland Tower Development",
-                    project_number="HT-2025-001",
-                    address="11 Highland Dr, Boston, MA 02120, United States",
-                    status="In Progress"
-                )
-                
             # Render the entire application with the app manager
             app_manager.render_application()
             

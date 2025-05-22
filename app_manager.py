@@ -217,10 +217,7 @@ def _configure_caching():
         logging.error(f"Cache configuration error: {str(e)}")
 
 def _render_ui_framework():
-    """Render the main UI framework including header, navigation, and content."""
-    # Render the application header with navigation
-    render_header()
-    
+    """Render the main UI framework including navigation and content."""
     # Main content area
     with st.container():
         # Get current menu selection

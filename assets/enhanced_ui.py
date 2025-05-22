@@ -287,8 +287,7 @@ def apply_enhanced_styles():
 
 def create_project_header(project_name, project_number="", address="", status="In Progress"):
     """
-    Create a professional project header with clean modern design using Python code
-    instead of HTML markup.
+    Create a professional project header with clean modern design at the very top of the page.
     
     Args:
         project_name (str): Name of the project
@@ -296,58 +295,64 @@ def create_project_header(project_name, project_number="", address="", status="I
         address (str, optional): Project address
         status (str, optional): Project status
     """
-    # Create a container for the header
-    header_container = st.container()
-    
-    # Use columns for layout
-    with header_container:
-        # Remove padding from the container
-        st.markdown("""
+    # Remove default streamlit padding and margin
+    st.markdown("""
         <style>
-        div[data-testid="stVerticalBlock"] > div:first-child {
-            margin-top: -1rem;
-            margin-left: -1rem;
-            margin-right: -1rem;
-            background-color: white;
-            border-bottom: 1px solid #e0e0e0;
-            padding: 10px 16px;
-        }
+            .block-container {
+                padding-top: 0;
+                padding-bottom: 0;
+                margin-top: 0;
+            }
+            header {
+                display: none;
+            }
+            #MainMenu {
+                visibility: hidden;
+            }
+            footer {
+                visibility: hidden;
+            }
+            section.main > div:first-child {
+                padding-top: 0 !important;
+            }
+            div[data-testid="stVerticalBlock"] {
+                gap: 0;
+            }
         </style>
-        """, unsafe_allow_html=True)
-        
-        # Create a 3-column layout
-        left_col, center_col, right_col = st.columns([1, 2, 1])
-        
-        with left_col:
-            st.markdown("""
-            <div style="display: flex; align-items: center;">
-                <div style="background-color: #00a8e8; padding: 8px; border-radius: 4px; margin-right: 5px;">
-                    <span style="color: white; font-weight: bold; font-size: 14px;">gc</span>
-                </div>
-                <span style="color: #2e86de; font-weight: 600; margin-left: 2px;">Panel</span>
+    """, unsafe_allow_html=True)
+    
+    # Project details to display
+    project_details = "$45.5M • 168,500 sq ft • 15 stories above ground, 2 below"
+    
+    # Create the header HTML
+    header_html = f"""
+    <div style="display: flex; justify-content: space-between; align-items: center; 
+                background-color: white; padding: 12px 16px; border-bottom: 1px solid #e0e0e0;
+                width: 100%; box-sizing: border-box;">
+        <div style="display: flex; align-items: center;">
+            <div style="background-color: #00a8e8; padding: 8px; border-radius: 4px; margin-right: 5px;">
+                <span style="color: white; font-weight: bold; font-size: 14px;">gc</span>
             </div>
-            """, unsafe_allow_html=True)
-        
-        with center_col:
-            st.markdown(f"""
-            <div style="text-align: center;">
-                <div style="font-weight: 600; color: #2c3e50; font-size: 0.95rem;">{project_name}</div>
-                <div style="color: #7f8c8d; font-size: 0.75rem;">$45.5M • 168,500 sq ft • 15 stories above ground, 2 below</div>
+            <span style="color: #2e86de; font-weight: 600; margin-left: 2px;">Panel</span>
+        </div>
+        <div style="text-align: center;">
+            <div style="font-weight: 600; color: #2c3e50; font-size: 0.95rem;">{project_name}</div>
+            <div style="color: #7f8c8d; font-size: 0.75rem;">{project_details}</div>
+        </div>
+        <div style="display: flex; align-items: center;">
+            <span style="color: #7f8c8d; font-size: 0.8rem; margin-right: 5px;">Navigation</span>
+            <div style="display: flex; align-items: center; background-color: #f0f3f6; border-radius: 4px; padding: 3px 8px;">
+                <span style="color: #4a90e2; margin-right: 5px;">Dashboard</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
             </div>
-            """, unsafe_allow_html=True)
-        
-        with right_col:
-            st.markdown("""
-            <div style="display: flex; align-items: center; color: #7f8c8d; font-size: 0.8rem; font-weight: 500; padding: 5px 10px;">
-                <span style="margin-right: 3px;">Navigation</span>
-                <div style="display: flex; align-items: center; background-color: #f0f3f6; border-radius: 4px; padding: 3px 8px;">
-                    <span style="color: #4a90e2; margin-right: 5px;">Dashboard</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+        </div>
+    </div>
+    """
+    
+    # Render the header at the top
+    st.markdown(header_html, unsafe_allow_html=True)
 
 def create_metrics_dashboard(metrics_data):
     """

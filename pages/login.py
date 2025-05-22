@@ -28,10 +28,23 @@ def login_page():
         max-width: 1000px;
         margin: 0 auto;
     }
-    /* Hide default header and footer */
+    /* Hide default header, footer, and sidebar */
     header {display: none !important;}
     footer {display: none !important;}
     #MainMenu {display: none !important;}
+    [data-testid="stSidebar"] {display: none !important;}
+    
+    /* Improve form spacing */
+    div.stForm > div {
+        padding-bottom: 10px;
+    }
+    button[kind="primaryFormSubmit"] {
+        margin-top: 10px;
+    }
+    /* Better layout for the login page */
+    .stTabs [data-baseweb="tab-panel"] {
+        padding-top: 1rem;
+    }
     </style>
     """, unsafe_allow_html=True)
     
@@ -74,31 +87,27 @@ def login_page():
     """, unsafe_allow_html=True)
     
     # Main login container
-    with st.container():
-        tabs = st.tabs(["Login", "Register"])
-        
-        with tabs[0]:
-            # Use a simplified version without nested columns
-            render_oauth_login_page()
-        
-        with tabs[1]:
-            col1, col2, col3 = st.columns([1, 2, 1])
-            
-            with col2:
-                st.markdown("""
-                <div style="text-align: center; margin: 40px 0;">
-                    <h2>Request Access</h2>
-                    <p>Registration for gcPanel is managed by your project administrator.</p>
-                    <p>If you need access, please contact your project manager or administrator with your:</p>
-                    <ul style="text-align: left;">
-                        <li>Full name</li>
-                        <li>Company</li>
-                        <li>Position/role</li>
-                        <li>Corporate email address</li>
-                    </ul>
-                    <p>Once added to the project directory, you'll be able to sign in using your corporate email address.</p>
-                </div>
-                """, unsafe_allow_html=True)
+    tabs = st.tabs(["Login", "Register"])
+    
+    with tabs[0]:
+        # Use a simplified version without nested columns
+        render_oauth_login_page()
+    
+    with tabs[1]:
+        st.markdown("""
+        <div style="text-align: center; margin: 20px 0;">
+            <h2>Request Access</h2>
+            <p>Registration for gcPanel is managed by your project administrator.</p>
+            <p>If you need access, please contact your project manager or administrator with your:</p>
+            <ul style="text-align: left;">
+                <li>Full name</li>
+                <li>Company</li>
+                <li>Position/role</li>
+                <li>Corporate email address</li>
+            </ul>
+            <p>Once added to the project directory, you'll be able to sign in using your corporate email address.</p>
+        </div>
+        """, unsafe_allow_html=True)
     
     # Footer
     st.markdown("""

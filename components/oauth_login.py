@@ -29,19 +29,25 @@ def render_oauth_buttons():
     # Define button styles
     button_styles = {
         "google": {
-            "bgcolor": "#4285F4",
-            "color": "white",
-            "icon": "https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            "bgcolor": "#FFFFFF",
+            "color": "#757575",
+            "border": "1px solid #DADCE0",
+            "icon": "https://developers.google.com/identity/images/g-logo.png",
+            "hover": "background-color: #F5F5F5"
         },
         "microsoft": {
             "bgcolor": "#2F2F2F",
             "color": "white",
-            "icon": "https://logincdn.msauth.net/shared/1.0/content/images/favicon_a_eupayfgghqiai7k9sol6eih2.ico"
+            "border": "none",
+            "icon": "https://logincdn.msauth.net/shared/1.0/content/images/microsoft_logo_ee5c8d9fb6248c938fd0dc19370e90bd.svg",
+            "hover": "background-color: #444444"
         },
         "procore": {
-            "bgcolor": "#F56B46",
+            "bgcolor": "#F9A01B",
             "color": "white",
-            "icon": "https://cdn.procore.com/images/favicon.ico"
+            "border": "none",
+            "icon": "https://assets.procore.com/images/favicon.ico",
+            "hover": "background-color: #E99010"
         }
     }
     
@@ -94,10 +100,15 @@ def render_oauth_button(provider: OAuthProvider, name: str, style: Dict[str, str
             <a href="{auth_url}" target="_self" style="text-decoration: none; width: 100%;">
                 <button 
                     style="background-color: {style['bgcolor']}; color: {style['color']}; 
-                           border: none; padding: 10px 15px; border-radius: 5px; width: 100%;
-                           cursor: pointer; display: flex; align-items: center; justify-content: center;"
+                           border: {style.get('border', 'none')}; padding: 12px 15px; 
+                           border-radius: 4px; width: 100%; font-weight: 500;
+                           cursor: pointer; display: flex; align-items: center; 
+                           justify-content: center; transition: all 0.2s ease;
+                           box-shadow: 0 1px 3px rgba(0,0,0,0.1);"
+                    onmouseover="this.style.{style.get('hover', 'opacity: 0.9')}"
+                    onmouseout="this.style.backgroundColor='{style['bgcolor']}'"
                 >
-                    <img src="{style['icon']}" style="height: 20px; margin-right: 10px;"/>
+                    <img src="{style['icon']}" style="height: 20px; margin-right: 10px; vertical-align: middle;"/>
                     <span>Continue with {name}</span>
                 </button>
             </a>

@@ -67,6 +67,13 @@ def main():
         
         # Show login page if not authenticated
         if not is_authenticated:
+            # Hide sidebar on login page
+            st.markdown("""
+            <style>
+            [data-testid="stSidebar"] {display: none !important;}
+            </style>
+            """, unsafe_allow_html=True)
+            
             # Import and render login page
             from pages.login import login_page
             login_page()

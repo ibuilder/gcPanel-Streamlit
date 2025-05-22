@@ -315,7 +315,8 @@ class CrudModule:
                             st.session_state[f'{base_key}_edit_mode'] = False
                             st.rerun()
                     with edit_col:
-                        if st.button("✏️", key=f"edit_{item[self.id_field]}", help="Edit"):
+                        item_id = item.get(self.id_field, f"unknown_{hash(str(item))}")
+                        if st.button("✏️", key=f"edit_{item_id}", help="Edit"):
                             st.session_state[f'{base_key}_selected_id'] = item[self.id_field]
                             st.session_state[f'{base_key}_view'] = 'detail'
                             st.session_state[f'{base_key}_edit_mode'] = True

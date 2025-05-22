@@ -294,15 +294,32 @@ def render_selected_module(current_menu):
             index=0
         )
         
+        # Check which option was selected and render appropriate viewer
         if viewer_type == "Enhanced 3D Model Viewer":
-            render_bim()
+            try:
+                render_bim()
+            except Exception as e:
+                st.error(f"Error loading BIM viewer: {str(e)}")
+                st.info("Try selecting a different viewer type above.")
         elif viewer_type == "Basic Floor Stacks":
-            render_basic_bim_viewer()
+            try:
+                render_basic_bim_viewer()
+            except Exception as e:
+                st.error(f"Error loading basic BIM viewer: {str(e)}")
+                st.info("Try selecting a different viewer type above.")
         else:
-            render_advanced_bim_viewer()
+            try:
+                render_advanced_bim_viewer()
+            except Exception as e:
+                st.error(f"Error loading advanced BIM viewer: {str(e)}")
+                st.info("Try selecting a different viewer type above.")
     # Handle our new standalone BIM viewer
     elif current_menu == "StandaloneBIM":
-        render_bim_standalone()
+        try:
+            render_bim_standalone()
+        except Exception as e:
+            st.error(f"Error loading standalone BIM viewer: {str(e)}")
+            st.info("The standalone BIM viewer may require additional setup.")
     # For regular modules, use the mapping to find and call the appropriate function
     elif current_menu in module_mapping:
         module_mapping[current_menu]()

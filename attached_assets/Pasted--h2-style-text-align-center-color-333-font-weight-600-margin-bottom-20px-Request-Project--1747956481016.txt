@@ -1,0 +1,56 @@
+<h2 style="text-align: center; color: #333; font-weight: 600; margin-bottom: 20px;">Request Project Access</h2>
+
+<div style="background-color: #f5f5f5; border-left: 4px solid #2b579a; padding: 15px; margin-bottom: 20px; border-radius: 0 4px 4px 0;">
+    <p style="margin: 0; color: #555;"><strong>Note:</strong> Registration for Highland Tower Development is managed by your project administrator.</p>
+</div>
+
+<p style="color: #444;">To request access, please contact your project manager with the following information:</p>
+
+<div style="background-color: #f9f9f9; border-radius: 6px; padding: 15px; margin-top: 10px;">
+    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+        <div style="display: flex; align-items: center; justify-content: center; background-color: #f9a01b; width: 24px; height: 24px; border-radius: 50%; margin-right: 10px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+            </svg>
+        </div>
+        <div><strong>Full Name & Professional Credentials</strong></div>
+    </div>
+
+    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+        <div style="display: flex; align-items: center; justify-content: center; background-color: #f9a01b; width: 24px; height: 24px; border-radius: 50%; margin-right: 10px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                <path d="M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z" />
+            </svg>
+        </div>
+        <div><strong>Company Name & Address</strong></div>
+    </div>
+
+    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+        <div style="display: flex; align-items: center; justify-content: center; background-color: #f9a01b; width: 24px; height: 24px; border-radius: 50%; margin-right: 10px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                <path d="M12,15C13.66,15 15,13.66 15,12C15,10.34 13.66,9 12,9C10.34,9 9,10.34 9,12C9,13.66 10.34,15 12,15M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+            </svg>
+        </div>
+        <div><strong>Project Role & Responsibilities</strong></div>
+    </div>
+
+    <div style="display: flex; align-items: center;">
+        <div style="display: flex; align-items: center; justify-content: center; background-color: #f9a01b; width: 24px; height: 24px; border-radius: 50%; margin-right: 10px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                <path d="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" />
+            </svg>
+        </div>
+        <div><strong>Corporate Email Address</strong></div>
+    </div>
+</div>
+
+<div style="margin-top: 25px; text-align: center;">
+    <div style="display: inline-block; background-color: #f5f5f5; padding: 12px 20px; border-radius: 6px; border: 1px dashed #ccc;">
+        <div style="display: flex; align-items: center; color: #555;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#555" style="margin-right: 8px;">
+                <path d="M12,3C7.46,3 3.34,4.78 0.29,7.67C0.11,7.85 0,8.1 0,8.38C0,8.66 0.11,8.91 0.29,9.09L2.77,11.57C2.95,11.75 3.2,11.86 3.5,11.86C3.75,11.86 4,11.75 4.18,11.58C4.97,10.84 5.87,10.22 6.84,9.73C7.17,9.57 7.4,9.23 7.4,8.83V5.73C8.85,5.25 10.39,5 12,5C13.59,5 15.14,5.25 16.59,5.72V8.82C16.59,9.21 16.82,9.56 17.15,9.72C18.13,10.21 19,10.84 19.82,11.57C20,11.75 20.25,11.85 20.5,11.85C20.8,11.85 21.05,11.74 21.23,11.56L23.71,9.08C23.89,8.9 24,8.65 24,8.37C24,8.09 23.88,7.85 23.7,7.67C20.65,4.78 16.53,3 12,3M9,7V10C9,10 3,15 3,18V22H21V18C21,15 15,10 15,10V7H13V9H11V7H9Z" />
+            </svg>
+            Once approved, you'll receive login credentials via email
+        </div>
+    </div>
+</div>

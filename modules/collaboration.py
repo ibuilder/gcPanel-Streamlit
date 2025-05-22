@@ -425,17 +425,19 @@ def render_task_board(user_map):
                 """
                 st.markdown(task_html, unsafe_allow_html=True)
                 
-                col1, col2 = st.columns(2)
-                with col1:
-                    if st.button("Complete", key=f"complete_{task['id']}"):
-                        # Update task status
-                        for t in st.session_state.tasks:
-                            if t["id"] == task["id"]:
-                                t["status"] = "Complete"
-                        st.rerun()
-                with col2:
-                    if st.button("Edit", key=f"edit_ip_{task['id']}"):
-                        st.session_state.editing_task = task["id"]
+                # Use containers instead of nested columns
+                with st.container():
+                    btn_col1, btn_col2 = st.columns(2)
+                    with btn_col1:
+                        if st.button("Complete", key=f"complete_{task['id']}"):
+                            # Update task status
+                            for t in st.session_state.tasks:
+                                if t["id"] == task["id"]:
+                                    t["status"] = "Complete"
+                            st.rerun()
+                    with btn_col2:
+                        if st.button("Edit", key=f"edit_ip_{task['id']}"):
+                            st.session_state.editing_task = task["id"]
     
     # Completed column
     with col3:

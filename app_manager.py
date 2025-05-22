@@ -259,6 +259,7 @@ def render_selected_module(current_menu):
         "Integrations": render_integrations,
         "⚙️ Settings": render_settings,
         "Settings": render_settings,
+        "👨‍💻 Admin": lambda: modules.admin.render(),
         "Admin": lambda: modules.admin.render()
     }
     

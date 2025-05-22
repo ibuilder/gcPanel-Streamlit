@@ -233,10 +233,11 @@ def login_page():
         </div>
         """, unsafe_allow_html=True)
     
-    # Footer
+    # Footer with website link
     st.markdown("""
     <div style="text-align: center; margin-top: 50px; color: #999; font-size: 0.8rem;">
         <p>© 2025 gcPanel Construction Management. All rights reserved.</p>
+        <p><a href="http://www.gcpanel.co" target="_blank" style="color: #999; font-weight: 500;">www.gcPanel.co</a></p>
         <p><a href="#" style="color: #999;">Privacy Policy</a> | <a href="#" style="color: #999;">Terms of Service</a></p>
     </div>
     """, unsafe_allow_html=True)

@@ -31,22 +31,51 @@ from modules.bim_viewer.basic_viewer import render_basic_bim_viewer
 from modules.bim_viewer.advanced_viewer import render_advanced_bim_viewer
 from modules.bim import render_bim
 from modules.standalone_bim import render_bim_standalone
-from modules.field_operations import render_field_operations
+from modules.field_operations import render as render_field_operations
 from modules.scheduling import render_scheduling
 from modules.safety import render_safety
-from modules.cost_management import render
+from modules.cost_management import render as render_cost_management
 from modules.closeout import render_closeout
-from modules.engineering import render_engineering
+from modules.engineering import render as render_engineering
 from modules.documents import render_documents
 from modules.mobile_companion import render_mobile_companion
 from modules.analytics import render_analytics
 from modules.ai_assistant import render_ai_assistant
 from modules.integrations import render_integrations
-from modules.digital_signatures import render_digital_signatures
-from modules.features_showcase import render_features_showcase
 
-# Import CRUD modules
+# Import Admin module features
 import modules.contracts
+import modules.admin
+
+def initialize_session_state():
+    """
+    Initialize session state variables from config and set up required app state.
+    
+    This function initializes:
+    1. Default session state variables from app_config
+    2. Notification system state
+    3. Any other required application state variables
+    """
+    _initialize_default_state()
+    _initialize_notifications()
+    
+def _initialize_default_state():
+    """Initialize the basic session state variables from configuration."""
+    # Iterate through the default session state and initialize any missing values
+    for key, value in DEFAULT_SESSION_STATE.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
+
+def _initialize_notifications():
+    """Initialize the notification system state if not already present."""
+    if 'notifications' not in st.session_state:
+        st.session_state.notifications = []
+    
+    if 'show_notifications' not in st.session_state:
+        st.session_state.show_notifications = False
+    
+    if 'unread_count' not in st.session_state:
+        st.session_state.unread_count = 0
 
 # Import CRUD demo and newly added CRUD modules
 import modules.crud_demo
@@ -232,26 +261,28 @@ def render_selected_module(current_menu):
     # Define a mapping of menu items to their rendering functions
     # This makes it easy to add new modules without modifying the if/elif chain
     module_mapping = {
+        # Main Navigation
         "Dashboard": render_dashboard,
         "Project Information": render_project_information,
         "Schedule": render_scheduling,
         "Safety": render_safety,
         "Contracts": lambda: modules.contracts.render(),
-        "Cost Management": render,
+        "Cost Management": render_cost_management,
         "Analytics": render_analytics,
         "Engineering": render_engineering,
         "Field Operations": render_field_operations,
         "Documents": render_documents,
-        "Digital Signatures": render_digital_signatures,
-        "AI Assistant": render_ai_assistant,
-        "Features Showcase": render_features_showcase,
-        "Mobile Companion": render_mobile_companion,
         "Closeout": render_closeout,
+        "Mobile Companion": render_mobile_companion,
+        "AI Assistant": render_ai_assistant,
         "Integrations": render_integrations,
-        "CRUD Style Demo": lambda: modules.crud_demo.render_crud_demo(),
-        "Field Issues": lambda: modules.field_issues.render(),
-        "Equipment": lambda: modules.equipment.render(),
-        "Settings": render_settings
+        "Settings": render_settings,
+        
+        # Admin Section (hidden from main navigation)
+        "Admin": lambda: modules.admin.render(),
+        
+        # Legacy modules that will be removed or redirected
+        "Equipment": lambda: modules.equipment.render()
     }
     
     # Handle special case for BIM with multiple view options

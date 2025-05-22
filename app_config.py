@@ -30,17 +30,13 @@ MENU_OPTIONS = [
     "📈 Analytics",
     "🔧 Engineering",
     "🚧 Field Operations",
-    "🛠️ Field Issues",
-    "🚜 Equipment",
     "📄 Documents",
-    "🏢 BIM Viewer",
-    "✍️ Digital Signatures",
-    "📱 Mobile Companion",
     "✅ Closeout",
     "🤖 AI Assistant",
-    "✨ Features Showcase",
-    "🎨 CRUD Style Demo",
-    "⚙️ Settings"
+    "📱 Mobile Companion",
+    "🔄 Integrations",
+    "⚙️ Settings",
+    "👨‍💻 Admin"  # Admin section at the end
 ]
 
 # Mapping from display names (with icons) to internal module names
@@ -54,17 +50,13 @@ MENU_MAP = {
     "📈 Analytics": "Analytics",
     "🔧 Engineering": "Engineering",
     "🚧 Field Operations": "Field Operations",
-    "🛠️ Field Issues": "Field Issues",
-    "🚜 Equipment": "Equipment",
     "📄 Documents": "Documents",
-    "🏢 BIM Viewer": "StandaloneBIM",
-    "✍️ Digital Signatures": "Digital Signatures",
-    "📱 Mobile Companion": "Mobile Companion",
     "✅ Closeout": "Closeout",
     "🤖 AI Assistant": "AI Assistant",
-    "✨ Features Showcase": "Features Showcase",
-    "🎨 CRUD Style Demo": "CRUD Style Demo",
-    "⚙️ Settings": "Settings"
+    "📱 Mobile Companion": "Mobile Companion",
+    "🔄 Integrations": "Integrations",
+    "⚙️ Settings": "Settings",
+    "👨‍💻 Admin": "Admin"  # Admin section
 }
 
 # ============================================================================

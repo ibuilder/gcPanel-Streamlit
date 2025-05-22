@@ -229,7 +229,7 @@ def render_purchase_orders():
     
     with filter_col4:
         st.markdown("<br>", unsafe_allow_html=True)
-        show_all = st.checkbox("Show All", value=False)
+        show_all = st.checkbox("Show All", value=False, key="procurement_show_all")
     
     # Create purchase order data
     purchase_orders = [

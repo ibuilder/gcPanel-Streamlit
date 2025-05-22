@@ -297,22 +297,7 @@ def render_login_form():
     st.markdown('<div class="login-container">', unsafe_allow_html=True)
     st.markdown('<div class="security-badge">🔒 Secure Login</div>', unsafe_allow_html=True)
     
-    # Streamlined header
-    st.markdown("""
-    <div class="login-header">
-        <div class="login-title">gcPanel</div>
-        <div class="login-subtitle">Construction Management Platform</div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Project info
-    environment = "DEMO" if st.session_state.get('demo_mode', True) else "PRODUCTION"
-    st.markdown(f"""
-    <div class="project-info">
-        <div class="project-name">Highland Tower Development</div>
-        <div class="project-details">$45.5M Mixed-Use Project • {environment} Environment</div>
-    </div>
-    """, unsafe_allow_html=True)
+
     
     # Quick Access Demo Accounts Section
     st.markdown("### 🎭 Quick Access Demo Accounts")

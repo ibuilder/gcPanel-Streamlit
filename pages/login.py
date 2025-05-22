@@ -35,13 +35,20 @@ def login_page():
     [data-testid="stAppViewContainer"] > div {
         padding: 2em 3em;
     }
-    /* Hide default header, footer, sidebar and collapse button */
+    /* Hide default header, footer, sidebar and collapse button - enhanced for all versions */
     header {display: none !important;}
     footer {display: none !important;}
     #MainMenu {display: none !important;}
     [data-testid="stSidebar"] {display: none !important;}
+    section[data-testid="stSidebarUserContent"] {display: none !important;}
+    .st-emotion-cache-10oheav {visibility: hidden !important;}
     .st-emotion-cache-1c7y2kd {display: none !important;} /* Hide the sidebar collapse button */
     button[kind="headerNoPadding"] {display: none !important;} /* Additional sidebar button hide */
+    /* Hide all sidebar elements more aggressively */
+    [data-testid="collapsedControl"] {display: none !important;}
+    #Sidebar {display: none !important;}
+    nav[data-testid="stSidebar"] {display: none !important;}
+    nav.st-emotion-cache-zq5wmm.ezrtsby0 {display: none !important;}
     
     /* Improve form spacing */
     div.stForm > div {

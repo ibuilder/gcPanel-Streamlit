@@ -97,15 +97,21 @@ def main():
         
         # Show login page if not authenticated
         if not is_authenticated:
-            # Hide sidebar and all sidebar-related elements on login page
+            # Completely hide sidebar and all sidebar-related elements on login page
             st.markdown("""
             <style>
-            /* Hide all sidebar elements and controls */
+            /* Aggressively hide all sidebar elements and controls for all versions */
             [data-testid="stSidebar"] {display: none !important;}
             .st-emotion-cache-1c7y2kd {display: none !important;}
             button[kind="headerNoPadding"] {display: none !important;}
             section[data-testid="stSidebarContent"] {display: none !important;}
             .st-emotion-cache-z5fcl4 {display: none !important;}
+            section[data-testid="stSidebarUserContent"] {display: none !important;}
+            .st-emotion-cache-10oheav {visibility: hidden !important;}
+            [data-testid="collapsedControl"] {display: none !important;}
+            #Sidebar {display: none !important;}
+            nav[data-testid="stSidebar"] {display: none !important;}
+            nav.st-emotion-cache-zq5wmm.ezrtsby0 {display: none !important;}
             </style>
             """, unsafe_allow_html=True)
             

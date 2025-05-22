@@ -34,6 +34,7 @@ MENU_OPTIONS = [
     "📄 Documents",
     "🏢 BIM",
     "✅ Closeout",
+    "👥 Collaboration",  # New collaboration module
     "🤖 AI Assistant",
     "📱 Mobile Companion",
     "🔄 Integrations",

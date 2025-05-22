@@ -19,12 +19,12 @@ import os
 import json
 
 # Re-export all the render functions from modules
-from modules.preconstruction.site_analysis import render_site_analysis
-from modules.preconstruction.estimating import render_estimating
-from modules.preconstruction.value_engineering import render_value_engineering
-from modules.preconstruction.constructability import render_constructability
-from modules.preconstruction.bid_management import render_bid_management
-from modules.preconstruction.procurement import render_procurement
+from modules.PreConstruction.site_analysis import render_site_analysis
+from modules.PreConstruction.estimating import render_estimating
+from modules.PreConstruction.value_engineering import render_value_engineering
+from modules.PreConstruction.constructability import render_constructability
+from modules.PreConstruction.bid_management import render_bid_management
+from modules.PreConstruction.procurement import render_procurement
 
 def render():
     """Render the Pre-Construction module"""

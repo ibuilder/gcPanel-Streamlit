@@ -42,7 +42,8 @@ from modules.mobile_companion import render_mobile_companion
 from modules.analytics import render as render_analytics
 from modules.ai_assistant import render_ai_assistant
 from modules.integrations import render_integrations
-from modules.preconstruction import render as render_preconstruction
+# Import PreConstruction module
+import modules.PreConstruction
 
 # Import Admin module features
 import modules.contracts

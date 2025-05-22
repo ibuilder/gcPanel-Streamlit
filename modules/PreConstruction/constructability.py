@@ -202,7 +202,7 @@ def render_issues_log():
     
     with filter_col3:
         st.markdown("<br>", unsafe_allow_html=True)
-        show_all = st.checkbox("Show All", value=False)
+        show_all = st.checkbox("Show All", value=False, key="constructability_show_all")
     
     # Create issues data
     issues = [

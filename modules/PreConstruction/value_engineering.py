@@ -74,7 +74,7 @@ def render_ve_proposals():
     
     with filter_col3:
         st.markdown("<br>", unsafe_allow_html=True)
-        show_all = st.checkbox("Show All", value=False)
+        show_all = st.checkbox("Show All", value=False, key="ve_show_all")
     
     # Create VE proposal data
     ve_proposals = [

@@ -223,7 +223,7 @@ def render_bid_packages():
     
     with filter_col4:
         st.markdown("<br>", unsafe_allow_html=True)
-        show_all = st.checkbox("Show All", value=False)
+        show_all = st.checkbox("Show All", value=False, key="bid_pkg_show_all")
     
     # Create bid package data
     bid_packages = [

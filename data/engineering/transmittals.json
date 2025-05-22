@@ -1,0 +1,786 @@
+[
+  {
+    "transmittal_id": "TRN-001",
+    "date_sent": "2025-03-01",
+    "recipient": "Fire Marshal - Highland Fire Department",
+    "recipient_company": "Highland Fire Department",
+    "recipient_email": "contact@highlandfiredepartment.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Updated Construction Schedule",
+    "description": "Transmittal for Updated Construction Schedule to Fire Marshal - Highland Fire Department",
+    "delivery_method": "Mail",
+    "status": "Acknowledged",
+    "date_delivered": "2025-03-05",
+    "date_acknowledged": "2025-03-11",
+    "date_returned": null,
+    "comments": "",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "DWG",
+        "file_name": "attachment_1.pdf"
+      },
+      {
+        "title": "Attachment 2",
+        "description": "Description for attachment 2",
+        "file_type": "PDF",
+        "file_name": "attachment_2.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-002",
+    "date_sent": "2025-04-01",
+    "recipient": "MEP Engineer - MEP Solutions Inc.",
+    "recipient_company": "MEP Solutions Inc.",
+    "recipient_email": "contact@mepsolutionsinc..com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Updated Construction Schedule",
+    "description": "Transmittal for Updated Construction Schedule to MEP Engineer - MEP Solutions Inc.",
+    "delivery_method": "Mail",
+    "status": "Returned",
+    "date_delivered": "2025-04-04",
+    "date_acknowledged": "2025-04-11",
+    "date_returned": "2025-04-16",
+    "comments": "Please review and respond at your earliest convenience.",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "IMG",
+        "file_name": "attachment_1.pdf"
+      },
+      {
+        "title": "Attachment 2",
+        "description": "Description for attachment 2",
+        "file_type": "DWG",
+        "file_name": "attachment_2.pdf"
+      },
+      {
+        "title": "Attachment 3",
+        "description": "Description for attachment 3",
+        "file_type": "DWG",
+        "file_name": "attachment_3.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-003",
+    "date_sent": "2025-05-11",
+    "recipient": "Architect - Modern Architects Group",
+    "recipient_company": "Modern Architects Group",
+    "recipient_email": "contact@modernarchitectsgroup.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Window Shop Drawings",
+    "description": "Transmittal for Window Shop Drawings to Architect - Modern Architects Group",
+    "delivery_method": "Email",
+    "status": "Sent",
+    "date_delivered": null,
+    "date_acknowledged": null,
+    "date_returned": null,
+    "comments": "Please review and respond at your earliest convenience.",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "IMG",
+        "file_name": "attachment_1.pdf"
+      },
+      {
+        "title": "Attachment 2",
+        "description": "Description for attachment 2",
+        "file_type": "IMG",
+        "file_name": "attachment_2.pdf"
+      },
+      {
+        "title": "Attachment 3",
+        "description": "Description for attachment 3",
+        "file_type": "XLS",
+        "file_name": "attachment_3.pdf"
+      },
+      {
+        "title": "Attachment 4",
+        "description": "Description for attachment 4",
+        "file_type": "IMG",
+        "file_name": "attachment_4.pdf"
+      },
+      {
+        "title": "Attachment 5",
+        "description": "Description for attachment 5",
+        "file_type": "XLS",
+        "file_name": "attachment_5.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-004",
+    "date_sent": "2025-02-23",
+    "recipient": "Building Department - City of Highland",
+    "recipient_company": "City of Highland",
+    "recipient_email": "contact@cityofhighland.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Updated Construction Schedule",
+    "description": "Transmittal for Updated Construction Schedule to Building Department - City of Highland",
+    "delivery_method": "FedEx",
+    "status": "Returned",
+    "date_delivered": "2025-02-27",
+    "date_acknowledged": "2025-03-03",
+    "date_returned": "2025-03-06",
+    "comments": "",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "IMG",
+        "file_name": "attachment_1.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-005",
+    "date_sent": "2025-02-25",
+    "recipient": "Plumbing Subcontractor - Plumbing Specialists",
+    "recipient_company": "Plumbing Specialists",
+    "recipient_email": "contact@plumbingspecialists.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Plumbing Fixture Submittals",
+    "description": "Transmittal for Plumbing Fixture Submittals to Plumbing Subcontractor - Plumbing Specialists",
+    "delivery_method": "FedEx",
+    "status": "Sent",
+    "date_delivered": null,
+    "date_acknowledged": null,
+    "date_returned": null,
+    "comments": "",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "PDF",
+        "file_name": "attachment_1.pdf"
+      },
+      {
+        "title": "Attachment 2",
+        "description": "Description for attachment 2",
+        "file_type": "DOC",
+        "file_name": "attachment_2.pdf"
+      },
+      {
+        "title": "Attachment 3",
+        "description": "Description for attachment 3",
+        "file_type": "PDF",
+        "file_name": "attachment_3.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-006",
+    "date_sent": "2025-03-13",
+    "recipient": "Structural Engineer - Smith Engineering",
+    "recipient_company": "Smith Engineering",
+    "recipient_email": "contact@smithengineering.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Submittal Package for Concrete Mix Design",
+    "description": "Transmittal for Submittal Package for Concrete Mix Design to Structural Engineer - Smith Engineering",
+    "delivery_method": "Courier",
+    "status": "Sent",
+    "date_delivered": null,
+    "date_acknowledged": null,
+    "date_returned": null,
+    "comments": "Please review and respond at your earliest convenience.",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "DOC",
+        "file_name": "attachment_1.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-007",
+    "date_sent": "2025-04-08",
+    "recipient": "Building Department - City of Highland",
+    "recipient_company": "City of Highland",
+    "recipient_email": "contact@cityofhighland.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "RFI Response for Foundation Details",
+    "description": "Transmittal for RFI Response for Foundation Details to Building Department - City of Highland",
+    "delivery_method": "Hand Delivery",
+    "status": "Returned",
+    "date_delivered": "2025-04-12",
+    "date_acknowledged": "2025-04-15",
+    "date_returned": "2025-04-24",
+    "comments": "",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "DWG",
+        "file_name": "attachment_1.pdf"
+      },
+      {
+        "title": "Attachment 2",
+        "description": "Description for attachment 2",
+        "file_type": "DOC",
+        "file_name": "attachment_2.pdf"
+      },
+      {
+        "title": "Attachment 3",
+        "description": "Description for attachment 3",
+        "file_type": "DOC",
+        "file_name": "attachment_3.pdf"
+      },
+      {
+        "title": "Attachment 4",
+        "description": "Description for attachment 4",
+        "file_type": "IMG",
+        "file_name": "attachment_4.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-008",
+    "date_sent": "2025-03-04",
+    "recipient": "Owner - Highland Properties LLC",
+    "recipient_company": "Highland Properties LLC",
+    "recipient_email": "contact@highlandpropertiesllc.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Steel Shop Drawings",
+    "description": "Transmittal for Steel Shop Drawings to Owner - Highland Properties LLC",
+    "delivery_method": "Mail",
+    "status": "Delivered",
+    "date_delivered": "2025-03-07",
+    "date_acknowledged": null,
+    "date_returned": null,
+    "comments": "",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "XLS",
+        "file_name": "attachment_1.pdf"
+      },
+      {
+        "title": "Attachment 2",
+        "description": "Description for attachment 2",
+        "file_type": "DWG",
+        "file_name": "attachment_2.pdf"
+      },
+      {
+        "title": "Attachment 3",
+        "description": "Description for attachment 3",
+        "file_type": "DOC",
+        "file_name": "attachment_3.pdf"
+      },
+      {
+        "title": "Attachment 4",
+        "description": "Description for attachment 4",
+        "file_type": "DWG",
+        "file_name": "attachment_4.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-009",
+    "date_sent": "2025-02-24",
+    "recipient": "Electrical Subcontractor - Electrical Solutions",
+    "recipient_company": "Electrical Solutions",
+    "recipient_email": "contact@electricalsolutions.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Updated Construction Schedule",
+    "description": "Transmittal for Updated Construction Schedule to Electrical Subcontractor - Electrical Solutions",
+    "delivery_method": "FedEx",
+    "status": "Acknowledged",
+    "date_delivered": "2025-02-26",
+    "date_acknowledged": "2025-02-28",
+    "date_returned": null,
+    "comments": "",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "DOC",
+        "file_name": "attachment_1.pdf"
+      },
+      {
+        "title": "Attachment 2",
+        "description": "Description for attachment 2",
+        "file_type": "XLS",
+        "file_name": "attachment_2.pdf"
+      },
+      {
+        "title": "Attachment 3",
+        "description": "Description for attachment 3",
+        "file_type": "DOC",
+        "file_name": "attachment_3.pdf"
+      },
+      {
+        "title": "Attachment 4",
+        "description": "Description for attachment 4",
+        "file_type": "PDF",
+        "file_name": "attachment_4.pdf"
+      },
+      {
+        "title": "Attachment 5",
+        "description": "Description for attachment 5",
+        "file_type": "PDF",
+        "file_name": "attachment_5.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-010",
+    "date_sent": "2025-04-01",
+    "recipient": "Plumbing Subcontractor - Plumbing Specialists",
+    "recipient_company": "Plumbing Specialists",
+    "recipient_email": "contact@plumbingspecialists.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Plumbing Fixture Submittals",
+    "description": "Transmittal for Plumbing Fixture Submittals to Plumbing Subcontractor - Plumbing Specialists",
+    "delivery_method": "Hand Delivery",
+    "status": "Returned",
+    "date_delivered": "2025-04-05",
+    "date_acknowledged": "2025-04-10",
+    "date_returned": "2025-04-14",
+    "comments": "Please review and respond at your earliest convenience.",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "DOC",
+        "file_name": "attachment_1.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-011",
+    "date_sent": "2025-03-16",
+    "recipient": "Architect - Modern Architects Group",
+    "recipient_company": "Modern Architects Group",
+    "recipient_email": "contact@modernarchitectsgroup.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Updated Construction Schedule",
+    "description": "Transmittal for Updated Construction Schedule to Architect - Modern Architects Group",
+    "delivery_method": "Courier",
+    "status": "Sent",
+    "date_delivered": null,
+    "date_acknowledged": null,
+    "date_returned": null,
+    "comments": "",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "PDF",
+        "file_name": "attachment_1.pdf"
+      },
+      {
+        "title": "Attachment 2",
+        "description": "Description for attachment 2",
+        "file_type": "DWG",
+        "file_name": "attachment_2.pdf"
+      },
+      {
+        "title": "Attachment 3",
+        "description": "Description for attachment 3",
+        "file_type": "XLS",
+        "file_name": "attachment_3.pdf"
+      },
+      {
+        "title": "Attachment 4",
+        "description": "Description for attachment 4",
+        "file_type": "DWG",
+        "file_name": "attachment_4.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-012",
+    "date_sent": "2025-02-26",
+    "recipient": "Plumbing Subcontractor - Plumbing Specialists",
+    "recipient_company": "Plumbing Specialists",
+    "recipient_email": "contact@plumbingspecialists.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "RFI Response for Foundation Details",
+    "description": "Transmittal for RFI Response for Foundation Details to Plumbing Subcontractor - Plumbing Specialists",
+    "delivery_method": "Hand Delivery",
+    "status": "Delivered",
+    "date_delivered": "2025-03-02",
+    "date_acknowledged": null,
+    "date_returned": null,
+    "comments": "Please review and respond at your earliest convenience.",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "DOC",
+        "file_name": "attachment_1.pdf"
+      },
+      {
+        "title": "Attachment 2",
+        "description": "Description for attachment 2",
+        "file_type": "IMG",
+        "file_name": "attachment_2.pdf"
+      },
+      {
+        "title": "Attachment 3",
+        "description": "Description for attachment 3",
+        "file_type": "DOC",
+        "file_name": "attachment_3.pdf"
+      },
+      {
+        "title": "Attachment 4",
+        "description": "Description for attachment 4",
+        "file_type": "DOC",
+        "file_name": "attachment_4.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-013",
+    "date_sent": "2025-03-06",
+    "recipient": "Structural Engineer - Smith Engineering",
+    "recipient_company": "Smith Engineering",
+    "recipient_email": "contact@smithengineering.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Steel Shop Drawings",
+    "description": "Transmittal for Steel Shop Drawings to Structural Engineer - Smith Engineering",
+    "delivery_method": "Courier",
+    "status": "Delivered",
+    "date_delivered": "2025-03-07",
+    "date_acknowledged": null,
+    "date_returned": null,
+    "comments": "",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "PDF",
+        "file_name": "attachment_1.pdf"
+      },
+      {
+        "title": "Attachment 2",
+        "description": "Description for attachment 2",
+        "file_type": "XLS",
+        "file_name": "attachment_2.pdf"
+      },
+      {
+        "title": "Attachment 3",
+        "description": "Description for attachment 3",
+        "file_type": "DWG",
+        "file_name": "attachment_3.pdf"
+      },
+      {
+        "title": "Attachment 4",
+        "description": "Description for attachment 4",
+        "file_type": "DOC",
+        "file_name": "attachment_4.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-014",
+    "date_sent": "2025-02-27",
+    "recipient": "Electrical Subcontractor - Electrical Solutions",
+    "recipient_company": "Electrical Solutions",
+    "recipient_email": "contact@electricalsolutions.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Window Shop Drawings",
+    "description": "Transmittal for Window Shop Drawings to Electrical Subcontractor - Electrical Solutions",
+    "delivery_method": "Courier",
+    "status": "Draft",
+    "date_delivered": null,
+    "date_acknowledged": null,
+    "date_returned": null,
+    "comments": "Please review and respond at your earliest convenience.",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "XLS",
+        "file_name": "attachment_1.pdf"
+      },
+      {
+        "title": "Attachment 2",
+        "description": "Description for attachment 2",
+        "file_type": "XLS",
+        "file_name": "attachment_2.pdf"
+      },
+      {
+        "title": "Attachment 3",
+        "description": "Description for attachment 3",
+        "file_type": "PDF",
+        "file_name": "attachment_3.pdf"
+      },
+      {
+        "title": "Attachment 4",
+        "description": "Description for attachment 4",
+        "file_type": "IMG",
+        "file_name": "attachment_4.pdf"
+      },
+      {
+        "title": "Attachment 5",
+        "description": "Description for attachment 5",
+        "file_type": "XLS",
+        "file_name": "attachment_5.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-015",
+    "date_sent": "2025-04-12",
+    "recipient": "Electrical Subcontractor - Electrical Solutions",
+    "recipient_company": "Electrical Solutions",
+    "recipient_email": "contact@electricalsolutions.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Fire Alarm Design",
+    "description": "Transmittal for Fire Alarm Design to Electrical Subcontractor - Electrical Solutions",
+    "delivery_method": "FedEx",
+    "status": "Returned",
+    "date_delivered": "2025-04-14",
+    "date_acknowledged": "2025-04-15",
+    "date_returned": "2025-04-22",
+    "comments": "",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "XLS",
+        "file_name": "attachment_1.pdf"
+      },
+      {
+        "title": "Attachment 2",
+        "description": "Description for attachment 2",
+        "file_type": "DWG",
+        "file_name": "attachment_2.pdf"
+      },
+      {
+        "title": "Attachment 3",
+        "description": "Description for attachment 3",
+        "file_type": "IMG",
+        "file_name": "attachment_3.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-016",
+    "date_sent": "2025-03-17",
+    "recipient": "Building Department - City of Highland",
+    "recipient_company": "City of Highland",
+    "recipient_email": "contact@cityofhighland.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Building Permit Application",
+    "description": "Transmittal for Building Permit Application to Building Department - City of Highland",
+    "delivery_method": "Mail",
+    "status": "Acknowledged",
+    "date_delivered": "2025-03-18",
+    "date_acknowledged": "2025-03-19",
+    "date_returned": null,
+    "comments": "Please review and respond at your earliest convenience.",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "DOC",
+        "file_name": "attachment_1.pdf"
+      },
+      {
+        "title": "Attachment 2",
+        "description": "Description for attachment 2",
+        "file_type": "XLS",
+        "file_name": "attachment_2.pdf"
+      },
+      {
+        "title": "Attachment 3",
+        "description": "Description for attachment 3",
+        "file_type": "DOC",
+        "file_name": "attachment_3.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-017",
+    "date_sent": "2025-05-17",
+    "recipient": "Structural Engineer - Smith Engineering",
+    "recipient_company": "Smith Engineering",
+    "recipient_email": "contact@smithengineering.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Building Permit Application",
+    "description": "Transmittal for Building Permit Application to Structural Engineer - Smith Engineering",
+    "delivery_method": "Courier",
+    "status": "Draft",
+    "date_delivered": null,
+    "date_acknowledged": null,
+    "date_returned": null,
+    "comments": "",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "DWG",
+        "file_name": "attachment_1.pdf"
+      },
+      {
+        "title": "Attachment 2",
+        "description": "Description for attachment 2",
+        "file_type": "PDF",
+        "file_name": "attachment_2.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-018",
+    "date_sent": "2025-05-07",
+    "recipient": "Fire Marshal - Highland Fire Department",
+    "recipient_company": "Highland Fire Department",
+    "recipient_email": "contact@highlandfiredepartment.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Plumbing Fixture Submittals",
+    "description": "Transmittal for Plumbing Fixture Submittals to Fire Marshal - Highland Fire Department",
+    "delivery_method": "FedEx",
+    "status": "Draft",
+    "date_delivered": null,
+    "date_acknowledged": null,
+    "date_returned": null,
+    "comments": "Please review and respond at your earliest convenience.",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "PDF",
+        "file_name": "attachment_1.pdf"
+      },
+      {
+        "title": "Attachment 2",
+        "description": "Description for attachment 2",
+        "file_type": "DOC",
+        "file_name": "attachment_2.pdf"
+      },
+      {
+        "title": "Attachment 3",
+        "description": "Description for attachment 3",
+        "file_type": "PDF",
+        "file_name": "attachment_3.pdf"
+      },
+      {
+        "title": "Attachment 4",
+        "description": "Description for attachment 4",
+        "file_type": "XLS",
+        "file_name": "attachment_4.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-019",
+    "date_sent": "2025-05-16",
+    "recipient": "General Contractor - GC Construction",
+    "recipient_company": "GC Construction",
+    "recipient_email": "contact@gcconstruction.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Window Shop Drawings",
+    "description": "Transmittal for Window Shop Drawings to General Contractor - GC Construction",
+    "delivery_method": "FedEx",
+    "status": "Draft",
+    "date_delivered": null,
+    "date_acknowledged": null,
+    "date_returned": null,
+    "comments": "",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "DOC",
+        "file_name": "attachment_1.pdf"
+      },
+      {
+        "title": "Attachment 2",
+        "description": "Description for attachment 2",
+        "file_type": "IMG",
+        "file_name": "attachment_2.pdf"
+      },
+      {
+        "title": "Attachment 3",
+        "description": "Description for attachment 3",
+        "file_type": "XLS",
+        "file_name": "attachment_3.pdf"
+      },
+      {
+        "title": "Attachment 4",
+        "description": "Description for attachment 4",
+        "file_type": "DWG",
+        "file_name": "attachment_4.pdf"
+      }
+    ]
+  },
+  {
+    "transmittal_id": "TRN-020",
+    "date_sent": "2025-03-07",
+    "recipient": "Fire Marshal - Highland Fire Department",
+    "recipient_company": "Highland Fire Department",
+    "recipient_email": "contact@highlandfiredepartment.com",
+    "sender": "John Smith",
+    "sender_company": "GC Construction",
+    "sender_email": "john.smith@gcconstruction.com",
+    "subject": "Revised Mechanical Drawings",
+    "description": "Transmittal for Revised Mechanical Drawings to Fire Marshal - Highland Fire Department",
+    "delivery_method": "Email",
+    "status": "Draft",
+    "date_delivered": null,
+    "date_acknowledged": null,
+    "date_returned": null,
+    "comments": "",
+    "attachments": [
+      {
+        "title": "Attachment 1",
+        "description": "Description for attachment 1",
+        "file_type": "IMG",
+        "file_name": "attachment_1.pdf"
+      },
+      {
+        "title": "Attachment 2",
+        "description": "Description for attachment 2",
+        "file_type": "PDF",
+        "file_name": "attachment_2.pdf"
+      }
+    ]
+  }
+]

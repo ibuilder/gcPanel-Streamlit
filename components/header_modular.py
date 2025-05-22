@@ -171,13 +171,15 @@ def render_header(modules, current_module):
                 }, 100);
             }
             
-            // Add click event listeners to nav buttons
+            // Add click event listeners to nav buttons using proper event handling
             document.addEventListener("DOMContentLoaded", function() {
                 const navButtons = document.querySelectorAll(".nav-button");
-                navButtons.forEach(button => {
-                    button.addEventListener("click", function() {
+                navButtons.forEach(function(button) {
+                    button.addEventListener("click", function(e) {
                         const moduleId = this.getAttribute("data-module");
-                        handleNavClick(moduleId);
+                        if (moduleId) {
+                            handleNavClick(moduleId);
+                        }
                     });
                 });
             });

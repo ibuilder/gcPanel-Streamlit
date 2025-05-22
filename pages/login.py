@@ -126,7 +126,6 @@ def login_page():
     # Regular login page with construction theme
     st.markdown("""
     <div style="text-align: center; margin-bottom: 30px;">
-        <div>
         <h1 style="font-size: 2.5rem; margin-top: 10px;">
             <span style="color: #2b579a; font-weight: 700;">gc</span><span style="color: #333; font-weight: 700;">Panel</span>
         </h1>
@@ -143,12 +142,33 @@ def login_page():
     """, unsafe_allow_html=True)
     
     # Main login container
-    tabs = st.tabs(["Login", "Register"])
+    tabs = st.tabs(["Login", "Register", "Demo Accounts"])
     
     with tabs[0]:
-        # Use the simple login form instead of the nested columns version
-        from login_form import render_login_form
-        render_login_form()
+        # Standard login form
+        username = st.text_input("Email or Username", key="username_input")
+        password = st.text_input("Password", type="password", key="password_input")
+        
+        # Remember me checkbox
+        remember = st.checkbox("Remember me", value=False)
+        
+        # Login button
+        if st.button("Sign In", use_container_width=True, type="primary", key="signin_btn"):
+            if not username or not password:
+                st.error("Please enter both username/email and password")
+            else:
+                # Store the form submission in session state for processing in the main app
+                st.session_state.login_username = username
+                st.session_state.login_password = password
+                st.session_state.login_form_submitted = True
+                
+                # Show a loading message
+                st.success("Authenticating... Please wait.")
+                st.rerun()
+        
+        # Display "forgot password" link
+        st.markdown('<div style="text-align: right;"><a href="#" style="color: #2b579a; font-size: 0.9rem;">Forgot password?</a></div>', 
+                    unsafe_allow_html=True)
         
         # Add OAuth buttons directly
         from components.oauth_login import render_oauth_buttons

@@ -63,7 +63,7 @@ def render_digital_signature_section(form_type="document", required_signatures=N
                 # Digital signature button
                 if role not in signatures or not signatures[role].get('signed', False):
                     if st.button(f"🖊️ Sign as {role}", key=f"{form_type}_sign_{i}"):
-                        if signature_name.strip():
+                        if signature_name and signature_name.strip():
                             # Create digital signature
                             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                             signature_data = {

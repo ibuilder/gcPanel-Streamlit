@@ -127,8 +127,6 @@ def login_page():
     st.markdown("""
     <div style="text-align: center; margin-bottom: 30px;">
         <div>
-            <img src="https://i.imgur.com/XYYzKKy.png" alt="gcPanel Logo" style="max-width: 200px;">
-        </div>
         <h1 style="font-size: 2.5rem; margin-top: 10px;">
             <span style="color: #2b579a; font-weight: 700;">gc</span><span style="color: #333; font-weight: 700;">Panel</span>
         </h1>

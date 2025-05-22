@@ -434,12 +434,23 @@ class TMTicketsModule(CrudModule):
                         "notes": notes
                     }
                     
-                    # Save the ticket
-                    self._save_item(ticket)
+                    # Add digital signatures section
+                    signatures = render_digital_signature_section("tm_ticket", ["Field Supervisor", "Project Manager"])
                     
-                    # Show success message and return to list
-                    st.success(f"T&M Ticket {ticket_id} saved successfully!")
-                    self._return_to_list_view()
+                    # Validate signatures before saving
+                    is_valid, message = validate_required_signatures(signatures, ["Field Supervisor", "Project Manager"])
+                    if is_valid:
+                        # Add signature data to ticket
+                        ticket["signatures"] = get_signature_summary(signatures)
+                        
+                        # Save the ticket
+                        self._save_item(ticket)
+                        
+                        # Show success message and return to list
+                        st.success(f"T&M Ticket {ticket_id} saved successfully with digital signatures!")
+                        self._return_to_list_view()
+                    else:
+                        st.error(f"Cannot save T&M ticket: {message}")
             
             if cancel_button:
                 self._return_to_list_view()

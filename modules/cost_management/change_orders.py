@@ -17,6 +17,7 @@ import pandas as pd
 import uuid
 
 from modules.crud_template import CrudModule
+from components.digital_signature import render_digital_signature_section, get_signature_summary, validate_required_signatures
 from assets.crud_styler import (
     apply_crud_styles, 
     render_form_actions, 
@@ -423,12 +424,23 @@ class ChangeOrdersModule(CrudModule):
                         "notes": notes
                     }
                     
-                    # Save the change order
-                    self._save_item(change_order)
+                    # Add digital signatures section
+                    signatures = render_digital_signature_section("change_order", ["Project Manager", "Owner Representative"])
                     
-                    # Show success message and return to list
-                    st.success(f"Change Order {co_id} saved successfully!")
-                    self._return_to_list_view()
+                    # Validate signatures before saving
+                    is_valid, message = validate_required_signatures(signatures, ["Project Manager", "Owner Representative"])
+                    if is_valid:
+                        # Add signature data to change order
+                        change_order["signatures"] = get_signature_summary(signatures)
+                        
+                        # Save the change order
+                        self._save_item(change_order)
+                        
+                        # Show success message and return to list
+                        st.success(f"Change Order {co_id} saved successfully with digital signatures!")
+                        self._return_to_list_view()
+                    else:
+                        st.error(f"Cannot save change order: {message}")
             
             if cancel_button:
                 self._return_to_list_view()

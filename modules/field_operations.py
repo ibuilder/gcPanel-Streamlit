@@ -32,6 +32,11 @@ def render_field_operations():
     # Safety Observations Tab
     with tabs[3]:
         render_safety_observations()
+        
+    # Checklists Tab
+    with tabs[4]:
+        from modules.field_operations.checklists import render_checklists
+        render_checklists()
 
 def render_daily_reports():
     """Render the daily reports interface."""
@@ -110,6 +115,17 @@ def render_daily_reports():
         Delivery of HVAC equipment delayed by 1 day due to transportation issues.
         Water leak discovered on floor 10, plumbing team investigating source.
         """)
+        
+        # Add digital signatures for daily reports
+        signatures = render_digital_signature_section("daily_report", ["Field Supervisor", "Project Manager"])
+        
+        # Save button with signature validation
+        if st.button("💾 Save Daily Report", key="save_daily_report"):
+            is_valid, message = validate_required_signatures(signatures, ["Field Supervisor", "Project Manager"])
+            if is_valid:
+                st.success("Daily report saved with digital signatures!")
+            else:
+                st.error(f"Cannot save report: {message}")
 
 def render_inspections():
     """Render the inspections interface."""

@@ -15,9 +15,9 @@ def simple_breadcrumbs(current_page, previous_pages=None):
         current_page (str): Current page name
         previous_pages (list, optional): List of previous pages in the navigation hierarchy
     """
-    # Create the breadcrumb HTML
+    # Create the breadcrumb HTML with more compact styling
     breadcrumb_html = """
-    <div class="breadcrumb-container">
+    <div class="breadcrumb-container" style="margin-top:0; padding-top:0; margin-bottom:0.5rem;">
         <div class="breadcrumbs">
     """
     

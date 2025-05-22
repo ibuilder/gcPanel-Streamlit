@@ -56,6 +56,19 @@ def render_fixed_header():
     # Add more CSS to remove spacing
     st.markdown("""
     <style>
+    /* Move everything to top of page */
+    .main .block-container {
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
+    
+    /* Remove space under header and above breadcrumbs */
+    .breadcrumb-container {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        margin-bottom: 0.25rem !important;
+    }
+    
     /* Remove padding from columns */
     div[data-testid="column"] {
         padding: 0 !important;
@@ -66,6 +79,11 @@ def render_fixed_header():
     div[data-testid="stSelectbox"] {
         padding: 0 !important;
         margin: 0 !important;
+    }
+    
+    /* Remove top padding for all elements */
+    .stVerticalBlock {
+        gap: 0rem !important;
     }
     
     /* Compact header layout */
@@ -80,6 +98,12 @@ def render_fixed_header():
         margin-bottom: 0 !important;
         padding-top: 0 !important;
         padding-bottom: 0 !important;
+    }
+    
+    /* Make sure all blocks start from the top */
+    div[data-testid="stVerticalBlock"] > div:first-child {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
     }
     </style>
     """, unsafe_allow_html=True)

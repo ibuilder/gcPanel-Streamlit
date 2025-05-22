@@ -84,48 +84,40 @@ def render_login_form():
     # Streamlined production CSS
     st.markdown("""
     <style>
-    /* Main login container */
-    .login-container {
-        max-width: 460px;
-        margin: 2rem auto;
-        padding: 2.5rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 20px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-        color: white;
-        position: relative;
-    }
+    /* Main container styling removed */
     
     /* Security badge */
     .security-badge {
-        position: absolute;
+        position: fixed;
         top: 1rem;
         right: 1rem;
-        background: rgba(255,255,255,0.2);
+        background: rgba(102, 126, 234, 0.9);
+        color: white;
         padding: 0.4rem 0.8rem;
         border-radius: 15px;
         font-size: 0.7rem;
         font-weight: 600;
         backdrop-filter: blur(10px);
+        z-index: 1000;
     }
     
     /* Form elements */
     .stTextInput > div > div > input {
-        border: 2px solid rgba(255,255,255,0.3) !important;
+        border: 2px solid #667eea !important;
         border-radius: 10px !important;
-        background: rgba(255,255,255,0.1) !important;
-        color: white !important;
+        background: white !important;
+        color: #333 !important;
         font-size: 16px !important;
         padding: 0.75rem !important;
     }
     
     .stTextInput > div > div > input:focus {
-        border-color: rgba(255,255,255,0.8) !important;
-        box-shadow: 0 0 0 3px rgba(255,255,255,0.2) !important;
+        border-color: #764ba2 !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2) !important;
     }
     
     .stTextInput > div > div > input::placeholder {
-        color: rgba(255,255,255,0.7) !important;
+        color: #999 !important;
     }
     
     /* Button improvements */
@@ -293,8 +285,7 @@ def render_login_form():
         st.error(f"🔒 Account temporarily locked due to multiple failed attempts. Try again in {minutes_remaining} minutes.")
         return
     
-    # Main login container with security badge
-    st.markdown('<div class="login-container">', unsafe_allow_html=True)
+    # Security badge
     st.markdown('<div class="security-badge">🔒 Secure Login</div>', unsafe_allow_html=True)
     
 
@@ -463,5 +454,3 @@ def render_login_form():
     </div>
     """, unsafe_allow_html=True)
     
-    # Close main container
-    st.markdown('</div>', unsafe_allow_html=True)

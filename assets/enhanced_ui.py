@@ -287,7 +287,8 @@ def apply_enhanced_styles():
 
 def create_project_header(project_name, project_number="", address="", status="In Progress"):
     """
-    Create a professional project header with clean modern design.
+    Create a professional project header with clean modern design using Python code
+    instead of HTML markup.
     
     Args:
         project_name (str): Name of the project
@@ -295,51 +296,58 @@ def create_project_header(project_name, project_number="", address="", status="I
         address (str, optional): Project address
         status (str, optional): Project status
     """
-    # Format project details
-    project_details = "$45.5M • 168,500 sq ft • 15 stories above ground, 2 below"
+    # Create a container for the header
+    header_container = st.container()
     
-    # Tower crane SVG icon (construction icon)
-    tower_crane_icon = """
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="6" y="4" width="4" height="6"></rect>
-        <line x1="8" y1="1" x2="8" y2="4"></line>
-        <line x1="8" y1="10" x2="8" y2="23"></line>
-        <line x1="8" y1="4" x2="16" y2="4"></line>
-        <line x1="16" y1="4" x2="16" y2="10"></line>
-        <line x1="16" y1="10" x2="20" y2="10"></line>
-    </svg>
-    """
-    
-    header_html = f"""
-    <div style="display: flex; justify-content: space-between; align-items: center; 
-                background-color: white; padding: 10px 16px; border-bottom: 1px solid #e0e0e0;
-                margin: -1rem -1rem 1rem -1rem;">
-        <div style="display: flex; align-items: center;">
-            <div style="background-color: #00a8e8; padding: 8px; border-radius: 4px; margin-right: 5px;">
-                <span style="color: white; font-weight: bold; font-size: 14px;">gc</span>
+    # Use columns for layout
+    with header_container:
+        # Remove padding from the container
+        st.markdown("""
+        <style>
+        div[data-testid="stVerticalBlock"] > div:first-child {
+            margin-top: -1rem;
+            margin-left: -1rem;
+            margin-right: -1rem;
+            background-color: white;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 10px 16px;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        # Create a 3-column layout
+        left_col, center_col, right_col = st.columns([1, 2, 1])
+        
+        with left_col:
+            st.markdown("""
+            <div style="display: flex; align-items: center;">
+                <div style="background-color: #00a8e8; padding: 8px; border-radius: 4px; margin-right: 5px;">
+                    <span style="color: white; font-weight: bold; font-size: 14px;">gc</span>
+                </div>
+                <span style="color: #2e86de; font-weight: 600; margin-left: 2px;">Panel</span>
             </div>
-            <span style="color: #2e86de; font-weight: 600; margin-left: 2px;">Panel</span>
-            <div style="margin-left: 8px; color: #2e86de;">
-                {tower_crane_icon}
+            """, unsafe_allow_html=True)
+        
+        with center_col:
+            st.markdown(f"""
+            <div style="text-align: center;">
+                <div style="font-weight: 600; color: #2c3e50; font-size: 0.95rem;">{project_name}</div>
+                <div style="color: #7f8c8d; font-size: 0.75rem;">$45.5M • 168,500 sq ft • 15 stories above ground, 2 below</div>
             </div>
-        </div>
-        <div style="text-align: center;">
-            <div style="font-weight: 600; color: #2c3e50; font-size: 0.95rem;">{project_name}</div>
-            <div style="color: #7f8c8d; font-size: 0.75rem;">{project_details}</div>
-        </div>
-        <div style="display: flex; align-items: center; color: #7f8c8d; font-size: 0.8rem; font-weight: 500; padding: 5px 10px;">
-            <span style="margin-right: 3px;">Navigation</span>
-            <div style="display: flex; align-items: center; background-color: #f0f3f6; border-radius: 4px; padding: 3px 8px;">
-                <span style="color: #4a90e2; margin-right: 5px;">Dashboard</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
+            """, unsafe_allow_html=True)
+        
+        with right_col:
+            st.markdown("""
+            <div style="display: flex; align-items: center; color: #7f8c8d; font-size: 0.8rem; font-weight: 500; padding: 5px 10px;">
+                <span style="margin-right: 3px;">Navigation</span>
+                <div style="display: flex; align-items: center; background-color: #f0f3f6; border-radius: 4px; padding: 3px 8px;">
+                    <span style="color: #4a90e2; margin-right: 5px;">Dashboard</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
             </div>
-        </div>
-    </div>
-    """
-    
-    st.markdown(header_html, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
 
 def create_metrics_dashboard(metrics_data):
     """

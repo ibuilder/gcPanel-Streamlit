@@ -1,0 +1,43 @@
+/* Header styling for gcPanel */
+
+/* Add a subtle border at the bottom of the header */
+.header-container {
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+}
+
+/* Crane icon styling */
+.crane-icon {
+    font-size: 26px;
+    color: #0099ff;
+}
+
+/* Logo text styling */
+.logo-text {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+/* Blue gc text */
+.gc-text {
+    color: #0099ff;
+}
+
+/* Panel text */
+.panel-text {
+    color: #333333;
+}
+
+/* Navigation label */
+.nav-label {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+/* Remove extra padding from the logo button */
+.stButton button {
+    padding: 0;
+}

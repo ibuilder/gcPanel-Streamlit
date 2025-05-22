@@ -2,17 +2,18 @@
 Clean Header Component for gcPanel.
 
 This module provides a streamlined header with project title, logo, and navigation.
+Following modular design principles with separate styles and templates.
 """
 
 import streamlit as st
+import os
 from app_config import MENU_OPTIONS, MENU_MAP, PROJECT_INFO
 
-def render_header():
-    """Render the clean header component."""
+def get_css():
+    """Return CSS for header styling."""
+    return """
+    /* Header styling for gcPanel */
     
-    # Add minimal CSS for styling
-    st.markdown("""
-    <style>
     /* Add a subtle border at the bottom of the header */
     .header-container {
         border-bottom: 1px solid #f0f0f0;
@@ -20,15 +21,65 @@ def render_header():
         padding-bottom: 0.5rem;
     }
     
+    /* Crane icon styling */
+    .crane-icon {
+        font-size: 26px;
+        color: #0099ff;
+    }
+    
+    /* Logo text styling */
+    .logo-text {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+    
+    /* Blue gc text */
+    .gc-text {
+        color: #0099ff;
+    }
+    
+    /* Panel text */
+    .panel-text {
+        color: #333333;
+    }
+    
+    /* Navigation label */
+    .nav-label {
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 5px;
+    }
+    
     /* Remove extra padding from the logo button */
     .stButton button {
         padding: 0;
     }
-    </style>
-    """, unsafe_allow_html=True)
+    """
+
+def get_header_container_html():
+    """Return HTML for header container."""
+    return """<div class="header-container"><!-- Header content --></div>"""
+
+def get_logo_html():
+    """Return HTML for logo."""
+    return """
+    <div class="header-logo">
+        <div class="crane-icon">🏗️</div>
+        <div class="logo-text">
+            <span class="gc-text">gc</span><span class="panel-text">Panel</span>
+        </div>
+    </div>
+    """
+
+def render_header():
+    """Render the clean header component using modular styles and templates."""
     
-    # Create the header container with a CSS class
-    st.markdown('<div class="header-container">', unsafe_allow_html=True)
+    # Apply CSS styling from the function
+    st.markdown(f"<style>{get_css()}</style>", unsafe_allow_html=True)
+    
+    # Start the header container
+    st.markdown(get_header_container_html(), unsafe_allow_html=True)
     
     # Use Streamlit column layout
     cols = st.columns([1, 3, 1])
@@ -38,20 +89,19 @@ def render_header():
         # Create a simple 2-column layout for the logo
         logo_cols = st.columns([1, 3])
         
-        # Tower crane icon
+        # Add logo components
         with logo_cols[0]:
-            st.markdown('<div style="font-size: 26px; color: #0099ff;">🏗️</div>', unsafe_allow_html=True)
+            st.markdown('<div class="crane-icon">🏗️</div>', unsafe_allow_html=True)
         
-        # gcPanel text
         with logo_cols[1]:
             st.markdown(
-                '<span style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">'
-                '<span style="color: #0099ff;">gc</span><span style="color: #333333;">Panel</span>'
+                '<span class="logo-text">'
+                '<span class="gc-text">gc</span><span class="panel-text">Panel</span>'
                 '</span>', 
                 unsafe_allow_html=True
             )
         
-        # Hidden button for dashboard navigation - use Streamlit's built-in button
+        # Home navigation button
         st.button(
             "Home", 
             key="logo_dashboard_button", 
@@ -72,7 +122,7 @@ def render_header():
     # Right column - Navigation with icons
     with cols[2]:
         # Navigation label
-        st.caption("Navigation")
+        st.markdown('<div class="nav-label">Navigation</div>', unsafe_allow_html=True)
         
         # Default selection based on current menu
         default_index = MENU_OPTIONS.index("📊 Dashboard")

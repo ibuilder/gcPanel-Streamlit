@@ -8,6 +8,7 @@ with the new module loader system for better independence.
 import streamlit as st
 from modules.module_loader import get_modules_by_category
 
+
 def render_header(modules, current_module):
     """
     Render the application header with navigation menu.
@@ -76,31 +77,28 @@ def render_header(modules, current_module):
         letter-spacing: 0.5px;
     }
     </style>
-    """, unsafe_allow_html=True)
-    
+    """,
+                unsafe_allow_html=True)
+
     # Header layout
     with st.container():
         col1, col2, col3 = st.columns([1, 3, 1])
-        
+
         with col1:
             # Logo and title
-            st.markdown(
-                """
+            st.markdown("""
                 <div class="header-logo">
                     <img src="https://raw.githubusercontent.com/streamlit/streamlit/develop/app/client/static/favicon.png" alt="gcPanel Logo">
                     <div>
-                        <div class="header-title">gcPanel</div>
-                        <div class="header-project">Highland Tower Development</div>
+                        <div class="header-project">Highland Tower Development</div><div class="header-title">gcPanel</div>
                     </div>
                 </div>
                 """,
-                unsafe_allow_html=True
-            )
-        
+                        unsafe_allow_html=True)
+
         with col3:
             # User menu and notifications
-            st.markdown(
-                """
+            st.markdown("""
                 <div class="header-actions">
                     <span class="material-icons" style="cursor: pointer; margin-right: 15px; color: #666;">
                         notifications
@@ -110,57 +108,52 @@ def render_header(modules, current_module):
                     </span>
                 </div>
                 """,
-                unsafe_allow_html=True
-            )
-    
+                        unsafe_allow_html=True)
+
     # Navigation sidebar
     with st.sidebar:
         st.markdown('<div class="nav-container">', unsafe_allow_html=True)
-        
+
         # Get modules organized by category
         categories = get_modules_by_category()
-        
+
         # Sort categories to ensure Main is first
-        sorted_categories = sorted(
-            categories.items(),
-            key=lambda x: 0 if x[0] == "Main" else 1
-        )
-        
+        sorted_categories = sorted(categories.items(),
+                                   key=lambda x: 0 if x[0] == "Main" else 1)
+
         # Render navigation items by category
         for category, module_list in sorted_categories:
             # Show category header except for Main category
             if category != "Main":
-                st.markdown(f'<div class="nav-category">{category}</div>', unsafe_allow_html=True)
-            
+                st.markdown(f'<div class="nav-category">{category}</div>',
+                            unsafe_allow_html=True)
+
             # Create navigation buttons for each module in this category
             for module in module_list:
                 module_id = module["id"]
                 module_name = module["name"]
-                
+
                 # Determine if this is the active module
                 is_active = module_id == current_module
                 active_class = "active" if is_active else ""
-                
+
                 # Create clickable navigation item
-                if st.markdown(
-                    f"""
+                if st.markdown(f"""
                     <div class="nav-button {active_class}" 
                          onclick="handleNavClick('{module_id}')" 
                          data-module="{module_id}">
                         {module_name}
                     </div>
                     """,
-                    unsafe_allow_html=True
-                ):
+                               unsafe_allow_html=True):
                     # This is fallback behavior if the JS click doesn't work
                     st.session_state.current_module = module_id
                     st.rerun()
-        
+
         st.markdown('</div>', unsafe_allow_html=True)
-        
+
         # Add JavaScript for navigation click handling
-        st.markdown(
-            """
+        st.markdown("""
             <script>
             function handleNavClick(moduleId) {
                 // Send a message to update the current_module in session state
@@ -190,5 +183,4 @@ def render_header(modules, current_module):
             });
             </script>
             """,
-            unsafe_allow_html=True
-        )
+                    unsafe_allow_html=True)

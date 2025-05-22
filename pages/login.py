@@ -138,8 +138,26 @@ def login_page():
     tabs = st.tabs(["Login", "Register"])
     
     with tabs[0]:
-        # Use a simplified version without nested columns
-        render_oauth_login_page()
+        # Use the simple login form instead of the nested columns version
+        from login_form import render_login_form
+        render_login_form()
+        
+        # Add OAuth buttons directly
+        from components.oauth_login import render_oauth_buttons
+        render_oauth_buttons()
+        
+        # Add the gcPanel information
+        st.markdown("""
+        <div style="text-align: center; margin-top: 25px; padding: 15px; background-color: #f7f7f7; border-radius: 6px; border-left: 4px solid #f9a01b;">
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#555" style="margin-right: 8px;">
+                    <path d="M13,9H11V7H13V9M13,17H11V11H13V17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
+                </svg>
+                <span style="font-weight: 600; color: #444;">New to gcPanel?</span>
+            </div>
+            <p style="color: #666; font-size: 0.9rem;">Get more information at <a href="http://www.gcpanel.co" target="_blank" style="color: #2b579a; font-weight: 500;">www.gcPanel.co</a></p>
+        </div>
+        """, unsafe_allow_html=True)
     
     with tabs[1]:
         st.markdown("""

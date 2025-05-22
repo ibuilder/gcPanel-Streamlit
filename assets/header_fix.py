@@ -17,9 +17,15 @@ def apply_header_fixes():
         display: none !important;
     }
     
-    /* Fix top margin */
+    /* Fix top margin - make it much smaller */
     .main .block-container {
-        padding-top: 1rem;
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
+    
+    /* Force all vertical blocks to start at the top */
+    div[data-testid="stVerticalBlock"] {
+        gap: 0 !important;
     }
     
     /* Header container styling */

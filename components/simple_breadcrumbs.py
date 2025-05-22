@@ -99,31 +99,11 @@ def get_breadcrumbs_for_page(page):
         page (str): Page name
         
     Returns:
-        list: Breadcrumb hierarchy with Home as the first item
+        list: The current page name only - no longer using hierarchies
     """
-    breadcrumbs = ["Home"]
+    # For Dashboard or Home, don't show any breadcrumbs
+    if page == "Dashboard" or page == "Home":
+        return []
     
-    # Define breadcrumb hierarchies for different pages
-    hierarchies = {
-        "Project Information": ["Home"],
-        "Schedule": ["Home"],
-        "Safety": ["Home"],
-        "Contracts": ["Home"],
-        "Cost Management": ["Home"],
-        "Analytics": ["Home"],
-        "Engineering": ["Home"],
-        "Field Operations": ["Home"],
-        "Documents": ["Home"],
-        "StandaloneBIM": ["Home"],
-        "Mobile Companion": ["Home"],
-        "Closeout": ["Home"],
-        "AI Assistant": ["Home"],
-        "Features Showcase": ["Home"],
-        "Settings": ["Home"]
-    }
-    
-    # Return appropriate hierarchy or just Home + page
-    if page in hierarchies:
-        return hierarchies[page] + [page]
-    else:
-        return ["Home", page]
+    # For all other pages, just return the page name - no hierarchy
+    return [page]

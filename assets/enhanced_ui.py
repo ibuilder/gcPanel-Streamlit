@@ -377,15 +377,16 @@ def create_project_header(project_name, project_number="", address="", status="I
         "Resources": "Resources"
     }
     
-    # Create navigation menu HTML
+    # Create navigation menu HTML - Using simpler approach for JavaScript in f-strings
     nav_menu = ""
     for label, value in nav_items.items():
-        nav_menu += f"""
-        <a href="#" onclick="parent.postMessage({{type: 'streamlit:setSessionState', key: 'current_menu', value: '{value}'}}, '*');"
+        menu_item = f"""
+        <a href="#" onclick="navigateTo('{value}')" 
            style="display: block; padding: 8px 12px; text-decoration: none; color: #333; font-size: 13px; text-align: left;">
             {label}
         </a>
         """
+        nav_menu += menu_item
     
     # Create the header HTML
     header_html = f"""
@@ -430,6 +431,22 @@ def create_project_header(project_name, project_number="", address="", status="I
             </div>
         </div>
     </div>
+    
+    <script>
+    function navigateTo(menu) {{
+        // Set the session state
+        window.parent.postMessage({{
+            type: "streamlit:setSessionState",
+            key: "current_menu",
+            value: menu
+        }}, "*");
+        
+        // Force a rerun
+        window.parent.postMessage({{
+            type: "streamlit:forceRerun"
+        }}, "*");
+    }}
+    </script>
     """
     
     # Render the header at the top

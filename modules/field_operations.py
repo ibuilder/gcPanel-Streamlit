@@ -8,13 +8,14 @@ daily reports, inspections, and quality control.
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
+from components.digital_signature import render_digital_signature_section, get_signature_summary, validate_required_signatures
 
 def render_field_operations():
     """Render the field operations interface."""
     st.header("Field Operations")
     
     # Create tabs for different field operation functions
-    tabs = st.tabs(["Daily Reports", "Inspections", "Quality Control", "Safety Observations"])
+    tabs = st.tabs(["Daily Reports", "Inspections", "Quality Control", "Safety Observations", "Checklists"])
     
     # Daily Reports Tab
     with tabs[0]:

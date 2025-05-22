@@ -280,7 +280,7 @@ def role_transition_animation(from_role: str, to_role: str) -> None:
     </div>
     
     <style>
-    .role-transition {
+    .role-transition {{
         display: flex;
         align-items: center;
         justify-content: center;
@@ -290,53 +290,53 @@ def role_transition_animation(from_role: str, to_role: str) -> None:
         border-radius: 10px;
         margin: 15px 0;
         animation: slide-in 0.5s ease-out;
-    }
+    }}
     
-    .role-badge {
+    .role-badge {{
         padding: 8px 16px;
         border-radius: 20px;
         font-weight: bold;
         color: white;
         animation: badge-pop 0.4s ease-out;
-    }
+    }}
     
-    .from-role {
+    .from-role {{
         background: #6c757d;
         animation-delay: 0.1s;
-    }
+    }}
     
-    .to-role {
+    .to-role {{
         background: #28a745;
         animation-delay: 0.3s;
-    }
+    }}
     
-    .transition-arrow {
+    .transition-arrow {{
         font-size: 24px;
         color: #007bff;
         animation: arrow-bounce 1s ease-in-out infinite;
-    }
+    }}
     
-    .transition-text {
+    .transition-text {{
         color: #666;
         font-size: 14px;
-    }
+    }}
     
-    @keyframes slide-in {
-        from { transform: translateY(-20px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
+    @keyframes slide-in {{
+        from {{ transform: translateY(-20px); opacity: 0; }}
+        to {{ transform: translateY(0); opacity: 1; }}
+    }}
     
-    @keyframes badge-pop {
-        0% { transform: scale(0); }
-        80% { transform: scale(1.1); }
-        100% { transform: scale(1); }
-    }
+    @keyframes badge-pop {{
+        0% {{ transform: scale(0); }}
+        80% {{ transform: scale(1.1); }}
+        100% {{ transform: scale(1); }}
+    }}
     
-    @keyframes arrow-bounce {
-        0%, 20%, 50%, 80%, 100% { transform: translateX(0); }
-        40% { transform: translateX(5px); }
-        60% { transform: translateX(3px); }
-    }
+    @keyframes arrow-bounce {{
+        0%, 20%, 50%, 80%, 100% {{ transform: translateX(0); }}
+        40% {{ transform: translateX(5px); }}
+        60% {{ transform: translateX(3px); }}
+    }}
     </style>
     """, unsafe_allow_html=True)
     

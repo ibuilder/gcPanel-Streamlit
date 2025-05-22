@@ -278,12 +278,17 @@ class TMTicketsModule(CrudModule):
                 
                 with col2:
                     # Work Date
+                    # Work Date with proper error handling
+                    default_date = datetime.now().date()
+                    if not is_new and current_item.get("work_date"):
+                        try:
+                            default_date = datetime.strptime(current_item["work_date"], "%Y-%m-%d").date()
+                        except (ValueError, TypeError):
+                            pass
+                    
                     work_date = st.date_input(
                         "Work Date",
-                        value=datetime.now() if is_new else (
-                            datetime.strptime(current_item["work_date"], "%Y-%m-%d") 
-                            if "work_date" in current_item else datetime.now()
-                        )
+                        value=default_date
                     )
                     
                     # Status
@@ -448,12 +453,12 @@ class TMTicketsModule(CrudModule):
                         
                         # Show success message and return to list
                         st.success(f"T&M Ticket {ticket_id} saved successfully with digital signatures!")
-                        self._return_to_list_view()
+                        self.return_to_list_view()
                     else:
                         st.error(f"Cannot save T&M ticket: {message}")
             
             if cancel_button:
-                self._return_to_list_view()
+                self.return_to_list_view()
         
         # Close the detail container
         end_crud_detail_container()

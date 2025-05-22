@@ -200,6 +200,17 @@ class CrudModule:
         
         return sorted_items
     
+    def return_to_list_view(self):
+        """Return to the list view by clearing detail view session state."""
+        base_key = self._get_state_key_prefix()
+        if f"{base_key}_show_detail" in st.session_state:
+            del st.session_state[f"{base_key}_show_detail"]
+        if f"{base_key}_selected_item" in st.session_state:
+            del st.session_state[f"{base_key}_selected_item"]
+        if f"{base_key}_is_new" in st.session_state:
+            del st.session_state[f"{base_key}_is_new"]
+        st.rerun()
+    
     def render_list_view(self):
         """Render the list view with standardized CRUD styling."""
         # Apply CRUD styles
@@ -297,7 +308,8 @@ class CrudModule:
                 with row_cols[-1]:
                     view_col, edit_col = st.columns(2)
                     with view_col:
-                        if st.button("👁️", key=f"view_{item[self.id_field]}", help="View details"):
+                        item_id = item.get(self.id_field, f"unknown_{hash(str(item))}")
+                        if st.button("👁️", key=f"view_{item_id}", help="View details"):
                             st.session_state[f'{base_key}_selected_id'] = item[self.id_field]
                             st.session_state[f'{base_key}_view'] = 'detail'
                             st.session_state[f'{base_key}_edit_mode'] = False

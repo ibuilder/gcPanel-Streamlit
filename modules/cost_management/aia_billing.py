@@ -93,7 +93,9 @@ class AIABillingModule(CrudModule):
                 max_completion_pct = min(1.0, (i * 0.25) * (1 + random.uniform(-0.2, 0.2)))
                 
                 # Adjust completion percentage by division (earlier divisions complete faster)
-                division_num = int(re.search(r'Division (\d+)', division).group(1)) if re.search(r'Division (\d+)', division) else i
+                import re
+                division_match = re.search(r'Division (\d+)', division)
+                division_num = int(division_match.group(1)) if division_match else i
                 division_factor = max(0.1, min(1.0, 1.0 - (division_num / 30)))
                 
                 completion_pct = max_completion_pct * division_factor
@@ -1065,7 +1067,7 @@ class AIABillingModule(CrudModule):
                 g703_sheet.column_dimensions[col_letter].width = 15
             
             # Save the Excel writer
-            writer.save()
+                pass  # Context manager handles save
             
             # Return the BytesIO object
             output.seek(0)

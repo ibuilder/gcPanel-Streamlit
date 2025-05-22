@@ -57,6 +57,28 @@ def main():
         # Apply enhanced UI styles for professional, enterprise-grade appearance
         apply_enhanced_styles()
         
+        # Remove sidebar completely from the entire application
+        st.markdown("""
+        <style>
+        /* Completely hide all sidebar elements and controls from all pages */
+        [data-testid="stSidebar"] {display: none !important;}
+        .st-emotion-cache-1c7y2kd {display: none !important;}
+        button[kind="headerNoPadding"] {display: none !important;}
+        section[data-testid="stSidebarContent"] {display: none !important;}
+        .st-emotion-cache-z5fcl4 {display: none !important;}
+        section[data-testid="stSidebarUserContent"] {display: none !important;}
+        .st-emotion-cache-10oheav {visibility: hidden !important;}
+        [data-testid="collapsedControl"] {display: none !important;}
+        #Sidebar {display: none !important;}
+        nav[data-testid="stSidebar"] {display: none !important;}
+        nav.st-emotion-cache-zq5wmm.ezrtsby0 {display: none !important;}
+        /* Hide more aggressively with additional selectors */
+        .css-1d391kg {display: none !important;}
+        .st-hy {display: none !important;}
+        .st-emotion-cache-ue6h4q {display: none !important;}
+        </style>
+        """, unsafe_allow_html=True)
+        
         # Initialize session state variables from app_manager
         app_manager.initialize_session_state()
         
@@ -97,23 +119,6 @@ def main():
         
         # Show login page if not authenticated
         if not is_authenticated:
-            # Completely hide sidebar and all sidebar-related elements on login page
-            st.markdown("""
-            <style>
-            /* Aggressively hide all sidebar elements and controls for all versions */
-            [data-testid="stSidebar"] {display: none !important;}
-            .st-emotion-cache-1c7y2kd {display: none !important;}
-            button[kind="headerNoPadding"] {display: none !important;}
-            section[data-testid="stSidebarContent"] {display: none !important;}
-            .st-emotion-cache-z5fcl4 {display: none !important;}
-            section[data-testid="stSidebarUserContent"] {display: none !important;}
-            .st-emotion-cache-10oheav {visibility: hidden !important;}
-            [data-testid="collapsedControl"] {display: none !important;}
-            #Sidebar {display: none !important;}
-            nav[data-testid="stSidebar"] {display: none !important;}
-            nav.st-emotion-cache-zq5wmm.ezrtsby0 {display: none !important;}
-            </style>
-            """, unsafe_allow_html=True)
             
             # Import and render login page
             from pages.login import login_page

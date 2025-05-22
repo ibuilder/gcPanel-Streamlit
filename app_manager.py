@@ -266,7 +266,7 @@ def render_selected_module(current_menu):
         "Safety": render_safety,
         "Contracts": lambda: modules.contracts.render(),
         "Cost Management": render_cost_management,
-        "Pre-Construction": lambda: modules.preconstruction.render(),
+        "PreConstruction": lambda: modules.PreConstruction.render(),
         "Analytics": render_analytics,
         "Engineering": render_engineering,
         "Field Operations": render_field_operations,

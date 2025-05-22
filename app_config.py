@@ -49,7 +49,7 @@ MENU_MAP = {
     "⚠️ Safety": "Safety",
     "📝 Contracts": "Contracts", 
     "💰 Cost Management": "Cost Management",
-    "🏗️ Pre-Construction": "Pre-Construction",
+    "🏗️ Pre-Construction": "PreConstruction",
     "📈 Analytics": "Analytics",
     "🔧 Engineering": "Engineering",
     "🚧 Field Operations": "Field Operations",

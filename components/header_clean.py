@@ -44,16 +44,18 @@ def render_header():
         
         # Left column - Logo with tower crane icon (clickable)
         with cols[0]:
-            # Create a clickable logo that redirects to Dashboard
+            # Create a professional logo with tower crane icon
             st.markdown("""
             <div style="display: flex; align-items: center; cursor: pointer;" onclick="window.location.href='/?view=Dashboard'">
-                <img src="gcpanel.png" width="110" style="margin-right: 5px;">
-                <span style="font-size: 24px; color: #555;">🏗️</span>
+                <div style="display: flex; align-items: center; margin-right: 10px;">
+                    <span style="font-size: 28px; font-weight: 700; color: #2c3e50; letter-spacing: -1px;">gc<span style="color: #3498db">Panel</span></span>
+                    <span style="font-size: 24px; margin-left: 5px; color: #e74c3c;">🏗️</span>
+                </div>
             </div>
             """, unsafe_allow_html=True)
             
-            # Add a button that will take users to dashboard
-            if st.button("Go to Dashboard", key="logo_dashboard_button", help="Return to Dashboard"):
+            # Hidden button for dashboard navigation
+            if st.button("Dashboard", key="logo_dashboard_button", help="Return to Dashboard", type="secondary"):
                 st.session_state["current_menu"] = "Dashboard"
                 st.rerun()
         

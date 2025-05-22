@@ -138,10 +138,9 @@ def _render_ui_framework():
     </style>
     """, unsafe_allow_html=True)
     
-    # Render simple breadcrumbs for navigation context (only if needed)
-    if current_menu != "Dashboard" and current_menu != "Home":
-        breadcrumbs = get_breadcrumbs_for_page(current_menu)
-        simple_breadcrumbs(breadcrumbs)
+    # Always render breadcrumbs for navigation context
+    breadcrumbs = get_breadcrumbs_for_page(current_menu)
+    simple_breadcrumbs(breadcrumbs)
     
     # Handle notifications display
     _handle_notification_display()

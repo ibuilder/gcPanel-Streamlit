@@ -46,7 +46,7 @@ def render_fixed_header():
     </style>
     """, unsafe_allow_html=True)
     
-    # Create the fixed header with HTML
+    # Create the fixed header with HTML for the logo and project info
     header_html = f"""
     <div style="position:relative; top:0; left:0; right:0; z-index:999; background:#f8f9fa; padding:5px 10px; border-bottom:1px solid #e9ecef; margin:0;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -69,3 +69,22 @@ def render_fixed_header():
     
     # Render the header
     st.markdown(header_html, unsafe_allow_html=True)
+    
+    # Add the navigation dropdown
+    col1, col2, col3 = st.columns([1, 3, 1])
+    with col3:
+        current_menu = st.session_state.get("current_menu", "Dashboard")
+        from app_config import MENU_OPTIONS
+        
+        selected_menu = st.selectbox(
+            label="",
+            options=MENU_OPTIONS,
+            index=MENU_OPTIONS.index(current_menu) if current_menu in MENU_OPTIONS else 0,
+            key="nav_dropdown",
+            label_visibility="collapsed"
+        )
+        
+        # Update current menu if selection changed
+        if selected_menu != current_menu:
+            st.session_state.current_menu = selected_menu
+            st.rerun()

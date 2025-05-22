@@ -61,7 +61,7 @@ def render_fixed_header():
                 <div style="font-size:12px; color:#666;">$45.5M • 168,500 sq ft • 15 stories above ground, 2 below</div>
             </div>
             <div style="text-align:right;">
-                <div style="font-size:12px; color:#666;">Navigation</div>
+                <!-- Navigation dropdown will be placed here -->
             </div>
         </div>
     </div>
@@ -70,14 +70,14 @@ def render_fixed_header():
     # Render the header
     st.markdown(header_html, unsafe_allow_html=True)
     
-    # Add the navigation dropdown
+    # Add the navigation dropdown directly where the "Navigation" text was
     col1, col2, col3 = st.columns([1, 3, 1])
     with col3:
         current_menu = st.session_state.get("current_menu", "Dashboard")
         from app_config import MENU_OPTIONS
         
         selected_menu = st.selectbox(
-            label="",
+            label="Navigation", # Adding a proper label for accessibility
             options=MENU_OPTIONS,
             index=MENU_OPTIONS.index(current_menu) if current_menu in MENU_OPTIONS else 0,
             key="nav_dropdown",

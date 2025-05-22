@@ -10,80 +10,97 @@ from app_config import MENU_OPTIONS, MENU_MAP, PROJECT_INFO
 def render_header():
     """Render the clean header component."""
     
-    # Add some custom CSS for professional header styling
+    # Add minimal CSS for styling
     st.markdown("""
     <style>
+    /* Add a subtle border at the bottom of the header */
     .header-container {
-        padding: 1rem 0;
-        border-bottom: 1px solid #e0e0e0;
+        border-bottom: 1px solid #f0f0f0;
         margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
     }
-    .project-title {
-        font-size: 18px;
-        font-weight: 600;
-        margin: 0;
-        color: #333;
-    }
-    .project-details {
-        font-size: 14px;
-        color: #666;
-        margin: 0;
-    }
+    
+    /* Remove extra padding from the logo button */
     .stButton button {
-        border: none;
-        background: none;
         padding: 0;
     }
     </style>
     """, unsafe_allow_html=True)
     
-    # Use the simpler approach with direct Streamlit components
-    # This will ensure the layout works consistently
-    with st.container():
-        cols = st.columns([1, 3, 1])
+    # Create the header container with a CSS class
+    st.markdown('<div class="header-container">', unsafe_allow_html=True)
+    
+    # Use Streamlit column layout
+    cols = st.columns([1, 3, 1])
+    
+    # Left column - Logo with tower crane icon
+    with cols[0]:
+        # Create a simple 2-column layout for the logo
+        logo_cols = st.columns([1, 3])
         
-        # Left column - Logo with tower crane icon (clickable)
-        with cols[0]:
-            # Create a bold logo with tower crane to the left, blue 'gc' and grey 'Panel'
-            st.markdown("""
-            <div style="display: flex; align-items: center; cursor: pointer;" onclick="window.location.href='/?view=Dashboard'">
-                <div style="display: flex; align-items: center;">
-                    <div style="font-size: 26px; color: #0099ff; margin-right: 8px;">🏗️</div>
-                    <div>
-                        <span style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">
-                            <span style="color: #0099ff;">gc</span><span style="color: #333333;">Panel</span>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Hidden button for dashboard navigation
-            if st.button("Dashboard", key="logo_dashboard_button", help="Return to Dashboard", type="secondary"):
-                st.session_state["current_menu"] = "Dashboard"
-                st.rerun()
+        # Tower crane icon
+        with logo_cols[0]:
+            st.markdown('<div style="font-size: 26px; color: #0099ff;">🏗️</div>', unsafe_allow_html=True)
         
-        # Middle column - Project Info (smaller project name)
-        with cols[1]:
-            st.markdown(f'<p class="project-title">{PROJECT_INFO["name"]}</p>', unsafe_allow_html=True)
-            st.markdown(f'<p class="project-details">{PROJECT_INFO["value"]} • {PROJECT_INFO["size"]} • {PROJECT_INFO["floors"]}</p>', unsafe_allow_html=True)
-        
-        # Right column - Navigation with icons
-        with cols[2]:
-            st.markdown('<p style="font-size:13px; color:#666; margin-bottom:5px;">Navigation</p>', unsafe_allow_html=True)
-            
-            # Force label visibility to be visible to ensure icons show up
-            selected_menu = st.selectbox(
-                "Select Module",
-                options=MENU_OPTIONS,
-                index=MENU_OPTIONS.index("📊 Dashboard") if "current_menu" not in st.session_state else MENU_OPTIONS.index([opt for opt in MENU_OPTIONS if MENU_MAP[opt] == st.session_state.current_menu][0]),
-                label_visibility="collapsed",
-                format_func=lambda x: x  # This ensures the icons display correctly
+        # gcPanel text
+        with logo_cols[1]:
+            st.markdown(
+                '<span style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">'
+                '<span style="color: #0099ff;">gc</span><span style="color: #333333;">Panel</span>'
+                '</span>', 
+                unsafe_allow_html=True
             )
-            
-            # Update current menu when selection changes
-            if selected_menu:
-                new_menu = MENU_MAP[selected_menu]
-                if st.session_state.get("current_menu") != new_menu:
-                    st.session_state["current_menu"] = new_menu
-                    st.rerun()
+        
+        # Hidden button for dashboard navigation - use Streamlit's built-in button
+        st.button(
+            "Home", 
+            key="logo_dashboard_button", 
+            help="Return to Dashboard",
+            type="secondary",
+            on_click=lambda: st.session_state.update({"current_menu": "Dashboard"})
+        )
+    
+    # Middle column - Project Info
+    with cols[1]:
+        # Project name - using Streamlit's text formatting
+        st.subheader(PROJECT_INFO["name"])
+        
+        # Project details
+        details = f"{PROJECT_INFO['value']} • {PROJECT_INFO['size']} • {PROJECT_INFO['floors']}"
+        st.caption(details)
+    
+    # Right column - Navigation with icons
+    with cols[2]:
+        # Navigation label
+        st.caption("Navigation")
+        
+        # Default selection based on current menu
+        default_index = MENU_OPTIONS.index("📊 Dashboard")
+        if "current_menu" in st.session_state:
+            try:
+                # Find the menu option that maps to the current menu
+                matching_options = [opt for opt in MENU_OPTIONS if MENU_MAP[opt] == st.session_state.current_menu]
+                if matching_options:
+                    default_index = MENU_OPTIONS.index(matching_options[0])
+            except (ValueError, IndexError):
+                # If there's an error, fall back to Dashboard
+                pass
+        
+        # Create the navigation dropdown
+        selected_menu = st.selectbox(
+            "Select Module",
+            options=MENU_OPTIONS,
+            index=default_index,
+            label_visibility="collapsed",
+            format_func=lambda x: x  # Keep the icons
+        )
+        
+        # Handle navigation changes
+        if selected_menu:
+            new_menu = MENU_MAP[selected_menu]
+            if st.session_state.get("current_menu") != new_menu:
+                st.session_state["current_menu"] = new_menu
+                st.rerun()
+    
+    # Close the header container
+    st.markdown('</div>', unsafe_allow_html=True)

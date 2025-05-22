@@ -130,8 +130,8 @@ def render_oauth_login_page():
     .login-container {
         padding: 1rem;
         background-color: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
     .login-header {
         text-align: center;
@@ -151,33 +151,99 @@ def render_oauth_login_page():
         padding: 0 1rem;
         color: #666;
         font-size: 0.875rem;
+        background-color: white;
+    }
+    
+    /* Construction-themed elements */
+    .construction-icon {
+        display: inline-block;
+        margin-right: 5px;
+        vertical-align: middle;
+    }
+    
+    /* Form styling */
+    input[type="text"], input[type="password"] {
+        border: 1px solid #ddd !important;
+        border-radius: 4px !important;
+        padding: 12px 10px !important;
+        background-color: #f9f9f9 !important;
+    }
+    
+    input[type="text"]:focus, input[type="password"]:focus {
+        border-color: #f9a01b !important;
+        box-shadow: 0 0 0 1px #f9a01b !important;
+    }
+    
+    .oauth-button {
+        margin-bottom: 10px;
+        padding: 10px;
+        transition: all 0.2s ease;
+    }
+    
+    .oauth-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     </style>
     """, unsafe_allow_html=True)
     
+    # Construction-themed header icon
+    st.markdown("""
+    <div style="text-align: center; margin-bottom: 15px;">
+        <div style="display: inline-block; background-color: #f9a01b; border-radius: 50%; padding: 15px; box-shadow: 0 3px 6px rgba(0,0,0,0.1);">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
+                <path d="M13.5,10A1.5,1.5 0 0,1 12,8.5A1.5,1.5 0 0,1 13.5,7A1.5,1.5 0 0,1 15,8.5A1.5,1.5 0 0,1 13.5,10M22,1V11H21V19A1,1 0 0,1 20,20H4A1,1 0 0,1 3,19V11H2V1H11V8.31C10.36,8.55 9.97,9.17 10,9.83C10.05,10.5 10.56,11 11.25,11H12.75A1.25,1.25 0 0,0 14,9.75C14,9.29 13.71,8.9 13.28,8.77L13,8.31V1H22Z" />
+            </svg>
+        </div>
+    </div>
+    <h2 style="text-align: center; margin-bottom: 20px; color: #333; font-weight: 600;">Project Access</h2>
+    """, unsafe_allow_html=True)
+    
     # Email and password form (simplified layout)
     with st.form("login_form"):
-        st.subheader("Sign in to your account")
-        st.text_input("Email", placeholder="Enter your email")
-        st.text_input("Password", placeholder="Enter your password", type="password")
+        st.text_input("Email", key="login_email", placeholder="Enter your email")
+        st.text_input("Password", key="login_password", placeholder="Enter your password", type="password")
         
-        # Remember me checkbox and forgot password link
-        st.checkbox("Remember me")
-        st.markdown('<div style="text-align: right;"><a href="#">Forgot password?</a></div>', unsafe_allow_html=True)
+        # Remember me and forgot password in a single row
+        col1, col2 = st.columns(2)
+        with col1:
+            st.checkbox("Remember me", key="remember_me")
+        with col2:
+            st.markdown('<div style="text-align: right;"><a href="#" style="color: #2b579a;">Forgot password?</a></div>', unsafe_allow_html=True)
         
-        # Submit button
-        st.form_submit_button("Sign In", use_container_width=True)
+        # Submit button - explicitly added to fix the form error
+        submit_clicked = st.form_submit_button("Sign In", use_container_width=True)
+        
+        # Process form submission
+        if submit_clicked:
+            # In a real app, we would validate credentials here
+            st.warning("Traditional login is not yet implemented. Please use corporate login options below.")
     
-    # Divider
-    st.markdown('<div class="divider"><span>OR</span></div>', unsafe_allow_html=True)
+    # Divider with construction theme
+    st.markdown("""
+    <div class="divider">
+        <span style="display: flex; align-items: center;">
+            <svg class="construction-icon" width="16" height="16" viewBox="0 0 24 24" fill="#666">
+                <path d="M6,2C4.89,2 4,2.89 4,4V20A2,2 0 0,0 6,22H10V20.09L12.09,18H16.9L19,15.9V4C19,2.89 18.1,2 17,2H6M6,4H17V16H11.91L10,17.91V16H6V4M8,6V12H16V6H8Z" />
+            </svg>
+            CORPORATE LOGIN
+        </span>
+    </div>
+    """, unsafe_allow_html=True)
     
     # OAuth buttons
     render_oauth_buttons()
     
-    # Registration link
+    # Project access info with construction theme
     st.markdown("""
-    <div style="text-align: center; margin-top: 20px;">
-        <p>Don't have an account? <a href="#">Contact your project administrator</a></p>
+    <div style="text-align: center; margin-top: 25px; padding: 15px; background-color: #f7f7f7; border-radius: 6px; border-left: 4px solid #f9a01b;">
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#555" style="margin-right: 8px;">
+                <path d="M13,9H11V7H13V9M13,17H11V11H13V17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
+            </svg>
+            <span style="font-weight: 600; color: #444;">New to Highland Tower Development?</span>
+        </div>
+        <p style="color: #666; font-size: 0.9rem;">Contact your project manager to request access credentials</p>
     </div>
     """, unsafe_allow_html=True)
 

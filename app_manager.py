@@ -42,6 +42,7 @@ from modules.mobile_companion import render_mobile_companion
 from modules.analytics import render as render_analytics
 from modules.ai_assistant import render_ai_assistant
 from modules.integrations import render_integrations
+from modules.preconstruction import render as render_preconstruction
 
 # Import Admin module features
 import modules.contracts
@@ -265,10 +266,12 @@ def render_selected_module(current_menu):
         "Safety": render_safety,
         "Contracts": lambda: modules.contracts.render(),
         "Cost Management": render_cost_management,
+        "Pre-Construction": render_preconstruction,
         "Analytics": render_analytics,
         "Engineering": render_engineering,
         "Field Operations": render_field_operations,
         "Documents": render_documents,
+        "BIM": render_bim,
         "Closeout": render_closeout,
         "Mobile Companion": render_mobile_companion,
         "AI Assistant": render_ai_assistant,

@@ -42,9 +42,20 @@ def render_header():
     with st.container():
         cols = st.columns([1, 3, 1])
         
-        # Left column - Logo (larger)
+        # Left column - Logo with tower crane icon (clickable)
         with cols[0]:
-            st.image("gcpanel.png", width=110)
+            # Create a clickable logo that redirects to Dashboard
+            st.markdown("""
+            <div style="display: flex; align-items: center; cursor: pointer;" onclick="window.location.href='/?view=Dashboard'">
+                <img src="gcpanel.png" width="110" style="margin-right: 5px;">
+                <span style="font-size: 24px; color: #555;">🏗️</span>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Add a button that will take users to dashboard
+            if st.button("Go to Dashboard", key="logo_dashboard_button", help="Return to Dashboard"):
+                st.session_state["current_menu"] = "Dashboard"
+                st.rerun()
         
         # Middle column - Project Info (smaller project name)
         with cols[1]:

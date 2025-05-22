@@ -65,6 +65,36 @@ def main():
         if "authenticated" in st.session_state:
             is_authenticated = st.session_state.authenticated
         
+        # Handle the admin and demo login credentials for quick testing
+        if "login_form_submitted" in st.session_state and st.session_state.login_form_submitted:
+            username = st.session_state.get("login_username", "")
+            password = st.session_state.get("login_password", "")
+            
+            # Reset the form submission flag
+            st.session_state.login_form_submitted = False
+            
+            # Check for admin credentials
+            if username.lower() == "admin" and password == "admin123":
+                # Set authentication in session state
+                st.session_state.authenticated = True
+                st.session_state.user = {
+                    "username": "admin",
+                    "email": "admin@gcpanel.com",
+                    "full_name": "Admin User",
+                    "role": "admin"
+                }
+                is_authenticated = True
+            # Add demo user credentials
+            elif username.lower() == "demo" and password == "demo123":
+                st.session_state.authenticated = True
+                st.session_state.user = {
+                    "username": "demo",
+                    "email": "demo@gcpanel.com",
+                    "full_name": "Demo User",
+                    "role": "viewer"
+                }
+                is_authenticated = True
+        
         # Show login page if not authenticated
         if not is_authenticated:
             # Hide sidebar on login page

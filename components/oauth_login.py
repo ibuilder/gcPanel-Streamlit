@@ -204,7 +204,7 @@ def render_oauth_login_page():
         with col2:
             st.markdown('<div style="text-align: right;"><a href="#" style="color: #2b579a;">Forgot password?</a></div>', unsafe_allow_html=True)
         
-        # Submit button with processing
+        # Submit button 
         submit_clicked = st.form_submit_button("Sign In", use_container_width=True)
         
         # Process form submission
@@ -212,36 +212,14 @@ def render_oauth_login_page():
             if not username or not password:
                 st.error("Please enter both username/email and password")
             else:
-                # Check for admin credentials
-                if username.lower() == "admin" and password == "admin123":
-                    # Set authentication in session state
-                    st.session_state.authenticated = True
-                    st.session_state.user = {
-                        "username": "admin",
-                        "email": "admin@gcpanel.com",
-                        "full_name": "Admin User",
-                        "role": "admin"
-                    }
-                    st.session_state.remember_me = remember
-                    st.success("Login successful! Redirecting to dashboard...")
-                    # Force page reload to show the dashboard
-                    st.rerun()
-                # Add any other hardcoded users here if needed
-                elif username.lower() == "demo" and password == "demo123":
-                    st.session_state.authenticated = True
-                    st.session_state.user = {
-                        "username": "demo",
-                        "email": "demo@gcpanel.com",
-                        "full_name": "Demo User",
-                        "role": "viewer"
-                    }
-                    st.session_state.remember_me = remember
-                    st.success("Login successful! Redirecting to dashboard...")
-                    # Force page reload to show the dashboard
-                    st.rerun()
-                else:
-                    # In a production app, this would check against a database
-                    st.error("Invalid username or password")
+                # Store credentials in session state for processing
+                st.session_state.login_username = username
+                st.session_state.login_password = password
+                st.session_state.login_form_submitted = True
+                
+                # Show a message and trigger the rerun
+                st.success("Signing in...")
+                st.rerun()
     
     # Divider with construction theme
     st.markdown("""

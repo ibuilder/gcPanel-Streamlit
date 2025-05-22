@@ -1,21 +1,41 @@
 """
 Cost Management module for the gcPanel Construction Management Dashboard.
 
-This module provides cost management functionality including budgets, expenses,
-forecasting, and financial reporting.
+This module provides comprehensive cost management functionality including:
+- Financial overview and metrics
+- Budget vs. actual cost tracking
+- Cost forecasting and projections
+- Proposals and change orders
+- T&M tickets with unit pricing
+- Financial reporting and analytics
 """
 
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
 import random
+import os
+import sys
+
+# Import the modules for proposals, T&M tickets, and change orders
+from modules.cost_management.proposals import render_proposals
+from modules.cost_management.tm_tickets import render_tm_tickets
+from modules.cost_management.change_orders import render_change_orders
 
 def render_cost_management():
     """Render the cost management interface."""
     st.header("Cost Management")
     
     # Create tabs for different cost management functions
-    tabs = st.tabs(["Overview", "Budget vs. Actual", "Forecasting", "Reporting"])
+    tabs = st.tabs([
+        "Overview", 
+        "Budget vs. Actual", 
+        "Proposals", 
+        "T&M Tickets", 
+        "Change Orders", 
+        "Forecasting", 
+        "Reporting"
+    ])
     
     # Cost Overview Tab
     with tabs[0]:
@@ -25,12 +45,24 @@ def render_cost_management():
     with tabs[1]:
         render_budget_vs_actual()
     
-    # Forecasting Tab
+    # Proposals Tab
     with tabs[2]:
+        render_proposals()
+    
+    # T&M Tickets Tab
+    with tabs[3]:
+        render_tm_tickets()
+    
+    # Change Orders Tab
+    with tabs[4]:
+        render_change_orders()
+    
+    # Forecasting Tab
+    with tabs[5]:
         render_forecasting()
         
     # Reporting Tab
-    with tabs[3]:
+    with tabs[6]:
         render_reporting()
 
 def render_cost_overview():

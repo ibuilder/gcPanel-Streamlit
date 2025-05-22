@@ -16,10 +16,30 @@ def apply_enhanced_styles():
     """
     st.markdown("""
     <style>
-    /* Main Layout Improvements */
+    /* Force removal of sidebar from all pages */
+    [data-testid="stSidebar"] {display: none !important; width: 0 !important; min-width: 0 !important;}
+    .st-emotion-cache-1cypcdb {display: none !important; width: 0 !important;}
+    .st-emotion-cache-z5fcl4 {display: none !important; width: 0 !important;}
+    .st-emotion-cache-15z6y4i {display: none !important; width: 0 !important;}
+    .st-emotion-cache-1nm2qx3 {display: none !important; width: 0 !important;}
+    section[data-testid="stSidebarUserContent"] {display: none !important; width: 0 !important;}
+    .st-emotion-cache-10oheav {display: none !important; width: 0 !important;}
+    [data-testid="collapsedControl"] {display: none !important; width: 0 !important;}
+    nav[data-testid="stSidebar"] {display: none !important; width: 0 !important;}
+    #Sidebar {display: none !important; width: 0 !important;}
+    button[kind="headerNoPadding"] {display: none !important; width: 0 !important;}
+    /* Adjust main content for no sidebar */
     .main .block-container {
         padding-top: 1rem;
         padding-bottom: 1rem;
+        margin-left: 0 !important;
+        max-width: none !important;
+        width: 100% !important;
+    }
+    /* Remove sidebar space */
+    .st-emotion-cache-18ni7ap {
+        left: 0 !important;
+        width: 100% !important;
     }
     
     /* Header Styling */

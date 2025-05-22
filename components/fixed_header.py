@@ -53,27 +53,62 @@ def render_fixed_header():
     </style>
     """, unsafe_allow_html=True)
     
-    # Create the first part of the header (logo and project info)
+    # Add more CSS to remove spacing
     st.markdown("""
-    <div style="position:relative; top:0; left:0; right:0; z-index:999; background:#f8f9fa; padding:5px 10px; border-bottom:1px solid #e9ecef; margin:0;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; align-items:center;">
-                <div style="font-size:24px; color:#0099ff; margin-right:5px;">🏗️</div>
-                <div>
-                    <span style="font-weight:bold; color:#0099ff;">gc</span><span style="font-weight:bold; color:#333333;">Panel</span>
-                </div>
-            </div>
-            <div style="text-align:center;">
-                <div style="font-weight:bold; font-size:18px;">Highland Tower Development</div>
-                <div style="font-size:12px; color:#666;">$45.5M • 168,500 sq ft • 15 stories above ground, 2 below</div>
-            </div>
+    <style>
+    /* Remove padding from columns */
+    div[data-testid="column"] {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* Remove padding from select box */
+    div[data-testid="stSelectbox"] {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* Compact header layout */
+    .header-row {
+        margin: 0 !important;
+        padding: 5px 0 !important;
+    }
+    
+    /* Remove element container padding */
+    .element-container {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    </style>
     """, unsafe_allow_html=True)
     
-    # Create a column layout for the third part (navigation)
-    col1, col2, col3 = st.columns([7, 1, 2])
+    # Create a three-column layout for the header with no padding
+    header_col1, header_col2, header_col3 = st.columns([1, 2, 1])
     
-    # In the third column, place the navigation dropdown
-    with col3:
+    # Column 1: Logo
+    with header_col1:
+        st.markdown("""
+        <div style="display:flex; align-items:center; padding:0; margin:0;">
+            <div style="font-size:24px; color:#0099ff; margin-right:5px;">🏗️</div>
+            <div>
+                <span style="font-weight:bold; color:#0099ff;">gc</span><span style="font-weight:bold; color:#333333;">Panel</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Column 2: Project Info (centered)
+    with header_col2:
+        st.markdown("""
+        <div style="text-align:center; padding:0; margin:0;">
+            <div style="font-weight:bold; font-size:18px; line-height:1.2;">Highland Tower Development</div>
+            <div style="font-size:12px; color:#666; line-height:1.2;">$45.5M • 168,500 sq ft • 15 stories above ground, 2 below</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Column 3: Navigation dropdown
+    with header_col3:
         current_menu = st.session_state.get("current_menu", "Dashboard")
         from app_config import MENU_OPTIONS
         
@@ -90,8 +125,7 @@ def render_fixed_header():
             st.session_state.current_menu = selected_menu
             st.rerun()
     
-    # Close the header div
+    # Add a horizontal line below the header
     st.markdown("""
-        </div>
-    </div>
+    <hr style="height:1px; margin:0; padding:0; border:none; background-color:#e9ecef;">
     """, unsafe_allow_html=True)

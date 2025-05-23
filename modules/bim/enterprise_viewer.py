@@ -340,7 +340,6 @@ class BIMViewerComponent:
         component_value = components.html(
             component_html,
             height=self.height,
-            width=self.width,
             scrolling=False
         )
         

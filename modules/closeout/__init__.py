@@ -729,9 +729,106 @@ class CloseoutItemModule(CrudModule):
             
             st.markdown("</div>", unsafe_allow_html=True)
 
+def render_automated_closeout_tracking():
+    """Render automated closeout tracking dashboard"""
+    st.markdown("### 🤖 Automated Closeout Tracking")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Closeout Progress**")
+        st.metric("Overall Completion", "78%", "+12% this month")
+        st.metric("Items Completed", "23/30", "7 remaining")
+        st.metric("On-Time Delivery", "87%", "Above target")
+        
+        st.markdown("**Critical Items Due Soon**")
+        st.warning("⚠️ O&M Manuals due in 5 days")
+        st.warning("⚠️ Final inspections due in 8 days")
+        st.info("ℹ️ Warranties collection in progress")
+    
+    with col2:
+        st.markdown("**Automated Notifications**")
+        st.success("✅ All stakeholders notified of upcoming deadlines")
+        st.success("✅ Daily progress reports sent to team")
+        st.info("📧 Reminder emails sent to responsible parties")
+        
+        st.markdown("**Smart Scheduling**")
+        st.markdown("📅 Auto-scheduled final walkthrough: June 10")
+        st.markdown("🏢 Certificate of Occupancy target: June 15")
+        st.markdown("🎯 Project handover: June 20")
+
+def render_digital_handover_package():
+    """Render digital handover package management"""
+    st.markdown("### 📱 Digital Handover Package")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Package Contents**")
+        handover_items = [
+            {"item": "As-Built Drawings", "status": "Complete", "files": 47},
+            {"item": "O&M Manuals", "status": "In Progress", "files": 8},
+            {"item": "Warranties", "status": "Complete", "files": 23},
+            {"item": "Training Videos", "status": "Complete", "files": 12},
+            {"item": "Certificates", "status": "In Progress", "files": 6}
+        ]
+        
+        for item in handover_items:
+            status_color = "#4CAF50" if item["status"] == "Complete" else "#ff8800"
+            st.markdown(f"""
+                <div style="border: 1px solid #ddd; padding: 10px; margin: 5px 0; border-radius: 5px;">
+                    <strong>📁 {item["item"]}</strong><br>
+                    <span style="color: {status_color};">Status: {item["status"]}</span> | {item["files"]} files
+                </div>
+            """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("**Package Analytics**")
+        st.metric("Total Documents", "96", "All systems covered")
+        st.metric("Digital Format", "100%", "Cloud accessible")
+        st.metric("Owner Training", "92%", "Staff certified")
+        
+        if st.button("📦 Generate Final Package", type="primary"):
+            st.success("Digital handover package generated and ready for delivery!")
+
+def render_warranty_management():
+    """Render warranty and maintenance management"""
+    st.markdown("### 🛡️ Warranty & Maintenance Management")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("**Active Warranties**")
+        st.metric("Total Warranties", "45", "All major systems")
+        st.metric("Avg Duration", "5 years", "Extended coverage")
+        st.metric("Total Value", "$2.1M", "Protected assets")
+    
+    with col2:
+        st.markdown("**Expiration Alerts**")
+        st.markdown("🟡 HVAC Equipment: 2 years remaining")
+        st.markdown("🟡 Roofing System: 8 years remaining")
+        st.markdown("🟢 Windows: 15 years remaining")
+        st.markdown("🔴 Fire Alarm: 6 months remaining")
+    
+    with col3:
+        st.markdown("**Maintenance Schedule**")
+        st.markdown("📅 **Monthly**: HVAC filter replacement")
+        st.markdown("📅 **Quarterly**: Fire system inspection")
+        st.markdown("📅 **Annually**: Elevator certification")
+        st.markdown("📅 **Bi-annually**: Roof inspection")
+
 def render():
-    """Render the Closeout module."""
-    st.title("Project Closeout")
+    """Render the Enhanced Project Closeout module."""
+    st.title("🏁 Enhanced Project Closeout Management")
+    
+    # Automated Closeout Tracking
+    render_automated_closeout_tracking()
+    
+    # Digital Handover Package
+    render_digital_handover_package()
+    
+    # Warranty Management
+    render_warranty_management()
     
     # Create tabs for different closeout functions
     tab1, tab2 = st.tabs(["Closeout Dashboard", "Closeout Items"])

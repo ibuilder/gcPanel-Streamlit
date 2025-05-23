@@ -285,5 +285,34 @@ def main():
             with st.expander("Error Details (Developers Only)"):
                 st.code(error_details)
 
+def render_custom_header():
+    """Render the custom header with project info and user details."""
+    
+    user_role = st.session_state.get('user_role', 'Project Manager')
+    username = st.session_state.get('username', 'User')
+    
+    # Get project info from config
+    from app_config import PROJECT_INFO
+    
+    st.markdown(f"""
+    <div class="custom-header">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div class="header-title">
+                    🏗️ gcPanel
+                    <span style="font-weight: normal; margin-left: 20px;">{PROJECT_INFO['name']}</span>
+                </div>
+                <div class="project-info">
+                    {PROJECT_INFO['value']} • {PROJECT_INFO['location']} • Phase: {PROJECT_INFO['current_phase']}
+                </div>
+            </div>
+            <div class="user-info">
+                <div><strong>{username}</strong></div>
+                <div style="opacity: 0.8;">{user_role}</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
 if __name__ == "__main__":
     main()

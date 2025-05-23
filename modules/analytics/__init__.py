@@ -149,9 +149,95 @@ def render_analytics_dashboard():
     
     st.markdown("</div>", unsafe_allow_html=True)
 
+def render_predictive_analytics():
+    """Render AI-powered predictive analytics dashboard"""
+    st.markdown("### 🤖 AI-Powered Predictive Analytics")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Project Completion Predictions**")
+        st.metric("Predicted Completion", "June 15, 2027", "2 weeks ahead of schedule")
+        st.metric("Budget at Completion", "$44.2M", "Under budget by $1.3M")
+        st.metric("Risk Score", "Medium", "Weather and supply chain factors")
+        
+        st.markdown("**Key Risk Factors**")
+        st.markdown("🌦️ Weather delays: 15% probability")
+        st.markdown("📦 Supply chain: 8% probability")
+        st.markdown("👷 Labor shortage: 5% probability")
+    
+    with col2:
+        st.markdown("**Performance Trends**")
+        # Sample predictive data
+        import pandas as pd
+        prediction_data = pd.DataFrame({
+            'Month': ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+            'Actual Progress': [72, None, None, None, None, None],
+            'Predicted Progress': [72, 78, 84, 89, 95, 100],
+            'Confidence Interval': [72, 76, 81, 86, 92, 98]
+        })
+        st.line_chart(prediction_data.set_index('Month')[['Predicted Progress', 'Confidence Interval']])
+
+def render_real_time_insights():
+    """Render real-time business insights dashboard"""
+    st.markdown("### ⚡ Real-Time Business Insights")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("**Today's Insights**")
+        st.metric("Productivity Index", "118%", "+12% vs average")
+        st.metric("Cost Efficiency", "96%", "Better than target")
+        st.metric("Quality Score", "94%", "+2% this week")
+    
+    with col2:
+        st.markdown("**Live Alerts**")
+        st.success("✅ Steel delivery on schedule")
+        st.warning("⚠️ Concrete pour delayed 2 hours")
+        st.info("ℹ️ Equipment utilization at 85%")
+        st.success("✅ Safety compliance at 98%")
+    
+    with col3:
+        st.markdown("**Market Intelligence**")
+        st.metric("Material Cost Index", "108", "+3% this quarter")
+        st.metric("Labor Availability", "Good", "No shortages predicted")
+        st.metric("Competitor Analysis", "Leading", "2 weeks ahead average")
+
+def render_executive_analytics():
+    """Render executive-level analytics and KPIs"""
+    st.markdown("### 👔 Executive Analytics Dashboard")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Portfolio Performance**")
+        portfolio_data = pd.DataFrame({
+            'Project': ['Highland Tower', 'Oak Plaza', 'Metro Center', 'River View'],
+            'Progress': [72, 45, 89, 23],
+            'Budget Status': [97, 103, 95, 101],
+            'Schedule Status': [102, 98, 105, 99]
+        })
+        st.dataframe(portfolio_data, use_container_width=True)
+    
+    with col2:
+        st.markdown("**Strategic Metrics**")
+        st.metric("Portfolio Value", "$180M", "4 active projects")
+        st.metric("Average Profit Margin", "12.8%", "+1.2% vs target")
+        st.metric("Client Satisfaction", "96%", "Industry leading")
+        st.metric("Employee Retention", "94%", "+3% this year")
+
 def render():
-    """Render the comprehensive Analytics & Reporting module."""
-    st.title("📊 Analytics & Business Intelligence")
+    """Render the Enhanced Analytics & AI-Powered Business Intelligence module."""
+    st.title("📊 Enhanced Analytics & AI-Powered Business Intelligence")
+    
+    # AI-Powered Predictive Analytics
+    render_predictive_analytics()
+    
+    # Real-Time Business Insights
+    render_real_time_insights()
+    
+    # Executive Analytics
+    render_executive_analytics()
     
     # Create comprehensive tabs for all analytics features
     tabs = st.tabs([

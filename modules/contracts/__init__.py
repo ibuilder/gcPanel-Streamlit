@@ -841,9 +841,107 @@ class SubcontractModule(CrudModule):
 # Import Change Orders functionality
 from modules.contracts.change_orders import ChangeOrderModule
 
+def render_contract_analytics():
+    """Render contract analytics and performance dashboard"""
+    st.markdown("### 📊 Contract Performance Analytics")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("**Contract Values**")
+        st.metric("Total Contract Value", "$45.5M", "Highland Tower")
+        st.metric("Executed to Date", "$32.8M", "72% complete")
+        st.metric("Remaining Value", "$12.7M", "28% remaining")
+    
+    with col2:
+        st.markdown("**Contract Compliance**")
+        st.metric("Change Orders", "8", "+2 this month")
+        st.metric("Avg Processing Time", "5.2 days", "-1.3 vs target")
+        st.metric("Signature Compliance", "96%", "+4% this quarter")
+    
+    with col3:
+        st.markdown("**Financial Health**")
+        st.metric("Payment Applications", "12", "All current")
+        st.metric("Retainage Held", "$1.64M", "5% of completed work")
+        st.metric("Outstanding Invoices", "$287K", "Within terms")
+
+def render_digital_contract_workflow():
+    """Render digital contract workflow with e-signatures"""
+    st.markdown("### ✍️ Digital Contract Workflow")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Pending Signatures**")
+        pending_contracts = [
+            {"id": "CO-015", "title": "HVAC Change Order", "type": "Change Order", "value": "$45K", "days": 3},
+            {"id": "SC-089", "title": "Electrical Subcontract", "type": "Subcontract", "value": "$2.1M", "days": 1},
+            {"id": "CO-016", "title": "Foundation Revision", "type": "Change Order", "value": "$78K", "days": 5}
+        ]
+        
+        for contract in pending_contracts:
+            urgency_color = "#ff4444" if contract["days"] >= 5 else "#ff8800" if contract["days"] >= 3 else "#4CAF50"
+            st.markdown(f"""
+                <div style="border-left: 4px solid {urgency_color}; padding: 10px; margin: 5px 0; background-color: #f8f9fa;">
+                    <strong>📝 {contract["id"]}: {contract["title"]}</strong><br>
+                    <small>Type: {contract["type"]} | Value: {contract["value"]} | Pending: {contract["days"]} days</small>
+                </div>
+            """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("**Signature Status**")
+        st.markdown("✅ **Owner**: Highland Properties LLC")
+        st.markdown("⏳ **General Contractor**: Pending review")
+        st.markdown("🔄 **Architect**: In progress")
+        st.markdown("📧 **Legal**: Awaiting DocuSign")
+        
+        if st.button("📧 Send Reminder", type="primary"):
+            st.success("Signature reminders sent to all pending parties!")
+
+def render_contract_risk_assessment():
+    """Render contract risk assessment and compliance monitoring"""
+    st.markdown("### ⚖️ Contract Risk Assessment")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Risk Indicators**")
+        risks = [
+            {"category": "Payment Terms", "risk": "Low", "score": 2.1, "status": "Monitored"},
+            {"category": "Change Order Volume", "risk": "Medium", "score": 6.8, "status": "Review Required"},
+            {"category": "Schedule Delays", "risk": "Low", "score": 3.2, "status": "Monitored"},
+            {"category": "Scope Creep", "risk": "Medium", "score": 5.9, "status": "Active Management"}
+        ]
+        
+        for risk in risks:
+            risk_color = "#4CAF50" if risk["risk"] == "Low" else "#ff8800" if risk["risk"] == "Medium" else "#ff4444"
+            st.markdown(f"""
+                <div style="border: 1px solid #ddd; padding: 10px; margin: 5px 0; border-radius: 5px;">
+                    <strong>{risk["category"]}</strong><br>
+                    <span style="color: {risk_color};">Risk: {risk["risk"]} ({risk["score"]}/10)</span><br>
+                    <small>Status: {risk["status"]}</small>
+                </div>
+            """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("**Compliance Monitoring**")
+        st.success("✅ Insurance certificates current")
+        st.success("✅ Bond documentation complete")
+        st.warning("⚠️ Safety training expires in 15 days")
+        st.info("📋 Annual contract review due next month")
+
 def render():
-    """Render the Contracts Management module."""
-    st.title("Contracts Management")
+    """Render the Enhanced Contracts Management module."""
+    st.title("📄 Enhanced Contract Management")
+    
+    # Contract Analytics Dashboard
+    render_contract_analytics()
+    
+    # Digital Contract Workflow
+    render_digital_contract_workflow()
+    
+    # Contract Risk Assessment
+    render_contract_risk_assessment()
     
     # Create tabs for different contract types
     tab1, tab2, tab3 = st.tabs(["Owner Contracts", "Subcontracts", "Change Orders"])

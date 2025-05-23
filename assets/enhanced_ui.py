@@ -48,6 +48,249 @@ def apply_enhanced_styles():
         border-bottom: 1px solid #e0e0e0;
     }
     
+    /* Enhanced Module Content Styling */
+    .stMarkdown h1 {
+        color: #1f2937;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        border-bottom: 3px solid #3b82f6;
+        padding-bottom: 0.5rem;
+    }
+    
+    .stMarkdown h2 {
+        color: #374151;
+        font-weight: 600;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid #10b981;
+        padding-left: 1rem;
+    }
+    
+    .stMarkdown h3 {
+        color: #4b5563;
+        font-weight: 600;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Enhanced Card Styling */
+    .element-container div[data-testid="metric-container"] {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        margin: 0.5rem 0;
+    }
+    
+    .element-container div[data-testid="metric-container"]:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    /* Enhanced Button Styling */
+    .stButton > button {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    }
+    
+    .stButton > button:hover {
+        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+        box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+        transform: translateY(-1px);
+    }
+    
+    .stButton > button[kind="secondary"] {
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        color: #475569;
+        border: 1px solid #cbd5e1;
+    }
+    
+    .stButton > button[kind="secondary"]:hover {
+        background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+        color: #334155;
+    }
+    
+    /* Enhanced Input Field Styling */
+    .stTextInput > div > div > input,
+    .stSelectbox > div > div > div,
+    .stTextArea > div > div > textarea {
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background-color: #ffffff;
+    }
+    
+    .stTextInput > div > div > input:focus,
+    .stSelectbox > div > div > div:focus,
+    .stTextArea > div > div > textarea:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        outline: none;
+    }
+    
+    /* Enhanced Tab Styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background-color: #f8fafc;
+        padding: 0.5rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        height: 50px;
+        padding: 0px 24px;
+        background-color: transparent;
+        border-radius: 8px;
+        color: #64748b;
+        font-weight: 500;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white !important;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    }
+    
+    /* Enhanced Alert and Status Styling */
+    .stAlert {
+        border-radius: 8px;
+        border: none;
+        padding: 1rem 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .stSuccess {
+        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        border-left: 4px solid #10b981;
+        color: #047857;
+    }
+    
+    .stError {
+        background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+        border-left: 4px solid #ef4444;
+        color: #dc2626;
+    }
+    
+    .stWarning {
+        background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        border-left: 4px solid #f59e0b;
+        color: #d97706;
+    }
+    
+    .stInfo {
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        border-left: 4px solid #3b82f6;
+        color: #1d4ed8;
+    }
+    
+    /* Enhanced Data Display Styling */
+    .stDataFrame {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        margin: 1rem 0;
+    }
+    
+    /* Enhanced Progress Bar Styling */
+    .stProgress .st-bo {
+        background-color: #e2e8f0;
+        border-radius: 8px;
+        height: 8px;
+    }
+    
+    .stProgress .st-bp {
+        background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
+        border-radius: 8px;
+    }
+    
+    /* Enhanced Expander Styling */
+    .streamlit-expanderHeader {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 0.5rem;
+        padding: 0.75rem 1rem;
+        font-weight: 600;
+        color: #374151;
+    }
+    
+    /* Enhanced Column Spacing */
+    .element-container {
+        margin-bottom: 1rem;
+    }
+    
+    /* Custom Status Badge Styling */
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .status-success {
+        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        color: #047857;
+        border: 1px solid #10b981;
+    }
+    
+    .status-warning {
+        background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        color: #d97706;
+        border: 1px solid #f59e0b;
+    }
+    
+    .status-error {
+        background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+        color: #dc2626;
+        border: 1px solid #ef4444;
+    }
+    
+    .status-info {
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        color: #1d4ed8;
+        border: 1px solid #3b82f6;
+    }
+    
+    /* Enhanced Container Spacing */
+    .main .block-container {
+        padding: 2rem 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .main .block-container {
+            padding: 1rem 0.75rem;
+        }
+        
+        .element-container div[data-testid="metric-container"] {
+            padding: 1rem;
+        }
+        
+        .stButton > button {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+    }
+    
     h1, h2, h3, h4 {
         color: #2c3e50;
         font-weight: 600;

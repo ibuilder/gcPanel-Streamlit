@@ -19,14 +19,17 @@ def render_dashboard():
     # Current project info
     current_project = st.session_state.get("current_project", "Highland Tower Development")
     
-    # Enhanced project status with weather and critical alerts
-    render_enhanced_project_status(current_project)
+    # Enhanced project status with real-time data
+    render_enhanced_project_status_section(current_project)
     
     # Real-time critical path alerts
-    render_critical_path_alerts()
+    render_critical_path_alerts_section()
     
     # Weather conditions affecting construction
-    render_weather_impact_dashboard()
+    render_weather_impact_section()
+    
+    # Customizable dashboard widgets
+    render_customizable_widgets_section()
     
     # Project Header Card
     st.markdown(
@@ -258,6 +261,129 @@ def render_dashboard():
             )
         
         st.markdown("</div>", unsafe_allow_html=True)
+
+def render_enhanced_project_status(current_project):
+    """Render enhanced project status with real-time data integration"""
+    st.markdown("### 🏗️ Enhanced Project Status")
+    
+    # Real-time project metrics
+    col1, col2, col3, col4, col5 = st.columns(5)
+    
+    with col1:
+        st.metric("Overall Progress", "72%", "+3% this week", delta_color="normal")
+    
+    with col2:
+        st.metric("Budget Status", "$32.8M", "-2.3% under budget", delta_color="inverse")
+    
+    with col3:
+        st.metric("Schedule Status", "On Track", "+2 days ahead", delta_color="normal")
+    
+    with col4:
+        st.metric("Quality Score", "94%", "+2% improvement", delta_color="normal")
+    
+    with col5:
+        st.metric("Safety Score", "98%", "0 incidents this week", delta_color="normal")
+
+def render_critical_path_alerts():
+    """Render critical path alerts and schedule dependencies"""
+    st.markdown("### ⚠️ Critical Path Alerts")
+    
+    alerts = [
+        {
+            "severity": "high",
+            "task": "Foundation Inspection",
+            "impact": "2-day delay risk",
+            "action": "Schedule inspector for tomorrow",
+            "responsible": "John Smith"
+        },
+        {
+            "severity": "medium", 
+            "task": "Steel Delivery",
+            "impact": "Potential 1-week delay",
+            "action": "Confirm delivery schedule",
+            "responsible": "Sarah Johnson"
+        }
+    ]
+    
+    for alert in alerts:
+        severity_color = "#ff4444" if alert["severity"] == "high" else "#ff8800"
+        st.markdown(
+            f"""
+            <div style="border-left: 4px solid {severity_color}; padding: 12px; margin: 8px 0; background-color: #f8f9fa;">
+                <strong>🚨 {alert["task"]}</strong><br>
+                <span style="color: {severity_color};">Impact: {alert["impact"]}</span><br>
+                Action: {alert["action"]} (Assigned: {alert["responsible"]})
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+def render_weather_impact_dashboard():
+    """Render weather conditions affecting construction"""
+    st.markdown("### 🌤️ Weather Impact Dashboard")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("**Current Conditions**")
+        st.markdown("🌤️ Partly Cloudy")
+        st.markdown("🌡️ 72°F")
+        st.markdown("💨 Wind: 8 mph")
+        st.markdown("💧 Humidity: 45%")
+    
+    with col2:
+        st.markdown("**Today's Impact**")
+        st.markdown("✅ Concrete work: Favorable")
+        st.markdown("✅ Exterior work: Good conditions")
+        st.markdown("⚠️ High work: Monitor wind")
+        st.markdown("✅ Material delivery: Clear")
+    
+    with col3:
+        st.markdown("**3-Day Forecast**")
+        st.markdown("🌤️ Tomorrow: Partly cloudy, 75°F")
+        st.markdown("☀️ Friday: Sunny, 78°F")
+        st.markdown("🌧️ Saturday: Rain expected")
+
+def render_customizable_widgets():
+    """Render customizable dashboard widgets"""
+    st.markdown("### 🎛️ Customizable Widgets")
+    
+    # Widget customization options
+    col1, col2 = st.columns([1, 3])
+    
+    with col1:
+        st.markdown("**Widget Options**")
+        widget_options = st.multiselect(
+            "Select widgets to display:",
+            ["Project Timeline", "Budget Trend", "Team Activity", "Recent Photos", "Equipment Status"],
+            default=["Project Timeline", "Budget Trend", "Team Activity"]
+        )
+    
+    with col2:
+        # Render selected widgets
+        if "Project Timeline" in widget_options:
+            st.markdown("**📅 Project Timeline**")
+            timeline_data = pd.DataFrame({
+                'Phase': ['Foundation', 'Structure', 'Envelope', 'MEP', 'Finishes'],
+                'Progress': [100, 85, 60, 30, 10]
+            })
+            st.bar_chart(timeline_data.set_index('Phase'))
+        
+        if "Budget Trend" in widget_options:
+            st.markdown("**💰 Budget Trend**")
+            budget_data = pd.DataFrame({
+                'Month': ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                'Planned': [2000000, 4500000, 7200000, 10800000, 15200000],
+                'Actual': [1950000, 4350000, 7050000, 10500000, 14800000]
+            })
+            st.line_chart(budget_data.set_index('Month'))
+        
+        if "Team Activity" in widget_options:
+            st.markdown("**👥 Team Activity**")
+            st.markdown("- 🟢 12 team members active")
+            st.markdown("- 📋 8 tasks completed today")
+            st.markdown("- 💬 15 new messages")
+            st.markdown("- 📊 3 reports submitted")
     
     # Upcoming deadlines section
     st.subheader("Upcoming Deadlines")

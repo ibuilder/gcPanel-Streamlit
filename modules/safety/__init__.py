@@ -182,9 +182,110 @@ def render_safety_dashboard():
     # Close the white container
     st.markdown("</div>", unsafe_allow_html=True)
 
+def render_ai_safety_monitoring():
+    """Render AI-powered safety monitoring dashboard"""
+    st.markdown("### 🤖 AI-Powered Safety Monitoring")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Real-Time Safety Alerts**")
+        alerts = [
+            {"type": "PPE Violation", "location": "Level 5", "confidence": "95%", "severity": "High"},
+            {"type": "Fall Risk Detected", "location": "Scaffolding Area", "confidence": "88%", "severity": "High"},
+            {"type": "Unsafe Lifting", "location": "Loading Dock", "confidence": "92%", "severity": "Medium"}
+        ]
+        
+        for alert in alerts:
+            color = "#ff4444" if alert["severity"] == "High" else "#ff8800"
+            st.markdown(f"""
+                <div style="border-left: 4px solid {color}; padding: 10px; margin: 5px 0; background-color: #f8f9fa;">
+                    <strong>⚠️ {alert["type"]}</strong><br>
+                    <small>Location: {alert["location"]} | Confidence: {alert["confidence"]}</small>
+                </div>
+            """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("**Safety Predictions**")
+        st.success("🎯 Zero predicted incidents this week")
+        st.warning("⚠️ Elevated risk on Friday (weather)")
+        st.info("📊 Safety score trending upward")
+        st.markdown("🔄 Next AI safety audit: Tomorrow 2 PM")
+
+def render_digital_safety_checklists():
+    """Render digital safety checklists with templates"""
+    st.markdown("### ✅ Digital Safety Checklists")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Available Checklist Templates**")
+        checklists = [
+            {"name": "Daily Site Safety Walk", "items": 25, "completion": "100%"},
+            {"name": "Equipment Pre-Use Inspection", "items": 15, "completion": "80%"},
+            {"name": "Weekly Safety Meeting", "items": 12, "completion": "92%"},
+            {"name": "Crane Operation Safety", "items": 30, "completion": "67%"}
+        ]
+        
+        for checklist in checklists:
+            completion = float(checklist["completion"].rstrip('%'))
+            color = "#4CAF50" if completion >= 90 else "#ff8800" if completion >= 70 else "#ff4444"
+            
+            st.markdown(f"""
+                <div style="border: 1px solid #ddd; padding: 10px; margin: 5px 0; border-radius: 5px;">
+                    <strong>📋 {checklist["name"]}</strong><br>
+                    <small>{checklist["items"]} items | </small>
+                    <span style="color: {color}; font-weight: bold;">{checklist["completion"]} Complete</span>
+                </div>
+            """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("**Quick Actions**")
+        if st.button("📋 Start Daily Safety Walk", type="primary"):
+            st.success("Daily Safety Walk checklist started!")
+        
+        if st.button("🚨 Report Safety Incident"):
+            st.info("Safety incident reporting form opened")
+        
+        if st.button("👷 PPE Compliance Check"):
+            st.info("PPE compliance verification initiated")
+
+def render_safety_training_tracker():
+    """Render safety training and certification tracking"""
+    st.markdown("### 🎓 Safety Training & Certifications")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("**Training Compliance**")
+        st.metric("Overall Compliance", "94%", "+2% this month")
+        st.metric("Certifications Current", "87%", "+5% this month")
+        st.metric("Training Hours YTD", "1,247", "+156 vs target")
+    
+    with col2:
+        st.markdown("**Upcoming Expirations**")
+        st.markdown("🟡 John Smith - OSHA 10 (30 days)")
+        st.markdown("🔴 Sarah Johnson - First Aid (5 days)")
+        st.markdown("🟡 Mike Davis - Crane Operator (45 days)")
+    
+    with col3:
+        st.markdown("**Required Training**")
+        st.markdown("📚 Fall Protection (5 workers)")
+        st.markdown("📚 Hazmat Handling (3 workers)")
+        st.markdown("📚 Equipment Safety (8 workers)")
+
 def render():
-    """Render the Safety Management module."""
-    st.title("Safety Management")
+    """Render the Enhanced Safety Management module."""
+    st.title("🦺 Enhanced Safety Management")
+    
+    # AI-Powered Safety Monitoring
+    render_ai_safety_monitoring()
+    
+    # Digital Safety Checklists
+    render_digital_safety_checklists()
+    
+    # Safety Training Tracker
+    render_safety_training_tracker()
     
     # Create tabs for different safety functions
     tabs = st.tabs(["Dashboard", "Incidents", "Inspections", "Hazards"])

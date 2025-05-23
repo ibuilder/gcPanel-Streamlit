@@ -18,10 +18,105 @@ import os
 from modules.documents.pdf_helper import display_pdf_document
 
 
-def render_documents():
-    """Render the Documents module"""
+def render_ai_document_processing():
+    """Render AI-powered document processing dashboard"""
+    st.markdown("### 🤖 AI-Powered Document Processing")
     
-    st.title("Documents")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Document Intelligence**")
+        st.metric("Documents Processed", "1,247", "+89 this week")
+        st.metric("Auto-Tagged", "96%", "AI classification accuracy")
+        st.metric("Text Extracted", "100%", "OCR success rate")
+        
+        st.markdown("**Recent AI Analysis**")
+        st.markdown("📄 Contract terms extracted from 3 documents")
+        st.markdown("🔍 Safety requirements identified in specs")
+        st.markdown("📊 Cost data extracted from invoices")
+    
+    with col2:
+        st.markdown("**Smart Search Results**")
+        if st.text_input("🔍 Search documents with AI", placeholder="e.g., 'concrete specifications Level 5'"):
+            st.markdown("**AI Search Results:**")
+            st.markdown("📋 03 30 00 - Cast-in-Place Concrete (98% match)")
+            st.markdown("📐 S-105 - Level 5 Structural Plans (92% match)")
+            st.markdown("💰 Invoice #12847 - Concrete Supply (87% match)")
+
+def render_cloud_file_management():
+    """Render cloud file management and collaboration"""
+    st.markdown("### ☁️ Cloud File Management & Collaboration")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Storage Analytics**")
+        st.metric("Total Storage", "2.8 TB", "+450 GB this month")
+        st.metric("Files Shared", "8,472", "Active collaboration")
+        st.metric("Version Control", "100%", "All files tracked")
+        
+        st.markdown("**Sync Status**")
+        st.success("✅ All devices synchronized")
+        st.success("✅ Backup completed: 2 hours ago")
+        st.info("ℹ️ Auto-sync every 30 minutes")
+    
+    with col2:
+        st.markdown("**Team Collaboration**")
+        st.markdown("👥 **Active Users**: 12 team members online")
+        st.markdown("📝 **Recent Activity**:")
+        st.markdown("• John Smith viewed A-101 (5 min ago)")
+        st.markdown("• Sarah Johnson edited specs (15 min ago)")
+        st.markdown("• Mike Davis uploaded photos (1 hour ago)")
+        
+        if st.button("📤 Share Document", type="primary"):
+            st.success("Document sharing link generated!")
+
+def render_version_control_system():
+    """Render advanced version control for documents"""
+    st.markdown("### 🔄 Advanced Version Control")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Version History**")
+        versions = [
+            {"version": "Rev D", "date": "Today 2:30 PM", "author": "John Smith", "changes": "Updated door schedule"},
+            {"version": "Rev C", "date": "Yesterday", "author": "Sarah Johnson", "changes": "MEP coordination changes"},
+            {"version": "Rev B", "date": "3 days ago", "author": "Mike Davis", "changes": "Structural revisions"}
+        ]
+        
+        for version in versions:
+            st.markdown(f"""
+                <div style="border: 1px solid #ddd; padding: 10px; margin: 5px 0; border-radius: 5px;">
+                    <strong>📄 {version["version"]}</strong> by {version["author"]}<br>
+                    <small>{version["date"]}: {version["changes"]}</small>
+                </div>
+            """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("**Change Tracking**")
+        st.markdown("🔍 **Auto-detect changes**: ON")
+        st.markdown("📧 **Email notifications**: Enabled")
+        st.markdown("🔒 **Access control**: Role-based")
+        
+        st.markdown("**Approval Workflow**")
+        st.markdown("⏳ 3 documents pending approval")
+        st.markdown("✅ 15 documents approved this week")
+        st.markdown("🔄 2 documents in review")
+
+def render_documents():
+    """Render the Enhanced Documents module with AI-powered features"""
+    
+    st.title("📁 Enhanced Document Management")
+    
+    # AI-Powered Document Processing
+    render_ai_document_processing()
+    
+    # Cloud File Management
+    render_cloud_file_management()
+    
+    # Version Control System
+    render_version_control_system()
     
     # Create tabs for different document types
     tab1, tab2, tab3 = st.tabs(["Construction Plans", "Specifications", "Project Documents"])

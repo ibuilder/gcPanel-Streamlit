@@ -1,299 +1,253 @@
-# gcPanel - Construction Management Dashboard
+# 🏗️ gcPanel Construction Management Platform
 
-A comprehensive construction project management platform built with Streamlit, designed for modern construction teams who need powerful project management capabilities with an intuitive interface.
+**Enterprise-Grade Construction Project Management & BIM Visualization**
 
-## 🏗️ Project Overview
+A comprehensive, production-ready construction management platform that revolutionizes project delivery through cutting-edge technologies, intelligent analytics, and advanced 3D BIM visualization capabilities.
 
-**Highland Tower Development** - A $45.5M mixed-use development showcasing the full capabilities of gcPanel's construction management platform.
+![gcPanel Version](https://img.shields.io/badge/Version-2.0.0-blue)
+![Python](https://img.shields.io/badge/Python-3.11+-green)
+![Streamlit](https://img.shields.io/badge/Streamlit-Latest-red)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-Deployable-purple)
+![License](https://img.shields.io/badge/License-Enterprise-orange)
 
-- **120 residential units + 8 retail spaces**
-- **168,500 sq ft across 15 stories above ground + 2 below**
-- **Complete project lifecycle management from preconstruction to closeout**
+## 🚀 **Current Platform Capabilities**
 
-## ✨ Key Features
+### **Core Management Modules**
+- **📊 Dashboard & Analytics** - Executive KPIs, project performance metrics, and business intelligence
+- **📋 Preconstruction** - Project planning, estimating, and procurement management
+- **🔧 Engineering** - Technical documentation, design coordination, and specifications
+- **🏗️ Field Operations** - Daily reports, quality control, inspections, and progress tracking
+- **🦺 Safety Management** - Incident tracking, compliance monitoring, and training records
+- **📑 Contract Management** - Contract administration, change orders, and vendor management
+- **💰 Cost Management** - Budget tracking, AIA billing (G702/G703), and financial analytics
+- **🏢 BIM Management** - Enterprise 3D visualization, clash detection, and model coordination
+- **📋 Closeout** - Project completion, documentation, and handover processes
+- **👥 Resource Management** - Team coordination, equipment tracking, and resource allocation
 
-gcPanel revolutionizes construction project management with enterprise-grade features in a user-friendly interface:
+### **🎮 Enterprise BIM Capabilities**
+- **Professional 3D Viewer** - Built with ThatOpen engine, web-ifc, and Three.js
+- **IFC Model Support** - Full IFC 2X3, IFC4, and IFC4X3 compatibility
+- **Advanced Navigation** - Orbit, walk, and fly modes with smooth controls
+- **Measurement Tools** - Distance, area, and volume calculations
+- **Element Properties** - Detailed BIM element inspection and metadata
+- **Clash Detection** - Automated conflict identification between building systems
+- **Section Views** - Dynamic model sectioning and analysis
+- **Model Analytics** - Performance metrics, optimization, and validation
 
-### 📊 Core Management Modules
-- **🎯 Dashboard**: Real-time project KPIs, budget tracking, and progress visualization
-- **📅 Schedule Management**: Interactive Gantt charts and milestone tracking
-- **💰 Cost Management**: Budget control, change orders, T&M tickets, and AIA billing
-- **⚠️ Safety Management**: Incident tracking, compliance monitoring, and safety metrics
-- **📋 Field Operations**: Daily reports, quality control, and issue management
-- **📑 Contract Management**: Contract tracking, procurement, and vendor management
-- **🏗️ BIM Integration**: 3D model visualization and clash detection
-- **📄 Document Control**: Drawing management, RFIs, and specification tracking
-- **🔧 Engineering**: Technical calculations, specifications, and design management
-- **✅ Project Closeout**: Warranty tracking, final documentation, and handover
+### **📈 Business Intelligence & Analytics**
+- **Executive Dashboards** - Portfolio overview, KPIs, and strategic metrics
+- **Financial Analytics** - Revenue tracking, profit margins, and cash flow analysis
+- **Safety Intelligence** - Incident trends, compliance scores, and training analytics
+- **Productivity Metrics** - Labor efficiency, equipment utilization, and progress tracking
+- **Custom Reporting** - Automated report generation with PDF/Excel export
+- **Predictive Analytics** - Budget forecasting and timeline predictions
 
-### 🔐 Security & Authentication
-- **Production-ready login system** with rate limiting and security features
-- **Role-based access control** for different user types (Admin, PM, Field, Subcontractor, Client)
-- **Digital signatures** integrated into forms for T&M tickets, change orders, and invoices
-- **Session management** with secure JWT token handling
+## 🏗️ **Featured Project: Highland Tower Development**
 
-### 🎨 User Experience
-- **Modern, clean interface** without sidebars for maximum screen real estate
-- **Responsive design** optimized for both desktop and mobile field use
-- **Professional styling** with consistent UI components across all modules
-- **Streamlined workflows** designed for construction industry best practices
+**Project Overview:**
+- **Total Value:** $45.5M mixed-use development
+- **Scope:** 120 residential units + 8 retail spaces
+- **Building:** 168,500 sq ft across 15 stories above ground + 2 below
+- **Timeline:** 24-month construction schedule
+- **Team:** 150+ construction professionals
 
-## 🚀 Quick Start
+## 🛠️ **Technology Stack**
 
-### Prerequisites
-- Python 3.8+
-- Streamlit 1.24+
-- PostgreSQL database (or use demo data)
+### **Backend & Core**
+- **Python 3.11+** - Core application logic and data processing
+- **Streamlit** - Web interface framework with enterprise optimizations
+- **PostgreSQL** - Production database with advanced indexing
+- **SQLAlchemy** - ORM with connection pooling and query optimization
+- **JWT Authentication** - Secure token-based authentication system
 
-### Installation
-1. **Clone the repository**
-2. **Install dependencies** using the provided package management
-3. **Set up environment variables** for database connection
-4. **Run the application**: `streamlit run app.py --server.port 5000`
+### **Frontend & Visualization**
+- **ThatOpen Engine** - Professional BIM visualization engine
+- **Three.js** - Advanced 3D graphics and rendering
+- **web-ifc** - IFC file processing and model loading
+- **Plotly** - Interactive charts and data visualization
+- **Custom CSS/JS** - Enterprise-grade UI components
 
-### Demo Login Accounts
-The system includes pre-configured demo accounts for testing different user roles:
-- **Admin**: Full system access and configuration
-- **Project Manager**: Project oversight and reporting
-- **Field Supervisor**: Daily operations and field reports  
-- **Subcontractor**: Limited access to relevant work items
-- **Client**: Read-only access to project status and reports
+### **Infrastructure & Deployment**
+- **Docker** - Multi-stage containerization with security optimizations
+- **Kubernetes** - Production-ready orchestration with auto-scaling
+- **Nginx** - Reverse proxy and load balancing
+- **Redis** - Caching and session management
+- **Prometheus/Grafana** - Monitoring and alerting (optional)
 
-## Developer Guide
+## 🚀 **Quick Start Guide**
 
-### Project Structure
+### **Prerequisites**
+- Docker and Docker Compose
+- PostgreSQL database (local or cloud)
+- Environment variables configured
 
-```
-gcPanel/
-├── app.py                 # Main application entry point
-├── app_manager.py         # Application initialization and module routing
-├── app_config.py          # Centralized configuration settings
-├── assets/                # Static assets (CSS, images, etc.)
-│   ├── container_styles.py    # UI container styling
-│   └── styles.py              # Global CSS styles
-├── components/            # Reusable UI components
-│   ├── action_bar.py          # Action buttons for pages
-│   ├── header_clean.py        # Application header
-│   └── ...                    # Other components
-├── core/                  # Core application services
-├── data/                  # Data models and database utilities
-├── modules/               # Application modules/pages
-│   ├── dashboard/             # Dashboard module
-│   ├── contracts/             # Contracts module
-│   └── ...                    # Other modules
-├── utils/                 # Utility functions and helpers
-│   ├── ui_manager.py          # UI utility functions
-│   └── ...                    # Other utilities
-├── static/                # Static assets served by the application
-└── tests/                 # Unit and integration tests
-```
+### **1. Environment Setup**
+Create your `.env` file:
+```bash
+# Database Configuration
+DATABASE_URL=postgresql://user:password@host:5432/gcpanel_db
+PGHOST=your_db_host
+PGPORT=5432
+PGDATABASE=gcpanel_db
+PGUSER=your_db_user
+PGPASSWORD=your_db_password
 
-### Application Architecture
+# Security Keys
+JWT_SECRET_KEY=your-jwt-secret-key-here
+SECRET_KEY=your-app-secret-key-here
 
-The gcPanel application follows a modular architecture with the following key components:
-
-1. **Entry Point (app.py)**: Initializes the application and starts the main workflow.
-
-2. **Application Manager (app_manager.py)**: Handles session state, navigation, and module routing.
-
-3. **Configuration (app_config.py)**: Centralized settings organized by functional areas.
-
-4. **Components**: Reusable UI elements that maintain consistent design throughout the app.
-
-5. **Modules**: Individual functional areas of the application (Dashboard, Contracts, etc.).
-
-### How to Extend the Application
-
-#### Adding a New Module
-
-1. **Create Module Directory**: Create a new directory in the `modules/` folder for your module:
-   ```
-   modules/new_module/
-   ```
-
-2. **Create Module Files**:
-   ```python
-   # modules/new_module/__init__.py
-   import streamlit as st
-   
-   def render_new_module():
-       st.title("New Module")
-       # Your module content here
-   ```
-
-3. **Update Configuration**: Add your module to `app_config.py`:
-   ```python
-   # Add to MENU_OPTIONS
-   MENU_OPTIONS = [
-       # ... existing options
-       "🆕 New Module",
-   ]
-   
-   # Add to MENU_MAP
-   MENU_MAP = {
-       # ... existing mapping
-       "🆕 New Module": "New Module",
-   }
-   
-   # If your module needs action buttons
-   PAGES_WITH_ACTIONS = {
-       # ... existing pages
-       "New Module": "New Item",
-   }
-   ```
-
-4. **Register Module Renderer**: Add your module to the rendering function in `app_manager.py`:
-   ```python
-   # Import your module
-   from modules.new_module import render_new_module
-   
-   # Add to module_mapping in render_selected_module
-   module_mapping = {
-       # ... existing modules
-       "New Module": render_new_module,
-   }
-   ```
-
-#### Creating New Components
-
-1. **Create Component File**: Add a new file in the `components/` directory:
-   ```python
-   # components/new_component.py
-   import streamlit as st
-   
-   def render_new_component(param1, param2=None):
-       """
-       Render a new component.
-       
-       Args:
-           param1: First parameter description
-           param2: Optional second parameter description
-       
-       Returns:
-           Any data that needs to be returned
-       """
-       # Component implementation
-       pass
-   ```
-
-2. **Import and Use**: Import and use your component in modules:
-   ```python
-   from components.new_component import render_new_component
-   
-   # In your module
-   render_new_component("some value")
-   ```
-
-### Best Practices
-
-1. **Modular Design**: Keep modules and components focused on specific functionality.
-
-2. **Consistent Styling**: Use the provided styling utilities in `assets/` for UI consistency.
-
-3. **Clean Imports**: Import only what you need to avoid circular dependencies.
-
-4. **Documentation**: Add docstrings to all functions and modules explaining purpose and usage.
-
-5. **Session State**: Use Streamlit's session state for storing persistent data between reruns.
-
-6. **Configuration**: Add new configuration values to appropriate sections in `app_config.py`.
-
-## Modules
-
-| Module | Description |
-|--------|-------------|
-| **Dashboard** | Project overview with key metrics and analytics |
-| **Project Information** | Central repository for project details and team information |
-| **Schedule** | Gantt charts, milestone tracking, and progress visualization |
-| **Safety** | Incident reports, safety metrics, and compliance tracking |
-| **Contracts** | Contract management, change orders, and procurement |
-| **Cost Management** | Budget tracking, forecasting, and financial reporting |
-| **Engineering** | Technical documentation, specifications, and calculations |
-| **Field Operations** | Daily reports, quality control, and issue tracking |
-| **Documents** | Document management with version control and approval workflows |
-| **BIM** | 3D model visualization and information extraction |
-| **Closeout** | Project closeout documentation and warranty management |
-
-## Implementation
-
-### Installation Requirements
-- Python 3.8+
-- Streamlit 1.24+
-- SQLAlchemy
-- Plotly and Pandas for data visualization
-- JWT for authentication
-
-### Database Configuration
-The platform supports both SQLite (local development) and PostgreSQL (production) databases through SQLAlchemy ORM.
-
-### Authentication
-Role-based access control with secure JWT implementation supports multiple user types:
-- Administrator
-- Project Manager
-- Field Supervisor
-- Subcontractor
-- Client/Owner
-
-## 🛠️ Technical Architecture
-
-### Application Structure
-```
-gcPanel/
-├── app.py                     # Main application entry point
-├── login_form.py             # Secure authentication system
-├── app_manager.py            # Session management and routing
-├── app_config.py             # Centralized configuration
-├── modules/                  # Feature modules
-│   ├── dashboard/           # Project overview and KPIs
-│   ├── cost_management/     # Budget, billing, change orders
-│   ├── field_operations/    # Daily reports, inspections
-│   ├── safety/             # Safety management and incidents
-│   └── contracts/          # Contract and vendor management
-├── components/              # Reusable UI components
-│   ├── digital_signature.py # Digital signature integration
-│   └── header_clean.py     # Application header
-├── assets/                 # Styling and UI enhancements
-├── utils/                  # Utility functions and helpers
-└── data/                   # Data storage and models
+# Optional External APIs
+OPENAI_API_KEY=your-openai-key-here
+TWILIO_ACCOUNT_SID=your-twilio-sid-here
+TWILIO_AUTH_TOKEN=your-twilio-token-here
+TWILIO_PHONE_NUMBER=your-twilio-phone-here
 ```
 
-### Key Design Principles
-- **Modular Architecture**: Each module is self-contained and easily extensible
-- **Consistent UI/UX**: Standardized components ensure uniform experience
-- **Security First**: Production-ready authentication and data protection
-- **Mobile Responsive**: Optimized for field use on tablets and phones
-- **Performance Optimized**: Efficient data handling and caching strategies
+### **2. Local Development**
+```bash
+# Clone the repository
+git clone https://github.com/yourcompany/gcpanel.git
+cd gcpanel
 
-## 📈 Recent Updates
+# Install dependencies
+pip install -e .
 
-### Latest Improvements
-- ✅ **Removed sidebar navigation** for cleaner, full-width interface
-- ✅ **Enhanced login system** with security features and demo accounts
-- ✅ **Digital signatures** integrated into critical forms
-- ✅ **Improved error handling** and code quality across modules
-- ✅ **Streamlined UI** with professional styling and consistent layouts
-- ✅ **Database optimization** for better performance
+# Run the application
+streamlit run app.py --server.port 5000
+```
 
-### Currently Active Features
-- **Complete Cost Management** with T&M tickets, change orders, and AIA billing
-- **Field Operations** with daily reports and quality control tracking
-- **Safety Management** with incident reporting and compliance tracking
-- **Document Management** with version control and approval workflows
-- **BIM Integration** with 3D model visualization capabilities
+### **3. Docker Deployment**
+```bash
+# Build and run with Docker Compose
+docker-compose up -d
 
-## 🔮 Future Enhancements
+# View logs
+docker-compose logs -f gcpanel
 
-- **Advanced Analytics**: Predictive project insights and risk assessment
-- **Mobile App**: Native companion for field data collection
-- **API Integration**: Enhanced connectivity with external construction tools
-- **Multi-Project**: Portfolio management across multiple projects
-- **AI Features**: Automated report generation and intelligent recommendations
+# Scale the application
+docker-compose up -d --scale gcpanel=3
+```
 
-## 📸 Screenshots
+### **4. Kubernetes Deployment**
+```bash
+# Apply Kubernetes configurations
+kubectl apply -f k8s-namespace.yaml
+kubectl apply -f k8s-configmap.yaml
+kubectl apply -f k8s-secrets.yaml
+kubectl apply -f k8s-persistentvolumes.yaml
+kubectl apply -f k8s-deployment.yaml
+kubectl apply -f k8s-service.yaml
+kubectl apply -f k8s-ingress.yaml
 
-![gcPanel Dashboard](attached_assets/gcpanel-streamlit2.png)
-*gcPanel Construction Management Dashboard - Highland Tower Project Overview*
+# Check deployment status
+kubectl get pods -n gcpanel
+kubectl get services -n gcpanel
+```
 
-## 📄 License
+## 📊 **Production Features**
 
-© 2025 gcPanel Construction Management Platform. All rights reserved.
+### **Performance Optimizations**
+- **Multi-stage Docker builds** - Optimized container size and security
+- **Database connection pooling** - Efficient database resource management
+- **Caching layer** - Redis integration for improved response times
+- **Static file serving** - Optimized asset delivery
+- **Health checks** - Automated monitoring and recovery
+
+### **Security Enhancements**
+- **Non-root containers** - Security-first containerization
+- **CORS protection** - Cross-origin request security
+- **XSRF protection** - Cross-site request forgery prevention
+- **Input validation** - Comprehensive data sanitization
+- **Audit logging** - Complete security event tracking
+
+### **Monitoring & Observability**
+- **Health endpoints** - Application and database health monitoring
+- **Prometheus metrics** - Performance and business metrics collection
+- **Grafana dashboards** - Visual monitoring and alerting
+- **Log aggregation** - Centralized logging and analysis
+
+## 🔧 **Configuration Files**
+
+### **Kubernetes Deployment Files**
+- `k8s-namespace.yaml` - Namespace configuration
+- `k8s-configmap.yaml` - Application configuration
+- `k8s-secrets.yaml` - Sensitive data management
+- `k8s-deployment.yaml` - Application deployment
+- `k8s-service.yaml` - Service configuration
+- `k8s-ingress.yaml` - External access configuration
+- `k8s-persistentvolumes.yaml` - Storage configuration
+
+### **Docker Configuration**
+- `Dockerfile` - Multi-stage production build
+- `docker-compose.yml` - Local development and deployment
+- `.dockerignore` - Build optimization
+
+## 📈 **Analytics & Reporting**
+
+### **Available Reports**
+- **Executive Summary** - High-level KPIs and portfolio overview
+- **Project Performance** - Schedule, budget, and quality metrics
+- **Financial Analysis** - Revenue, profit margins, and cash flow
+- **Safety Reports** - Incident tracking and compliance metrics
+- **Productivity Analysis** - Labor efficiency and resource utilization
+
+### **Export Formats**
+- PDF reports with professional formatting
+- Excel workbooks with multiple data sheets
+- PowerPoint presentations for stakeholders
+- CSV data for further analysis
+
+## 🛡️ **Security & Compliance**
+
+### **Security Features**
+- JWT-based authentication with refresh tokens
+- Role-based access control (RBAC)
+- Input validation and sanitization
+- SQL injection prevention
+- XSS protection
+- CSRF protection
+
+### **Compliance Standards**
+- OSHA safety reporting compliance
+- AIA billing format compliance (G702/G703)
+- Financial audit trail maintenance
+- Document retention policies
+- Data privacy protection
+
+## 🌐 **Deployment Options**
+
+### **Cloud Platforms**
+- **AWS EKS** - Elastic Kubernetes Service
+- **Google GKE** - Google Kubernetes Engine
+- **Azure AKS** - Azure Kubernetes Service
+- **Digital Ocean** - Kubernetes clusters
+
+### **Traditional Hosting**
+- **Docker Swarm** - Container orchestration
+- **VMware** - Virtual machine deployment
+- **Bare Metal** - Direct server installation
+
+## 🔗 **API Integrations**
+
+### **Currently Integrated**
+- **OpenAI** - AI-powered features and insights
+- **Twilio** - SMS notifications and alerts
+- **Weather APIs** - Real-time weather data
+- **Email Services** - SMTP notification delivery
+
+### **Integration Ready**
+- **QuickBooks** - Accounting system integration
+- **Sage** - Financial management system
+- **Autodesk** - BIM and design tool connectivity
+- **Microsoft Project** - Schedule synchronization
+
+## 📄 **License**
+
+Enterprise License - Contact for commercial licensing and deployment options.
+
+---
+
+**Built with ❤️ for the Construction Industry**
+
+*Transforming construction project management through innovative technology and intelligent insights.*

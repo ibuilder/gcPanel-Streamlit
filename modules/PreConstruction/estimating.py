@@ -14,6 +14,11 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
+from assets.crud_styler import (
+    render_crud_list_container, end_crud_list_container,
+    render_crud_detail_container, end_crud_detail_container,
+    render_form_actions, render_crud_table, apply_crud_formatter
+)
 
 def render_estimating():
     """Render the Estimating dashboard"""

@@ -1078,202 +1078,271 @@ class AIABillingModule(CrudModule):
             return None
     
     def _show_pdf(self, item):
-        """Display the PDF version of the payment application."""
-        st.markdown("### PDF Preview of Payment Application")
+        """Generate and display a proper PDF version of the AIA G702/G703 payment application."""
+        st.markdown("### 📄 AIA G702/G703 Payment Application PDF")
         
-        # Create a PDF-like display using HTML/CSS
-        html_content = f"""
-        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; border: 1px solid #ccc;">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <h2>APPLICATION AND CERTIFICATE FOR PAYMENT</h2>
-                <p>AIA DOCUMENT G702</p>
-            </div>
+        try:
+            # Generate the PDF using ReportLab
+            pdf_bytes = self._generate_aia_pdf(item)
             
-            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                <div>
-                    <strong>TO OWNER:</strong> {item['owner_name']}<br>
-                    <strong>PROJECT:</strong> {item['project_name']}<br>
-                    <strong>PROJECT NO.:</strong> {item['project_number']}
-                </div>
-                <div>
-                    <strong>APPLICATION NO.:</strong> {item['application_number']}<br>
-                    <strong>PERIOD TO:</strong> {item['period_to']}<br>
-                    <strong>CONTRACT DATE:</strong> {item['contract_date']}
-                </div>
-            </div>
+            if pdf_bytes:
+                # Create download button for the PDF
+                st.download_button(
+                    label="📥 Download AIA G702/G703 PDF",
+                    data=pdf_bytes,
+                    file_name=f"AIA_Payment_App_{item['application_number']}.pdf",
+                    mime="application/pdf",
+                    type="primary"
+                )
+                
+                # Display PDF preview in browser
+                import base64
+                base64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
+                pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="800px" type="application/pdf"></iframe>'
+                st.markdown(pdf_display, unsafe_allow_html=True)
+            else:
+                st.error("❌ Error generating PDF. Please try again.")
+                
+        except Exception as e:
+            st.error(f"❌ Error generating PDF: {str(e)}")
+
+    def _generate_aia_pdf(self, item):
+        """Generate a professional AIA G702/G703 PDF using ReportLab."""
+        from reportlab.lib.pagesizes import letter
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.units import inch
+        from reportlab.lib import colors
+        from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+        from io import BytesIO
+        
+        try:
+            # Create PDF in memory
+            buffer = BytesIO()
+            doc = SimpleDocTemplate(
+                buffer,
+                pagesize=letter,
+                rightMargin=0.75*inch,
+                leftMargin=0.75*inch,
+                topMargin=1*inch,
+                bottomMargin=1*inch
+            )
             
-            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                <div>
-                    <strong>FROM CONTRACTOR:</strong> {item['contractor_name']}<br>
-                    <strong>CONTRACT FOR:</strong> Construction
-                </div>
-                <div>
-                    <strong>VIA ARCHITECT:</strong> {item['architect_name']}<br>
-                    <strong>CONTRACT NO.:</strong> {item['contract_number']}
-                </div>
-            </div>
+            # Get styles
+            styles = getSampleStyleSheet()
             
-            <div style="margin-top: 30px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                    <div style="width: 70%; padding-right: 20px;">
-                        <div style="margin-bottom: 10px;">
-                            <strong>1. ORIGINAL CONTRACT SUM</strong>
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <strong>2. NET CHANGE BY CHANGE ORDERS</strong>
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <strong>3. CONTRACT SUM TO DATE (Line 1 ± 2)</strong>
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <strong>4. TOTAL COMPLETED & STORED TO DATE</strong>
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <strong>5. RETAINAGE:</strong><br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;a. {item['retainage_percentage']}% of Completed Work
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <strong>6. TOTAL EARNED LESS RETAINAGE</strong>
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <strong>7. LESS PREVIOUS CERTIFICATES FOR PAYMENT</strong>
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <strong>8. CURRENT PAYMENT DUE</strong>
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <strong>9. BALANCE TO FINISH, INCLUDING RETAINAGE</strong>
-                        </div>
-                    </div>
-                    <div style="width: 30%; text-align: right;">
-                        <div style="margin-bottom: 10px;">
-                            <strong>${float(item['total_contract_sum']):,.2f}</strong>
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <strong>${float(item['net_change_orders']):,.2f}</strong>
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <strong>${float(item['contract_sum_to_date']):,.2f}</strong>
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <strong>${float(item['total_completed_stored']):,.2f}</strong>
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <strong>${float(item['retainage_amount']):,.2f}</strong>
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <strong>${float(item['total_earned_less_retainage']):,.2f}</strong>
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <strong>${float(item['previous_payments']):,.2f}</strong>
-                        </div>
-                        <div style="margin-bottom: 10px; border: 2px solid #000; padding: 5px;">
-                            <strong>${float(item['payment_due']):,.2f}</strong>
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <strong>${float(item['contract_sum_to_date']) - float(item['total_earned_less_retainage']):,.2f}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            # Custom styles
+            title_style = ParagraphStyle(
+                'CustomTitle',
+                parent=styles['Heading1'],
+                fontSize=16,
+                spaceAfter=30,
+                alignment=TA_CENTER
+            )
             
-            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px;">
-                <h3>CONTINUATION SHEET (G703)</h3>
-                <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-                    <thead>
-                        <tr style="background-color: #f2f2f2;">
-                            <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">Item<br>No.</th>
-                            <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Description of Work</th>
-                            <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Scheduled<br>Value</th>
-                            <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">From Previous<br>Application</th>
-                            <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">This<br>Period</th>
-                            <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Completed<br>To Date</th>
-                            <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">%</th>
-                            <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Balance<br>To Finish</th>
-                            <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Stored<br>Materials</th>
-                            <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Total Completed<br>& Stored</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        """
-        
-        # Add schedule of values rows
-        for sov_item in item['schedule_of_values']:
-            html_content += f"""
-                <tr>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: center;">{sov_item['item_id']}</td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: left;">{sov_item['description']}</td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${float(sov_item['scheduled_value']):,.2f}</td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${float(sov_item['previous_applications']):,.2f}</td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${float(sov_item['this_period']):,.2f}</td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${float(sov_item['completed_to_date']):,.2f}</td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: center;">{float(sov_item['percent_complete']):.1f}%</td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${float(sov_item['balance_to_finish']):,.2f}</td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${float(sov_item['stored_materials']):,.2f}</td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${float(sov_item['total_completed_stored']):,.2f}</td>
-                </tr>
-            """
-        
-        # Calculate totals
-        total_scheduled = sum(sov_item['scheduled_value'] for sov_item in item['schedule_of_values'])
-        total_previous = sum(sov_item['previous_applications'] for sov_item in item['schedule_of_values'])
-        total_this_period = sum(sov_item['this_period'] for sov_item in item['schedule_of_values'])
-        total_completed = sum(sov_item['completed_to_date'] for sov_item in item['schedule_of_values'])
-        total_percent = (total_completed / total_scheduled) * 100 if total_scheduled > 0 else 0
-        total_balance = total_scheduled - total_completed
-        total_stored_materials = sum(sov_item['stored_materials'] for sov_item in item['schedule_of_values'])
-        total_completed_stored = sum(sov_item['total_completed_stored'] for sov_item in item['schedule_of_values'])
-        
-        # Add totals row
-        html_content += f"""
-                <tr style="font-weight: bold; background-color: #f2f2f2;">
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: center;"></td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: left;">GRAND TOTAL</td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${total_scheduled:,.2f}</td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${total_previous:,.2f}</td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${total_this_period:,.2f}</td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${total_completed:,.2f}</td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: center;">{total_percent:.1f}%</td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${total_balance:,.2f}</td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${total_stored_materials:,.2f}</td>
-                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${total_completed_stored:,.2f}</td>
-                </tr>
-            </tbody>
-        </table>
-        """
-        
-        # Add signatures section
-        html_content += f"""
-            <div style="margin-top: 40px; display: flex; justify-content: space-between;">
-                <div style="width: 45%; border-top: 1px solid #000; padding-top: 5px;">
-                    <strong>ARCHITECT'S CERTIFICATE FOR PAYMENT</strong><br>
-                    Date: _____________________<br><br>
-                    Architect: _________________________________
-                </div>
-                <div style="width: 45%; border-top: 1px solid #000; padding-top: 5px;">
-                    <strong>CONTRACTOR:</strong><br>
-                    By: _____________________  Date: _______________<br><br>
-                    Name: {item['contractor_name']}
-                </div>
-            </div>
-        </div>
-        """
-        
-        # Display the HTML content
-        st.markdown(html_content, unsafe_allow_html=True)
-        
-        # Add a button to download the PDF
-        if st.button("Generate PDF for Download", key="generate_pdf_btn"):
-            st.warning("In a production environment, this would generate a proper PDF document for download.")
-            st.info("For demonstration purposes, the HTML preview above represents what the PDF would look like.")
+            heading_style = ParagraphStyle(
+                'CustomHeading',
+                parent=styles['Heading2'],
+                fontSize=12,
+                spaceAfter=12,
+                alignment=TA_LEFT
+            )
             
-            # Note: In a real implementation, we would use a PDF generation library like ReportLab or WeasyPrint
-            # to convert the HTML to a proper PDF file that can be downloaded.
+            normal_style = ParagraphStyle(
+                'CustomNormal',
+                parent=styles['Normal'],
+                fontSize=10,
+                spaceAfter=6
+            )
+            
+            # Content for the PDF
+            content = []
+            
+            # === PAGE 1: AIA G702 APPLICATION FOR PAYMENT ===
+            
+            # Title
+            content.append(Paragraph("APPLICATION AND CERTIFICATE FOR PAYMENT", title_style))
+            content.append(Paragraph("AIA DOCUMENT G702", normal_style))
+            content.append(Spacer(1, 20))
+            
+            # Project Information Table
+            project_data = [
+                ['TO OWNER:', item['owner_name'], 'APPLICATION NO.:', str(item['application_number'])],
+                ['PROJECT:', item['project_name'], 'PERIOD TO:', item['period_to']],
+                ['PROJECT NO.:', item['project_number'], 'CONTRACT DATE:', item['contract_date']],
+                ['', '', '', ''],
+                ['FROM CONTRACTOR:', item['contractor_name'], 'VIA ARCHITECT:', item['architect_name']],
+                ['CONTRACT FOR:', 'Construction', 'CONTRACT NO.:', item['contract_number']]
+            ]
+            
+            project_table = Table(project_data, colWidths=[1.5*inch, 2.5*inch, 1.5*inch, 1.5*inch])
+            project_table.setStyle(TableStyle([
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+                ('BACKGROUND', (2, 0), (2, -1), colors.lightgrey),
+            ]))
+            
+            content.append(project_table)
+            content.append(Spacer(1, 30))
+            
+            # Payment Summary Table
+            summary_data = [
+                ['1. ORIGINAL CONTRACT SUM', f"${float(item['total_contract_sum']):,.2f}"],
+                ['2. NET CHANGE BY CHANGE ORDERS', f"${float(item['net_change_orders']):,.2f}"],
+                ['3. CONTRACT SUM TO DATE (Line 1 ± 2)', f"${float(item['contract_sum_to_date']):,.2f}"],
+                ['4. TOTAL COMPLETED & STORED TO DATE', f"${float(item['total_completed_stored']):,.2f}"],
+                [f"5. RETAINAGE ({item['retainage_percentage']}% of Completed Work)", f"${float(item['retainage_amount']):,.2f}"],
+                ['6. TOTAL EARNED LESS RETAINAGE', f"${float(item['total_earned_less_retainage']):,.2f}"],
+                ['7. LESS PREVIOUS CERTIFICATES FOR PAYMENT', f"${float(item['previous_payments']):,.2f}"],
+                ['8. CURRENT PAYMENT DUE', f"${float(item['payment_due']):,.2f}"],
+                ['9. BALANCE TO FINISH, INCLUDING RETAINAGE', f"${float(item['contract_sum_to_date']) - float(item['total_earned_less_retainage']):,.2f}"]
+            ]
+            
+            summary_table = Table(summary_data, colWidths=[5*inch, 2*inch])
+            summary_table.setStyle(TableStyle([
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+                ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+                ('FONTNAME', (0, 7), (1, 7), 'Helvetica-Bold'),  # Highlight current payment due
+                ('BACKGROUND', (0, 7), (1, 7), colors.yellow),
+            ]))
+            
+            content.append(summary_table)
+            content.append(Spacer(1, 30))
+            
+            # Signature Section
+            signature_data = [
+                ['CONTRACTOR CERTIFICATION:', ''],
+                ['By:', ''],
+                ['Date:', ''],
+                ['', ''],
+                ['ARCHITECT CERTIFICATION:', ''],
+                ['By:', ''],
+                ['Date:', ''],
+                ['', ''],
+                ['OWNER APPROVAL:', ''],
+                ['By:', ''],
+                ['Date:', '']
+            ]
+            
+            signature_table = Table(signature_data, colWidths=[3*inch, 3.5*inch])
+            signature_table.setStyle(TableStyle([
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ('BACKGROUND', (0, 0), (0, 0), colors.lightgrey),
+                ('BACKGROUND', (0, 4), (0, 4), colors.lightgrey),
+                ('BACKGROUND', (0, 8), (0, 8), colors.lightgrey),
+            ]))
+            
+            content.append(signature_table)
+            
+            # Page break for G703
+            content.append(PageBreak())
+            
+            # === PAGE 2: AIA G703 CONTINUATION SHEET ===
+            
+            content.append(Paragraph("CONTINUATION SHEET", title_style))
+            content.append(Paragraph("AIA DOCUMENT G703", normal_style))
+            content.append(Spacer(1, 20))
+            
+            # Project header for G703
+            g703_header = [
+                ['PROJECT:', item['project_name'], 'APPLICATION NO.:', str(item['application_number'])],
+                ['CONTRACTOR:', item['contractor_name'], 'PERIOD TO:', item['period_to']]
+            ]
+            
+            g703_header_table = Table(g703_header, colWidths=[1.5*inch, 3*inch, 1.5*inch, 1*inch])
+            g703_header_table.setStyle(TableStyle([
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+                ('BACKGROUND', (2, 0), (2, -1), colors.lightgrey),
+            ]))
+            
+            content.append(g703_header_table)
+            content.append(Spacer(1, 20))
+            
+            # Schedule of Values Table
+            sov_headers = [
+                'Item', 'Description of Work', 'Scheduled\nValue', 'Previous\nApps', 'This\nPeriod', 
+                'Completed\nTo Date', '%\nComplete', 'Balance\nTo Finish', 'Stored\nMaterials', 'Total Completed\n& Stored'
+            ]
+            
+            sov_data = [sov_headers]
+            
+            # Add schedule of values items
+            for sov_item in item['schedule_of_values']:
+                row = [
+                    str(sov_item['item_id']),
+                    sov_item['description'][:30] + '...' if len(sov_item['description']) > 30 else sov_item['description'],
+                    f"${sov_item['scheduled_value']:,.0f}",
+                    f"${sov_item['previous_applications']:,.0f}",
+                    f"${sov_item['this_period']:,.0f}",
+                    f"${sov_item['completed_to_date']:,.0f}",
+                    f"{sov_item['percent_complete']:.1f}%",
+                    f"${sov_item['balance_to_finish']:,.0f}",
+                    f"${sov_item['stored_materials']:,.0f}",
+                    f"${sov_item['total_completed_stored']:,.0f}"
+                ]
+                sov_data.append(row)
+            
+            # Add totals row
+            total_scheduled = sum(sov['scheduled_value'] for sov in item['schedule_of_values'])
+            total_previous = sum(sov['previous_applications'] for sov in item['schedule_of_values'])
+            total_this_period = sum(sov['this_period'] for sov in item['schedule_of_values'])
+            total_completed = sum(sov['completed_to_date'] for sov in item['schedule_of_values'])
+            total_balance = sum(sov['balance_to_finish'] for sov in item['schedule_of_values'])
+            total_stored = sum(sov['stored_materials'] for sov in item['schedule_of_values'])
+            total_completed_stored = sum(sov['total_completed_stored'] for sov in item['schedule_of_values'])
+            
+            totals_row = [
+                '', 'TOTALS', f"${total_scheduled:,.0f}", f"${total_previous:,.0f}", 
+                f"${total_this_period:,.0f}", f"${total_completed:,.0f}", '', 
+                f"${total_balance:,.0f}", f"${total_stored:,.0f}", f"${total_completed_stored:,.0f}"
+            ]
+            sov_data.append(totals_row)
+            
+            # Create the table with appropriate column widths
+            col_widths = [0.4*inch, 2*inch, 0.8*inch, 0.8*inch, 0.8*inch, 0.8*inch, 0.6*inch, 0.8*inch, 0.8*inch, 0.8*inch]
+            sov_table = Table(sov_data, colWidths=col_widths, repeatRows=1)
+            
+            sov_table.setStyle(TableStyle([
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 8),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),  # Header row
+                ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),  # Totals row
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Header bold
+                ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),  # Totals bold
+                ('ALIGN', (2, 0), (-1, -1), 'RIGHT'),  # Right align numbers
+                ('ALIGN', (0, 0), (1, -1), 'LEFT'),  # Left align item and description
+            ]))
+            
+            content.append(sov_table)
+            
+            # Build PDF
+            doc.build(content)
+            
+            # Return PDF bytes
+            buffer.seek(0)
+            return buffer.getvalue()
+            
+        except Exception as e:
+            st.error(f"Error generating AIA PDF: {str(e)}")
+            return None
 
 def render():
     """Render the AIA Billing module."""
-    st.title("AIA G702/G703 Billing")
-    
     # Create and render the AIA Billing module
     aia_billing = AIABillingModule()
     aia_billing.render()

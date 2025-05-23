@@ -19,8 +19,14 @@ def render_dashboard():
     # Current project info
     current_project = st.session_state.get("current_project", "Highland Tower Development")
     
-    # Enhanced metrics overview
-    render_project_overview_section(current_project)
+    # Enhanced project status with weather and critical alerts
+    render_enhanced_project_status(current_project)
+    
+    # Real-time critical path alerts
+    render_critical_path_alerts()
+    
+    # Weather conditions affecting construction
+    render_weather_impact_dashboard()
     
     # Project Header Card
     st.markdown(

@@ -12,12 +12,15 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta
 
 def render_dashboard():
-    """Render the main dashboard."""
+    """Render the enhanced construction management dashboard."""
     
-    st.header("Dashboard")
+    st.title("🏗️ Project Dashboard")
     
     # Current project info
     current_project = st.session_state.get("current_project", "Highland Tower Development")
+    
+    # Enhanced metrics overview
+    render_project_overview_section(current_project)
     
     # Project Header Card
     st.markdown(

@@ -34,14 +34,43 @@ def render_sidebar():
         
         st.divider()
         
-        # User Information
-        current_user = st.session_state.get("username", "Project Manager")
-        user_role = st.session_state.get("user_role", "admin")
+        # Check if user is authenticated
+        is_authenticated = st.session_state.get("authenticated", False)
         
-        st.markdown(f"""
-        **User:** {current_user}  
-        **Role:** {user_role.title()}
-        """)
+        if is_authenticated:
+            # User Information for logged in users
+            current_user = st.session_state.get("username", "Project Manager")
+            user_role = st.session_state.get("user_role", "admin")
+            
+            st.markdown(f"""
+            **User:** {current_user}  
+            **Role:** {user_role.title()}
+            """)
+        else:
+            # About gcPanel for non-logged in users
+            st.markdown("### About gcPanel")
+            st.markdown("""
+            **gcPanel** is the industry-leading construction management platform that revolutionizes how teams collaborate on projects.
+            
+            🏗️ **Features:**
+            • Project Dashboard & Analytics
+            • BIM Integration & Visualization  
+            • Safety Management & Compliance
+            • Cost Control & Budget Tracking
+            • Document Management
+            • Field Operations Support
+            
+            💼 **Perfect for:**
+            • General Contractors
+            • Project Managers
+            • Construction Teams
+            • Development Companies
+            
+            🌟 **Get gcPanel for your projects!**
+            """)
+            
+            if st.button("🌐 Visit www.gcpanel.co", use_container_width=True, type="primary"):
+                st.markdown("[Click here to visit gcPanel.co](https://www.gcpanel.co)", unsafe_allow_html=True)
         
         st.divider()
         

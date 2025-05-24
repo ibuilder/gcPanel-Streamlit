@@ -6,6 +6,7 @@ It includes submodules for different types of analysis and reporting.
 """
 
 import streamlit as st
+import pandas as pd
 from modules.analytics.analysis import render as render_analysis
 from modules.analytics.business_intelligence import render_business_intelligence
 
@@ -242,6 +243,12 @@ def render():
     # Create comprehensive tabs for all analytics features
     tabs = st.tabs([
         "📈 Executive Dashboard", 
+        "🏗️ Project Analytics",
+        "💰 Cost Analytics",
+        "📄 Contract Analytics", 
+        "🦺 Safety Analytics",
+        "🔧 Engineering Analytics",
+        "🚧 Field Analytics",
         "🔍 Detailed Analysis", 
         "📊 Business Intelligence",
         "📋 Reports Overview"
@@ -251,13 +258,129 @@ def render():
         render_analytics_dashboard()
     
     with tabs[1]:
-        render_analysis()
+        render_project_analytics_dashboard()
     
     with tabs[2]:
-        render_business_intelligence()
+        render_cost_analytics()
     
     with tabs[3]:
+        render_contract_analytics()
+    
+    with tabs[4]:
+        render_safety_analytics()
+    
+    with tabs[5]:
+        render_engineering_analytics()
+    
+    with tabs[6]:
+        render_field_analytics()
+    
+    with tabs[7]:
+        render_analysis()
+    
+    with tabs[8]:
+        render_business_intelligence()
+    
+    with tabs[9]:
         render_reports_overview()
+
+def render_project_analytics_dashboard():
+    """Render consolidated project analytics dashboard with all dashboard analytics"""
+    st.markdown("### 🏗️ Project Analytics Dashboard")
+    
+    # Enhanced Project Status Section
+    st.markdown("#### Enhanced Project Status")
+    col1, col2, col3, col4, col5 = st.columns(5)
+    
+    with col1:
+        st.metric("Overall Progress", "72%", "+3% this week", delta_color="normal")
+    
+    with col2:
+        st.metric("Budget Status", "$32.8M", "-2.3% under budget", delta_color="inverse")
+    
+    with col3:
+        st.metric("Schedule Status", "On Track", "+2 days ahead", delta_color="normal")
+    
+    with col4:
+        st.metric("Quality Score", "94%", "+2% improvement", delta_color="normal")
+    
+    with col5:
+        st.metric("Safety Score", "98%", "0 incidents this week", delta_color="normal")
+    
+    st.markdown("---")
+    
+    # Critical Path Alerts Section
+    st.markdown("#### 🚨 Critical Path Alerts")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.warning("⚠️ Structural steel delivery delayed by 3 days")
+        st.info("ℹ️ MEP rough-in inspection scheduled for next week")
+    
+    with col2:
+        st.success("✅ Foundation work completed ahead of schedule")
+        st.error("🔴 Elevator installation requires immediate attention")
+    
+    st.markdown("---")
+    
+    # Weather Impact Section
+    st.markdown("#### 🌤️ Weather Impact Analysis")
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric("Weather Delays", "2 days", "This month")
+        st.metric("Productivity Impact", "-8%", "Due to rain")
+    
+    with col2:
+        st.markdown("**Upcoming Weather**")
+        st.info("☀️ Clear skies next 3 days")
+        st.warning("🌧️ Rain expected Thu-Fri")
+    
+    with col3:
+        st.markdown("**Recommendations**")
+        st.success("✅ Continue outdoor work Mon-Wed")
+        st.warning("⚠️ Plan indoor activities Thu-Fri")
+    
+    st.markdown("---")
+    
+    # Customizable Widgets Section
+    st.markdown("#### 🎛️ Customizable Project Widgets")
+    
+    col1, col2 = st.columns([1, 3])
+    
+    with col1:
+        st.markdown("**Widget Options**")
+        widget_options = st.multiselect(
+            "Select widgets to display:",
+            ["Project Timeline", "Budget Trend", "Team Activity", "Recent Photos", "Equipment Status"],
+            default=["Project Timeline", "Budget Trend", "Team Activity"]
+        )
+    
+    with col2:
+        # Render selected widgets
+        if "Project Timeline" in widget_options:
+            st.markdown("**📅 Project Timeline**")
+            timeline_data = pd.DataFrame({
+                'Phase': ['Foundation', 'Structure', 'Envelope', 'MEP', 'Finishes'],
+                'Progress': [100, 85, 60, 30, 10]
+            })
+            st.bar_chart(timeline_data.set_index('Phase'))
+        
+        if "Budget Trend" in widget_options:
+            st.markdown("**💰 Budget Trend**")
+            budget_data = pd.DataFrame({
+                'Month': ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                'Planned': [2000000, 4500000, 7200000, 10800000, 15200000],
+                'Actual': [1950000, 4350000, 7050000, 10500000, 14800000]
+            })
+            st.line_chart(budget_data.set_index('Month'))
+        
+        if "Team Activity" in widget_options:
+            st.markdown("**👥 Team Activity**")
+            st.markdown("- 🟢 12 team members active")
+            st.markdown("- 📋 8 tasks completed today")
+            st.markdown("- 💬 15 new messages")
+            st.markdown("- 📊 3 reports submitted")
 
 def render_reports_overview():
     """Render comprehensive reports overview with enterprise features."""

@@ -59,21 +59,54 @@ def apply_complete_dark_theme():
         border: 1px solid var(--border-primary) !important;
     }
     
-    /* Force All Charts and Graphs Dark */
-    .js-plotly-plot, .plotly,
+    /* Force All Charts and Graphs Dark - Enhanced */
+    .js-plotly-plot, .plotly, .plotly-graph-div,
     .user-select-none, .svg-container,
     .stPlotlyChart, [data-testid="stPlotlyChart"] {
         background-color: var(--bg-card) !important;
         color: var(--text-primary) !important;
     }
     
-    /* Plotly Chart Background and Text */
+    /* Plotly Chart Background and Text - Complete Coverage */
     .js-plotly-plot .plotly .main-svg,
-    .js-plotly-plot .bg,
-    .modebar, .modebar-container {
+    .js-plotly-plot .bg, .plot-container,
+    .modebar, .modebar-container, .modebar-group,
+    .plotly .gtitle, .plotly .xtitle, .plotly .ytitle,
+    .plotly text, .plotly .tick text {
         background-color: var(--bg-card) !important;
         color: var(--text-primary) !important;
         fill: var(--text-primary) !important;
+    }
+    
+    /* Streamlit Navigation and Header - Enhanced Dark */
+    .main .block-container, 
+    [data-testid="stSidebar"], 
+    [data-testid="stSidebarNav"],
+    .css-1d391kg, .css-12oz5g7,
+    header[data-testid="stHeader"] {
+        background-color: var(--bg-secondary) !important;
+        color: var(--text-primary) !important;
+    }
+    
+    /* All Navigation Elements Dark */
+    nav, .stSelectbox, .stTabs,
+    .streamlit-container .main,
+    .stApp > header, .stToolbar {
+        background-color: var(--bg-secondary) !important;
+        color: var(--text-primary) !important;
+        border-color: var(--border-primary) !important;
+    }
+    
+    /* Force Logout and Action Buttons Dark */
+    button[kind="secondary"], button[kind="primary"],
+    .stButton button, .stDownloadButton button,
+    [data-testid="baseButton-secondary"],
+    [data-testid="baseButton-primary"] {
+        background-color: var(--bg-card) !important;
+        color: var(--text-primary) !important;
+        border: 1px solid var(--border-primary) !important;
+        padding: 0.75rem 1.25rem !important;
+        margin: 0.5rem !important;
     }
     
     /* Root Elements - Complete Dark */
@@ -145,21 +178,60 @@ def apply_complete_dark_theme():
         font-size: 2rem !important;
     }
     
-    /* Buttons - Complete Dark Style */
+    /* Buttons - Complete Dark Style with Better Padding */
     .stButton > button {
         background: linear-gradient(135deg, var(--accent-blue), #3182ce) !important;
         color: #ffffff !important;
         border: none !important;
         border-radius: 8px !important;
         padding: 0.75rem 1.5rem !important;
+        margin: 0.5rem 0 !important;
         font-weight: 500 !important;
         box-shadow: var(--shadow-dark) !important;
         transition: all 0.3s ease !important;
+        min-height: 44px !important;
     }
     
     .stButton > button:hover {
         background: linear-gradient(135deg, #3182ce, #2c5aa0) !important;
         transform: translateY(-2px) !important;
+    }
+    
+    /* Container Spacing and Padding Improvements */
+    .stContainer, [data-testid="stVerticalBlock"] {
+        padding: 1rem 1.5rem !important;
+        margin: 0.5rem 0 !important;
+    }
+    
+    .stColumns, [data-testid="stColumns"] {
+        gap: 1.5rem !important;
+        padding: 0 0.75rem !important;
+    }
+    
+    .stColumn, [data-testid="stColumn"] {
+        padding: 0 0.75rem !important;
+        margin: 0.5rem 0 !important;
+    }
+    
+    /* Card-style containers with proper spacing */
+    .element-container, [data-testid="element-container"] {
+        padding: 1rem !important;
+        margin: 1rem 0 !important;
+        background-color: var(--bg-card) !important;
+        border-radius: 8px !important;
+        border: 1px solid var(--border-primary) !important;
+    }
+    
+    /* Content blocks with breathing room */
+    .stMarkdown, [data-testid="stMarkdown"] {
+        padding: 0.5rem 1rem !important;
+        margin: 0.75rem 0 !important;
+    }
+    
+    /* Form element containers */
+    .stTextInput, .stSelectbox, .stTextArea, .stNumberInput {
+        margin: 0.75rem 0 !important;
+        padding: 0.25rem 0 !important;
     }
     
     /* Form Elements - Complete Dark */

@@ -564,6 +564,8 @@ def main_clean():
     
     # Check authentication
     if not st.session_state.get("authenticated", False):
+        st.error("🔒 Access Denied - Please log in to access Highland Tower Development dashboard")
+        st.info("You need to authenticate to view project information and modules.")
         from login_form import render_login_form
         render_login_form()
         return

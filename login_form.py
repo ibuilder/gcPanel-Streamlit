@@ -87,6 +87,19 @@ def render_login_form():
     # Minimal CSS for essential styling only
     st.markdown("""
     <style>
+    /* Move login screen to top of page */
+    .main .block-container {
+        padding-top: 0rem !important;
+        padding-bottom: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .stApp {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+    
     /* Security badge */
     .security-badge {
         position: fixed;

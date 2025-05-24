@@ -111,6 +111,10 @@ def render_vr_ar_integration():
         if st.button("📱 Start AR Session"):
             st.info("AR session would begin with mobile device camera")
 
+def render():
+    """Main render function for the BIM module"""
+    render_bim()
+
 def render_bim():
     """Render the Enhanced BIM module with AI-powered 3D visualization"""
     

@@ -18,10 +18,6 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "gcPanel Server"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
 args = "gcPanel Sidebar"
 
 [[workflows.workflow.tasks]]
@@ -40,14 +36,9 @@ args = "gcPanel Clean"
 task = "workflow.run"
 args = "gcPanel Working"
 
-[[workflows.workflow]]
-name = "gcPanel Server"
-author = "agent"
-
 [[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "streamlit run app.py --server.port 5000"
-waitForPort = 5000
+task = "workflow.run"
+args = "gcPanel Production"
 
 [[workflows.workflow]]
 name = "gcPanel Sidebar"
@@ -92,6 +83,15 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "streamlit run app_working.py --server.port 5000"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "gcPanel Production"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "streamlit run app_production.py --server.port 5000"
 waitForPort = 5000
 
 [[ports]]

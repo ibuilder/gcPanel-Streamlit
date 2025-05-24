@@ -1,57 +1,55 @@
 """
-RFI (Request for Information) Module for Highland Tower Development
+RFIs (Requests for Information) Module for Highland Tower Development
 
 This standalone module provides comprehensive RFI management functionality including:
-- RFI creation, tracking, and management
-- Status workflow management
-- Priority and trade-based filtering
-- Response time tracking
-- Digital collaboration tools
+- RFI creation, tracking, and response management
+- Priority-based workflow and escalation
+- Multi-party collaboration and notifications
+- Response time tracking and analytics
+- Professional RFI formatting and distribution
 """
 
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
-import plotly.express as px
-import plotly.graph_objects as go
 
 def render():
-    """Render the standalone RFI Management module"""
+    """Render the standalone RFIs module"""
     st.title("❓ Request for Information (RFI) Management")
     
     # RFI Dashboard metrics
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.metric("Open RFIs", "7", "+2 this week")
+        st.metric("Open RFIs", "12", "+3 this week")
     with col2:
-        st.metric("Avg Response Time", "2.3 days", "-0.5 days")
+        st.metric("Avg Response Time", "2.8 days", "+0.2 days")
     with col3:
-        st.metric("Critical RFIs", "2", "⚠️ Attention needed")
+        st.metric("Pending Response", "5", "Awaiting answers")
     with col4:
-        st.metric("This Month", "15", "+8 from last month")
+        st.metric("Resolved This Month", "24", "+8 from last month")
     
     # Quick actions
     st.markdown("#### Quick Actions")
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        if st.button("➕ New RFI", type="primary", use_container_width=True, key="new_rfi_main"):
+        if st.button("➕ Create New RFI", type="primary", use_container_width=True, key="new_rfi_btn"):
             st.session_state['show_rfi_form'] = True
             st.rerun()
     
     with col2:
-        if st.button("📊 RFI Analytics", type="secondary", use_container_width=True, key="rfi_analytics_main"):
+        if st.button("📊 RFI Analytics", type="secondary", use_container_width=True, key="rfi_analytics_btn"):
             st.session_state['show_rfi_analytics'] = True
             st.rerun()
     
     with col3:
-        if st.button("📤 Export RFIs", type="secondary", use_container_width=True, key="export_rfi_main"):
+        if st.button("📤 Export RFIs", type="secondary", use_container_width=True, key="export_rfis_btn"):
             st.success("RFI data exported successfully!")
     
     with col4:
-        if st.button("🔄 Refresh Data", type="secondary", use_container_width=True, key="refresh_rfi_main"):
-            st.success("RFI data refreshed!")
+        if st.button("🔄 Refresh Status", type="secondary", use_container_width=True, key="refresh_rfis_btn"):
+            st.success("RFI status updated!")
     
     # RFI List with filters
     st.markdown("#### Active RFIs - Highland Tower Development")
@@ -59,80 +57,85 @@ def render():
     # Filters
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        status_filter = st.selectbox("Status", ["All", "Open", "Pending Response", "Under Review", "Answered", "Closed"])
+        status_filter = st.selectbox("Status", ["All", "Open", "Under Review", "Answered", "Closed"], key="rfi_status_filter")
     with col2:
-        priority_filter = st.selectbox("Priority", ["All", "Critical", "High", "Medium", "Low"])
+        priority_filter = st.selectbox("Priority", ["All", "Critical", "High", "Medium", "Low"], key="rfi_priority_filter")
     with col3:
-        trade_filter = st.selectbox("Trade", ["All", "Structural", "Architectural", "MEP", "Civil", "Other"])
+        category_filter = st.selectbox("Category", ["All", "Design", "Specification", "Schedule", "Materials", "Safety"], key="rfi_category_filter")
     with col4:
-        search_term = st.text_input("Search RFIs", placeholder="Search by ID or subject...")
+        search_term = st.text_input("Search RFIs", placeholder="Search by ID or description...", key="rfi_search")
     
     # Highland Tower Development RFI data
     rfis = [
         {
             "rfi_id": "RFI-HTD-001",
-            "subject": "Foundation Detail Clarification - Tower Base",
-            "trade": "Structural",
-            "status": "Pending Response",
+            "title": "Foundation Reinforcement Detail Clarification",
+            "description": "Need clarification on rebar placement for foundation grid A1-A3",
+            "category": "Design",
             "priority": "High",
-            "submitted_date": "2025-05-20",
-            "due_date": "2025-05-27",
-            "submitted_by": "Mike Johnson",
+            "status": "Under Review",
+            "submitted_date": "2025-05-23",
+            "due_date": "2025-05-30",
+            "submitted_by": "Highland Steel Works",
             "assigned_to": "Jennifer Wilson",
-            "days_open": 4,
-            "description": "Need clarification on foundation details at grid lines A1-A3 for Highland Tower base connection to existing structure."
+            "days_open": 1,
+            "responses": 0
         },
         {
             "rfi_id": "RFI-HTD-002",
-            "subject": "HVAC Equipment Specifications - Penthouse Level",
-            "trade": "MEP",
-            "status": "Under Review",
-            "priority": "Medium",
+            "title": "MEP Coordination - HVAC Duct Routing",
+            "description": "Conflict between HVAC ductwork and structural beam on Level 2",
+            "category": "Design",
+            "priority": "Critical",
+            "status": "Open",
             "submitted_date": "2025-05-22",
-            "due_date": "2025-05-29",
-            "submitted_by": "Sarah Thompson",
+            "due_date": "2025-05-25",
+            "submitted_by": "Climate Control LLC",
             "assigned_to": "David Chen",
             "days_open": 2,
-            "description": "Seeking specifications for rooftop HVAC equipment for Highland Tower penthouse level including capacity requirements."
+            "responses": 1
         },
         {
             "rfi_id": "RFI-HTD-003",
-            "subject": "Curtain Wall Connection Details - Floors 8-15",
-            "trade": "Architectural",
+            "title": "Curtain Wall Anchor Specification",
+            "description": "Request specification for curtain wall anchor system at penthouse level",
+            "category": "Specification",
+            "priority": "Medium",
             "status": "Answered",
-            "priority": "Critical",
-            "submitted_date": "2025-05-18",
-            "due_date": "2025-05-25",
-            "submitted_by": "Lisa Rodriguez",
-            "assigned_to": "Jennifer Wilson",
+            "submitted_date": "2025-05-20",
+            "due_date": "2025-05-27",
+            "submitted_by": "Facade Systems Inc",
+            "assigned_to": "Lisa Rodriguez",
             "days_open": 0,
-            "description": "Critical connection details needed for curtain wall installation on upper floors of Highland Tower."
+            "responses": 2
         },
         {
             "rfi_id": "RFI-HTD-004",
-            "subject": "Elevator Shaft Dimensions - Service Elevator",
-            "trade": "Structural",
-            "status": "Open",
+            "title": "Concrete Pour Schedule Coordination",
+            "description": "Clarification needed on concrete pour sequence for parking garage",
+            "category": "Schedule",
             "priority": "High",
-            "submitted_date": "2025-05-23",
-            "due_date": "2025-05-30",
-            "submitted_by": "Carlos Rivera",
+            "status": "Under Review",
+            "submitted_date": "2025-05-21",
+            "due_date": "2025-05-28",
+            "submitted_by": "Reliable Concrete LLC",
             "assigned_to": "Mike Johnson",
-            "days_open": 1,
-            "description": "Service elevator shaft dimensions conflict between architectural and structural drawings."
+            "days_open": 3,
+            "responses": 0
         },
         {
             "rfi_id": "RFI-HTD-005",
-            "subject": "Fire Protection System Integration - Retail Spaces",
-            "trade": "MEP",
+            "title": "Fire Safety System Integration",
+            "description": "Integration details for fire suppression with elevator shaft",
+            "category": "Safety",
+            "priority": "Critical",
             "status": "Open",
-            "priority": "Medium",
             "submitted_date": "2025-05-24",
-            "due_date": "2025-05-31",
+            "due_date": "2025-05-26",
             "submitted_by": "Fire Safety Inc",
-            "assigned_to": "David Chen",
+            "assigned_to": "Safety Manager",
             "days_open": 0,
-            "description": "Integration requirements for fire protection systems in retail spaces below Highland Tower."
+            "responses": 0
         }
     ]
     
@@ -142,12 +145,13 @@ def render():
         filtered_rfis = [rfi for rfi in filtered_rfis if rfi["status"] == status_filter]
     if priority_filter != "All":
         filtered_rfis = [rfi for rfi in filtered_rfis if rfi["priority"] == priority_filter]
-    if trade_filter != "All":
-        filtered_rfis = [rfi for rfi in filtered_rfis if rfi["trade"] == trade_filter]
+    if category_filter != "All":
+        filtered_rfis = [rfi for rfi in filtered_rfis if rfi["category"] == category_filter]
     if search_term:
         filtered_rfis = [rfi for rfi in filtered_rfis if 
                         search_term.lower() in rfi["rfi_id"].lower() or 
-                        search_term.lower() in rfi["subject"].lower()]
+                        search_term.lower() in rfi["title"].lower() or
+                        search_term.lower() in rfi["description"].lower()]
     
     # Display filtered count
     st.caption(f"Showing {len(filtered_rfis)} of {len(rfis)} RFIs")
@@ -160,21 +164,40 @@ def render():
             col1, col2, col3, col4 = st.columns([3, 2, 1, 1])
             
             with col1:
-                priority_color = "#ef4444" if rfi["priority"] == "Critical" else "#ff8800" if rfi["priority"] == "High" else "#4CAF50"
-                st.markdown(f"**{rfi['rfi_id']}**: {rfi['subject']}")
-                st.markdown(f"<small style='color: {priority_color};'>● {rfi['priority']} Priority | {rfi['trade']}</small>", unsafe_allow_html=True)
+                st.markdown(f"**{rfi['rfi_id']}**: {rfi['title']}")
+                st.markdown(f"<small>📂 {rfi['category']} | {rfi['description'][:60]}...</small>", unsafe_allow_html=True)
             
             with col2:
-                status_color = "#ef4444" if rfi["status"] == "Pending Response" else "#ff8800" if rfi["status"] == "Under Review" else "#4CAF50"
+                # Priority color coding
+                priority_colors = {
+                    "Critical": "#ef4444",
+                    "High": "#ff8800", 
+                    "Medium": "#2196F3",
+                    "Low": "#4CAF50"
+                }
+                priority_color = priority_colors.get(rfi["priority"], "#666")
+                
+                # Status color coding
+                status_colors = {
+                    "Open": "#2196F3",
+                    "Under Review": "#ff8800",
+                    "Answered": "#4CAF50",
+                    "Closed": "#666"
+                }
+                status_color = status_colors.get(rfi["status"], "#666")
+                
+                st.markdown(f"<span style='color: {priority_color}; font-weight: bold;'>● {rfi['priority']}</span>", unsafe_allow_html=True)
                 st.markdown(f"<span style='color: {status_color}; font-weight: bold;'>{rfi['status']}</span>", unsafe_allow_html=True)
-                st.markdown(f"<small>Due: {rfi['due_date']}</small>", unsafe_allow_html=True)
             
             with col3:
-                st.markdown(f"**{rfi['days_open']}** days open")
-                st.markdown(f"<small>{rfi['assigned_to']}</small>", unsafe_allow_html=True)
+                if rfi['days_open'] > 0:
+                    st.markdown(f"**{rfi['days_open']}** days open")
+                else:
+                    st.markdown("**New** RFI")
+                st.markdown(f"<small>Due: {rfi['due_date']}</small>", unsafe_allow_html=True)
             
             with col4:
-                if st.button("View Details", key=f"view_rfi_standalone_{rfi['rfi_id']}", use_container_width=True):
+                if st.button("View Details", key=f"view_rfi_{rfi['rfi_id']}", use_container_width=True):
                     st.session_state[f'show_rfi_detail_{rfi["rfi_id"]}'] = True
                     st.rerun()
     
@@ -185,42 +208,25 @@ def render():
         col1, col2 = st.columns(2)
         
         with col1:
-            # Status distribution
-            status_counts = {}
-            for rfi in filtered_rfis:
-                status = rfi["status"]
-                status_counts[status] = status_counts.get(status, 0) + 1
-            
-            if status_counts:
-                fig_status = px.pie(
-                    values=list(status_counts.values()),
-                    names=list(status_counts.keys()),
-                    title="RFI Status Distribution",
-                    color_discrete_sequence=px.colors.qualitative.Set3
-                )
-                fig_status.update_layout(height=300)
-                st.plotly_chart(fig_status, use_container_width=True)
-        
-        with col2:
             # Priority distribution
             priority_counts = {}
             for rfi in filtered_rfis:
                 priority = rfi["priority"]
                 priority_counts[priority] = priority_counts.get(priority, 0) + 1
             
-            if priority_counts:
-                fig_priority = px.bar(
-                    x=list(priority_counts.keys()),
-                    y=list(priority_counts.values()),
-                    title="RFI Priority Distribution",
-                    labels={"x": "Priority", "y": "Count"},
-                    color=list(priority_counts.keys()),
-                    color_discrete_map={
-                        "Critical": "#ef4444",
-                        "High": "#ff8800", 
-                        "Medium": "#ffeb3b",
-                        "Low": "#4CAF50"
-                    }
-                )
-                fig_priority.update_layout(height=300, showlegend=False)
-                st.plotly_chart(fig_priority, use_container_width=True)
+            st.markdown("**Priority Distribution**")
+            for priority, count in priority_counts.items():
+                color = priority_colors.get(priority, "#666")
+                st.markdown(f"<span style='color: {color};'>● {priority}: {count}</span>", unsafe_allow_html=True)
+        
+        with col2:
+            # Status distribution
+            status_counts = {}
+            for rfi in filtered_rfis:
+                status = rfi["status"]
+                status_counts[status] = status_counts.get(status, 0) + 1
+            
+            st.markdown("**Status Distribution**")
+            for status, count in status_counts.items():
+                color = status_colors.get(status, "#666")
+                st.markdown(f"<span style='color: {color};'>● {status}: {count}</span>", unsafe_allow_html=True)

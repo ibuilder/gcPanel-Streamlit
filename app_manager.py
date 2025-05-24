@@ -189,6 +189,26 @@ def _handle_action_buttons(current_menu):
     if current_menu in PAGES_WITH_ACTIONS:
         render_action_bar(current_menu)
 
+def render_rfis():
+    """Render the RFIs module"""
+    from modules.rfis import render
+    render()
+
+def render_submittals():
+    """Render the Submittals module"""
+    from modules.submittals import render
+    render()
+
+def render_transmittals():
+    """Render the Transmittals module"""
+    from modules.transmittals import render
+    render()
+
+def render_daily_reports_standalone():
+    """Render the standalone Daily Reports module"""
+    from modules.daily_reports import render
+    render()
+
 def render_selected_module(current_menu):
     """
     Render the module selected by the user.
@@ -239,14 +259,14 @@ def render_selected_module(current_menu):
         "PreConstruction": lambda: modules.PreConstruction.render(),
         "📈 Analytics": render_analytics,
         "Analytics": render_analytics,
-        "❓ RFIs": lambda: modules.rfis.render(),
-        "RFIs": lambda: modules.rfis.render(),
-        "📦 Submittals": lambda: modules.submittals.render(),
-        "Submittals": lambda: modules.submittals.render(),
-        "📤 Transmittals": lambda: modules.transmittals.render(),
-        "Transmittals": lambda: modules.transmittals.render(),
-        "📝 Daily Reports": lambda: modules.daily_reports.render(),
-        "Daily Reports": lambda: modules.daily_reports.render(),
+        "❓ RFIs": render_rfis,
+        "RFIs": render_rfis,
+        "📦 Submittals": render_submittals,
+        "Submittals": render_submittals,
+        "📤 Transmittals": render_transmittals,
+        "Transmittals": render_transmittals,
+        "📝 Daily Reports": render_daily_reports_standalone,
+        "Daily Reports": render_daily_reports_standalone,
         "🚧 Field Operations": render_field_operations,
         "Field Operations": render_field_operations,
         "📄 Documents": render_documents,

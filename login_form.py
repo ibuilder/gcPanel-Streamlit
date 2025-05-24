@@ -347,40 +347,40 @@ def render_login_form():
     
     # Enhanced login button with validation
     if st.button("🚀 Sign In Securely", use_container_width=True, type="primary", key="signin_btn"):
-            if not username or not password:
-                st.error("⚠️ Please enter both username/email and password")
+        if not username or not password:
+            st.error("⚠️ Please enter both username/email and password")
+            st.session_state.login_attempts += 1
+        else:
+            # Validate input security
+            is_valid, error_msg = _validate_input_security(username, password)
+            if not is_valid:
+                st.error(f"⚠️ {error_msg}")
                 st.session_state.login_attempts += 1
+                _log_security_event("INVALID_INPUT", username, False)
             else:
-                # Validate input security
-                is_valid, error_msg = _validate_input_security(username, password)
-                if not is_valid:
-                    st.error(f"⚠️ {error_msg}")
-                    st.session_state.login_attempts += 1
-                    _log_security_event("INVALID_INPUT", username, False)
-                else:
-                    # Store the form submission in session state for processing in the main app
-                    st.session_state.login_username = username
-                    st.session_state.login_password = password
-                    st.session_state.login_form_submitted = True
-                    
-                    # Reset attempts on valid input
-                    st.session_state.login_attempts = 0
-                    _log_security_event("LOGIN_ATTEMPT", username, True)
-                    
-                    # Show loading
-                    with st.spinner("🔄 Authenticating..."):
-                        time.sleep(1.2)
-                    st.success("✅ Login successful!")
-                    time.sleep(0.3)
-                    st.rerun()
-            
-            # Check if account should be locked
-            if st.session_state.login_attempts >= 5:
-                st.session_state.account_locked = True
-                st.session_state.lock_until = datetime.now() + timedelta(minutes=15)
-                _log_security_event("ACCOUNT_LOCKED", username, False)
-                st.error("🔒 Account locked for 15 minutes due to multiple failed attempts")
+                # Store the form submission in session state for processing in the main app
+                st.session_state.login_username = username
+                st.session_state.login_password = password
+                st.session_state.login_form_submitted = True
+                
+                # Reset attempts on valid input
+                st.session_state.login_attempts = 0
+                _log_security_event("LOGIN_ATTEMPT", username, True)
+                
+                # Show loading
+                with st.spinner("🔄 Authenticating..."):
+                    time.sleep(1.2)
+                st.success("✅ Login successful!")
+                time.sleep(0.3)
                 st.rerun()
+        
+        # Check if account should be locked
+        if st.session_state.login_attempts >= 5:
+            st.session_state.account_locked = True
+            st.session_state.lock_until = datetime.now() + timedelta(minutes=15)
+            _log_security_event("ACCOUNT_LOCKED", username, False)
+            st.error("🔒 Account locked for 15 minutes due to multiple failed attempts")
+            st.rerun()
         
     # OAuth section
     st.markdown("---")

@@ -39,6 +39,43 @@ def apply_complete_dark_theme():
         color: var(--text-primary) !important;
     }
     
+    /* Force Dark on Navigation and Toolbar */
+    .stToolbar, [data-testid="stToolbar"],
+    .stHeader, [data-testid="stHeader"],
+    header[data-testid="stHeader"],
+    .main-header, .toolbar {
+        background-color: var(--bg-secondary) !important;
+        color: var(--text-primary) !important;
+        border-bottom: 1px solid var(--border-primary) !important;
+    }
+    
+    /* Logout Button and Navigation Buttons */
+    .stButton > button[kind="secondary"],
+    button[data-testid="baseButton-secondary"],
+    .stButton button,
+    [data-testid="stButton"] button {
+        background-color: var(--bg-card) !important;
+        color: var(--text-primary) !important;
+        border: 1px solid var(--border-primary) !important;
+    }
+    
+    /* Force All Charts and Graphs Dark */
+    .js-plotly-plot, .plotly,
+    .user-select-none, .svg-container,
+    .stPlotlyChart, [data-testid="stPlotlyChart"] {
+        background-color: var(--bg-card) !important;
+        color: var(--text-primary) !important;
+    }
+    
+    /* Plotly Chart Background and Text */
+    .js-plotly-plot .plotly .main-svg,
+    .js-plotly-plot .bg,
+    .modebar, .modebar-container {
+        background-color: var(--bg-card) !important;
+        color: var(--text-primary) !important;
+        fill: var(--text-primary) !important;
+    }
+    
     /* Root Elements - Complete Dark */
     html, body {
         background-color: var(--bg-primary) !important;

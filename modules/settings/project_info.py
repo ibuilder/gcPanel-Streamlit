@@ -318,7 +318,7 @@ def render_form():
         return
     
     # Create tabs for different sections
-    tab1, tab2, tab3 = st.tabs(["Project Details", "Project Contacts", "Project Settings"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Project Details", "Project Contacts", "Contract Information", "Project Settings"])
     
     with tab1:
         st.subheader("Project Details")
@@ -588,6 +588,164 @@ def render_form():
                     st.error("Error updating contact information")
     
     with tab3:
+        st.subheader("AIA Contract Document Numbering")
+        st.markdown("**Configure contract documents using the official AIA numbering system**")
+        
+        with st.form("aia_contract_numbering_form"):
+            st.markdown("#### AIA Document Number Format: **SERIES-TYPE-DELIVERY-SEQUENCE-EDITION**")
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                # AIA Series
+                aia_series = st.selectbox(
+                    "AIA Document Series",
+                    options=[
+                        "A - Owner-Architect Agreements",
+                        "B - Owner-Contractor Agreements", 
+                        "C - Other Agreements",
+                        "D - Documents",
+                        "G - Forms for Contract Administration and Project Management"
+                    ],
+                    index=1,  # Default to B - Owner-Contractor
+                    help="Select the AIA document series that applies to this project"
+                )
+                
+                # AIA Type
+                aia_type = st.selectbox(
+                    "Document Type",
+                    options=[
+                        "1 - Prime Agreements",
+                        "2 - Conditions or Scope of the Agreements",
+                        "3 - Bonds or Qualifications",
+                        "4 - Agreements between Prime and Sub-Contractors",
+                        "5 - Guides",
+                        "7 - Bid Documents and Construction Forms",
+                        "8 - Forms or Documents Specific to the Architect"
+                    ],
+                    index=0,  # Default to 1 - Prime Agreements
+                    help="Select the type of contract document"
+                )
+                
+                # Project Delivery Method
+                aia_delivery = st.selectbox(
+                    "Project Delivery Method",
+                    options=[
+                        "0 - Traditional Design-Bid-Build",
+                        "1 - Design-Build",
+                        "2 - Construction Manager as Adviser",
+                        "3 - Construction Manager as Constructor", 
+                        "4 - Integrated Project Delivery (IPD)",
+                        "5 - Public-Private Partnership",
+                        "6 - Multiple Prime Contracting"
+                    ],
+                    index=0,  # Default to Traditional
+                    help="Select the project delivery method being used"
+                )
+            
+            with col2:
+                # Sequence Number
+                aia_sequence = st.selectbox(
+                    "Document Sequence",
+                    options=[
+                        "1 - First in Series",
+                        "2 - Second in Series", 
+                        "3 - Third in Series",
+                        "4 - Fourth in Series",
+                        "5 - Fifth in Series"
+                    ],
+                    index=0,  # Default to First
+                    help="Select the sequence number for this document type"
+                )
+                
+                # Edition Year
+                aia_edition = st.selectbox(
+                    "AIA Document Edition",
+                    options=[
+                        "2017 - 2017 Edition",
+                        "2014 - 2014 Edition",
+                        "2007 - 2007 Edition",
+                        "1997 - 1997 Edition"
+                    ],
+                    index=0,  # Default to 2017
+                    help="Select the AIA document edition year"
+                )
+                
+                # Generated Contract Number Display
+                st.markdown("#### Generated Contract Number:")
+                series_code = aia_series.split(' - ')[0]
+                type_code = aia_type.split(' - ')[0] 
+                delivery_code = aia_delivery.split(' - ')[0]
+                sequence_code = aia_sequence.split(' - ')[0]
+                edition_code = aia_edition.split(' - ')[0]
+                
+                contract_number = f"{series_code}{type_code}{delivery_code}{sequence_code}™–{edition_code}"
+                st.code(contract_number, language=None)
+                
+                st.markdown("**Highland Tower Development Primary Contract:**")
+                st.markdown(f"**{contract_number}**")
+            
+            # Contract Details
+            st.markdown("---")
+            st.markdown("#### Contract Information")
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                contract_title = st.text_input(
+                    "Contract Title",
+                    value=project_info.get('contract_title', {}).get('value', 'Highland Tower Development Construction Agreement'),
+                    help="Official title of the contract document"
+                )
+                
+                contract_value = st.text_input(
+                    "Contract Value",
+                    value=project_info.get('contract_value', {}).get('value', '$45,500,000'),
+                    help="Total contract value for the project"
+                )
+            
+            with col2:
+                contract_date = st.date_input(
+                    "Contract Execution Date",
+                    help="Date when the contract was executed"
+                )
+                
+                retainage_percentage = st.number_input(
+                    "Retainage Percentage",
+                    min_value=0.0,
+                    max_value=15.0,
+                    value=5.0,
+                    step=0.5,
+                    help="Percentage of retainage to be held"
+                )
+            
+            # Submit button
+            if st.form_submit_button("Save Contract Information", type="primary"):
+                # Update contract information
+                updates = {
+                    'aia_series': aia_series,
+                    'aia_type': aia_type,
+                    'aia_delivery': aia_delivery,
+                    'aia_sequence': aia_sequence,
+                    'aia_edition': aia_edition,
+                    'contract_number': contract_number,
+                    'contract_title': contract_title,
+                    'contract_value': contract_value,
+                    'contract_date': str(contract_date),
+                    'retainage_percentage': str(retainage_percentage)
+                }
+                
+                success = True
+                for key, value in updates.items():
+                    if not update_project_info(key, value):
+                        success = False
+                
+                if success:
+                    st.success(f"✅ Contract information updated successfully! Contract Number: **{contract_number}**")
+                else:
+                    st.error("Error updating contract information")
+    
+    with tab4:
         st.subheader("Project Settings")
         
         with st.form("project_settings_form"):

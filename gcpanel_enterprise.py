@@ -187,36 +187,157 @@ def apply_enterprise_theme():
     </style>
     """, unsafe_allow_html=True)
 
-# Render login
+# Enhanced Login with Emotional Intelligence & About Section
 def render_login():
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
+    # Emotional Welcome Banner
+    st.markdown("""
+    <div class="enterprise-card" style="background: linear-gradient(135deg, #4A90E2 0%, #5BA0F2 100%); color: white; text-align: center; margin-bottom: 2rem;">
+        <h1 style="margin: 0; color: white; font-size: 2.5rem;">🏗️ Welcome to gcPanel</h1>
+        <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; opacity: 0.9;">
+            You're about to manage something extraordinary
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Emotional Intelligence - Addressing the overwhelm
+    st.markdown("""
+    <div class="enterprise-card" style="background: linear-gradient(135deg, #28A745 0%, #34CE57 100%); color: white; text-align: center;">
+        <h3 style="margin: 0; color: white;">🌟 Building Dreams Into Reality</h3>
+        <p style="margin: 0.5rem 0 0 0; opacity: 0.9; line-height: 1.6;">
+            Managing a $45.5M project feels overwhelming? That's normal! You're orchestrating the creation of 
+            120 homes and 8 businesses where families will live and dreams will flourish. 
+            <strong>gcPanel makes the complex simple.</strong>
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Main login area with tabs
+    tabs = st.tabs(["🔐 Login", "📖 About gcPanel", "🎯 Why You'll Succeed"])
+    
+    with tabs[0]:
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown("""
+            <div class="enterprise-card" style="text-align: center;">
+                <h2 style="color: #4A90E2;">Ready to Build Excellence?</h2>
+                <p style="color: #6C757D;">Your construction command center awaits</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Emotional support messaging
+            time_of_day = datetime.now().hour
+            if time_of_day < 12:
+                greeting = "Good morning! Ready to make progress on Highland Tower?"
+            elif time_of_day < 17:
+                greeting = "Good afternoon! Let's see how your project is advancing!"
+            else:
+                greeting = "Good evening! Time to review today's achievements!"
+            
+            st.info(f"💪 {greeting}")
+            
+            username = st.text_input("👤 Username", placeholder="Enter your username")
+            password = st.text_input("🔒 Password", type="password", placeholder="Enter your password")
+            
+            # Encouraging messages
+            if username and not password:
+                st.success("Great! Now enter your password to access your project dashboard.")
+            elif username and password:
+                st.success("Perfect! Ready to log in and continue building excellence!")
+            
+            col_a, col_b = st.columns(2)
+            with col_a:
+                if st.button("🚀 Begin Building", use_container_width=True):
+                    if username and password:
+                        st.session_state.authenticated = True
+                        st.session_state.username = username
+                        st.session_state.user_role = "admin" if username.lower() == "admin" else "user"
+                        # Welcome message with emotional support
+                        st.balloons()
+                        st.success(f"Welcome back, {username}! Highland Tower is in excellent hands. Let's continue building something amazing together!")
+                        st.rerun()
+                    else:
+                        st.error("Please enter both username and password to access your project")
+            
+            with col_b:
+                if st.button("👀 Try Demo", use_container_width=True):
+                    st.session_state.authenticated = True
+                    st.session_state.username = "Demo User"
+                    st.session_state.user_role = "user"
+                    st.success("Welcome to the Demo! Explore how gcPanel transforms construction management.")
+                    st.rerun()
+    
+    with tabs[1]:
         st.markdown("""
-        <div class="enterprise-card" style="text-align: center;">
-            <h1>🏗️ gcPanel Enterprise</h1>
-            <p>Highland Tower Development</p>
+        <div class="enterprise-card">
+            <h2 style="color: #4A90E2;">🏗️ About Highland Tower Development</h2>
+            <p><strong>Project Vision:</strong> A stunning 15-story mixed-use development that will become a cornerstone of the community.</p>
+            
+            <h3 style="color: #4A90E2;">📊 Project Scale</h3>
+            <ul>
+                <li><strong>Investment:</strong> $45.5 Million</li>
+                <li><strong>Residential Units:</strong> 120 modern apartments</li>
+                <li><strong>Commercial Spaces:</strong> 8 retail units</li>
+                <li><strong>Height:</strong> 15 stories above ground + 2 below</li>
+                <li><strong>Timeline:</strong> 24-month construction period</li>
+            </ul>
+            
+            <h3 style="color: #4A90E2;">🚀 What gcPanel Does For You</h3>
+            <p>gcPanel transforms overwhelming complexity into clear, actionable insights:</p>
+            <ul>
+                <li><strong>🧠 AI-Powered Intelligence:</strong> Predicts issues before they happen</li>
+                <li><strong>💰 Smart Cost Management:</strong> Tracks every dollar with precision</li>
+                <li><strong>👷 Safety Excellence:</strong> Keeps your team safe and compliant</li>
+                <li><strong>📊 Real-Time Insights:</strong> See progress as it happens</li>
+                <li><strong>🏢 BIM Integration:</strong> Visualize your building in 3D</li>
+            </ul>
         </div>
         """, unsafe_allow_html=True)
         
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
+        # Emotional reassurance section
+        st.markdown("""
+        <div class="enterprise-card" style="background: linear-gradient(135deg, #FFC107 0%, #FFD54F 100%); color: #333;">
+            <h3 style="color: #333;">💡 Remember: Every Skyscraper Started Here</h3>
+            <p style="color: #333; line-height: 1.6;">
+                Feeling overwhelmed by the scale? That's the mark of someone who understands the magnitude of what you're creating.
+                The Empire State Building, One World Trade Center, Burj Khalifa - they all started with someone like you, 
+                looking at plans and wondering "How do we make this real?" 
+                <strong>gcPanel is your guide from blueprint to ribbon cutting.</strong>
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with tabs[2]:
+        st.markdown("""
+        <div class="enterprise-card">
+            <h2 style="color: #4A90E2;">🎯 Why You're Going to Succeed</h2>
+            
+            <h3 style="color: #28A745;">🔧 You Have the Right Tools</h3>
+            <p>gcPanel gives you the same advanced technology used by Fortune 500 construction companies. 
+            You're not just managing a project - you're commanding a digital construction empire.</p>
+            
+            <h3 style="color: #28A745;">📈 Smart Decision Making</h3>
+            <p>Every great project manager has felt that "Where do I even start?" moment. 
+            The difference? They had systems. gcPanel IS your system.</p>
+            
+            <h3 style="color: #28A745;">👥 You're Not Alone</h3>
+            <p>Behind every metric, every dashboard, every alert is a tool designed by people who've built 
+            hundreds of projects. You're standing on the shoulders of giants.</p>
+            
+            <h3 style="color: #28A745;">🏆 The End Goal</h3>
+            <p>In 24 months, you'll watch families move into beautiful homes and businesses open their doors 
+            in spaces you helped create. That's not just construction - that's community building.</p>
+        </div>
+        """, unsafe_allow_html=True)
         
-        col_a, col_b = st.columns(2)
-        with col_a:
-            if st.button("Login", use_container_width=True):
-                if username and password:
-                    st.session_state.authenticated = True
-                    st.session_state.username = username
-                    st.session_state.user_role = "admin" if username.lower() == "admin" else "user"
-                    st.rerun()
-                else:
-                    st.error("Please enter credentials")
-        with col_b:
-            if st.button("Demo Access", use_container_width=True):
-                st.session_state.authenticated = True
-                st.session_state.username = "Demo User"
-                st.session_state.user_role = "user"
-                st.rerun()
+        # Motivational call to action
+        st.markdown("""
+        <div class="enterprise-card" style="background: linear-gradient(135deg, #4A90E2 0%, #5BA0F2 100%); color: white; text-align: center;">
+            <h3 style="margin: 0; color: white;">Ready to Build Something Amazing?</h3>
+            <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">
+                Click "Begin Building" above and let's turn those blueprints into reality! 🚀
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
 # Render sidebar
 def render_sidebar():

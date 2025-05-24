@@ -10,6 +10,60 @@ import pandas as pd
 from modules.analytics.analysis import render as render_analysis
 from modules.analytics.business_intelligence import render_business_intelligence
 
+# Enhanced analytics functions moved from dashboard
+def render_enhanced_project_status_section(current_project):
+    """Render enhanced project status with real-time data integration"""
+    st.markdown("### 🏗️ Enhanced Project Status")
+    
+    # Real-time project metrics
+    col1, col2, col3, col4, col5 = st.columns(5)
+    
+    with col1:
+        st.metric("Overall Progress", "72%", "+3% this week", delta_color="normal")
+    
+    with col2:
+        st.metric("Budget Status", "$32.8M", "-2.3% under budget", delta_color="inverse")
+    
+    with col3:
+        st.metric("Schedule Status", "On Track", "+2 days ahead", delta_color="normal")
+    
+    with col4:
+        st.metric("Safety Score", "98%", "+2% this month", delta_color="normal")
+    
+    with col5:
+        st.metric("Quality Index", "94%", "+3% this year")
+
+def render_critical_path_alerts_section():
+    """Render real-time critical path alerts"""
+    st.markdown("### ⚠️ Critical Path Alerts")
+    
+    st.warning("**Alert:** Structural steel delivery delayed by 2 days - may impact schedule")
+    st.info("**Notice:** MEP coordination meeting scheduled for tomorrow")
+
+def render_weather_impact_section():
+    """Render weather conditions affecting construction"""
+    st.markdown("### 🌤️ Weather Impact Analysis")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Today's Weather", "Sunny, 75°F", "Good for concrete work")
+    with col2:
+        st.metric("Tomorrow's Forecast", "Partly Cloudy, 72°F", "Optimal conditions")
+
+def render_customizable_widgets_section():
+    """Render customizable dashboard widgets"""
+    st.markdown("### 📊 Analytics Widgets")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("**Recent Achievements:**")
+        st.markdown("- ✅ Foundation phase completed")
+        st.markdown("- ✅ Safety milestone reached")
+    with col2:
+        st.markdown("**Upcoming Milestones:**")
+        st.markdown("- 🎯 Structural steel completion")
+        st.markdown("- 🎯 MEP rough-in start")
+
 def render_analytics_dashboard():
     """Render the analytics dashboard overview."""
     st.subheader("Analytics Dashboard")

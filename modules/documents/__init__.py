@@ -30,6 +30,7 @@ def render():
         "📋 Project Specifications", 
         "📄 Contract Documents",
         "📏 Sheet Numbering Guide",
+        "🎬 Processing Demo",
         "📊 Document Analytics",
         "🔍 Document Search",
         "📤 Document Sharing"
@@ -47,13 +48,16 @@ def render():
     with tabs[3]:  # Sheet Numbering Guide
         render_sheet_numbering_guide()
     
-    with tabs[4]:  # Document Analytics
+    with tabs[4]:  # Processing Demo
+        render_document_processing_demo()
+    
+    with tabs[5]:  # Document Analytics
         render_document_analytics()
     
-    with tabs[5]:  # Document Search
+    with tabs[6]:  # Document Search
         render_document_search()
     
-    with tabs[6]:  # Document Sharing
+    with tabs[7]:  # Document Sharing
         render_document_sharing()
 
 def render_drawings_management():
@@ -1036,3 +1040,148 @@ def render_comment_panel():
             st.markdown(f"**{comment['user']}** ({comment['priority']})")
             st.markdown(f"{comment['text']}")
             st.divider()
+
+def render_document_processing_demo():
+    """Render animated document processing demonstration for Highland Tower Development"""
+    from components.progress_visualizer import (
+        render_document_progress_animation,
+        render_batch_progress_visualization,
+        render_real_time_processing_stats,
+        simulate_document_processing
+    )
+    
+    st.markdown("### 🎬 Document Processing Demonstrations")
+    st.markdown("Experience the animated progress visualizations used throughout gcPanel for Highland Tower Development document processing.")
+    
+    # Demo selection
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        demo_type = st.selectbox(
+            "Select Demo Type",
+            ["Single Document Upload", "Document Analysis", "Batch Processing", "Real-time Statistics"]
+        )
+    
+    with col2:
+        document_type = st.selectbox(
+            "Document Type",
+            ["Construction Plans", "Specifications", "Submittal", "RFI Response", "Change Order"]
+        )
+    
+    st.markdown("---")
+    
+    if demo_type == "Single Document Upload":
+        st.markdown("#### 📤 Single Document Upload Demo")
+        st.markdown("See how documents are uploaded and processed for Highland Tower Development:")
+        
+        if st.button("🚀 Start Upload Demo", type="primary"):
+            # Highland Tower specific document examples
+            documents = {
+                "Construction Plans": "Highland Tower - Structural Plans Sheet S-101",
+                "Specifications": "Highland Tower - Division 03 Concrete Specifications",
+                "Submittal": "Highland Tower - Curtain Wall System Submittal",
+                "RFI Response": "Highland Tower - Foundation Design RFI-024 Response",
+                "Change Order": "Highland Tower - HVAC System Change Order CO-015"
+            }
+            
+            document_name = documents.get(document_type, "Highland Tower Document")
+            simulate_document_processing(document_name, "upload")
+    
+    elif demo_type == "Document Analysis":
+        st.markdown("#### 🔍 Document Analysis Demo")
+        st.markdown("Watch how gcPanel analyzes construction documents:")
+        
+        if st.button("🔬 Start Analysis Demo", type="primary"):
+            documents = {
+                "Construction Plans": "Highland Tower - Architectural Plans A-201",
+                "Specifications": "Highland Tower - MEP Specifications Division 23",
+                "Submittal": "Highland Tower - Elevator System Technical Submittal",
+                "RFI Response": "Highland Tower - Structural Steel RFI-031 Response",
+                "Change Order": "Highland Tower - Electrical Upgrade CO-018"
+            }
+            
+            document_name = documents.get(document_type, "Highland Tower Document")
+            simulate_document_processing(document_name, "analysis")
+    
+    elif demo_type == "Batch Processing":
+        st.markdown("#### 📄 Batch Document Processing")
+        st.markdown("Multiple Highland Tower Development documents being processed simultaneously:")
+        
+        # Highland Tower batch processing example
+        batch_files = [
+            {"name": "Highland Tower - Site Plan A-001.pdf", "progress": 1.0, "status": "complete", "message": "Analysis complete"},
+            {"name": "Highland Tower - Floor Plans A-101.pdf", "progress": 0.75, "status": "processing", "message": "Extracting dimensions..."},
+            {"name": "Highland Tower - Elevations A-201.pdf", "progress": 0.45, "status": "processing", "message": "Analyzing facade details..."},
+            {"name": "Highland Tower - Sections A-301.pdf", "progress": 0.15, "status": "processing", "message": "Reading document structure..."},
+            {"name": "Highland Tower - Details A-401.pdf", "progress": 0.0, "status": "pending", "message": "Waiting in queue..."},
+            {"name": "Highland Tower - Structural S-101.pdf", "progress": 0.85, "status": "processing", "message": "Validating calculations..."}
+        ]
+        
+        render_batch_progress_visualization(batch_files)
+        
+        # Add refresh button for demo
+        if st.button("🔄 Refresh Status"):
+            st.rerun()
+    
+    elif demo_type == "Real-time Statistics":
+        st.markdown("#### 📊 Real-time Processing Statistics")
+        st.markdown("Live statistics from Highland Tower Development document processing:")
+        
+        # Highland Tower processing stats
+        stats = {
+            "processed": 142,
+            "total": 178,
+            "rate": "3.7 files/min",
+            "eta": "00:09:42"
+        }
+        
+        render_real_time_processing_stats(stats)
+        
+        # Sample current processing
+        st.markdown("#### Currently Processing:")
+        render_document_progress_animation(
+            process_type="analysis",
+            current_step=2,
+            total_steps=5,
+            message="Analyzing Highland Tower Mechanical Plans M-201...",
+            details={
+                "Document Type": "MEP Plans",
+                "File Size": "8.7 MB",
+                "Pages": "24",
+                "Progress": "Extracting equipment schedules"
+            }
+        )
+    
+    # Additional demo controls
+    st.markdown("---")
+    st.markdown("#### ⚙️ Demo Controls")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        if st.button("🎯 Custom Demo"):
+            st.info("Custom processing demos can be configured for specific Highland Tower document workflows.")
+    
+    with col2:
+        if st.button("📋 Export Demo"):
+            st.success("Demo configuration exported for Highland Tower team training.")
+    
+    with col3:
+        if st.button("🔄 Reset All"):
+            st.rerun()
+    
+    # Feature information
+    st.markdown("---")
+    st.markdown("#### 💡 Progress Visualization Features")
+    st.markdown("""
+    **Available throughout gcPanel for Highland Tower Development:**
+    
+    ✅ **Real-time Progress Tracking** - Live updates during document processing  
+    ✅ **Animated Step Indicators** - Visual feedback for each processing stage  
+    ✅ **Batch Processing Views** - Monitor multiple documents simultaneously  
+    ✅ **Custom Process Types** - Different animations for uploads, analysis, conversions  
+    ✅ **Detailed Statistics** - Processing rates, ETAs, and completion metrics  
+    ✅ **Error Handling** - Clear visual feedback for any processing issues  
+    ✅ **Mobile Responsive** - Works seamlessly on tablets and mobile devices  
+    ✅ **Integration Ready** - Connects with all Highland Tower document workflows  
+    """)

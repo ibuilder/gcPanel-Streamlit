@@ -348,6 +348,45 @@ class AIABillingModule:
             total_completed = schedule_df['total_completed_stored'].sum()
             completion_percentage = (total_completed / project_info['adjusted_contract_amount']) * 100
             st.metric("Overall Completion", f"{completion_percentage:.1f}%")
+        
+        # Submit Application Section
+        st.markdown("---")
+        st.markdown("#### Submit Application")
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        
+        with col2:
+            if st.button("🏗️ Create New G702 Application", type="primary", use_container_width=True):
+                # Generate new application number
+                current_data = self._load_data()
+                new_app_number = len(current_data.get("billing_history", [])) + 1
+                
+                # Create new billing entry
+                new_billing = {
+                    "application_number": new_app_number,
+                    "period_ending": datetime.now().strftime("%Y-%m-%d"),
+                    "total_completed_stored": total_completed,
+                    "total_retainage": schedule_df['retainage'].sum(),
+                    "total_earned_less_retainage": total_completed - schedule_df['retainage'].sum(),
+                    "less_previous_payments": 0.0,  # Would calculate from previous applications
+                    "current_payment_due": total_completed - schedule_df['retainage'].sum(),
+                    "status": "Draft",
+                    "created_date": datetime.now().strftime("%Y-%m-%d"),
+                    "approved_date": None
+                }
+                
+                # Add to billing history
+                if "billing_history" not in current_data:
+                    current_data["billing_history"] = []
+                current_data["billing_history"].append(new_billing)
+                
+                # Save updated data
+                with open(self.data_file_path, 'w') as f:
+                    json.dump(current_data, f, indent=2)
+                
+                st.success(f"✅ New G702 Application #{new_app_number} created successfully!")
+                st.info("Application saved as Draft. Review and submit when ready.")
+                st.rerun()
     
     def render_g703_schedule(self):
         """Render AIA G703 Schedule of Values"""

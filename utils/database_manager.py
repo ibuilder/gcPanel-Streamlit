@@ -9,8 +9,7 @@ Provides production-ready database features:
 """
 
 import os
-import psycopg2
-from psycopg2 import pool
+import sqlite3
 import logging
 from datetime import datetime
 from typing import Dict, List, Any, Optional
@@ -30,35 +29,28 @@ class DatabaseManager:
         }
         
     def initialize_connection_pool(self):
-        """Initialize database connection pool for production performance."""
+        """Initialize local SQLite database for Highland Tower Development."""
         try:
-            database_url = os.environ.get('DATABASE_URL')
-            if not database_url:
-                self.logger.warning("DATABASE_URL not found, using SQLite fallback")
-                return
+            # Use local SQLite database
+            db_path = "data/highland_tower.db"
+            os.makedirs("data", exist_ok=True)
             
-            # Create connection pool
-            self.connection_pool = psycopg2.pool.ThreadedConnectionPool(
-                minconn=1,
-                maxconn=20,
-                dsn=database_url
-            )
+            # Create connection to SQLite
+            self.connection = sqlite3.connect(db_path, check_same_thread=False)
+            self.connection.row_factory = sqlite3.Row
             
-            self.logger.info("Database connection pool initialized")
+            self.logger.info("Local SQLite database initialized successfully")
             
         except Exception as e:
-            self.logger.error(f"Failed to initialize connection pool: {str(e)}")
+            self.logger.error(f"Failed to initialize local database: {str(e)}")
     
     def get_connection(self):
-        """Get connection from pool."""
-        if self.connection_pool:
-            return self.connection_pool.getconn()
-        return None
+        """Get SQLite database connection."""
+        return self.connection
     
     def return_connection(self, connection):
-        """Return connection to pool."""
-        if self.connection_pool and connection:
-            self.connection_pool.putconn(connection)
+        """SQLite doesn't need connection pooling."""
+        pass
     
     def execute_query(self, query: str, params: Optional[tuple] = None) -> List[Dict[str, Any]]:
         """Execute query with performance monitoring."""
@@ -72,25 +64,25 @@ class DatabaseManager:
             if not connection:
                 return []
             
-            with connection.cursor() as cursor:
-                cursor.execute(query, params)
+            cursor = connection.cursor()
+            cursor.execute(query, params or ())
+            
+            # For SELECT queries, fetch results
+            if query.strip().upper().startswith('SELECT'):
+                columns = [desc[0] for desc in cursor.description]
+                rows = cursor.fetchall()
+                results = [dict(zip(columns, row)) for row in rows]
+            else:
+                connection.commit()
+                results = []
+            
+            # Check for slow queries
+            execution_time = (datetime.now() - start_time).total_seconds()
+            if execution_time > 1.0:  # Queries over 1 second
+                self.query_metrics["slow_queries"] += 1
+                self.logger.warning(f"Slow query detected: {execution_time:.2f}s")
                 
-                # For SELECT queries, fetch results
-                if query.strip().upper().startswith('SELECT'):
-                    columns = [desc[0] for desc in cursor.description]
-                    rows = cursor.fetchall()
-                    results = [dict(zip(columns, row)) for row in rows]
-                else:
-                    connection.commit()
-                    results = []
-                
-                # Check for slow queries
-                execution_time = (datetime.now() - start_time).total_seconds()
-                if execution_time > 1.0:  # Queries over 1 second
-                    self.query_metrics["slow_queries"] += 1
-                    self.logger.warning(f"Slow query detected: {execution_time:.2f}s")
-                
-                return results
+            return results
                 
         except Exception as e:
             self.query_metrics["failed_queries"] += 1
@@ -98,16 +90,12 @@ class DatabaseManager:
             if connection:
                 connection.rollback()
             return []
-            
         finally:
-            if connection:
-                self.return_connection(connection)
+            pass  # SQLite connection stays open
     
     def get_connection_count(self) -> int:
         """Get current connection pool size."""
-        if self.connection_pool:
-            return len(self.connection_pool._pool)
-        return 0
+        return 1  # SQLite uses single connection
     
     def get_metrics(self) -> Dict[str, Any]:
         """Get database performance metrics."""

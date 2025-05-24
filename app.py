@@ -256,7 +256,7 @@ def render_main_content():
             st.write("This module contains your advanced construction management features with CRUD functionality, digital signatures, and sophisticated tools.")
 
 def apply_theme():
-    """Apply dark theme styling"""
+    """Apply consistent Highland Tower branding for both light and dark themes"""
     if st.session_state.theme == "dark":
         st.markdown("""
         <style>
@@ -266,15 +266,70 @@ def apply_theme():
         }
         .stSidebar {
             background-color: #262730;
+            border-right: 2px solid #FF6B35;
         }
         .stButton > button {
             background-color: #FF6B35;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         .stButton > button:hover {
             background-color: #E55A2B;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
+        }
+        .stMetric {
+            background-color: #1E1E1E;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #FF6B35;
+        }
+        h1, h2, h3 {
+            color: #FF6B35;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <style>
+        .stApp {
+            background-color: #FFFFFF;
+            color: #1E1E1E;
+        }
+        .stSidebar {
+            background-color: #F8F9FA;
+            border-right: 2px solid #FF6B35;
+        }
+        .stButton > button {
+            background-color: #FF6B35;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .stButton > button:hover {
+            background-color: #E55A2B;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
+        }
+        .stMetric {
+            background-color: #F8F9FA;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #FF6B35;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #FF6B35;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .stSidebar .stMarkdown {
+            color: #1E1E1E;
         }
         </style>
         """, unsafe_allow_html=True)

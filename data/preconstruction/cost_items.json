@@ -1,0 +1,50 @@
+[
+  {
+    "item_id": "CI-001",
+    "estimate_id": "EST-HTD-004",
+    "csi_code": "01 11 00",
+    "description": "Summary of Work",
+    "division": "01 General Requirements",
+    "quantity": 1,
+    "unit": "LS",
+    "unit_cost": 150000,
+    "total_cost": 150000,
+    "labor_cost": 75000,
+    "material_cost": 50000,
+    "equipment_cost": 25000,
+    "subcontractor": "",
+    "notes": "Project overview and coordination"
+  },
+  {
+    "item_id": "CI-002",
+    "estimate_id": "EST-HTD-004",
+    "csi_code": "03 30 00",
+    "description": "Cast-in-Place Concrete",
+    "division": "03 Concrete",
+    "quantity": 6500,
+    "unit": "CY",
+    "unit_cost": 500,
+    "total_cost": 3250000,
+    "labor_cost": 1950000,
+    "material_cost": 975000,
+    "equipment_cost": 325000,
+    "subcontractor": "Reliable Concrete LLC",
+    "notes": "Includes all structural concrete work"
+  },
+  {
+    "item_id": "CI-003",
+    "estimate_id": "EST-HTD-004",
+    "csi_code": "05 12 00",
+    "description": "Structural Steel",
+    "division": "05 Metals",
+    "quantity": 850,
+    "unit": "TON",
+    "unit_cost": 4500,
+    "total_cost": 3825000,
+    "labor_cost": 1530000,
+    "material_cost": 1912500,
+    "equipment_cost": 382500,
+    "subcontractor": "Highland Steel Works",
+    "notes": "Structural steel frame and connections"
+  }
+]

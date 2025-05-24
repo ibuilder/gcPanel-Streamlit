@@ -329,12 +329,20 @@ def render_dashboard():
 
 def load_module_safely(module_path, fallback_paths=None):
     """Safe module loader with fallback options"""
+    import sys
+    import os
+    
+    # Add current directory to Python path
+    if os.getcwd() not in sys.path:
+        sys.path.insert(0, os.getcwd())
+    
     try:
+        # Try direct import first
         module = __import__(module_path, fromlist=['render'])
         if hasattr(module, 'render'):
             module.render()
             return True
-    except ImportError:
+    except (ImportError, ModuleNotFoundError):
         pass
     
     # Try fallback paths
@@ -345,7 +353,7 @@ def load_module_safely(module_path, fallback_paths=None):
                 if hasattr(module, 'render'):
                     module.render()
                     return True
-            except ImportError:
+            except (ImportError, ModuleNotFoundError):
                 continue
     return False
 
@@ -365,13 +373,17 @@ def render_main_content():
         elif current_menu == "Safety":
             load_module_safely('modules.safety')
         elif current_menu == "Contracts":
-            if not load_module_safely('modules.contracts'):
+            try:
                 import modules.contracts as contracts_module
                 contracts_module.render()
+            except ImportError:
+                load_module_safely('modules.contracts')
         elif current_menu == "Cost Management":
-            if not load_module_safely('modules.cost_management'):
+            try:
                 import modules.cost_management as cost_module
                 cost_module.render()
+            except ImportError:
+                load_module_safely('modules.cost_management')
         elif current_menu == "BIM":
             if not load_module_safely('modules.bim'):
                 load_module_safely('modules.bim_viewer.basic_viewer', ['modules.standalone_bim'])

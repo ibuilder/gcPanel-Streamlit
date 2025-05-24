@@ -127,6 +127,31 @@ def render_sidebar():
             if st.button("📁 Documents", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "Documents" else "secondary"):
                 st.session_state["current_menu"] = "Documents"
                 st.rerun()
+            
+            # Additional sophisticated modules you built
+            if st.button("❓ RFIs", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "RFIs" else "secondary"):
+                st.session_state["current_menu"] = "RFIs"
+                st.rerun()
+            
+            if st.button("📋 Daily Reports", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "Daily Reports" else "secondary"):
+                st.session_state["current_menu"] = "Daily Reports"
+                st.rerun()
+            
+            if st.button("📅 Scheduling", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "Scheduling" else "secondary"):
+                st.session_state["current_menu"] = "Scheduling"
+                st.rerun()
+            
+            if st.button("🔧 Settings", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "Settings" else "secondary"):
+                st.session_state["current_menu"] = "Settings"
+                st.rerun()
+            
+            if st.button("🤖 AI Assistant", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "AI Assistant" else "secondary"):
+                st.session_state["current_menu"] = "AI Assistant"
+                st.rerun()
+            
+            if st.button("📱 Mobile Companion", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "Mobile Companion" else "secondary"):
+                st.session_state["current_menu"] = "Mobile Companion"
+                st.rerun()
         
         st.divider()
         
@@ -298,93 +323,63 @@ def render_main_content():
     """Render main content based on selected module"""
     current_menu = st.session_state.get("current_menu", "Dashboard")
     
+    # Add modules path to make imports work
+    import sys
+    import os
+    if '.' not in sys.path:
+        sys.path.append('.')
+    
     try:
         if current_menu == "Dashboard":
             render_dashboard()
         elif current_menu == "Preconstruction":
-            # Import and use the sophisticated preconstruction module
-            import modules.preconstruction
-            modules.preconstruction.render()
+            from modules.preconstruction import render as render_preconstruction
+            render_preconstruction()
         elif current_menu == "Engineering":
-            # Import the advanced engineering module
-            try:
-                import modules.engineering
-                modules.engineering.render()
-            except ImportError:
-                import modules.rfis
-                modules.rfis.render()
+            from modules.engineering import render as render_engineering
+            render_engineering()
         elif current_menu == "Field Operations":
-            # Import field operations with daily reports and photo logs
-            try:
-                import modules.field_operations
-                modules.field_operations.render()
-            except ImportError:
-                import modules.daily_reports
-                modules.daily_reports.render()
+            from modules.field_operations import render as render_field
+            render_field()
         elif current_menu == "Safety":
-            # Import safety management with incident tracking
-            try:
-                import modules.safety
-                modules.safety.render()
-            except ImportError:
-                st.title("🦺 Safety Management")
-                st.info("Safety module loading...")
+            from modules.safety import render as render_safety
+            render_safety()
         elif current_menu == "Contracts":
-            # Import contracts with CRUD functionality
-            try:
-                import modules.contracts
-                modules.contracts.render()
-            except ImportError:
-                st.title("📄 Contract Management")
-                st.info("Contracts module loading...")
+            from modules.contracts import render as render_contracts
+            render_contracts()
         elif current_menu == "Cost Management":
-            # Import the sophisticated cost management with CRUD
-            try:
-                import modules.cost_management
-                modules.cost_management.render()
-            except ImportError:
-                st.title("💰 Cost Management")
-                st.info("Cost management module loading...")
+            from modules.cost_management import render as render_cost
+            render_cost()
         elif current_menu == "BIM":
-            # Import BIM with 3D viewer and clash detection
-            try:
-                import modules.bim
-                modules.bim.render()
-            except ImportError:
-                try:
-                    import modules.bim_viewer.basic_viewer
-                    modules.bim_viewer.basic_viewer.render()
-                except ImportError:
-                    st.title("🏢 BIM Management")
-                    st.info("BIM module loading...")
+            from modules.bim import render as render_bim
+            render_bim()
         elif current_menu == "Closeout":
-            # Import closeout module
-            try:
-                import modules.closeout
-                modules.closeout.render()
-            except ImportError:
-                st.title("✅ Project Closeout")
-                st.info("Closeout module loading...")
+            from modules.closeout import render as render_closeout
+            render_closeout()
         elif current_menu == "Analytics":
-            # Import analytics module
-            try:
-                import modules.analytics
-                modules.analytics.render()
-            except ImportError:
-                st.title("📈 Analytics & Business Intelligence")
-                st.info("Analytics module loading...")
+            from modules.analytics import render as render_analytics
+            render_analytics()
         elif current_menu == "Documents":
-            # Import document management
-            try:
-                import modules.documents
-                modules.documents.render()
-            except ImportError:
-                try:
-                    import modules.pdf_viewer.pdf_viewer
-                    modules.pdf_viewer.pdf_viewer.render()
-                except ImportError:
-                    st.title("📁 Document Management")
-                    st.info("Documents module loading...")
+            from modules.documents import render as render_documents
+            render_documents()
+        elif current_menu == "RFIs":
+            from modules.rfis import render as render_rfis
+            render_rfis()
+        elif current_menu == "Daily Reports":
+            from modules.daily_reports import render as render_daily
+            render_daily()
+        elif current_menu == "Settings":
+            from modules.settings import render as render_settings
+            render_settings()
+        elif current_menu == "AI Assistant":
+            import modules.ai_assistant as ai_module
+            ai_module.render()
+        elif current_menu == "Mobile Companion":
+            import modules.mobile_companion as mobile_module
+            mobile_module.render()
+        elif current_menu == "Scheduling":
+            from modules.scheduling import render as render_scheduling
+            render_scheduling()
         else:
             st.title(f"🔧 {current_menu}")
             st.info(f"The {current_menu} module is being connected.")

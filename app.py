@@ -258,9 +258,9 @@ def main():
         # Show login page if not authenticated
         if not is_authenticated:
             
-            # Import and render login page
-            from pages.login import login_page
-            login_page()
+            # Import and render clean login form
+            from login_form import render_login_form
+            render_login_form()
             return
             
         # User is authenticated, continue with regular app

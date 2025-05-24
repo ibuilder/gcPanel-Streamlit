@@ -31,6 +31,7 @@ def render():
         "📄 Contract Documents",
         "📏 Sheet Numbering Guide",
         "🎬 Processing Demo",
+        "📋 Reports",
         "📊 Document Analytics",
         "🔍 Document Search",
         "📤 Document Sharing"

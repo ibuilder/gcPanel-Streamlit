@@ -341,7 +341,7 @@ def render_form():
         return
     
     # Create tabs for different sections
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Project Details", "Project Contacts", "Project Delivery Method", "Contract Information", "Project Settings"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Project Details", "Project Contacts", "Project Delivery Method", "Contract Information"])
     
     with tab1:
         st.subheader("Project Details")
@@ -919,35 +919,6 @@ def render_form():
                     st.success(f"✅ Contract information updated successfully! Contract Number: **{contract_number}**")
                 else:
                     st.error("Error updating contract information")
-    
-    with tab4:
-        st.subheader("Project Settings")
-        
-        with st.form("project_settings_form"):
-            # Timezone
-            project_timezone = st.selectbox(
-                "Project Timezone",
-                options=[
-                    "America/New_York", "America/Chicago", "America/Denver", "America/Los_Angeles",
-                    "America/Anchorage", "America/Honolulu", "America/Phoenix", "America/Puerto_Rico"
-                ],
-                index=0 if project_info.get('project_timezone', {}).get('value', '') not in [
-                    "America/New_York", "America/Chicago", "America/Denver", "America/Los_Angeles",
-                    "America/Anchorage", "America/Honolulu", "America/Phoenix", "America/Puerto_Rico"
-                ] else [
-                    "America/New_York", "America/Chicago", "America/Denver", "America/Los_Angeles",
-                    "America/Anchorage", "America/Honolulu", "America/Phoenix", "America/Puerto_Rico"
-                ].index(project_info.get('project_timezone', {}).get('value', '')),
-                help=project_info.get('project_timezone', {}).get('description', '')
-            )
-            
-            # Submit button
-            if st.form_submit_button("Save Project Settings"):
-                # Update the fields
-                if update_project_info('project_timezone', project_timezone):
-                    st.success("Project settings updated successfully")
-                else:
-                    st.error("Error updating project settings")
     
     # Back button
     if st.button("Return to Project Information"):

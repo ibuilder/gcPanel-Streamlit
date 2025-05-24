@@ -327,64 +327,88 @@ def render_dashboard():
                 title='Project Phase Progress (%)', barmode='group')
     st.plotly_chart(fig, use_container_width=True)
 
-@st.cache_resource
-def get_module_loader():
-    """Cached module loader for better performance"""
-    return {
-        "Preconstruction": lambda: __import__('modules.preconstruction', fromlist=['render']).render(),
-        "Engineering": lambda: __import__('modules.engineering', fromlist=['render']).render(),
-        "Field Operations": lambda: __import__('modules.field_operations', fromlist=['render']).render(),
-        "Safety": lambda: __import__('modules.safety', fromlist=['render']).render(),
-        "Contracts": lambda: __import__('modules.contracts', fromlist=['render']).render(),
-        "Cost Management": lambda: __import__('modules.cost_management', fromlist=['render']).render(),
-        "Closeout": lambda: __import__('modules.closeout', fromlist=['render']).render(),
-        "Analytics": lambda: __import__('modules.analytics', fromlist=['render']).render(),
-        "RFIs": lambda: __import__('modules.rfis', fromlist=['render']).render(),
-        "Daily Reports": lambda: __import__('modules.daily_reports', fromlist=['render']).render(),
-        "Submittals": lambda: __import__('modules.submittals', fromlist=['render']).render(),
-        "Transmittals": lambda: __import__('modules.transmittals', fromlist=['render']).render(),
-        "Settings": lambda: __import__('modules.settings', fromlist=['render']).render(),
-        "AI Assistant": lambda: __import__('modules.ai_assistant', fromlist=['render']).render(),
-        "Mobile Companion": lambda: __import__('modules.mobile_companion', fromlist=['render']).render(),
-        "Scheduling": lambda: __import__('modules.scheduling', fromlist=['render']).render(),
-    }
+def load_module_safely(module_path, fallback_paths=None):
+    """Safe module loader with fallback options"""
+    try:
+        module = __import__(module_path, fromlist=['render'])
+        if hasattr(module, 'render'):
+            module.render()
+            return True
+    except ImportError:
+        pass
+    
+    # Try fallback paths
+    if fallback_paths:
+        for fallback in fallback_paths:
+            try:
+                module = __import__(fallback, fromlist=['render'])
+                if hasattr(module, 'render'):
+                    module.render()
+                    return True
+            except ImportError:
+                continue
+    return False
 
 def render_main_content():
-    """Optimized main content renderer with efficient module loading"""
+    """Clean main content renderer with robust module loading"""
     current_menu = st.session_state.get("current_menu", "Dashboard")
     
-    # Performance optimization with spinner
-    with st.spinner(f"Loading {current_menu}..."):
-        try:
-            if current_menu == "Dashboard":
-                render_dashboard()
-            elif current_menu == "BIM":
-                # BIM with fallback to viewer
-                try:
-                    __import__('modules.bim', fromlist=['render']).render()
-                except ImportError:
-                    __import__('modules.bim_viewer.basic_viewer', fromlist=['render']).render()
-            elif current_menu == "Documents":
-                # Documents with fallback to PDF viewer
-                try:
-                    __import__('modules.documents', fromlist=['render']).render()
-                except ImportError:
-                    __import__('modules.pdf_viewer.pdf_viewer', fromlist=['render']).render()
-            else:
-                # Load from cached module loader
-                module_loader = get_module_loader()
-                if current_menu in module_loader:
-                    module_loader[current_menu]()
-                else:
-                    st.title(f"🔧 {current_menu}")
-                    st.info(f"The {current_menu} module is being connected.")
-        
-        except ImportError as e:
-            st.error(f"Module not found: {current_menu}")
-            st.info("This module may not be fully implemented yet.")
-        except Exception as e:
-            st.error(f"Error loading {current_menu}: {str(e)}")
-            st.info("Please try refreshing or selecting a different module.")
+    try:
+        if current_menu == "Dashboard":
+            render_dashboard()
+        elif current_menu == "Preconstruction":
+            load_module_safely('modules.preconstruction')
+        elif current_menu == "Engineering":
+            load_module_safely('modules.engineering')
+        elif current_menu == "Field Operations":
+            load_module_safely('modules.field_operations', ['modules.field'])
+        elif current_menu == "Safety":
+            load_module_safely('modules.safety')
+        elif current_menu == "Contracts":
+            if not load_module_safely('modules.contracts'):
+                import modules.contracts as contracts_module
+                contracts_module.render()
+        elif current_menu == "Cost Management":
+            if not load_module_safely('modules.cost_management'):
+                import modules.cost_management as cost_module
+                cost_module.render()
+        elif current_menu == "BIM":
+            if not load_module_safely('modules.bim'):
+                load_module_safely('modules.bim_viewer.basic_viewer', ['modules.standalone_bim'])
+        elif current_menu == "Closeout":
+            load_module_safely('modules.closeout')
+        elif current_menu == "Analytics":
+            load_module_safely('modules.analytics')
+        elif current_menu == "Documents":
+            if not load_module_safely('modules.documents'):
+                load_module_safely('modules.pdf_viewer.pdf_viewer')
+        elif current_menu == "RFIs":
+            load_module_safely('modules.rfis')
+        elif current_menu == "Daily Reports":
+            load_module_safely('modules.daily_reports', ['modules.field.daily_reports'])
+        elif current_menu == "Submittals":
+            load_module_safely('modules.submittals', ['modules.engineering.submittals'])
+        elif current_menu == "Transmittals":
+            load_module_safely('modules.transmittals', ['modules.engineering.transmittals'])
+        elif current_menu == "Settings":
+            if not load_module_safely('modules.settings'):
+                import modules.settings as settings_module
+                settings_module.render()
+        elif current_menu == "AI Assistant":
+            import modules.ai_assistant as ai_module
+            ai_module.render()
+        elif current_menu == "Mobile Companion":
+            import modules.mobile_companion as mobile_module
+            mobile_module.render()
+        elif current_menu == "Scheduling":
+            load_module_safely('modules.scheduling')
+        else:
+            st.title(f"🔧 {current_menu}")
+            st.info(f"The {current_menu} module is being connected.")
+    
+    except Exception as e:
+        st.error(f"Error loading {current_menu}: {str(e)}")
+        st.info("Please try refreshing or selecting a different module.")
 
 # Removed placeholder functions - now using actual sophisticated modules
 

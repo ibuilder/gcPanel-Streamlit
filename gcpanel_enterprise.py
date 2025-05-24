@@ -189,7 +189,7 @@ def initialize_session_state():
             'alert_level': 'medium'
         },
         'system_health': {
-            'database': 'connected' if db.get_connection() else 'offline',
+            'database': 'connected' if data_manager.get_connection() else 'offline',
             'last_sync': datetime.now().strftime('%H:%M:%S'),
             'active_users': np.random.randint(15, 45)
         }

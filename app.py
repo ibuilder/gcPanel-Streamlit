@@ -83,7 +83,7 @@ def main():
         add_construction_dashboard_js()
         add_construction_help_button()
         
-        # Remove sidebar completely from the entire application
+        # Remove sidebar and ensure full width layout
         st.markdown("""
         <style>
         /* Completely hide all sidebar elements and controls from all pages */
@@ -98,10 +98,25 @@ def main():
         #Sidebar {display: none !important;}
         nav[data-testid="stSidebar"] {display: none !important;}
         nav.st-emotion-cache-zq5wmm.ezrtsby0 {display: none !important;}
-        /* Hide more aggressively with additional selectors */
         .css-1d391kg {display: none !important;}
         .st-hy {display: none !important;}
         .st-emotion-cache-ue6h4q {display: none !important;}
+        
+        /* Force full width layout */
+        .appview-container .main .block-container {
+            max-width: 100% !important;
+            padding-left: 2rem !important;
+            padding-right: 2rem !important;
+        }
+        
+        .stApp > div:first-child {
+            margin-left: 0px !important;
+        }
+        
+        .css-18e3th9, .css-1d391kg {
+            padding-left: 0rem !important;
+            padding-right: 0rem !important;
+        }
         </style>
         """, unsafe_allow_html=True)
         

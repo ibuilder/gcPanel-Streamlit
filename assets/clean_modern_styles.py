@@ -282,11 +282,19 @@ def apply_clean_modern_styles():
         visibility: hidden;
     }
     
-    /* Clean Container Spacing */
+    /* Full Width Container */
     .block-container {
         padding-top: 1rem;
         padding-bottom: 1rem;
-        max-width: 1200px;
+        max-width: 100% !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+    }
+    
+    .main .block-container {
+        max-width: 100% !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
     }
     </style>
     """, unsafe_allow_html=True)

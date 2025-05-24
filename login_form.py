@@ -302,24 +302,30 @@ def render_login_form():
     # Security badge
     st.markdown('<div class="security-badge">🔒 Secure Login</div>', unsafe_allow_html=True)
     
-    # Create tabs for different login options
-    tabs = st.tabs(["🔐 Login", "🎯 Demo Accounts", "📝 Register"])
+    # Show demo accounts prominently at the top
+    st.markdown("### 🎯 Quick Demo Access - Highland Tower Development")
+    st.markdown("**Try the platform instantly with these demo accounts:**")
     
-    with tabs[0]:
-        # Production login form section
-        st.markdown("### 🔐 Sign In to Your Account")
-        
-        # Login form
-        username = st.text_input(
-            "📧 Email or Username", 
-            key="username_input", 
-            placeholder="Enter your email",
-            help="Use your company email address"
-        )
-        
-        password = st.text_input(
-            "🔒 Password", 
-            type="password", 
+    # Demo accounts section
+    render_demo_accounts_pure()
+    
+    # Divider
+    st.markdown("---")
+    
+    # Production login form section
+    st.markdown("### 🔐 Sign In to Your Account")
+    
+    # Login form
+    username = st.text_input(
+        "📧 Email or Username", 
+        key="username_input", 
+        placeholder="Enter your email",
+        help="Use your company email address"
+    )
+    
+    password = st.text_input(
+        "🔒 Password", 
+        type="password", 
             key="password_input", 
             placeholder="Enter your password",
             help="Minimum 8 characters"

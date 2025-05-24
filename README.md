@@ -1,15 +1,15 @@
 # 🏗️ gcPanel Construction Management Platform
 
-**Enterprise-Grade Construction Project Management & BIM Visualization**
+**Enterprise-Grade Construction Project Management & Centralized Analytics**
 
-A comprehensive, production-ready construction management platform that revolutionizes project delivery through cutting-edge technologies, intelligent analytics, and advanced 3D BIM visualization capabilities.
+A comprehensive, production-ready construction management platform that revolutionizes project delivery through cutting-edge technologies, intelligent analytics consolidation, and advanced real-time insights for the Highland Tower Development project.
 
-![gcPanel Version](https://img.shields.io/badge/Version-2.0.0-blue)
+![gcPanel Version](https://img.shields.io/badge/Version-3.0.0-blue)
 ![Python](https://img.shields.io/badge/Python-3.11+-green)
 ![Streamlit](https://img.shields.io/badge/Streamlit-Latest-red)
-![Docker](https://img.shields.io/badge/Docker-Ready-blue)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-Deployable-purple)
-![License](https://img.shields.io/badge/License-Enterprise-orange)
+![Analytics](https://img.shields.io/badge/Analytics-Centralized-orange)
+![Production](https://img.shields.io/badge/Production-Ready-green)
+![License](https://img.shields.io/badge/License-Enterprise-purple)
 
 ## 🚀 **Current Platform Capabilities**
 
@@ -35,13 +35,22 @@ A comprehensive, production-ready construction management platform that revoluti
 - **Section Views** - Dynamic model sectioning and analysis
 - **Model Analytics** - Performance metrics, optimization, and validation
 
-### **📈 Business Intelligence & Analytics**
-- **Executive Dashboards** - Portfolio overview, KPIs, and strategic metrics
-- **Financial Analytics** - Revenue tracking, profit margins, and cash flow analysis
-- **Safety Intelligence** - Incident trends, compliance scores, and training analytics
-- **Productivity Metrics** - Labor efficiency, equipment utilization, and progress tracking
+### **📈 Centralized Analytics Command Center**
+- **Executive Dashboard** - Portfolio overview, KPIs, and strategic insights
+- **Project Analytics** - Enhanced project status, critical alerts, weather impact, customizable widgets
+- **Cost Analytics** - Budget tracking, AI-powered forecasting, risk indicators
+- **Contract Analytics** - Performance metrics, compliance tracking, financial health
+- **Safety Analytics** - Safety scores, AI monitoring, risk assessment
+- **Engineering Analytics** - RFI processing, review status, quality metrics
+- **Field Analytics** - Operations tracking, GPS monitoring, productivity metrics
+- **Business Intelligence** - Advanced analytics and predictive insights
 - **Custom Reporting** - Automated report generation with PDF/Excel export
-- **Predictive Analytics** - Budget forecasting and timeline predictions
+
+### **🏗️ Enhanced Features**
+- **Centralized Analytics** - All module analytics accessible from one location
+- **G702/G703 AIA Billing** - Professional submit button for creating new applications
+- **Risk Analysis Module** - Dedicated contract risk assessment and compliance monitoring
+- **Highland Tower Integration** - Authentic $45.5M project data throughout platform
 
 ## 🏗️ **Featured Project: Highland Tower Development**
 
@@ -183,14 +192,28 @@ kubectl get services -n gcpanel
 - `docker-compose.yml` - Local development and deployment
 - `.dockerignore` - Build optimization
 
-## 📈 **Analytics & Reporting**
+## 📈 **Centralized Analytics & Reporting**
 
-### **Available Reports**
-- **Executive Summary** - High-level KPIs and portfolio overview
-- **Project Performance** - Schedule, budget, and quality metrics
-- **Financial Analysis** - Revenue, profit margins, and cash flow
-- **Safety Reports** - Incident tracking and compliance metrics
-- **Productivity Analysis** - Labor efficiency and resource utilization
+### **Analytics Command Center**
+- **Executive Dashboard** - Portfolio KPIs and strategic insights
+- **Project Analytics** - Enhanced status, critical alerts, weather impact
+- **Cost Analytics** - Budget tracking with AI-powered forecasting
+- **Contract Analytics** - Performance metrics and compliance tracking
+- **Safety Analytics** - Safety scores with AI monitoring
+- **Engineering Analytics** - RFI processing and quality metrics
+- **Field Analytics** - Operations tracking and productivity metrics
+- **Business Intelligence** - Advanced predictive insights
+
+### **AIA G702/G703 Billing Features**
+- **Professional Submit Button** - Create new billing applications
+- **Automatic Numbering** - Sequential application generation
+- **Draft Management** - Save and review before submission
+- **Highland Tower Data** - Authentic $45.5M project integration
+
+### **Contract Management Enhancement**
+- **Risk Analysis Tab** - Dedicated contract risk assessment
+- **Analytics Tab** - Performance metrics and digital workflow
+- **Owner Change Orders** - Integrated with Schedule of Values
 
 ### **Export Formats**
 - PDF reports with professional formatting

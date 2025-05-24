@@ -141,7 +141,11 @@ class SOVManager:
         """Load SOV data from file"""
         try:
             with open(self.sov_file_path, 'r') as f:
-                return json.load(f)
+                data = json.load(f)
+                # Ensure data is properly structured
+                if isinstance(data, list):
+                    return self._get_default_sov_data()
+                return data
         except (FileNotFoundError, json.JSONDecodeError):
             return self._get_default_sov_data()
     

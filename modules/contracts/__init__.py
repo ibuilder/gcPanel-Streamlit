@@ -313,7 +313,7 @@ class OwnerContractModule(CrudModule):
                             with doc_col3:
                                 st.write(doc.get('size', ''))
                             with doc_col4:
-                                st.button("🔽", key=f"download_doc_{i}")
+                                st.write("📄")
                     else:
                         st.write("No documents uploaded yet.")
                     

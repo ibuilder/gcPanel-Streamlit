@@ -1026,4 +1026,35 @@ def render():
 
 def render():
     """Main render function for the Cost Management module"""
-    render_cost_management()
+    # Enhanced Cost Management Dashboard
+    st.title("💰 Cost Management")
+    
+    # Create tabs for different cost management features
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "📊 Budget Overview", 
+        "📋 Budget Items", 
+        "📄 Invoices", 
+        "📋 AIA G702/G703"
+    ])
+    
+    # Import AIA billing module
+    from modules.cost_management.aia_billing import render_aia_billing
+    
+    # Budget Overview Tab
+    with tab1:
+        budget_module = BudgetItemModule()
+        budget_module.render_budget_summary()
+    
+    # Budget Items Tab
+    with tab2:
+        budget_items = BudgetItemModule()
+        budget_items.render()
+    
+    # Invoices Tab
+    with tab3:
+        invoices = InvoiceModule()
+        invoices.render()
+    
+    # AIA G702/G703 Billing Tab
+    with tab4:
+        render_aia_billing()

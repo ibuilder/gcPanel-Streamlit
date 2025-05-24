@@ -608,12 +608,80 @@ def main_clean():
     
     try:
         if "Dashboard" in current_menu:
-            try:
-                import modules.dashboard
-                modules.dashboard.render_dashboard()
-            except ImportError:
-                st.title("🏗️ Dashboard")
-                st.info("Highland Tower Development dashboard loading...")
+            st.title("🏗️ Highland Tower Development Dashboard")
+            
+            # Clear any cache issues
+            st.cache_data.clear()
+            
+            # Project Overview Cards
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric(
+                    label="Project Value",
+                    value="$45.5M",
+                    delta="On Budget"
+                )
+            
+            with col2:
+                st.metric(
+                    label="Progress",
+                    value="67%",
+                    delta="2% this week"
+                )
+            
+            with col3:
+                st.metric(
+                    label="Units Complete",
+                    value="81/128",
+                    delta="5 this week"
+                )
+            
+            with col4:
+                st.metric(
+                    label="Safety Score",
+                    value="98%",
+                    delta="0.5% improvement"
+                )
+            
+            st.divider()
+            
+            # Recent Activity
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.subheader("🔄 Recent Activity")
+                st.write("• Foundation inspection completed - Unit 12A")
+                st.write("• MEP rough-in approved - Floors 8-10")
+                st.write("• Concrete pour scheduled - Level B2")
+                st.write("• Fire safety inspection passed - Retail spaces")
+                st.write("• Final electrical inspection - Units 45-50")
+            
+            with col2:
+                st.subheader("⚠️ Action Items")
+                st.warning("🔧 HVAC system calibration due - Floor 15")
+                st.info("📋 Weekly safety meeting - Tomorrow 9 AM")
+                st.success("✅ Permit renewal submitted - On track")
+                st.error("🚨 Weather delay possible - Monitor forecast")
+            
+            st.divider()
+            
+            # Progress Chart
+            st.subheader("📊 Construction Progress")
+            import pandas as pd
+            import plotly.express as px
+            
+            # Progress data
+            progress_data = pd.DataFrame({
+                'Phase': ['Foundation', 'Structure', 'MEP', 'Interior', 'Exterior'],
+                'Planned': [100, 100, 85, 45, 30],
+                'Actual': [100, 98, 82, 42, 25]
+            })
+            
+            fig = px.bar(progress_data, x='Phase', y=['Planned', 'Actual'], 
+                        title='Project Phase Progress (%)',
+                        barmode='group')
+            st.plotly_chart(fig, use_container_width=True)
         elif "Analytics" in current_menu:
             try:
                 import modules.analytics

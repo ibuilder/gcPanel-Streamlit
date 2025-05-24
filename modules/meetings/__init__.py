@@ -63,6 +63,8 @@ def render_meeting_agendas():
             [
                 "Project Planning Kick-Off Meeting",
                 "Weekly Project Coordination",
+                "Weekly Subcontractor Foreman Meeting",
+                "Weekly Owner Architect Contractor (OAC) Meeting",
                 "Design Review Meeting",
                 "Contractor Pre-Qualification",
                 "Safety Planning Meeting",
@@ -89,6 +91,10 @@ def render_meeting_agendas():
         render_kickoff_meeting_agenda()
     elif meeting_type == "Weekly Project Coordination":
         render_weekly_coordination_agenda()
+    elif meeting_type == "Weekly Subcontractor Foreman Meeting":
+        render_subcontractor_foreman_agenda()
+    elif meeting_type == "Weekly Owner Architect Contractor (OAC) Meeting":
+        render_oac_meeting_agenda()
     elif meeting_type == "Design Review Meeting":
         render_design_review_agenda()
     elif meeting_type == "Contractor Pre-Qualification":
@@ -229,6 +235,181 @@ def render_weekly_coordination_agenda():
             st.markdown(f"• {detail}")
         st.markdown("")
 
+def render_subcontractor_foreman_agenda():
+    """Render weekly subcontractor foreman meeting agenda"""
+    st.markdown("### 👷 Weekly Subcontractor Foreman Meeting")
+    st.markdown("**Highland Tower Development - Trade Coordination & Field Operations**")
+    
+    # Meeting details
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown("**📅 Day:** Every Tuesday")
+        st.markdown("**🕐 Time:** 7:00 AM - 8:00 AM")
+    with col2:
+        st.markdown("**📍 Location:** Job Site Trailer")
+        st.markdown("**👥 Attendees:** All Trade Foremen")
+    with col3:
+        st.markdown("**📋 Meeting Lead:** Site Superintendent")
+        st.markdown("**⏱️ Duration:** 60 minutes")
+    
+    st.markdown("---")
+    
+    agenda_items = [
+        ("5 min", "1. Safety First - Jobsite Safety Review", 
+         ["Previous week safety incidents or near misses",
+          "Current week safety focus areas",
+          "New safety requirements or procedures",
+          "Safety equipment and PPE updates"]),
+        
+        ("10 min", "2. Weather & Site Conditions", 
+         ["Weekly weather forecast impact",
+          "Site access and logistics updates",
+          "Material delivery schedules",
+          "Temporary facilities status"]),
+        
+        ("15 min", "3. Trade Progress Reports", 
+         ["Each foreman reports on previous week progress",
+          "Current phase completion status",
+          "Labor productivity and crew status",
+          "Material delivery confirmations"]),
+        
+        ("15 min", "4. Coordination & Sequencing", 
+         ["Trade interface coordination",
+          "Work area assignments and conflicts",
+          "Equipment sharing and scheduling",
+          "Utility shutdowns and connections"]),
+        
+        ("10 min", "5. Quality Control & Inspections", 
+         ["Required inspections for current week",
+          "Quality issues from previous week",
+          "Mock-up approvals and samples",
+          "Submittal status updates"]),
+        
+        ("5 min", "6. Action Items & Next Week Preview", 
+         ["Critical tasks for upcoming week",
+          "Resource requirements and requests",
+          "Milestone deadlines approaching",
+          "Follow-up actions assignment"])
+    ]
+    
+    for time, topic, details in agenda_items:
+        st.markdown(f"#### {time} - {topic}")
+        for detail in details:
+            st.markdown(f"• {detail}")
+        st.markdown("")
+    
+    # Trade participation section
+    st.markdown("---")
+    st.markdown("### 🔧 Required Trade Representation")
+    
+    trades = [
+        "General Contractor Superintendent",
+        "Site Safety Manager", 
+        "Concrete/Foundation Foreman",
+        "Structural Steel Foreman",
+        "Framing Foreman",
+        "MEP Foremen (Electrical, Plumbing, HVAC)",
+        "Drywall/Finishing Foreman",
+        "Roofing Foreman",
+        "Exterior/Glazing Foreman"
+    ]
+    
+    for trade in trades:
+        st.markdown(f"• {trade}")
+
+def render_oac_meeting_agenda():
+    """Render weekly Owner Architect Contractor (OAC) meeting agenda"""
+    st.markdown("### 🏢 Weekly Owner Architect Contractor (OAC) Meeting")
+    st.markdown("**Highland Tower Development - Executive Project Coordination**")
+    
+    # Meeting details
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown("**📅 Day:** Every Thursday")
+        st.markdown("**🕐 Time:** 10:00 AM - 11:30 AM")
+    with col2:
+        st.markdown("**📍 Location:** Highland Properties Office")
+        st.markdown("**👥 Attendees:** Senior Project Team")
+    with col3:
+        st.markdown("**📋 Meeting Lead:** Project Manager")
+        st.markdown("**⏱️ Duration:** 90 minutes")
+    
+    st.markdown("---")
+    
+    agenda_items = [
+        ("10 min", "1. Executive Summary & Project Dashboard", 
+         ["Overall project health status",
+          "Key performance indicators review",
+          "Budget variance summary",
+          "Schedule milestone status"]),
+        
+        ("15 min", "2. Design & Documentation Status", 
+         ["Design development progress",
+          "Submittal review and approval status",
+          "RFI resolution and pending items",
+          "Change order proposals and approvals"]),
+        
+        ("15 min", "3. Construction Progress Review", 
+         ["Major milestone completions",
+          "Current construction activities",
+          "Quality control and inspection results",
+          "Substantial completion timeline"]),
+        
+        ("15 min", "4. Financial & Commercial Items", 
+         ["Progress billing and payment status",
+          "Change order financial impact",
+          "Budget forecast and projections",
+          "Cash flow planning"]),
+        
+        ("10 min", "5. Risk Management & Issues", 
+         ["Project risks and mitigation strategies",
+          "Regulatory and permitting updates",
+          "Weather delays and recovery plans",
+          "Long-lead item procurement status"]),
+        
+        ("10 min", "6. Owner Requirements & Tenant Coordination", 
+         ["Tenant improvement coordination",
+          "Marketing and leasing schedule alignment",
+          "Owner furnished equipment status",
+          "Warranty and maintenance planning"]),
+        
+        ("10 min", "7. Stakeholder Communications", 
+         ["Public relations and community impact",
+          "City/municipality coordination",
+          "Utility company coordination",
+          "Marketing milestone achievements"]),
+        
+        ("5 min", "8. Action Items & Next Steps", 
+         ["Decision items requiring owner input",
+          "Follow-up actions and accountability",
+          "Next meeting agenda items",
+          "Executive escalation needs"])
+    ]
+    
+    for time, topic, details in agenda_items:
+        st.markdown(f"#### {time} - {topic}")
+        for detail in details:
+            st.markdown(f"• {detail}")
+        st.markdown("")
+    
+    # Key participants section
+    st.markdown("---")
+    st.markdown("### 👥 Required OAC Participants")
+    
+    participants = [
+        "Owner Representative - Highland Properties",
+        "Project Manager - Construction Team",
+        "Principal Architect - Design Team",
+        "General Contractor Project Executive",
+        "Construction Manager",
+        "Owner's Financial Representative",
+        "Project Development Manager",
+        "Legal Counsel (as needed for major decisions)"
+    ]
+    
+    for participant in participants:
+        st.markdown(f"• {participant}")
+
 def render_design_review_agenda():
     """Render design review meeting agenda"""
     st.markdown("### 🎨 Design Review Meeting")
@@ -361,6 +542,8 @@ def render_meeting_scheduling():
             [
                 "Project Planning Kick-Off Meeting",
                 "Weekly Project Coordination",
+                "Weekly Subcontractor Foreman Meeting",
+                "Weekly Owner Architect Contractor (OAC) Meeting",
                 "Design Review Meeting",
                 "Safety Planning Meeting",
                 "Progress Review Meeting"
@@ -624,6 +807,135 @@ AGENDA ITEMS:
          • Review previous actions
          • Assign new actions
          • Set deadlines
+""",
+        "Weekly Subcontractor Foreman Meeting": """
+HIGHLAND TOWER DEVELOPMENT
+WEEKLY SUBCONTRACTOR FOREMAN MEETING AGENDA
+
+Day: Every Tuesday
+Time: 7:00 AM - 8:00 AM
+Location: Job Site Trailer
+Meeting Lead: Site Superintendent
+Duration: 60 minutes
+
+AGENDA ITEMS:
+
+5 min    1. SAFETY FIRST - JOBSITE SAFETY REVIEW
+         • Previous week safety incidents or near misses
+         • Current week safety focus areas
+         • New safety requirements or procedures
+         • Safety equipment and PPE updates
+
+10 min   2. WEATHER & SITE CONDITIONS
+         • Weekly weather forecast impact
+         • Site access and logistics updates
+         • Material delivery schedules
+         • Temporary facilities status
+
+15 min   3. TRADE PROGRESS REPORTS
+         • Each foreman reports on previous week progress
+         • Current phase completion status
+         • Labor productivity and crew status
+         • Material delivery confirmations
+
+15 min   4. COORDINATION & SEQUENCING
+         • Trade interface coordination
+         • Work area assignments and conflicts
+         • Equipment sharing and scheduling
+         • Utility shutdowns and connections
+
+10 min   5. QUALITY CONTROL & INSPECTIONS
+         • Required inspections for current week
+         • Quality issues from previous week
+         • Mock-up approvals and samples
+         • Submittal status updates
+
+5 min    6. ACTION ITEMS & NEXT WEEK PREVIEW
+         • Critical tasks for upcoming week
+         • Resource requirements and requests
+         • Milestone deadlines approaching
+         • Follow-up actions assignment
+
+REQUIRED TRADE REPRESENTATION:
+• General Contractor Superintendent
+• Site Safety Manager
+• Concrete/Foundation Foreman
+• Structural Steel Foreman
+• Framing Foreman
+• MEP Foremen (Electrical, Plumbing, HVAC)
+• Drywall/Finishing Foreman
+• Roofing Foreman
+• Exterior/Glazing Foreman
+""",
+        "Weekly Owner Architect Contractor (OAC) Meeting": """
+HIGHLAND TOWER DEVELOPMENT
+WEEKLY OWNER ARCHITECT CONTRACTOR (OAC) MEETING AGENDA
+
+Day: Every Thursday
+Time: 10:00 AM - 11:30 AM
+Location: Highland Properties Office
+Meeting Lead: Project Manager
+Duration: 90 minutes
+
+AGENDA ITEMS:
+
+10 min   1. EXECUTIVE SUMMARY & PROJECT DASHBOARD
+         • Overall project health status
+         • Key performance indicators review
+         • Budget variance summary
+         • Schedule milestone status
+
+15 min   2. DESIGN & DOCUMENTATION STATUS
+         • Design development progress
+         • Submittal review and approval status
+         • RFI resolution and pending items
+         • Change order proposals and approvals
+
+15 min   3. CONSTRUCTION PROGRESS REVIEW
+         • Major milestone completions
+         • Current construction activities
+         • Quality control and inspection results
+         • Substantial completion timeline
+
+15 min   4. FINANCIAL & COMMERCIAL ITEMS
+         • Progress billing and payment status
+         • Change order financial impact
+         • Budget forecast and projections
+         • Cash flow planning
+
+10 min   5. RISK MANAGEMENT & ISSUES
+         • Project risks and mitigation strategies
+         • Regulatory and permitting updates
+         • Weather delays and recovery plans
+         • Long-lead item procurement status
+
+10 min   6. OWNER REQUIREMENTS & TENANT COORDINATION
+         • Tenant improvement coordination
+         • Marketing and leasing schedule alignment
+         • Owner furnished equipment status
+         • Warranty and maintenance planning
+
+10 min   7. STAKEHOLDER COMMUNICATIONS
+         • Public relations and community impact
+         • City/municipality coordination
+         • Utility company coordination
+         • Marketing milestone achievements
+
+5 min    8. ACTION ITEMS & NEXT STEPS
+         • Decision items requiring owner input
+         • Follow-up actions and accountability
+         • Next meeting agenda items
+         • Executive escalation needs
+
+REQUIRED OAC PARTICIPANTS:
+• Owner Representative - Highland Properties
+• Project Manager - Construction Team
+• Principal Architect - Design Team
+• General Contractor Project Executive
+• Construction Manager
+• Owner's Financial Representative
+• Project Development Manager
+• Legal Counsel (as needed for major decisions)
 """
     }
     

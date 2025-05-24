@@ -89,9 +89,18 @@ def main():
         <style>
         /* ELIMINATE ALL unnecessary containers and divs throughout the app */
         .main .block-container {
-            padding: 1rem !important;
+            padding: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
             margin: 0 !important;
+            margin-top: 0 !important;
             max-width: 100% !important;
+        }
+        
+        /* Remove ALL spacing from app container */
+        .stApp {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
         }
         
         /* Completely hide all sidebar elements and controls from all pages */
@@ -133,11 +142,13 @@ def main():
             padding: 0 !important;
         }
         
-        /* Force full width layout */
+        /* Force full width layout with zero top spacing */
         .appview-container .main .block-container {
             max-width: 100% !important;
             padding-left: 2rem !important;
             padding-right: 2rem !important;
+            padding-top: 0 !important;
+            margin-top: 0 !important;
         }
         
         .stApp > div:first-child {

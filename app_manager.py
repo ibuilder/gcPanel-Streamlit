@@ -171,9 +171,18 @@ def _render_ui_framework():
     <style>
         /* ELIMINATE ALL unnecessary containers and divs throughout dashboard */
         .main .block-container {
-            padding: 1rem !important;
+            padding: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
             margin: 0 !important;
+            margin-top: 0 !important;
             max-width: 100% !important;
+        }
+        
+        /* Bring header to absolute top */
+        .stApp {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
         }
         
         /* Proper content spacing */

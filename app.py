@@ -447,15 +447,20 @@ def render_sidebar():
         st.markdown("### Navigation")
         
         navigation_options = [
-            "Dashboard", "Preconstruction", "Engineering", "Field Operations", 
-            "Safety", "Contracts", "Cost Management", "BIM", "Closeout", 
-            "Analytics", "Documents"
+            "🏗️ Dashboard", "📋 Preconstruction", "⚙️ Engineering", "👷 Field Operations", 
+            "🦺 Safety", "📄 Contracts", "💰 Cost Management", "🏢 BIM", "✅ Closeout", 
+            "📊 Analytics", "📁 Documents"
         ]
+        
+        # Handle default selection with icons
+        default_selection = st.session_state.get("current_menu", "🏗️ Dashboard")
+        if not any(default_selection in option for option in navigation_options):
+            default_selection = "🏗️ Dashboard"
         
         current_menu = st.selectbox(
             "Select Module:",
             navigation_options,
-            index=navigation_options.index(st.session_state.get("current_menu", "Dashboard")),
+            index=navigation_options.index(default_selection) if default_selection in navigation_options else 0,
             key="navigation_select"
         )
         
@@ -557,12 +562,11 @@ def main_clean():
     if "user_role" not in st.session_state:
         st.session_state.user_role = "admin"
     
-    # Check authentication - skip for now to test sidebar
+    # Check authentication
     if not st.session_state.get("authenticated", False):
-        # For testing, automatically authenticate
-        st.session_state.authenticated = True
-        st.session_state.username = "Project Manager"
-        st.session_state.user_role = "admin"
+        from login_form import render_login_form
+        render_login_form()
+        return
     
     # Render sidebar navigation
     render_sidebar()
@@ -571,37 +575,37 @@ def main_clean():
     current_menu = st.session_state.get("current_menu", "Dashboard")
     
     try:
-        if current_menu == "Dashboard":
+        if "Dashboard" in current_menu:
             import modules.dashboard
             modules.dashboard.render_dashboard()
-        elif current_menu == "Analytics":
+        elif "Analytics" in current_menu:
             import modules.analytics
             modules.analytics.render_analytics_dashboard()
-        elif current_menu == "Preconstruction":
-            st.title("🏗️ Preconstruction")
+        elif "Preconstruction" in current_menu:
+            st.title("📋 Preconstruction")
             st.info("Preconstruction planning and documentation")
-        elif current_menu == "Engineering":
+        elif "Engineering" in current_menu:
             st.title("⚙️ Engineering")
             st.info("Engineering documents and specifications")
-        elif current_menu == "Field Operations":
+        elif "Field Operations" in current_menu:
             st.title("👷 Field Operations")
             st.info("Daily field activities and progress tracking")
-        elif current_menu == "Safety":
+        elif "Safety" in current_menu:
             st.title("🦺 Safety")
             st.info("Safety compliance and incident tracking")
-        elif current_menu == "Contracts":
-            st.title("📋 Contracts")
+        elif "Contracts" in current_menu:
+            st.title("📄 Contracts")
             st.info("Contract management and compliance")
-        elif current_menu == "Cost Management":
+        elif "Cost Management" in current_menu:
             st.title("💰 Cost Management")
             st.info("Budget tracking and cost analysis")
-        elif current_menu == "BIM":
+        elif "BIM" in current_menu:
             st.title("🏢 BIM")
             st.info("Building Information Modeling")
-        elif current_menu == "Closeout":
+        elif "Closeout" in current_menu:
             st.title("✅ Closeout")
             st.info("Project closeout and documentation")
-        elif current_menu == "Documents":
+        elif "Documents" in current_menu:
             st.title("📁 Documents")
             st.info("Document management and storage")
         else:

@@ -65,11 +65,8 @@ def render_customizable_widgets_section():
         st.markdown("- 🎯 MEP rough-in start")
 
 def render_analytics_dashboard():
-    """Render the analytics dashboard overview."""
-    st.subheader("Analytics Dashboard")
-    
-    # Create container with white background
-    st.markdown(f"<div style='background-color: white; padding: 15px; border-radius: 5px; margin-bottom: 15px;'>", unsafe_allow_html=True)
+    """Render the analytics dashboard with dark theme."""
+    st.title("📊 Analytics Dashboard")
     
     # Key Performance Indicators
     st.markdown("### Key Performance Indicators")

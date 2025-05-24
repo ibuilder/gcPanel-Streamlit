@@ -135,35 +135,14 @@ def render_customizable_widgets_section():
             st.markdown("- 📊 3 reports submitted")
 
 def render_dashboard():
-    """Render the clean Highland Tower Development dashboard."""
+    """Render the Highland Tower Development dashboard with sidebar layout."""
     
-    # Apply zero spacing CSS for dashboard
-    st.markdown("""
-    <style>
-    /* Bring dashboard content to top with zero spacing */
-    .main .block-container {
-        padding-top: 0 !important;
-        margin-top: 0 !important;
-    }
-    
-    /* Remove spacing between elements */
-    .element-container {
-        margin-bottom: 0.5rem !important;
-    }
-    
-    h1, h2, h3 {
-        margin-top: 0 !important;
-        margin-bottom: 0.5rem !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-    
-    st.title("🏗️ Highland Tower Development Dashboard")
+    st.title("🏗️ Project Dashboard")
     
     # Current project info
     current_project = st.session_state.get("current_project", "Highland Tower Development")
     
-    # Clean project metrics
+    # Clean project metrics with sidebar-friendly layout
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric("Overall Progress", "68%", "+3% this week")

@@ -443,6 +443,25 @@ def render_sidebar():
         </div>
         """, unsafe_allow_html=True)
         
+        # Navigation Menu - moved directly under logo
+        st.markdown("### Navigation")
+        
+        navigation_options = [
+            "Dashboard", "Preconstruction", "Engineering", "Field Operations", 
+            "Safety", "Contracts", "Cost Management", "BIM", "Closeout", 
+            "Analytics", "Documents"
+        ]
+        
+        current_menu = st.selectbox(
+            "Select Module:",
+            navigation_options,
+            index=navigation_options.index(st.session_state.get("current_menu", "Dashboard")),
+            key="navigation_select"
+        )
+        
+        # Update session state with selected menu
+        st.session_state["current_menu"] = current_menu
+        
         st.divider()
         
         # Project Information
@@ -465,27 +484,6 @@ def render_sidebar():
         **User:** {current_user}  
         **Role:** {user_role.title()}
         """)
-        
-        st.divider()
-        
-        # Navigation Menu
-        st.markdown("### Navigation")
-        
-        navigation_options = [
-            "Dashboard", "Preconstruction", "Engineering", "Field Operations", 
-            "Safety", "Contracts", "Cost Management", "BIM", "Closeout", 
-            "Analytics", "Documents"
-        ]
-        
-        current_menu = st.selectbox(
-            "Select Module:",
-            navigation_options,
-            index=navigation_options.index(st.session_state.get("current_menu", "Dashboard")),
-            key="navigation_select"
-        )
-        
-        # Update session state with selected menu
-        st.session_state["current_menu"] = current_menu
 
 def main_clean():
     """Clean main function with sidebar layout."""
@@ -497,27 +495,54 @@ def main_clean():
         initial_sidebar_state="expanded"
     )
     
-    # Apply clean dark theme
+    # Apply clean all dark theme
     st.markdown("""
     <style>
+        /* All dark theme */
         .stApp {
-            background-color: #1e1e1e;
+            background-color: #0e1117;
             color: white;
         }
+        
+        /* Sidebar dark */
+        section[data-testid="stSidebar"] {
+            background-color: #262730;
+        }
+        
+        /* Main content area */
+        .main .block-container {
+            background-color: #0e1117;
+            color: white;
+        }
+        
+        /* Metrics dark */
+        [data-testid="metric-container"] {
+            background-color: #262730;
+            border: 1px solid #464854;
+            color: white;
+        }
+        
+        /* Text elements */
+        .stMarkdown {
+            color: white;
+        }
+        
+        /* Form elements dark */
+        .stSelectbox > div > div {
+            background-color: #262730;
+            color: white;
+            border: 1px solid #464854;
+        }
+        
+        /* Buttons dark */
         .stButton > button {
-            background-color: #3498db;
+            background-color: #ff4b4b;
             color: white;
             border: none;
-            border-radius: 5px;
         }
+        
         .stButton > button:hover {
-            background-color: #2980b9;
-        }
-        [data-testid="metric-container"] {
-            background-color: #2d3e50;
-            border: 1px solid #34495e;
-            padding: 1rem;
-            border-radius: 5px;
+            background-color: #ff6c6c;
         }
     </style>
     """, unsafe_allow_html=True)
@@ -552,10 +577,36 @@ def main_clean():
         elif current_menu == "Analytics":
             import modules.analytics
             modules.analytics.render_analytics_dashboard()
+        elif current_menu == "Preconstruction":
+            st.title("🏗️ Preconstruction")
+            st.info("Preconstruction planning and documentation")
+        elif current_menu == "Engineering":
+            st.title("⚙️ Engineering")
+            st.info("Engineering documents and specifications")
+        elif current_menu == "Field Operations":
+            st.title("👷 Field Operations")
+            st.info("Daily field activities and progress tracking")
+        elif current_menu == "Safety":
+            st.title("🦺 Safety")
+            st.info("Safety compliance and incident tracking")
+        elif current_menu == "Contracts":
+            st.title("📋 Contracts")
+            st.info("Contract management and compliance")
+        elif current_menu == "Cost Management":
+            st.title("💰 Cost Management")
+            st.info("Budget tracking and cost analysis")
+        elif current_menu == "BIM":
+            st.title("🏢 BIM")
+            st.info("Building Information Modeling")
+        elif current_menu == "Closeout":
+            st.title("✅ Closeout")
+            st.info("Project closeout and documentation")
+        elif current_menu == "Documents":
+            st.title("📁 Documents")
+            st.info("Document management and storage")
         else:
-            st.title(f"{current_menu} - Highland Tower Development")
-            st.info(f"Loading {current_menu} module...")
-            st.write("Module content will be displayed here.")
+            st.title(f"{current_menu}")
+            st.info("Module content will be displayed here.")
     except Exception as e:
         st.error(f"Error loading {current_menu} module")
         st.info("Please try selecting a different module.")

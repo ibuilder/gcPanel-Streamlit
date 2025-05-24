@@ -13,6 +13,7 @@ import random
 import pandas as pd
 
 from modules.crud_template import CrudModule
+from components.digital_signature import render_digital_signature_section, get_signature_summary, validate_required_signatures
 from assets.crud_styler import (
     apply_crud_styles, 
     render_form_actions, 
@@ -316,19 +317,155 @@ class DailyReportModule(CrudModule):
                 
                 delays, safety_incidents, visitors, notes = render_crud_fieldset("Issues and Notes", render_issues_notes)
                 
+                # Photo Upload Section
+                def render_photo_upload():
+                    st.markdown("Upload photos of work progress, safety conditions, or issues:")
+                    uploaded_photos = st.file_uploader(
+                        "Upload Photos", 
+                        type=['jpg', 'jpeg', 'png'],
+                        accept_multiple_files=True,
+                        key=f"photos_{base_key}"
+                    )
+                    
+                    # Display existing photos
+                    if item.get('photos'):
+                        st.markdown("**Existing Photos:**")
+                        for i, photo in enumerate(item['photos']):
+                            st.markdown(f"• Photo {i+1}: {photo}")
+                    
+                    return uploaded_photos
+                
+                uploaded_photos = render_crud_fieldset("Photo Documentation", render_photo_upload)
+                
+                # Quality Control Section
+                def render_quality_control():
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        quality_inspections = st.text_area(
+                            "Quality Inspections Performed", 
+                            value=item.get('quality_inspections', ''),
+                            height=75,
+                            placeholder="List any quality inspections performed today"
+                        )
+                        
+                        rework_required = st.text_area(
+                            "Rework Required", 
+                            value=item.get('rework_required', 'None'),
+                            height=75,
+                            placeholder="Describe any rework that needs to be completed"
+                        )
+                    
+                    with col2:
+                        material_waste = st.text_area(
+                            "Material Waste/Issues", 
+                            value=item.get('material_waste', 'None'),
+                            height=75,
+                            placeholder="Document any material waste or quality issues"
+                        )
+                        
+                        productivity_notes = st.text_area(
+                            "Productivity Notes", 
+                            value=item.get('productivity_notes', ''),
+                            height=75,
+                            placeholder="Notes on crew productivity and efficiency"
+                        )
+                    
+                    return quality_inspections, rework_required, material_waste, productivity_notes
+                
+                quality_inspections, rework_required, material_waste, productivity_notes = render_crud_fieldset("Quality Control", render_quality_control)
+                
+                # Environmental Conditions Section
+                def render_environmental():
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        wind_speed = st.text_input(
+                            "Wind Speed", 
+                            value=item.get('wind_speed', ''),
+                            placeholder="e.g., 5-10 mph"
+                        )
+                        
+                        humidity = st.text_input(
+                            "Humidity", 
+                            value=item.get('humidity', ''),
+                            placeholder="e.g., 65%"
+                        )
+                    
+                    with col2:
+                        work_stoppage = st.text_area(
+                            "Weather-Related Work Stoppages", 
+                            value=item.get('work_stoppage', 'None'),
+                            height=60,
+                            placeholder="Any work stopped due to weather conditions"
+                        )
+                    
+                    return wind_speed, humidity, work_stoppage
+                
+                wind_speed, humidity, work_stoppage = render_crud_fieldset("Environmental Conditions", render_environmental)
+                
+                # Digital Signatures Section
+                def render_signatures():
+                    st.markdown("**Required Signatures for Daily Report Approval**")
+                    
+                    # Superintendent signature
+                    superintendent_sig = render_digital_signature_section(
+                        signature_id="superintendent_signature",
+                        signer_name="Project Superintendent",
+                        signature_purpose="Daily Report Verification",
+                        required=True,
+                        form_key=f"{base_key}_superintendent"
+                    )
+                    
+                    # Safety Manager signature  
+                    safety_sig = render_digital_signature_section(
+                        signature_id="safety_manager_signature",
+                        signer_name="Safety Manager",
+                        signature_purpose="Safety Compliance Verification",
+                        required=True,
+                        form_key=f"{base_key}_safety"
+                    )
+                    
+                    # Optional client representative signature
+                    client_sig = render_digital_signature_section(
+                        signature_id="client_signature",
+                        signer_name="Client Representative",
+                        signature_purpose="Daily Progress Acknowledgment",
+                        required=False,
+                        form_key=f"{base_key}_client"
+                    )
+                    
+                    return superintendent_sig, safety_sig, client_sig
+                
+                superintendent_sig, safety_sig, client_sig = render_crud_fieldset("Digital Signatures", render_signatures)
+                
                 # Form Actions
                 form_actions = render_form_actions(
-                    save_label="Save Daily Report",
+                    save_label="Submit Daily Report",
                     cancel_label="Cancel",
                     delete_label="Delete Daily Report",
                     show_delete=not is_new
                 )
                 
                 if form_actions['save_clicked']:
-                    # Update item with form values
+                    # Validate required signatures
+                    required_signatures = ["superintendent_signature", "safety_manager_signature"]
+                    signature_validation = validate_required_signatures(required_signatures)
+                    
+                    if not signature_validation['all_valid']:
+                        st.error("Missing required signatures. Please ensure all required signatures are completed before submitting.")
+                        st.stop()
+                    
+                    # Process uploaded photos
+                    photo_list = item.get('photos', [])
+                    if uploaded_photos:
+                        for photo in uploaded_photos:
+                            photo_list.append(f"Photo: {photo.name}")
+                    
+                    # Update item with form values including all new fields
                     updated_item = {
-                        'report_id': item['report_id'] if not is_new else f"DR-{report_date.strftime('%Y%m%d')}",
-                        'report_date': report_date.strftime('%Y-%m-%d'),
+                        'report_id': item['report_id'] if not is_new else f"DR-{datetime.strptime(str(report_date), '%Y-%m-%d').strftime('%Y%m%d')}",
+                        'report_date': str(report_date),
                         'weather': weather,
                         'temperature': temperature,
                         'workers': workers_data,
@@ -342,7 +479,21 @@ class DailyReportModule(CrudModule):
                         'notes': notes,
                         'submitted_by': submitted_by,
                         'submission_time': datetime.now().strftime('%Y-%m-%d %H:%M'),
-                        'photos': item.get('photos', [])
+                        'photos': photo_list,
+                        'quality_inspections': quality_inspections,
+                        'rework_required': rework_required,
+                        'material_waste': material_waste,
+                        'productivity_notes': productivity_notes,
+                        'wind_speed': wind_speed,
+                        'humidity': humidity,
+                        'work_stoppage': work_stoppage,
+                        'signatures': {
+                            'superintendent': get_signature_summary("superintendent_signature"),
+                            'safety_manager': get_signature_summary("safety_manager_signature"),
+                            'client': get_signature_summary("client_signature") if client_sig else None
+                        },
+                        'status': 'Submitted',
+                        'project': 'Highland Tower Development'
                     }
                     
                     # Save the updated item

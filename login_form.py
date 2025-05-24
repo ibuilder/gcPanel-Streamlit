@@ -299,9 +299,6 @@ def render_login_form():
         st.error(f"🔒 Account temporarily locked due to multiple failed attempts. Try again in {minutes_remaining} minutes.")
         return
     
-    # Security badge
-    st.markdown('<div class="security-badge">🔒 Secure Login</div>', unsafe_allow_html=True)
-    
     # Show demo accounts prominently at the top
     st.markdown("### 🎯 Quick Demo Access - Highland Tower Development")
     st.markdown("**Try the platform instantly with these demo accounts:**")

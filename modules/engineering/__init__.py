@@ -96,17 +96,8 @@ def render_technical_review_system():
         """, unsafe_allow_html=True)
 
 def render():
-    """Render the Enhanced Engineering module with advanced features."""
-    st.title("🔧 Enhanced Engineering Management")
-    
-    # RFI Workflow Automation
-    render_rfi_automation_dashboard()
-    
-    # Drawing Revision Control
-    render_drawing_revision_control()
-    
-    # Technical Review Checklists
-    render_technical_review_system()
+    """Render the Engineering Management module."""
+    st.title("🔧 Engineering Management")
     
     # Create tabs for different engineering functions
     tab1, tab2 = st.tabs(["Submittal Packages", "Transmittals"])

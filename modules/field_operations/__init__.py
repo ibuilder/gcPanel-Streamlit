@@ -116,20 +116,8 @@ def render_field_inspections():
     st.info("Field Inspections module with standardized CRUD styling will be implemented here.")
 
 def render():
-    """Render the Enhanced Field Operations module with advanced capabilities."""
-    st.title("🚧 Enhanced Field Operations")
-    
-    # GPS-Enabled Check-ins
-    render_gps_checkin_system()
-    
-    # Photo Documentation with Markup
-    render_photo_documentation_system()
-    
-    # Equipment Tracking Dashboard
-    render_equipment_tracking_dashboard()
-    
-    # Voice-to-Text Reports
-    render_voice_report_system()
+    """Render the Field Operations module."""
+    st.title("🚧 Field Operations")
     
     # Create tabs for different field operations functions
     tab1, tab2, tab3, tab4 = st.tabs(["Daily Reports", "Field Issues", "Quality Control", "Field Inspections"])

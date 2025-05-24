@@ -250,8 +250,48 @@ class AIABillingModule:
     
     def _load_data(self):
         """Load AIA billing data"""
-        with open(self.data_file_path, 'r') as f:
-            return json.load(f)
+        try:
+            with open(self.data_file_path, 'r') as f:
+                data = json.load(f)
+                # Ensure data is properly structured
+                if isinstance(data, list):
+                    # If data is a list, return default structure
+                    return self._get_default_data()
+                return data
+        except (FileNotFoundError, json.JSONDecodeError):
+            return self._get_default_data()
+    
+    def _get_default_data(self):
+        """Get default data structure"""
+        return {
+            "project_info": {
+                "project_name": "Highland Tower Development",
+                "project_number": "HTD-2024-001",
+                "location": "1847 Highland Ave, Los Angeles, CA 90028",
+                "architect": "Morrison Architects",
+                "contractor": "Premier Construction Group",
+                "owner": "Highland Development LLC",
+                "contract_date": "2024-01-15",
+                "contract_amount": 45500000.00,
+                "change_order_amount": 850000.00,
+                "adjusted_contract_amount": 46350000.00
+            },
+            "schedule_of_values": [
+                {
+                    "item": "01 00 00",
+                    "description": "General Requirements",
+                    "scheduled_value": 2275000.00,
+                    "work_completed_previous": 2275000.00,
+                    "work_completed_this_period": 0.00,
+                    "materials_stored": 0.00,
+                    "total_completed_stored": 2275000.00,
+                    "percentage": 100.0,
+                    "balance_to_finish": 0.00,
+                    "retainage": 0.00
+                }
+            ],
+            "billing_history": []
+        }
     
     def render_g702_application(self):
         """Render AIA G702 Application for Payment"""

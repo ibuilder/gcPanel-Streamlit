@@ -554,14 +554,39 @@ def render_sidebar():
 def render_dashboard():
     st.title("📊 AI-Powered Enterprise Dashboard")
     
-    # System Health Banner
+    # Master Builder Command Center Banner
     health_status = st.session_state.system_health
     st.markdown(f"""
     <div class="enterprise-card" style="background: linear-gradient(135deg, #4A90E2 0%, #5BA0F2 100%); color: white; text-align: center;">
-        <h4 style="margin: 0; color: white;">🚀 System Status: {health_status['database'].upper()}</h4>
+        <h4 style="margin: 0; color: white;">👑 Master Builder Command Center Active</h4>
         <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">
-            Last Sync: {health_status['last_sync']} • Active Users: {health_status['active_users']} • Database: Connected
+            $150M Project Authority • {health_status['active_users']} Team Members Under Command • All Systems Connected
         </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Leadership Authority Panel
+    st.markdown("""
+    <div class="enterprise-card" style="background: linear-gradient(135deg, #28A745 0%, #34CE57 100%); color: white;">
+        <h4 style="margin: 0; color: white;">🎯 Your Leadership Command Suite</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+            <div style="text-align: center;">
+                <h5 style="color: white; margin: 0;">Information Dominance</h5>
+                <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">You see problems before they happen</p>
+            </div>
+            <div style="text-align: center;">
+                <h5 style="color: white; margin: 0;">Process Control</h5>
+                <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">All decisions flow through you</p>
+            </div>
+            <div style="text-align: center;">
+                <h5 style="color: white; margin: 0;">Team Performance</h5>
+                <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Data shows who delivers excellence</p>
+            </div>
+            <div style="text-align: center;">
+                <h5 style="color: white; margin: 0;">Future Vision</h5>
+                <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Predictive tools guide your team</p>
+            </div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -639,11 +664,11 @@ def render_dashboard():
     with col2:
         st.markdown("""
         <div class="enterprise-card">
-            <h4 style="color: #28A745;">🏗️ Legacy Builders' Wisdom</h4>
-            <p><em>"The pyramids still stand because their builders thought in millennia, not quarters."</em></p>
-            <p><strong>Patience with Urgency:</strong> Rush builds waste. Excellence builds legacies.</p>
-            <p><strong>Material Respect:</strong> Every beam, every wire, every finish will outlive today's deadline pressure.</p>
-            <p style="color: #4A90E2; font-weight: bold;">You're part of humanity's oldest profession. Build with the dignity that deserves.</p>
+            <h4 style="color: #28A745;">👑 Master Builder Authority</h4>
+            <p><strong>Information Dominance:</strong> You see critical path delays 2 weeks before your teams do.</p>
+            <p><strong>Performance Transparency:</strong> Real data shows Steel Team 94% efficiency, MEP Team needs guidance at 76%.</p>
+            <p><strong>Decision Control:</strong> Every change order, material approval, and quality sign-off flows through your command center.</p>
+            <p style="color: #4A90E2; font-weight: bold;">Technology amplifies your leadership - you remain the Master Builder in control.</p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -652,7 +677,30 @@ def render_dashboard():
     # Charts with psychological context
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("📈 Progress Analytics")
+        st.subheader("📈 Master Builder Progress Command")
+        st.markdown("*Your vision materializing through controlled excellence*")
+        
+        # Team Performance Leaderboard
+        st.markdown("""
+        <div class="enterprise-card" style="background: linear-gradient(135deg, #6F42C1 0%, #8B5FBF 100%); color: white;">
+            <h4 style="color: white; margin: 0;">👑 Team Performance Under Your Command</h4>
+            <div style="margin-top: 1rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>🥇 Steel Team (Leader: Rodriguez)</span><span style="color: #FFD700;">94% Efficiency</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>🥈 Concrete Team (Leader: Johnson)</span><span style="color: #C0C0C0;">89% Efficiency</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>🥉 Framing Team (Leader: Chen)</span><span style="color: #CD7F32;">85% Efficiency</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>⚠️ MEP Team (Leader: Williams)</span><span style="color: #FFA500;">76% - Needs Guidance</span>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
         progress_data = pd.DataFrame({
             'Week': range(1, 13),
             'Planned': [5, 12, 20, 28, 35, 42, 50, 58, 65, 72, 80, 87],

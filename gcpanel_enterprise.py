@@ -309,23 +309,122 @@ def render_login():
     with tabs[2]:
         st.markdown("""
         <div class="enterprise-card">
-            <h2 style="color: #4A90E2;">🎯 Why You're Going to Succeed</h2>
+            <h2 style="color: #4A90E2;">🧠 The Builder's Mind: Psychology of Construction Excellence</h2>
+            <p style="font-style: italic; color: #6C757D;">Construction is humanity's oldest industry because it fulfills our deepest psychological drives. gcPanel honors these ancient instincts.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Mental Framework Section
+        st.markdown("""
+        <div class="enterprise-card" style="background: linear-gradient(135deg, #6F42C1 0%, #8B5FBF 100%); color: white;">
+            <h3 style="color: white; margin: 0;">🧭 Mental Framework for Legendary Builders</h3>
+            <p style="opacity: 0.9; margin: 0.5rem 0 0 0;">Master the psychology that separates great builders from the rest</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("""
+            <div class="enterprise-card">
+                <h4 style="color: #6F42C1;">🎯 Vision Before Action</h4>
+                <p><strong>Great builders see the finished structure in their minds first.</strong></p>
+                <p>✓ gcPanel's 3D BIM visualization lets you walk through Highland Tower before it exists<br>
+                ✓ Our project timeline shows you the end state, making the impossible feel inevitable<br>
+                ✓ Every dashboard reminds you: you're not just managing tasks, you're materializing a vision</p>
+                
+                <h4 style="color: #6F42C1;">🔄 Systems Thinking</h4>
+                <p><strong>Understanding how every component affects the whole.</strong></p>
+                <p>✓ Our AI analytics show how a delay in MEP affects finishing schedules<br>
+                ✓ Cost variance in one trade impacts overall project financial health<br>
+                ✓ Safety incidents ripple through team morale and productivity</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown("""
+            <div class="enterprise-card">
+                <h4 style="color: #6F42C1;">⚖️ Patience with Urgency</h4>
+                <p><strong>Balancing the drive to build fast with the wisdom to build right.</strong></p>
+                <p>✓ Our quality controls prevent the costly rush that creates expensive rework<br>
+                ✓ Predictive analytics warn when speed compromises long-term integrity<br>
+                ✓ Schedule optimization finds the fastest path without cutting corners</p>
+                
+                <h4 style="color: #6F42C1;">💪 Emotional Resilience</h4>
+                <p><strong>Managing the overwhelming responsibility of creation.</strong></p>
+                <p>✓ Real-time dashboards replace anxiety with clarity<br>
+                ✓ AI predictions transform surprises into planned responses<br>
+                ✓ Progress tracking shows daily proof that your vision is becoming reality</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Physical Process Section
+        st.markdown("""
+        <div class="enterprise-card" style="background: linear-gradient(135deg, #28A745 0%, #34CE57 100%); color: white;">
+            <h3 style="color: white; margin: 0;">🏗️ Physical Process: Building to Last Centuries</h3>
+            <p style="opacity: 0.9; margin: 0.5rem 0 0 0;">The eternal principles that create structures outliving their builders</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("""
+            <div class="enterprise-card">
+                <h4 style="color: #28A745;">🏛️ Foundation Obsession</h4>
+                <p><strong>Both literal and metaphorical foundations determine everything.</strong></p>
+                <p>✓ Our soil reports and structural analysis ensure Highland Tower's literal foundation<br>
+                ✓ Project documentation creates the knowledge foundation for future projects<br>
+                ✓ Team training builds the skill foundation that outlasts any single project</p>
+                
+                <h4 style="color: #28A745;">🎯 Quality Over Speed</h4>
+                <p><strong>Every decision compounds over decades.</strong></p>
+                <p>✓ Material tracking ensures only specified-grade components are installed<br>
+                ✓ Quality inspections prevent the shortcuts that become expensive failures<br>
+                ✓ Audit trails create accountability that drives excellence</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown("""
+            <div class="enterprise-card">
+                <h4 style="color: #28A745;">🌿 Material Respect</h4>
+                <p><strong>Understanding that buildings outlive their builders.</strong></p>
+                <p>✓ Environmental impact tracking honors future generations<br>
+                ✓ Durability analysis ensures Highland Tower stands for 100+ years<br>
+                ✓ Sustainable practices respect both materials and planet</p>
+                
+                <h4 style="color: #28A745;">👥 Team Leadership</h4>
+                <p><strong>Inspiring others to share your vision of permanence.</strong></p>
+                <p>✓ Progress celebrations keep teams motivated through difficult phases<br>
+                ✓ Clear communication ensures everyone understands their role in the legacy<br>
+                ✓ Recognition systems honor the craftspeople creating something eternal</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Psychology Integration
+        st.markdown("""
+        <div class="enterprise-card" style="background: linear-gradient(135deg, #FFC107 0%, #FFD54F 100%); color: #333;">
+            <h3 style="color: #333;">🧠 How gcPanel Honors the Builder's Psychology</h3>
             
-            <h3 style="color: #28A745;">🔧 You Have the Right Tools</h3>
-            <p>gcPanel gives you the same advanced technology used by Fortune 500 construction companies. 
-            You're not just managing a project - you're commanding a digital construction empire.</p>
-            
-            <h3 style="color: #28A745;">📈 Smart Decision Making</h3>
-            <p>Every great project manager has felt that "Where do I even start?" moment. 
-            The difference? They had systems. gcPanel IS your system.</p>
-            
-            <h3 style="color: #28A745;">👥 You're Not Alone</h3>
-            <p>Behind every metric, every dashboard, every alert is a tool designed by people who've built 
-            hundreds of projects. You're standing on the shoulders of giants.</p>
-            
-            <h3 style="color: #28A745;">🏆 The End Goal</h3>
-            <p>In 24 months, you'll watch families move into beautiful homes and businesses open their doors 
-            in spaces you helped create. That's not just construction - that's community building.</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                <div>
+                    <h4 style="color: #333;">✓ We Address the Overwhelm</h4>
+                    <p style="color: #333;">Managing $45.5M feels daunting because it IS daunting. We transform overwhelm into confidence through clarity and control.</p>
+                </div>
+                <div>
+                    <h4 style="color: #333;">✓ We Provide Control Systems</h4>
+                    <p style="color: #333;">AI-powered analytics satisfy humanity's deepest need: imposing order on chaos, making the unpredictable predictable.</p>
+                </div>
+                <div>
+                    <h4 style="color: #333;">✓ We Enable Legacy Thinking</h4>
+                    <p style="color: #333;">Every documentation system honors the builder's drive for immortality - creating knowledge that outlasts any individual.</p>
+                </div>
+                <div>
+                    <h4 style="color: #333;">✓ We Support the Builder's Mind</h4>
+                    <p style="color: #333;">From "Begin Building" to progress celebrations, we recognize construction as humanity's most psychologically fulfilling act.</p>
+                </div>
+            </div>
         </div>
         """, unsafe_allow_html=True)
         
@@ -455,7 +554,44 @@ def render_dashboard():
     
     st.markdown("---")
     
-    # Charts
+    # Builder's Psychology Integration in Dashboard
+    st.markdown("""
+    <div class="enterprise-card" style="background: linear-gradient(135deg, #6F42C1 0%, #8B5FBF 100%); color: white; text-align: center; margin: 1rem 0;">
+        <h4 style="margin: 0; color: white;">🧠 Builder's Mindset Active</h4>
+        <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">
+            "Vision Before Action" ✓ "Systems Thinking" ✓ "Foundation Obsession" ✓ "Legacy Thinking" ✓
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Psychology-Enhanced Project Insights
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        <div class="enterprise-card">
+            <h4 style="color: #6F42C1;">🎯 Today's Builder Focus</h4>
+            <p><strong>Vision Before Action:</strong> Highland Tower's 120 families are counting on your decisions today.</p>
+            <p><strong>Foundation Obsession:</strong> Every quality check you approve builds the legacy that will outlast us all.</p>
+            <p><strong>Systems Thinking:</strong> That MEP decision affects finishing schedules, which impacts move-in dates for real families.</p>
+            <p style="color: #28A745; font-weight: bold;">Remember: You're not just managing a project, you're materializing a vision that will stand for centuries.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div class="enterprise-card">
+            <h4 style="color: #28A745;">🏗️ Legacy Builders' Wisdom</h4>
+            <p><em>"The pyramids still stand because their builders thought in millennia, not quarters."</em></p>
+            <p><strong>Patience with Urgency:</strong> Rush builds waste. Excellence builds legacies.</p>
+            <p><strong>Material Respect:</strong> Every beam, every wire, every finish will outlive today's deadline pressure.</p>
+            <p style="color: #4A90E2; font-weight: bold;">You're part of humanity's oldest profession. Build with the dignity that deserves.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # Charts with psychological context
     col1, col2 = st.columns(2)
     with col1:
         st.subheader("📈 Progress Analytics")

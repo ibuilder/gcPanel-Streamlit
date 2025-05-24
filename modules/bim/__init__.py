@@ -16,6 +16,7 @@ This module follows a clear CRUD pattern with:
 """
 
 import streamlit as st
+import pandas as pd
 from modules.bim.components.model_viewer import (
     render_model_list,
     render_model_viewer,

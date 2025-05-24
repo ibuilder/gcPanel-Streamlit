@@ -969,4 +969,5 @@ def render():
     
     # Analytics Tab
     with tab4:
-        render_enhanced_contract_analytics()
+        st.markdown("### 📊 Contract Analytics")
+        st.info("Enhanced contract analytics coming soon")

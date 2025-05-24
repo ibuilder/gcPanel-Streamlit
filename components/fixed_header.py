@@ -112,15 +112,21 @@ def render_fixed_header():
     # Create a four-column layout for the header with no padding
     header_col1, header_col2, header_col3, header_col4 = st.columns([1, 2, 1, 0.5])
     
-    # Column 1: Logo
+    # Column 1: Enhanced Logo with animation
     with header_col1:
         st.markdown("""
-        <div style="display:flex; align-items:center; padding:0; margin:0;">
-            <div style="font-size:24px; color:#0099ff; margin-right:5px;">🏗️</div>
-            <div>
-                <span style="font-weight:bold; color:#0099ff;">gc</span><span style="font-weight:bold; color:#333333;">Panel</span>
+        <div style="display:flex; align-items:center; padding:0; margin:0;" class="logo-container">
+            <div style="font-size:24px; color:#f59e0b; margin-right:8px; transition: transform 0.3s ease;" class="logo-icon">🏗️</div>
+            <div style="font-family: 'Inter', sans-serif;">
+                <span style="font-weight:700; color:#1e293b; font-size:18px;">gc</span><span style="font-weight:700; color:#3b82f6; font-size:18px;">Panel</span>
+                <div style="font-size:10px; color:#64748b; line-height:1;">Construction Management</div>
             </div>
         </div>
+        <style>
+        .logo-container:hover .logo-icon {
+            transform: rotate(15deg) scale(1.1);
+        }
+        </style>
         """, unsafe_allow_html=True)
     
     # Column 2: Project Info (centered)

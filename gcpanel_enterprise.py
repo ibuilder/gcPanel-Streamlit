@@ -166,7 +166,65 @@ def apply_enterprise_theme():
         font-family: 'Inter', 'Segoe UI', sans-serif;
     }}
     h1, h2, h3 {{ color: {colors['primary']} !important; font-weight: 600; }}
-    .stSidebar {{ background: {colors['bg_card']}; }}
+    .stSidebar {{ 
+        background: {colors['bg_card']}; 
+        border-right: 6px solid {colors['primary']};
+        position: relative;
+        box-shadow: 6px 0 15px rgba(74, 144, 226, 0.3);
+    }}
+    .stSidebar::after {{
+        content: '';
+        position: absolute;
+        top: 0;
+        right: -6px;
+        width: 6px;
+        height: 100%;
+        background: linear-gradient(180deg, {colors['primary']} 0%, {colors['secondary']} 25%, {colors['success']} 50%, {colors['secondary']} 75%, {colors['primary']} 100%);
+        animation: pulse-border 4s ease-in-out infinite;
+        z-index: 1000;
+    }}
+    .stSidebar::before {{
+        content: '⭐ ✨ 🌟 ⭐ ✨ 🌟 ⭐ ✨ 🌟 ⭐ ✨ 🌟 ⭐ ✨ 🌟 ⭐ ✨ 🌟 ⭐ ✨ 🌟';
+        position: absolute;
+        top: 0;
+        right: -12px;
+        width: 12px;
+        height: 2000px;
+        font-size: 14px;
+        line-height: 40px;
+        color: #FFD700;
+        animation: star-scroll 8s linear infinite;
+        z-index: 1001;
+        text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+        writing-mode: vertical-lr;
+        text-orientation: mixed;
+    }}
+    @keyframes pulse-border {{
+        0%, 100% {{
+            background: linear-gradient(180deg, {colors['primary']} 0%, {colors['secondary']} 25%, {colors['success']} 50%, {colors['secondary']} 75%, {colors['primary']} 100%);
+            box-shadow: 0 0 15px rgba(74, 144, 226, 0.5);
+        }}
+        25% {{
+            background: linear-gradient(180deg, {colors['secondary']} 0%, {colors['accent']} 25%, #FFD700 50%, {colors['accent']} 75%, {colors['secondary']} 100%);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+        }}
+        50% {{
+            background: linear-gradient(180deg, {colors['success']} 0%, #34CE57 25%, #FFD700 50%, #34CE57 75%, {colors['success']} 100%);
+            box-shadow: 0 0 25px rgba(40, 167, 69, 0.8);
+        }}
+        75% {{
+            background: linear-gradient(180deg, {colors['accent']} 0%, {colors['primary']} 25%, {colors['success']} 50%, {colors['primary']} 75%, {colors['accent']} 100%);
+            box-shadow: 0 0 20px rgba(74, 144, 226, 0.6);
+        }}
+    }}
+    @keyframes star-scroll {{
+        0% {{
+            transform: translateY(0px);
+        }}
+        100% {{
+            transform: translateY(-320px);
+        }}
+    }}
     .stButton > button {{
         background: linear-gradient(135deg, {colors['primary']} 0%, {colors['secondary']} 100%);
         color: white; border: none; border-radius: 8px; padding: 0.5rem 1rem;

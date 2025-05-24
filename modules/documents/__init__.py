@@ -29,6 +29,7 @@ def render():
         "📐 Construction Drawings",
         "📋 Project Specifications", 
         "📄 Contract Documents",
+        "📏 Sheet Numbering Guide",
         "📊 Document Analytics",
         "🔍 Document Search",
         "📤 Document Sharing"
@@ -43,13 +44,16 @@ def render():
     with tabs[2]:  # Contract Documents
         render_contract_documents()
     
-    with tabs[3]:  # Document Analytics
+    with tabs[3]:  # Sheet Numbering Guide
+        render_sheet_numbering_guide()
+    
+    with tabs[4]:  # Document Analytics
         render_document_analytics()
     
-    with tabs[4]:  # Document Search
+    with tabs[5]:  # Document Search
         render_document_search()
     
-    with tabs[5]:  # Document Sharing
+    with tabs[6]:  # Document Sharing
         render_document_sharing()
 
 def render_drawings_management():

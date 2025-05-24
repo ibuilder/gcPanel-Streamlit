@@ -482,133 +482,7 @@ def render_form():
                     st.error("Error updating project details")
     
     with tab2:
-        st.subheader("Project Contacts")
-        
-        with st.form("project_contacts_form"):
-            # Owner information
-            st.write("**Owner Information**")
-            
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                owner_name = st.text_input(
-                    "Owner Name",
-                    value=project_info.get('owner_name', {}).get('value', ''),
-                    help=project_info.get('owner_name', {}).get('description', '')
-                )
-                
-                owner_contact = st.text_input(
-                    "Contact Person",
-                    value=project_info.get('owner_contact', {}).get('value', ''),
-                    help=project_info.get('owner_contact', {}).get('description', '')
-                )
-            
-            with col2:
-                owner_email = st.text_input(
-                    "Email",
-                    value=project_info.get('owner_email', {}).get('value', ''),
-                    help=project_info.get('owner_email', {}).get('description', '')
-                )
-                
-                owner_phone = st.text_input(
-                    "Phone",
-                    value=project_info.get('owner_phone', {}).get('value', ''),
-                    help=project_info.get('owner_phone', {}).get('description', '')
-                )
-            
-            st.write("---")
-            
-            # Architect information
-            st.write("**Architect Information**")
-            
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                architect_name = st.text_input(
-                    "Architect Name",
-                    value=project_info.get('architect_name', {}).get('value', ''),
-                    help=project_info.get('architect_name', {}).get('description', '')
-                )
-                
-                architect_contact = st.text_input(
-                    "Contact Person",
-                    value=project_info.get('architect_contact', {}).get('value', ''),
-                    help=project_info.get('architect_contact', {}).get('description', '')
-                )
-            
-            with col2:
-                architect_email = st.text_input(
-                    "Email",
-                    value=project_info.get('architect_email', {}).get('value', ''),
-                    help=project_info.get('architect_email', {}).get('description', '')
-                )
-                
-                architect_phone = st.text_input(
-                    "Phone",
-                    value=project_info.get('architect_phone', {}).get('value', ''),
-                    help=project_info.get('architect_phone', {}).get('description', '')
-                )
-            
-            st.write("---")
-            
-            # Contractor information
-            st.write("**Contractor Information**")
-            
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                contractor_name = st.text_input(
-                    "Contractor Name",
-                    value=project_info.get('contractor_name', {}).get('value', ''),
-                    help=project_info.get('contractor_name', {}).get('description', '')
-                )
-                
-                contractor_contact = st.text_input(
-                    "Contact Person",
-                    value=project_info.get('contractor_contact', {}).get('value', ''),
-                    help=project_info.get('contractor_contact', {}).get('description', '')
-                )
-            
-            with col2:
-                contractor_email = st.text_input(
-                    "Email",
-                    value=project_info.get('contractor_email', {}).get('value', ''),
-                    help=project_info.get('contractor_email', {}).get('description', '')
-                )
-                
-                contractor_phone = st.text_input(
-                    "Phone",
-                    value=project_info.get('contractor_phone', {}).get('value', ''),
-                    help=project_info.get('contractor_phone', {}).get('description', '')
-                )
-            
-            # Submit button
-            if st.form_submit_button("Save Contact Information"):
-                # Update all the fields
-                updates = {
-                    'owner_name': owner_name,
-                    'owner_contact': owner_contact,
-                    'owner_email': owner_email,
-                    'owner_phone': owner_phone,
-                    'architect_name': architect_name,
-                    'architect_contact': architect_contact,
-                    'architect_email': architect_email,
-                    'architect_phone': architect_phone,
-                    'contractor_name': contractor_name,
-                    'contractor_contact': contractor_contact,
-                    'contractor_email': contractor_email,
-                    'contractor_phone': contractor_phone
-                }
-                
-                success = True
-                for key, value in updates.items():
-                    if not update_project_info(key, value):
-                        success = False
-                
-                if success:
-                    st.success("Contact information updated successfully")
-                else:
-                    st.error("Error updating contact information")
+        render_project_contacts_crud()
     
     with tab3:
         st.subheader("📋 Project Delivery Method")
@@ -924,3 +798,425 @@ def render_form():
     if st.button("Return to Project Information"):
         st.session_state.current_view = "list"
         st.rerun()
+
+def render_project_contacts_crud():
+    """Render CRUD interface for project contacts with user creation and role management"""
+    import json
+    import uuid
+    import hashlib
+    from datetime import datetime
+    from assets.crud_styler import apply_crud_styles
+    
+    # Apply CRUD styling
+    apply_crud_styles()
+    
+    st.subheader("👥 Project Contacts Directory")
+    st.markdown("**Highland Tower Development - Comprehensive Contact Management**")
+    
+    # Initialize contacts data file
+    contacts_file = "data/project/contacts.json"
+    os.makedirs(os.path.dirname(contacts_file), exist_ok=True)
+    
+    # Load existing contacts
+    def load_contacts():
+        if os.path.exists(contacts_file):
+            try:
+                with open(contacts_file, 'r') as f:
+                    return json.load(f)
+            except:
+                return []
+        return []
+    
+    def save_contacts(contacts):
+        with open(contacts_file, 'w') as f:
+            json.dump(contacts, f, indent=2)
+    
+    def create_user_account(contact):
+        """Create user account with appropriate role permissions"""
+        # Generate temporary password
+        temp_password = f"Highland{contact['last_name']}{str(uuid.uuid4())[:6]}"
+        password_hash = hashlib.sha256(temp_password.encode()).hexdigest()
+        
+        # Determine role based on organization type
+        role_mapping = {
+            "Owner/Client": "owner",
+            "Architect": "architect", 
+            "Engineer": "engineer",
+            "General Contractor": "contractor",
+            "Subcontractor": "subcontractor",
+            "Consultant": "consultant",
+            "City/Government": "authority",
+            "Vendor/Supplier": "vendor"
+        }
+        
+        user_role = role_mapping.get(contact['organization_type'], 'viewer')
+        
+        # Create user record
+        user_data = {
+            "id": str(uuid.uuid4()),
+            "username": contact['email'],
+            "email": contact['email'],
+            "first_name": contact['first_name'],
+            "last_name": contact['last_name'],
+            "role": user_role,
+            "organization": contact['organization'],
+            "temp_password": temp_password,
+            "password_hash": password_hash,
+            "created_date": datetime.now().isoformat(),
+            "contact_id": contact['id'],
+            "status": "pending_activation",
+            "permissions": get_role_permissions(user_role)
+        }
+        
+        # Save user data
+        users_file = "data/users/project_users.json"
+        os.makedirs(os.path.dirname(users_file), exist_ok=True)
+        
+        users = []
+        if os.path.exists(users_file):
+            try:
+                with open(users_file, 'r') as f:
+                    users = json.load(f)
+            except:
+                users = []
+        
+        users.append(user_data)
+        
+        with open(users_file, 'w') as f:
+            json.dump(users, f, indent=2)
+        
+        return user_data
+    
+    def get_role_permissions(role):
+        """Define role-based permissions for Highland Tower Development"""
+        permissions = {
+            "owner": {
+                "modules": ["all"],
+                "actions": ["view", "create", "edit", "delete", "approve"],
+                "description": "Full access to all project modules and data"
+            },
+            "architect": {
+                "modules": ["documents", "bim", "field_operations", "meetings", "analytics"],
+                "actions": ["view", "create", "edit"],
+                "description": "Design documents, BIM, field coordination, meetings"
+            },
+            "engineer": {
+                "modules": ["documents", "bim", "field_operations", "safety"],
+                "actions": ["view", "create", "edit"],
+                "description": "Engineering documents, BIM, field operations, safety"
+            },
+            "contractor": {
+                "modules": ["all_except_contracts"],
+                "actions": ["view", "create", "edit"],
+                "description": "All modules except contract management"
+            },
+            "subcontractor": {
+                "modules": ["documents", "field_operations", "safety", "meetings"],
+                "actions": ["view", "create"],
+                "description": "Field operations, safety, relevant documents"
+            },
+            "consultant": {
+                "modules": ["documents", "meetings", "analytics"],
+                "actions": ["view", "create"],
+                "description": "Project documents, meetings, and analytics"
+            },
+            "authority": {
+                "modules": ["documents", "safety", "analytics"],
+                "actions": ["view"],
+                "description": "Read-only access to permits, safety, compliance"
+            },
+            "vendor": {
+                "modules": ["documents", "field_operations"],
+                "actions": ["view"],
+                "description": "Limited access to relevant documents and schedules"
+            },
+            "viewer": {
+                "modules": ["documents", "analytics"],
+                "actions": ["view"],
+                "description": "Read-only access to basic project information"
+            }
+        }
+        return permissions.get(role, permissions["viewer"])
+    
+    # Load current contacts
+    contacts = load_contacts()
+    
+    # CRUD Actions
+    action = st.radio(
+        "Select Action",
+        ["📋 View Contacts", "➕ Add Contact", "✏️ Edit Contact", "🗑️ Delete Contact"],
+        horizontal=True
+    )
+    
+    if action == "➕ Add Contact":
+        st.markdown("### Add New Contact to Highland Tower Development")
+        
+        with st.form("add_contact_form"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                first_name = st.text_input("First Name*", placeholder="John")
+                last_name = st.text_input("Last Name*", placeholder="Smith")
+                title = st.text_input("Job Title*", placeholder="Project Manager")
+                organization = st.text_input("Organization*", placeholder="Highland Properties LLC")
+            
+            with col2:
+                email = st.text_input("Email Address*", placeholder="john.smith@company.com")
+                phone = st.text_input("Phone Number", placeholder="(555) 123-4567")
+                mobile = st.text_input("Mobile Number", placeholder="(555) 987-6543")
+                
+                organization_type = st.selectbox(
+                    "Organization Type*",
+                    ["", "Owner/Client", "Architect", "Engineer", "General Contractor", 
+                     "Subcontractor", "Consultant", "City/Government", "Vendor/Supplier"]
+                )
+            
+            # Additional contact details
+            st.markdown("#### Additional Information")
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                address = st.text_area("Address", placeholder="123 Main Street\nSeattle, WA 98101")
+                specialization = st.text_input("Specialization/Trade", placeholder="Structural Engineering")
+            
+            with col2:
+                emergency_contact = st.text_input("Emergency Contact", placeholder="Name and phone")
+                notes = st.text_area("Notes", placeholder="Additional information about this contact")
+            
+            # User account creation option
+            create_account = st.checkbox(
+                "🔐 Create User Account", 
+                value=True,
+                help="Automatically create a user account with appropriate role permissions"
+            )
+            
+            if create_account:
+                st.info("📧 A temporary password will be generated and emailed to the contact for account activation.")
+            
+            # Submit button
+            if st.form_submit_button("➕ Add Contact", type="primary"):
+                if first_name and last_name and email and organization and organization_type:
+                    # Create new contact
+                    new_contact = {
+                        "id": str(uuid.uuid4()),
+                        "first_name": first_name,
+                        "last_name": last_name,
+                        "full_name": f"{first_name} {last_name}",
+                        "title": title,
+                        "organization": organization,
+                        "organization_type": organization_type,
+                        "email": email,
+                        "phone": phone,
+                        "mobile": mobile,
+                        "address": address,
+                        "specialization": specialization,
+                        "emergency_contact": emergency_contact,
+                        "notes": notes,
+                        "created_date": datetime.now().isoformat(),
+                        "status": "Active",
+                        "has_user_account": create_account
+                    }
+                    
+                    # Add to contacts list
+                    contacts.append(new_contact)
+                    save_contacts(contacts)
+                    
+                    # Create user account if requested
+                    if create_account:
+                        user_data = create_user_account(new_contact)
+                        st.success(f"✅ Contact added successfully!")
+                        st.success(f"🔐 User account created for {email}")
+                        st.info(f"📧 Temporary password: **{user_data['temp_password']}**")
+                        st.info(f"👤 Role assigned: **{user_data['role'].title()}**")
+                    else:
+                        st.success(f"✅ Contact added successfully!")
+                    
+                    st.rerun()
+                else:
+                    st.error("Please fill in all required fields (marked with *)")
+    
+    elif action == "📋 View Contacts":
+        st.markdown("### Highland Tower Development Contact Directory")
+        
+        if not contacts:
+            st.info("No contacts added yet. Use the 'Add Contact' option to get started.")
+        else:
+            # Filter and search options
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                org_filter = st.selectbox(
+                    "Filter by Organization Type",
+                    ["All"] + list(set([c['organization_type'] for c in contacts if c.get('organization_type')]))
+                )
+            
+            with col2:
+                search_term = st.text_input("Search Contacts", placeholder="Search by name, organization, or email")
+            
+            with col3:
+                st.metric("Total Contacts", len(contacts))
+            
+            # Filter contacts
+            filtered_contacts = contacts
+            
+            if org_filter != "All":
+                filtered_contacts = [c for c in filtered_contacts if c.get('organization_type') == org_filter]
+            
+            if search_term:
+                search_term = search_term.lower()
+                filtered_contacts = [
+                    c for c in filtered_contacts 
+                    if search_term in c.get('full_name', '').lower() or 
+                       search_term in c.get('organization', '').lower() or 
+                       search_term in c.get('email', '').lower()
+                ]
+            
+            # Display contacts in cards
+            for contact in filtered_contacts:
+                with st.expander(f"👤 {contact['full_name']} - {contact['title']} ({contact['organization']})"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.markdown(f"**📧 Email:** {contact['email']}")
+                        if contact.get('phone'):
+                            st.markdown(f"**📞 Phone:** {contact['phone']}")
+                        if contact.get('mobile'):
+                            st.markdown(f"**📱 Mobile:** {contact['mobile']}")
+                        st.markdown(f"**🏢 Organization Type:** {contact['organization_type']}")
+                    
+                    with col2:
+                        if contact.get('specialization'):
+                            st.markdown(f"**⚡ Specialization:** {contact['specialization']}")
+                        if contact.get('address'):
+                            st.markdown(f"**📍 Address:** {contact['address']}")
+                        st.markdown(f"**📅 Added:** {contact['created_date'][:10]}")
+                        
+                        # User account status
+                        if contact.get('has_user_account'):
+                            st.success("🔐 Has User Account")
+                        else:
+                            st.info("👤 Contact Only")
+                    
+                    if contact.get('notes'):
+                        st.markdown(f"**📝 Notes:** {contact['notes']}")
+    
+    elif action == "✏️ Edit Contact":
+        st.markdown("### Edit Contact Information")
+        
+        if not contacts:
+            st.info("No contacts available to edit.")
+        else:
+            # Select contact to edit
+            contact_options = [f"{c['full_name']} - {c['organization']}" for c in contacts]
+            selected_contact_idx = st.selectbox("Select Contact to Edit", range(len(contact_options)), format_func=lambda x: contact_options[x])
+            
+            if selected_contact_idx is not None:
+                contact = contacts[selected_contact_idx]
+                
+                with st.form("edit_contact_form"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        first_name = st.text_input("First Name*", value=contact.get('first_name', ''))
+                        last_name = st.text_input("Last Name*", value=contact.get('last_name', ''))
+                        title = st.text_input("Job Title*", value=contact.get('title', ''))
+                        organization = st.text_input("Organization*", value=contact.get('organization', ''))
+                    
+                    with col2:
+                        email = st.text_input("Email Address*", value=contact.get('email', ''))
+                        phone = st.text_input("Phone Number", value=contact.get('phone', ''))
+                        mobile = st.text_input("Mobile Number", value=contact.get('mobile', ''))
+                        
+                        org_types = ["Owner/Client", "Architect", "Engineer", "General Contractor", 
+                                   "Subcontractor", "Consultant", "City/Government", "Vendor/Supplier"]
+                        current_org_type = contact.get('organization_type', '')
+                        org_idx = org_types.index(current_org_type) if current_org_type in org_types else 0
+                        organization_type = st.selectbox("Organization Type*", org_types, index=org_idx)
+                    
+                    # Additional details
+                    address = st.text_area("Address", value=contact.get('address', ''))
+                    specialization = st.text_input("Specialization/Trade", value=contact.get('specialization', ''))
+                    emergency_contact = st.text_input("Emergency Contact", value=contact.get('emergency_contact', ''))
+                    notes = st.text_area("Notes", value=contact.get('notes', ''))
+                    
+                    # Submit button
+                    if st.form_submit_button("💾 Update Contact", type="primary"):
+                        if first_name and last_name and email and organization and organization_type:
+                            # Update contact
+                            contacts[selected_contact_idx].update({
+                                "first_name": first_name,
+                                "last_name": last_name,
+                                "full_name": f"{first_name} {last_name}",
+                                "title": title,
+                                "organization": organization,
+                                "organization_type": organization_type,
+                                "email": email,
+                                "phone": phone,
+                                "mobile": mobile,
+                                "address": address,
+                                "specialization": specialization,
+                                "emergency_contact": emergency_contact,
+                                "notes": notes,
+                                "updated_date": datetime.now().isoformat()
+                            })
+                            
+                            save_contacts(contacts)
+                            st.success("✅ Contact updated successfully!")
+                            st.rerun()
+                        else:
+                            st.error("Please fill in all required fields (marked with *)")
+    
+    elif action == "🗑️ Delete Contact":
+        st.markdown("### Delete Contact")
+        
+        if not contacts:
+            st.info("No contacts available to delete.")
+        else:
+            contact_options = [f"{c['full_name']} - {c['organization']}" for c in contacts]
+            selected_contact_idx = st.selectbox("Select Contact to Delete", range(len(contact_options)), format_func=lambda x: contact_options[x])
+            
+            if selected_contact_idx is not None:
+                contact = contacts[selected_contact_idx]
+                
+                st.warning(f"⚠️ Are you sure you want to delete **{contact['full_name']}** from {contact['organization']}?")
+                st.markdown("This action cannot be undone.")
+                
+                if contact.get('has_user_account'):
+                    st.error("🔐 This contact has an associated user account that will also need to be deactivated.")
+                
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    if st.button("🗑️ Delete Contact", type="primary"):
+                        contacts.pop(selected_contact_idx)
+                        save_contacts(contacts)
+                        st.success("✅ Contact deleted successfully!")
+                        st.rerun()
+                
+                with col2:
+                    if st.button("❌ Cancel"):
+                        st.info("Delete operation cancelled.")
+    
+    # Contact statistics
+    if contacts:
+        st.markdown("---")
+        st.markdown("### 📊 Contact Statistics")
+        
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            total_contacts = len(contacts)
+            st.metric("Total Contacts", total_contacts)
+        
+        with col2:
+            with_accounts = len([c for c in contacts if c.get('has_user_account')])
+            st.metric("User Accounts", with_accounts)
+        
+        with col3:
+            org_types = len(set([c['organization_type'] for c in contacts if c.get('organization_type')]))
+            st.metric("Organization Types", org_types)
+        
+        with col4:
+            organizations = len(set([c['organization'] for c in contacts if c.get('organization')]))
+            st.metric("Organizations", organizations)

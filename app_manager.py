@@ -166,13 +166,44 @@ def _render_ui_framework():
     # No need to render header here - it's now handled in app.py
     # This prevents duplicate headers
     
-    # Set up custom CSS for proper spacing of content
+    # Apply aggressive div removal for dashboard and all modules
     st.markdown("""
     <style>
+        /* ELIMINATE ALL unnecessary containers and divs throughout dashboard */
+        .main .block-container {
+            padding: 1rem !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+        }
+        
         /* Proper content spacing */
         .streamlit-container {
             padding-top: 0 !important;
         }
+        
+        /* Target specific container classes that create extra divs */
+        .css-1rs6os {display: none !important;}
+        .css-17ziqus {display: none !important;}
+        .css-12oz5g7 {display: none !important;}
+        .css-1y4p8pa {display: none !important;}
+        .css-91z34k {display: none !important;}
+        .css-1wrcr25 {display: none !important;}
+        .css-18e3th9 {display: none !important;}
+        .css-k1vhr4 {display: none !important;}
+        .css-1avcm0n {display: none !important;}
+        
+        /* Remove element containers and spacing */
+        .element-container {
+            margin: 0 !important; 
+            padding: 0 !important;
+            border: none !important;
+        }
+        
+        div[data-testid="element-container"] {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
         /* Fix navigation dropdown positioning */
         .stSelectbox {
             margin-top: 0 !important;

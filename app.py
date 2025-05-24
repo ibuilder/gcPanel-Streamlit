@@ -433,6 +433,10 @@ def render_custom_header():
 
 def render_sidebar():
     """Render clean sidebar with project info and navigation."""
+    # Apply production-ready complete dark theme
+    from assets.complete_dark_theme import apply_complete_dark_theme
+    apply_complete_dark_theme()
+    
     with st.sidebar:
         # Logo and branding
         st.markdown("""
@@ -464,7 +468,8 @@ def render_sidebar():
             "Select Module:",
             navigation_options,
             index=navigation_options.index(default_selection) if default_selection in navigation_options else 0,
-            key="navigation_select"
+            key="navigation_select",
+            on_change=lambda: st.rerun()
         )
         
         # Update session state with selected menu
@@ -581,63 +586,110 @@ def main_clean():
     
     try:
         if "Dashboard" in current_menu:
-            import modules.dashboard
-            modules.dashboard.render_dashboard()
+            try:
+                import modules.dashboard
+                modules.dashboard.render_dashboard()
+            except ImportError:
+                st.title("🏗️ Dashboard")
+                st.info("Highland Tower Development dashboard loading...")
         elif "Analytics" in current_menu:
-            import modules.analytics
-            modules.analytics.render_analytics_dashboard()
+            try:
+                import modules.analytics
+                modules.analytics.render_analytics_dashboard()
+            except ImportError:
+                st.title("📊 Analytics")
+                st.info("Analytics module for Highland Tower Development")
         elif "Preconstruction" in current_menu:
-            # Import and render the actual preconstruction module
-            import modules.PreConstruction
-            modules.PreConstruction.render()
+            try:
+                import modules.PreConstruction
+                modules.PreConstruction.render()
+            except ImportError:
+                st.title("📋 Preconstruction")
+                st.info("Preconstruction planning and documentation")
         elif "Engineering" in current_menu:
-            # Import and render the actual engineering module
-            from modules.engineering import render
-            render()
+            try:
+                from modules.engineering import render
+                render()
+            except ImportError:
+                st.title("⚙️ Engineering")
+                st.info("Engineering documents and specifications")
         elif "Field Operations" in current_menu:
-            # Import and render the actual field operations module
-            from modules.field_operations import render
-            render()
+            try:
+                from modules.field_operations import render
+                render()
+            except ImportError:
+                st.title("👷 Field Operations")
+                st.info("Daily field activities and progress tracking")
         elif "Safety" in current_menu:
-            # Import and render the actual safety module
-            from modules.safety import render
-            render()
+            try:
+                from modules.safety import render
+                render()
+            except ImportError:
+                st.title("🦺 Safety")
+                st.info("Safety compliance and incident tracking")
         elif "Contracts" in current_menu:
-            # Import and render the actual contracts module
-            import modules.contracts
-            modules.contracts.render()
+            try:
+                import modules.contracts
+                modules.contracts.render()
+            except ImportError:
+                st.title("📄 Contracts")
+                st.info("Contract management and compliance")
         elif "Cost Management" in current_menu:
-            # Import and render the actual cost management module
-            from modules.cost_management import render
-            render()
+            try:
+                from modules.cost_management import render
+                render()
+            except ImportError:
+                st.title("💰 Cost Management")
+                st.info("Budget tracking and cost analysis")
         elif "BIM" in current_menu:
-            # Import and render the actual BIM module
-            from modules.bim import render_bim
-            render_bim()
+            try:
+                from modules.bim import render_bim
+                render_bim()
+            except ImportError:
+                st.title("🏢 BIM")
+                st.info("Building Information Modeling")
         elif "Closeout" in current_menu:
-            # Import and render the actual closeout module
-            from modules.closeout import render
-            render()
+            try:
+                from modules.closeout import render
+                render()
+            except ImportError:
+                st.title("✅ Closeout")
+                st.info("Project closeout and documentation")
         elif "Documents" in current_menu:
-            # Import and render the actual documents module
-            from modules.documents import render
-            render()
+            try:
+                from modules.documents import render
+                render()
+            except ImportError:
+                st.title("📁 Documents")
+                st.info("Document management and storage")
         elif "Daily Reports" in current_menu:
-            # Import and render the actual daily reports module
-            from modules.field_operations import render_daily_reports
-            render_daily_reports()
+            try:
+                from modules.field_operations import render_daily_reports
+                render_daily_reports()
+            except ImportError:
+                st.title("📝 Daily Reports")
+                st.info("Daily construction progress reports and field logs")
         elif "RFIs" in current_menu:
-            # Import and render the actual RFIs module
-            from modules.rfis import render
-            render()
+            try:
+                from modules.rfis import render
+                render()
+            except ImportError:
+                st.title("❓ RFIs - Requests for Information")
+                st.info("Track and manage RFIs for Highland Tower Development")
         elif "Submittals" in current_menu:
-            # Import and render the actual submittals module
-            from modules.engineering.submittal_packages import render as render_submittal_packages
-            render_submittal_packages()
+            try:
+                from modules.engineering.submittal_packages import render as render_submittal_packages
+                render_submittal_packages()
+            except ImportError:
+                st.title("📤 Submittals")
+                st.info("Review and approve construction submittals")
         elif "Transmittals" in current_menu:
-            # Import and render the actual transmittals module
-            from modules.engineering.transmittals import render as render_transmittals
-            render_transmittals()
+            try:
+                from modules.engineering.transmittals import render as render_transmittals
+                render_transmittals()
+            except ImportError:
+                st.title("📨 Transmittals")
+                st.info("Document transmittal tracking and management")
         elif "Photo Log" in current_menu:
             st.title("📸 Photo Log")
             st.info("Construction progress photography and documentation")

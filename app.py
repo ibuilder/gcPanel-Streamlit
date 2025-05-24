@@ -26,6 +26,20 @@ import os
 from utils.ui_manager import set_page_config
 # import app_manager  # Temporarily disabled to fix module errors
 
+# Simple session state initialization
+def initialize_session_state():
+    """Initialize basic session state variables"""
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = False
+    if "current_menu" not in st.session_state:
+        st.session_state.current_menu = "Dashboard"
+    if "username" not in st.session_state:
+        st.session_state.username = "admin"
+    if "user_role" not in st.session_state:
+        st.session_state.user_role = "admin"
+    if "theme" not in st.session_state:
+        st.session_state.theme = "dark"
+
 # Import production configuration
 from config.production import ProductionConfig, setup_logging
 from utils.security import log_security_event
@@ -34,12 +48,12 @@ from utils.security import log_security_event
 logger = setup_logging()
 
 # Import feature showcase
-from modules.features_showcase import render_features_showcase
-from modules.mobile_field_companion import render_mobile_field_companion
+# from modules.features_showcase import render_features_showcase
+# from modules.mobile_field_companion import render_mobile_field_companion
 
 # Import AI features 
 # Modified to use modules directly instead of utility functions
-from modules.ai_assistant import render_ai_assistant
+# from modules.ai_assistant import render_ai_assistant
 
 # Import mobile optimization
 from utils.mobile.responsive_layout import add_mobile_styles
@@ -145,8 +159,8 @@ def main():
             </style>
             """, unsafe_allow_html=True)
         
-        # Initialize session state variables from app_manager
-        app_manager.initialize_session_state()
+        # Initialize session state variables
+        initialize_session_state()
         
         # Check authentication
         is_authenticated = False
@@ -428,6 +442,29 @@ def render_sidebar():
         **User:** {current_user}  
         **Role:** {user_role.title()}
         """)
+        
+        st.divider()
+        
+        # Light/Dark Theme Toggle at bottom of sidebar
+        st.markdown("### 🎨 Theme")
+        
+        current_theme = st.session_state.get("theme", "dark")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("🌙 Dark", 
+                        type="primary" if current_theme == "dark" else "secondary",
+                        use_container_width=True):
+                st.session_state.theme = "dark"
+                st.rerun()
+        
+        with col2:
+            if st.button("☀️ Light", 
+                        type="primary" if current_theme == "light" else "secondary", 
+                        use_container_width=True):
+                st.session_state.theme = "light"
+                st.rerun()
 
 def main_clean():
     """Clean main function with sidebar layout."""
@@ -439,57 +476,111 @@ def main_clean():
         initial_sidebar_state="expanded"
     )
     
-    # Apply clean all dark theme
-    st.markdown("""
-    <style>
-        /* All dark theme */
-        .stApp {
-            background-color: #0e1117;
-            color: white;
-        }
-        
-        /* Sidebar dark */
-        section[data-testid="stSidebar"] {
-            background-color: #262730;
-        }
-        
-        /* Main content area */
-        .main .block-container {
-            background-color: #0e1117;
-            color: white;
-        }
-        
-        /* Metrics dark */
-        [data-testid="metric-container"] {
-            background-color: #262730;
-            border: 1px solid #464854;
-            color: white;
-        }
-        
-        /* Text elements */
-        .stMarkdown {
-            color: white;
-        }
-        
-        /* Form elements dark */
-        .stSelectbox > div > div {
-            background-color: #262730;
-            color: white;
-            border: 1px solid #464854;
-        }
-        
-        /* Buttons dark */
-        .stButton > button {
-            background-color: #ff4b4b;
-            color: white;
-            border: none;
-        }
-        
-        .stButton > button:hover {
-            background-color: #ff6c6c;
-        }
-    </style>
-    """, unsafe_allow_html=True)
+    # Apply theme based on user selection
+    current_theme = st.session_state.get("theme", "dark")
+    
+    if current_theme == "dark":
+        st.markdown("""
+        <style>
+            /* Dark theme */
+            .stApp {
+                background-color: #0e1117;
+                color: white;
+            }
+            
+            /* Sidebar dark */
+            section[data-testid="stSidebar"] {
+                background-color: #262730;
+            }
+            
+            /* Main content area */
+            .main .block-container {
+                background-color: #0e1117;
+                color: white;
+            }
+            
+            /* Metrics dark */
+            [data-testid="metric-container"] {
+                background-color: #262730;
+                border: 1px solid #464854;
+                color: white;
+            }
+            
+            /* Text elements */
+            .stMarkdown {
+                color: white;
+            }
+            
+            /* Form elements dark */
+            .stSelectbox > div > div {
+                background-color: #262730;
+                color: white;
+                border: 1px solid #464854;
+            }
+            
+            /* Buttons dark */
+            .stButton > button {
+                background-color: #ff4b4b;
+                color: white;
+                border: none;
+            }
+            
+            .stButton > button:hover {
+                background-color: #ff6c6c;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <style>
+            /* Light theme */
+            .stApp {
+                background-color: #ffffff;
+                color: #262730;
+            }
+            
+            /* Sidebar light */
+            section[data-testid="stSidebar"] {
+                background-color: #f0f2f6;
+            }
+            
+            /* Main content area */
+            .main .block-container {
+                background-color: #ffffff;
+                color: #262730;
+            }
+            
+            /* Metrics light */
+            [data-testid="metric-container"] {
+                background-color: #f0f2f6;
+                border: 1px solid #d1d5db;
+                color: #262730;
+            }
+            
+            /* Text elements */
+            .stMarkdown {
+                color: #262730;
+            }
+            
+            /* Form elements light */
+            .stSelectbox > div > div {
+                background-color: #ffffff;
+                color: #262730;
+                border: 1px solid #d1d5db;
+            }
+            
+            /* Buttons light */
+            .stButton > button {
+                background-color: #ff4b4b;
+                color: white;
+                border: none;
+            }
+            
+            .stButton > button:hover {
+                background-color: #ff6c6c;
+            }
+        </style>
+        """, unsafe_allow_html=True)
     
     # Initialize basic session state
     if "authenticated" not in st.session_state:

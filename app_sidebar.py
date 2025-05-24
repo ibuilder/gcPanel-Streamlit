@@ -79,45 +79,120 @@ def render_sidebar():
         if st.button("💰 Budget Review", use_container_width=True, key="sidebar_budget"):
             st.session_state["current_menu"] = "Cost Management"
             st.rerun()
+        
+        st.divider()
+        
+        # Light/Dark Theme Toggle at bottom of sidebar
+        st.markdown("### 🎨 Theme")
+        
+        current_theme = st.session_state.get("theme", "dark")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("🌙 Dark", 
+                        type="primary" if current_theme == "dark" else "secondary",
+                        use_container_width=True,
+                        key="theme_dark"):
+                st.session_state.theme = "dark"
+                st.rerun()
+        
+        with col2:
+            if st.button("☀️ Light", 
+                        type="primary" if current_theme == "light" else "secondary", 
+                        use_container_width=True,
+                        key="theme_light"):
+                st.session_state.theme = "light"
+                st.rerun()
 
 def apply_sidebar_theme():
-    """Apply clean theme styling for sidebar layout."""
-    st.markdown("""
-    <style>
-        /* Clean theme */
-        .stApp {
-            background-color: #1e1e1e;
-            color: white;
-        }
-        
-        /* Sidebar styling */
-        .css-1d391kg {
-            background-color: #2d3e50;
-        }
-        
-        /* Main content area - clean spacing */
-        .main .block-container {
-            padding-top: 2rem;
-            padding-left: 2rem;
-            padding-right: 2rem;
-            max-width: 100%;
-        }
-        
-        /* Button styling */
-        .stButton > button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            width: 100%;
-        }
-        
-        .stButton > button:hover {
-            background-color: #2980b9;
-        }
-        
-        /* Form elements */
-        .stSelectbox > div > div {
+    """Apply theme styling based on user selection."""
+    current_theme = st.session_state.get("theme", "dark")
+    
+    if current_theme == "dark":
+        st.markdown("""
+        <style>
+            /* Dark theme */
+            .stApp {
+                background-color: #0e1117;
+                color: white;
+            }
+            
+            /* Sidebar dark */
+            section[data-testid="stSidebar"] {
+                background-color: #262730;
+            }
+            
+            /* Main content area */
+            .main .block-container {
+                background-color: #0e1117;
+                color: white;
+                padding-top: 2rem;
+                padding-left: 2rem;
+                padding-right: 2rem;
+                max-width: 100%;
+            }
+            
+            /* Button styling */
+            .stButton > button {
+                background-color: #ff4b4b;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                width: 100%;
+            }
+            
+            .stButton > button:hover {
+                background-color: #ff6c6c;
+            }
+            
+            /* Form elements dark */
+            .stSelectbox > div > div {
+                background-color: #262730;
+                color: white;
+                border: 1px solid #464854;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <style>
+            /* Light theme */
+            .stApp {
+                background-color: #ffffff;
+                color: #262730;
+            }
+            
+            /* Sidebar light */
+            section[data-testid="stSidebar"] {
+                background-color: #f0f2f6;
+            }
+            
+            /* Main content area */
+            .main .block-container {
+                background-color: #ffffff;
+                color: #262730;
+                padding-top: 2rem;
+                padding-left: 2rem;
+                padding-right: 2rem;
+                max-width: 100%;
+            }
+            
+            /* Button styling */
+            .stButton > button {
+                background-color: #3498db;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                width: 100%;
+            }
+            
+            .stButton > button:hover {
+                background-color: #2980b9;
+            }
+            
+            /* Form elements light */
+            .stSelectbox > div > div {
             background-color: #34495e;
             color: white;
             border: 1px solid #3498db;

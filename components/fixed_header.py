@@ -138,9 +138,13 @@ def render_fixed_header():
         </div>
         """, unsafe_allow_html=True)
     
-    # Column 3: Navigation dropdown
+    # Column 3: Navigation dropdown with debug info
     with header_col3:
         current_menu = st.session_state.get("current_menu", "Dashboard")
+        
+        # Debug: Print available options
+        st.write(f"Debug - Available options: {len(MENU_OPTIONS)}")
+        st.write(f"Current menu: {current_menu}")
         
         # Find current menu option with icon
         current_menu_option = "📊 Dashboard"
@@ -152,8 +156,8 @@ def render_fixed_header():
         selected_menu = st.selectbox(
             label="Navigation",
             options=MENU_OPTIONS,
-            index=MENU_OPTIONS.index(current_menu_option),
-            key="nav_dropdown",
+            index=MENU_OPTIONS.index(current_menu_option) if current_menu_option in MENU_OPTIONS else 0,
+            key=f"nav_dropdown_{len(MENU_OPTIONS)}",  # Force refresh with dynamic key
             label_visibility="collapsed"
         )
         

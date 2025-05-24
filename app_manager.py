@@ -19,6 +19,13 @@ from utils.cache_manager import CacheManager
 from utils.responsive_ui import apply_all_responsive_styles, detect_mobile
 from utils.search_manager import SearchManager
 
+# Import modules for standalone functionality
+import modules.daily_reports
+import modules.rfis
+import modules.submittals
+import modules.transmittals
+import modules.meetings
+
 # Import components
 from components.action_bar import render_action_bar
 from components.simple_breadcrumbs import simple_breadcrumbs, get_breadcrumbs_for_page
@@ -249,8 +256,8 @@ def render_selected_module(current_menu):
         "Project Information": render_project_information,
         "📅 Schedule": render_scheduling,
         "Schedule": render_scheduling,
-        "🤝 Meeting Management": lambda: modules.meetings.render(),
-        "meetings": lambda: modules.meetings.render(),
+        "🤝 Meeting Management": modules.meetings.render,
+        "Meeting Management": modules.meetings.render,
         "⚠️ Safety": render_safety,
         "Safety": render_safety,
         "📝 Contracts": lambda: modules.contracts.render(),
@@ -261,14 +268,14 @@ def render_selected_module(current_menu):
         "PreConstruction": lambda: modules.PreConstruction.render(),
         "📈 Analytics": render_analytics,
         "Analytics": render_analytics,
-        "❓ RFIs": render_rfis,
-        "RFIs": render_rfis,
-        "📦 Submittals": render_submittals,
-        "Submittals": render_submittals,
-        "📤 Transmittals": render_transmittals,
-        "Transmittals": render_transmittals,
-        "📝 Daily Reports": render_daily_reports_standalone,
-        "Daily Reports": render_daily_reports_standalone,
+        "❓ RFIs": modules.rfis.render,
+        "RFIs": modules.rfis.render,
+        "📦 Submittals": modules.submittals.render,
+        "Submittals": modules.submittals.render,
+        "📤 Transmittals": modules.transmittals.render,
+        "Transmittals": modules.transmittals.render,
+        "📝 Daily Reports": modules.daily_reports.render,
+        "Daily Reports": modules.daily_reports.render,
         "🚧 Field Operations": render_field_operations,
         "Field Operations": render_field_operations,
         "📄 Documents": render_documents,

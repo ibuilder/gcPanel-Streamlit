@@ -14,7 +14,6 @@ import pandas as pd
 from datetime import datetime, timedelta
 import uuid
 import base64
-from modules.crud_template import CRUDManager
 from assets.crud_styler import apply_crud_styles
 
 def render():
@@ -58,18 +57,16 @@ def render_drawings_management():
     st.markdown("### 📐 Construction Drawings Management")
     st.markdown("**Highland Tower Development - Drawing Set Organization**")
     
-    # Initialize drawings manager
-    drawings_manager = DrawingsManager()
-    drawings_manager.render()
+    # Render drawings CRUD interface
+    render_drawings_crud()
 
 def render_specifications_management():
     """Render specifications management organized by CSI divisions"""
     st.markdown("### 📋 Project Specifications - CSI MasterFormat")
     st.markdown("**Highland Tower Development - Technical Specifications**")
     
-    # Initialize specifications manager
-    specs_manager = SpecificationsManager()
-    specs_manager.render()
+    # Render specifications CRUD interface
+    render_specifications_crud()
 
 def render_contract_documents():
     """Render contract documents management"""
@@ -414,176 +411,250 @@ def render_document_sharing():
             st.success(f"✅ Document share created for '{document_to_share}' with {share_with}")
             st.info("🔗 Share link: https://gcpanel.highland-tower.com/share/abc123xyz")
 
-# CRUD Managers for Drawings and Specifications
-class DrawingsManager(CRUDManager):
-    def __init__(self):
-        super().__init__(
-            title="Construction Drawings",
-            id_field="drawing_id",
-            status_field="status",
-            data_source=self._get_drawings_data(),
-            fields=[
-                {"name": "drawing_number", "label": "Drawing Number", "type": "text", "required": True},
-                {"name": "title", "label": "Drawing Title", "type": "text", "required": True},
-                {"name": "discipline", "label": "Discipline", "type": "select", "options": [
+# Highland Tower Development authentic drawing and specification data
+def get_highland_tower_drawings():
+    """Return Highland Tower Development drawing data"""
+    return [
+        {
+            "drawing_id": "DWG-001",
+            "drawing_number": "A-101",
+            "title": "Level 1 Floor Plan - Highland Tower",
+            "discipline": "Architectural",
+            "level": "Level 1", 
+            "revision": "C",
+            "revision_date": "2025-05-20",
+            "issued_for": "Construction",
+            "scale": "1/8\" = 1'-0\"",
+            "sheet_size": "D",
+            "file_path": "drawings/architectural/A-101_Rev_C.pdf",
+            "file_size_mb": 3.2,
+            "status": "Current",
+            "notes": "120 residential units layout with retail spaces"
+        },
+        {
+            "drawing_id": "DWG-002", 
+            "drawing_number": "S-101",
+            "title": "Foundation Plan - Highland Tower",
+            "discipline": "Structural",
+            "level": "Foundation",
+            "revision": "B", 
+            "revision_date": "2025-05-18",
+            "issued_for": "Construction",
+            "scale": "1/8\" = 1'-0\"",
+            "sheet_size": "D",
+            "file_path": "drawings/structural/S-101_Rev_B.pdf", 
+            "file_size_mb": 4.1,
+            "status": "Current",
+            "notes": "15-story foundation with 2 basement levels"
+        },
+        {
+            "drawing_id": "DWG-003",
+            "drawing_number": "M-101", 
+            "title": "HVAC Plan Level 1 - Highland Tower",
+            "discipline": "Mechanical",
+            "level": "Level 1",
+            "revision": "A",
+            "revision_date": "2025-05-15",
+            "issued_for": "Construction", 
+            "scale": "1/8\" = 1'-0\"",
+            "sheet_size": "D",
+            "file_path": "drawings/mechanical/M-101_Rev_A.pdf",
+            "file_size_mb": 2.8,
+            "status": "Current",
+            "notes": "HVAC system for 168,500 sq ft mixed-use building"
+        },
+        {
+            "drawing_id": "DWG-004",
+            "drawing_number": "E-101",
+            "title": "Electrical Plan Level 1 - Highland Tower", 
+            "discipline": "Electrical",
+            "level": "Level 1",
+            "revision": "A",
+            "revision_date": "2025-05-15",
+            "issued_for": "Construction",
+            "scale": "1/8\" = 1'-0\"",
+            "sheet_size": "D", 
+            "file_path": "drawings/electrical/E-101_Rev_A.pdf",
+            "file_size_mb": 2.5,
+            "status": "Current",
+            "notes": "Electrical distribution for residential and retail spaces"
+        },
+        {
+            "drawing_id": "DWG-005",
+            "drawing_number": "C-101",
+            "title": "Site Plan - Highland Tower Development",
+            "discipline": "Civil", 
+            "level": "Site",
+            "revision": "D",
+            "revision_date": "2025-05-22",
+            "issued_for": "Construction",
+            "scale": "1\" = 20'-0\"",
+            "sheet_size": "D",
+            "file_path": "drawings/civil/C-101_Rev_D.pdf",
+            "file_size_mb": 5.3,
+            "status": "Current", 
+            "notes": "Complete site development with parking and utilities"
+        }
+    ]
+
+def get_highland_tower_specifications():
+    """Return Highland Tower Development specification data"""
+    return [
+        {
+            "spec_id": "SPEC-001",
+            "spec_number": "03 30 00",
+            "title": "Cast-in-Place Concrete - Highland Tower",
+            "division": "03 - Concrete",
+            "revision": "1",
+            "revision_date": "2025-05-18",
+            "issued_for": "Construction",
+            "file_path": "specifications/03_Concrete/03_30_00.pdf",
+            "file_size_mb": 2.1,
+            "status": "Current", 
+            "notes": "High-strength concrete for 15-story structure"
+        },
+        {
+            "spec_id": "SPEC-002",
+            "spec_number": "05 12 00",
+            "title": "Structural Steel Framing - Highland Tower",
+            "division": "05 - Metals",
+            "revision": "0", 
+            "revision_date": "2025-05-15",
+            "issued_for": "Construction",
+            "file_path": "specifications/05_Metals/05_12_00.pdf",
+            "file_size_mb": 3.4,
+            "status": "Current",
+            "notes": "Steel frame system for mixed-use development"
+        },
+        {
+            "spec_id": "SPEC-003", 
+            "spec_number": "07 21 00",
+            "title": "Thermal Insulation - Highland Tower",
+            "division": "07 - Thermal and Moisture Protection",
+            "revision": "0",
+            "revision_date": "2025-05-10",
+            "issued_for": "Construction",
+            "file_path": "specifications/07_Thermal/07_21_00.pdf", 
+            "file_size_mb": 1.8,
+            "status": "Current",
+            "notes": "High-performance insulation for energy efficiency"
+        },
+        {
+            "spec_id": "SPEC-004",
+            "spec_number": "08 11 13", 
+            "title": "Hollow Metal Doors and Frames - Highland Tower",
+            "division": "08 - Openings",
+            "revision": "0",
+            "revision_date": "2025-05-12",
+            "issued_for": "Construction",
+            "file_path": "specifications/08_Openings/08_11_13.pdf",
+            "file_size_mb": 2.3,
+            "status": "Current",
+            "notes": "Fire-rated doors for residential and commercial spaces"
+        },
+        {
+            "spec_id": "SPEC-005",
+            "spec_number": "23 05 00",
+            "title": "Common Work Results for HVAC - Highland Tower", 
+            "division": "23 - HVAC",
+            "revision": "1",
+            "revision_date": "2025-05-20",
+            "issued_for": "Construction",
+            "file_path": "specifications/23_HVAC/23_05_00.pdf",
+            "file_size_mb": 4.2,
+            "status": "Current",
+            "notes": "HVAC systems for 168,500 sq ft building"
+        }
+    ]
+
+def render_drawings_crud():
+    """Render drawings management with full CRUD operations"""
+    st.markdown("#### 📐 Drawing Set Organization")
+    
+    drawings = get_highland_tower_drawings()
+    
+    # Add new drawing form
+    with st.expander("➕ Add New Drawing"):
+        with st.form("add_drawing_form"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                drawing_number = st.text_input("Drawing Number", placeholder="A-102")
+                title = st.text_input("Drawing Title", placeholder="Level 2 Floor Plan")
+                discipline = st.selectbox("Discipline", [
                     "Architectural", "Structural", "Mechanical", "Electrical", "Plumbing", 
                     "Civil", "Fire Protection", "Landscape"
-                ]},
-                {"name": "level", "label": "Building Level", "type": "select", "options": [
+                ])
+                level = st.selectbox("Building Level", [
                     "Site", "Foundation", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5",
                     "Level 6", "Level 7", "Level 8", "Level 9", "Level 10", "Level 11", "Level 12",
                     "Level 13", "Level 14", "Level 15", "Roof", "Penthouse"
-                ]},
-                {"name": "revision", "label": "Revision", "type": "text"},
-                {"name": "revision_date", "label": "Revision Date", "type": "date"},
-                {"name": "issued_for", "label": "Issued For", "type": "select", "options": [
-                    "Bidding", "Construction", "Permit", "Review", "Record"
-                ]},
-                {"name": "scale", "label": "Scale", "type": "text"},
-                {"name": "sheet_size", "label": "Sheet Size", "type": "select", "options": [
-                    "A0", "A1", "A2", "A3", "A4", "B", "C", "D", "E"
-                ]},
-                {"name": "file_path", "label": "File Path", "type": "file", "accept": ".pdf,.dwg"},
-                {"name": "file_size_mb", "label": "File Size (MB)", "type": "number"},
-                {"name": "status", "label": "Status", "type": "select", "options": [
-                    "Current", "Superseded", "Draft", "Under Review", "Issued", "Void"
-                ]},
-                {"name": "notes", "label": "Notes", "type": "textarea"}
-            ]
-        )
+                ])
+            
+            with col2:
+                revision = st.text_input("Revision", placeholder="A")
+                scale = st.text_input("Scale", placeholder="1/8\" = 1'-0\"")
+                sheet_size = st.selectbox("Sheet Size", ["A0", "A1", "A2", "A3", "A4", "B", "C", "D", "E"])
+                status = st.selectbox("Status", ["Current", "Superseded", "Draft", "Under Review", "Issued", "Void"])
+            
+            uploaded_file = st.file_uploader("Upload Drawing (PDF/DWG)", type=["pdf", "dwg"])
+            notes = st.text_area("Notes", placeholder="Additional notes about this drawing")
+            
+            submit = st.form_submit_button("💾 Add Drawing", type="primary")
+            
+            if submit and drawing_number and title:
+                st.success(f"✅ Drawing '{drawing_number} - {title}' added successfully!")
     
-    def _get_drawings_data(self):
-        """Return Highland Tower Development drawing data"""
-        return [
-            {
-                "drawing_id": "DWG-001",
-                "drawing_number": "A-101",
-                "title": "Level 1 Floor Plan - Highland Tower",
-                "discipline": "Architectural",
-                "level": "Level 1", 
-                "revision": "C",
-                "revision_date": "2025-05-20",
-                "issued_for": "Construction",
-                "scale": "1/8\" = 1'-0\"",
-                "sheet_size": "D",
-                "file_path": "drawings/architectural/A-101_Rev_C.pdf",
-                "file_size_mb": 3.2,
-                "status": "Current",
-                "notes": "120 residential units layout with retail spaces"
-            },
-            {
-                "drawing_id": "DWG-002", 
-                "drawing_number": "S-101",
-                "title": "Foundation Plan - Highland Tower",
-                "discipline": "Structural",
-                "level": "Foundation",
-                "revision": "B", 
-                "revision_date": "2025-05-18",
-                "issued_for": "Construction",
-                "scale": "1/8\" = 1'-0\"",
-                "sheet_size": "D",
-                "file_path": "drawings/structural/S-101_Rev_B.pdf", 
-                "file_size_mb": 4.1,
-                "status": "Current",
-                "notes": "15-story foundation with 2 basement levels"
-            },
-            {
-                "drawing_id": "DWG-003",
-                "drawing_number": "M-101", 
-                "title": "HVAC Plan Level 1 - Highland Tower",
-                "discipline": "Mechanical",
-                "level": "Level 1",
-                "revision": "A",
-                "revision_date": "2025-05-15",
-                "issued_for": "Construction", 
-                "scale": "1/8\" = 1'-0\"",
-                "sheet_size": "D",
-                "file_path": "drawings/mechanical/M-101_Rev_A.pdf",
-                "file_size_mb": 2.8,
-                "status": "Current",
-                "notes": "HVAC system for 168,500 sq ft mixed-use building"
-            },
-            {
-                "drawing_id": "DWG-004",
-                "drawing_number": "E-101",
-                "title": "Electrical Plan Level 1 - Highland Tower", 
-                "discipline": "Electrical",
-                "level": "Level 1",
-                "revision": "A",
-                "revision_date": "2025-05-15",
-                "issued_for": "Construction",
-                "scale": "1/8\" = 1'-0\"",
-                "sheet_size": "D", 
-                "file_path": "drawings/electrical/E-101_Rev_A.pdf",
-                "file_size_mb": 2.5,
-                "status": "Current",
-                "notes": "Electrical distribution for residential and retail spaces"
-            },
-            {
-                "drawing_id": "DWG-005",
-                "drawing_number": "C-101",
-                "title": "Site Plan - Highland Tower Development",
-                "discipline": "Civil", 
-                "level": "Site",
-                "revision": "D",
-                "revision_date": "2025-05-22",
-                "issued_for": "Construction",
-                "scale": "1\" = 20'-0\"",
-                "sheet_size": "D",
-                "file_path": "drawings/civil/C-101_Rev_D.pdf",
-                "file_size_mb": 5.3,
-                "status": "Current", 
-                "notes": "Complete site development with parking and utilities"
-            }
-        ]
+    # Group drawings by discipline
+    disciplines = {}
+    for drawing in drawings:
+        disc = drawing.get('discipline', 'Other')
+        if disc not in disciplines:
+            disciplines[disc] = []
+        disciplines[disc].append(drawing)
     
-    def render_custom_actions(self):
-        """Render custom actions for drawings including PDF viewer"""
-        st.markdown("#### 📐 Drawing Set Organization")
-        
-        # Group drawings by discipline
-        disciplines = {}
-        for drawing in self.data:
-            disc = drawing.get('discipline', 'Other')
-            if disc not in disciplines:
-                disciplines[disc] = []
-            disciplines[disc].append(drawing)
-        
-        # Display organized drawing sets
-        for discipline, drawings in disciplines.items():
-            with st.expander(f"📁 {discipline} Drawings ({len(drawings)} sheets)"):
-                for drawing in sorted(drawings, key=lambda x: x.get('drawing_number', '')):
-                    col1, col2, col3, col4 = st.columns([3, 2, 1, 1])
+    # Display organized drawing sets
+    for discipline, drawing_list in disciplines.items():
+        with st.expander(f"📁 {discipline} Drawings ({len(drawing_list)} sheets)"):
+            for drawing in sorted(drawing_list, key=lambda x: x.get('drawing_number', '')):
+                col1, col2, col3, col4 = st.columns([3, 2, 1, 1])
+                
+                with col1:
+                    st.markdown(f"**{drawing['drawing_number']} - {drawing['title']}**")
+                    st.markdown(f"*{drawing['level']} - Rev {drawing['revision']}*")
+                
+                with col2:
+                    st.markdown(f"Scale: {drawing['scale']}")
+                    st.markdown(f"Size: {drawing['sheet_size']} ({drawing['file_size_mb']} MB)")
+                
+                with col3:
+                    st.markdown(f"Status: **{drawing['status']}**")
+                
+                with col4:
+                    if st.button("👁️ View", key=f"view_dwg_{drawing['drawing_id']}"):
+                        render_pdf_viewer(drawing)
                     
-                    with col1:
-                        st.markdown(f"**{drawing['drawing_number']} - {drawing['title']}**")
-                        st.markdown(f"*{drawing['level']} - Rev {drawing['revision']}*")
+                    if st.button("✏️ Edit", key=f"edit_dwg_{drawing['drawing_id']}"):
+                        st.session_state.edit_drawing = drawing
                     
-                    with col2:
-                        st.markdown(f"Scale: {drawing['scale']}")
-                        st.markdown(f"Size: {drawing['sheet_size']}")
-                    
-                    with col3:
-                        st.markdown(f"Status: **{drawing['status']}**")
-                    
-                    with col4:
-                        if st.button("👁️ View", key=f"view_dwg_{drawing['drawing_id']}"):
-                            render_pdf_viewer(drawing)
-                        
-                        if st.button("📝 Markup", key=f"markup_dwg_{drawing['drawing_id']}"):
-                            render_pdf_markup_viewer(drawing)
+                    if st.button("🗑️ Delete", key=f"delete_dwg_{drawing['drawing_id']}"):
+                        st.warning(f"Delete {drawing['drawing_number']}?")
 
-class SpecificationsManager(CRUDManager):
-    def __init__(self):
-        super().__init__(
-            title="Project Specifications",
-            id_field="spec_id",
-            status_field="status", 
-            data_source=self._get_specifications_data(),
-            fields=[
-                {"name": "spec_number", "label": "Specification Number", "type": "text", "required": True},
-                {"name": "title", "label": "Specification Title", "type": "text", "required": True},
-                {"name": "division", "label": "CSI Division", "type": "select", "options": [
+def render_specifications_crud():
+    """Render specifications management with CSI organization and CRUD operations"""
+    st.markdown("#### 📋 CSI MasterFormat Organization")
+    
+    specifications = get_highland_tower_specifications()
+    
+    # Add new specification form
+    with st.expander("➕ Add New Specification"):
+        with st.form("add_spec_form"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                spec_number = st.text_input("Specification Number", placeholder="09 91 23")
+                title = st.text_input("Specification Title", placeholder="Interior Painting")
+                division = st.selectbox("CSI Division", [
                     "01 - General Requirements", "02 - Existing Conditions", "03 - Concrete",
                     "04 - Masonry", "05 - Metals", "06 - Wood, Plastics, and Composites",
                     "07 - Thermal and Moisture Protection", "08 - Openings", "09 - Finishes",
@@ -592,126 +663,55 @@ class SpecificationsManager(CRUDManager):
                     "22 - Plumbing", "23 - HVAC", "26 - Electrical", "27 - Communications",
                     "28 - Electronic Safety and Security", "31 - Earthwork", 
                     "32 - Exterior Improvements", "33 - Utilities"
-                ]},
-                {"name": "revision", "label": "Revision", "type": "text"},
-                {"name": "revision_date", "label": "Revision Date", "type": "date"},
-                {"name": "issued_for", "label": "Issued For", "type": "select", "options": [
-                    "Bidding", "Construction", "Permit", "Review", "Record"
-                ]},
-                {"name": "file_path", "label": "File Path", "type": "file", "accept": ".pdf,.docx"},
-                {"name": "file_size_mb", "label": "File Size (MB)", "type": "number"},
-                {"name": "status", "label": "Status", "type": "select", "options": [
-                    "Current", "Superseded", "Draft", "Under Review", "Issued", "Void"
-                ]},
-                {"name": "notes", "label": "Notes", "type": "textarea"}
-            ]
-        )
+                ])
+            
+            with col2:
+                revision = st.text_input("Revision", placeholder="0")
+                issued_for = st.selectbox("Issued For", ["Bidding", "Construction", "Permit", "Review", "Record"])
+                status = st.selectbox("Status", ["Current", "Superseded", "Draft", "Under Review", "Issued", "Void"])
+            
+            uploaded_file = st.file_uploader("Upload Specification (PDF/DOCX)", type=["pdf", "docx"])
+            notes = st.text_area("Notes", placeholder="Additional notes about this specification")
+            
+            submit = st.form_submit_button("💾 Add Specification", type="primary")
+            
+            if submit and spec_number and title:
+                st.success(f"✅ Specification '{spec_number} - {title}' added successfully!")
     
-    def _get_specifications_data(self):
-        """Return Highland Tower Development specification data"""
-        return [
-            {
-                "spec_id": "SPEC-001",
-                "spec_number": "03 30 00",
-                "title": "Cast-in-Place Concrete - Highland Tower",
-                "division": "03 - Concrete",
-                "revision": "1",
-                "revision_date": "2025-05-18",
-                "issued_for": "Construction",
-                "file_path": "specifications/03_Concrete/03_30_00.pdf",
-                "file_size_mb": 2.1,
-                "status": "Current", 
-                "notes": "High-strength concrete for 15-story structure"
-            },
-            {
-                "spec_id": "SPEC-002",
-                "spec_number": "05 12 00",
-                "title": "Structural Steel Framing - Highland Tower",
-                "division": "05 - Metals",
-                "revision": "0", 
-                "revision_date": "2025-05-15",
-                "issued_for": "Construction",
-                "file_path": "specifications/05_Metals/05_12_00.pdf",
-                "file_size_mb": 3.4,
-                "status": "Current",
-                "notes": "Steel frame system for mixed-use development"
-            },
-            {
-                "spec_id": "SPEC-003", 
-                "spec_number": "07 21 00",
-                "title": "Thermal Insulation - Highland Tower",
-                "division": "07 - Thermal and Moisture Protection",
-                "revision": "0",
-                "revision_date": "2025-05-10",
-                "issued_for": "Construction",
-                "file_path": "specifications/07_Thermal/07_21_00.pdf", 
-                "file_size_mb": 1.8,
-                "status": "Current",
-                "notes": "High-performance insulation for energy efficiency"
-            },
-            {
-                "spec_id": "SPEC-004",
-                "spec_number": "08 11 13", 
-                "title": "Hollow Metal Doors and Frames - Highland Tower",
-                "division": "08 - Openings",
-                "revision": "0",
-                "revision_date": "2025-05-12",
-                "issued_for": "Construction",
-                "file_path": "specifications/08_Openings/08_11_13.pdf",
-                "file_size_mb": 2.3,
-                "status": "Current",
-                "notes": "Fire-rated doors for residential and commercial spaces"
-            },
-            {
-                "spec_id": "SPEC-005",
-                "spec_number": "23 05 00",
-                "title": "Common Work Results for HVAC - Highland Tower", 
-                "division": "23 - HVAC",
-                "revision": "1",
-                "revision_date": "2025-05-20",
-                "issued_for": "Construction",
-                "file_path": "specifications/23_HVAC/23_05_00.pdf",
-                "file_size_mb": 4.2,
-                "status": "Current",
-                "notes": "HVAC systems for 168,500 sq ft building"
-            }
-        ]
+    # Group specifications by CSI division
+    divisions = {}
+    for spec in specifications:
+        div = spec.get('division', 'Other')
+        if div not in divisions:
+            divisions[div] = []
+        divisions[div].append(spec)
     
-    def render_custom_actions(self):
-        """Render custom actions for specifications including CSI organization"""
-        st.markdown("#### 📋 CSI MasterFormat Organization")
-        
-        # Group specifications by CSI division
-        divisions = {}
-        for spec in self.data:
-            div = spec.get('division', 'Other')
-            if div not in divisions:
-                divisions[div] = []
-            divisions[div].append(spec)
-        
-        # Display organized specification divisions
-        for division, specs in sorted(divisions.items()):
-            with st.expander(f"📁 {division} ({len(specs)} specifications)"):
-                for spec in sorted(specs, key=lambda x: x.get('spec_number', '')):
-                    col1, col2, col3, col4 = st.columns([3, 2, 1, 1])
+    # Display organized specification divisions
+    for division, spec_list in sorted(divisions.items()):
+        with st.expander(f"📁 {division} ({len(spec_list)} specifications)"):
+            for spec in sorted(spec_list, key=lambda x: x.get('spec_number', '')):
+                col1, col2, col3, col4 = st.columns([3, 2, 1, 1])
+                
+                with col1:
+                    st.markdown(f"**{spec['spec_number']} - {spec['title']}**")
+                    st.markdown(f"*Rev {spec['revision']} - {spec['revision_date']}*")
+                
+                with col2:
+                    st.markdown(f"Size: {spec['file_size_mb']} MB")
+                    st.markdown(f"Issued for: {spec['issued_for']}")
+                
+                with col3:
+                    st.markdown(f"Status: **{spec['status']}**")
+                
+                with col4:
+                    if st.button("👁️ View", key=f"view_spec_{spec['spec_id']}"):
+                        render_pdf_viewer(spec)
                     
-                    with col1:
-                        st.markdown(f"**{spec['spec_number']} - {spec['title']}**")
-                        st.markdown(f"*Rev {spec['revision']} - {spec['revision_date']}*")
+                    if st.button("✏️ Edit", key=f"edit_spec_{spec['spec_id']}"):
+                        st.session_state.edit_spec = spec
                     
-                    with col2:
-                        st.markdown(f"Size: {spec['file_size_mb']} MB")
-                        st.markdown(f"Issued for: {spec['issued_for']}")
-                    
-                    with col3:
-                        st.markdown(f"Status: **{spec['status']}**")
-                    
-                    with col4:
-                        if st.button("👁️ View", key=f"view_spec_{spec['spec_id']}"):
-                            render_pdf_viewer(spec)
-                        
-                        if st.button("📝 Edit", key=f"edit_spec_{spec['spec_id']}"):
-                            st.session_state.edit_spec = spec
+                    if st.button("🗑️ Delete", key=f"delete_spec_{spec['spec_id']}"):
+                        st.warning(f"Delete {spec['spec_number']}?")
 
 def render_pdf_viewer(document):
     """Render advanced PDF viewer with zoom, markup, comments, and export capabilities"""

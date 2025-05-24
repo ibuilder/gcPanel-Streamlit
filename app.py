@@ -691,20 +691,40 @@ def main_clean():
                 st.title("📨 Transmittals")
                 st.info("Document transmittal tracking and management")
         elif "Photo Log" in current_menu:
-            st.title("📸 Photo Log")
-            st.info("Construction progress photography and documentation")
+            try:
+                from modules.field_operations import render_photo_log
+                render_photo_log()
+            except (ImportError, AttributeError):
+                st.title("📸 Photo Log")
+                st.info("Construction progress photography and documentation - Highland Tower Development")
         elif "Safety Observations" in current_menu:
-            st.title("👁️ Safety Observations")
-            st.info("Field safety observations and compliance tracking")
+            try:
+                from modules.safety.observations import render_observations
+                render_observations()
+            except (ImportError, AttributeError):
+                st.title("👁️ Safety Observations")
+                st.info("Field safety observations and compliance tracking")
         elif "Incidents" in current_menu:
-            st.title("⚠️ Incident Reports")
-            st.info("Safety incident reporting and investigation")
+            try:
+                from modules.safety.incidents import render_incidents
+                render_incidents()
+            except (ImportError, AttributeError):
+                st.title("⚠️ Incident Reports")
+                st.info("Safety incident reporting and investigation")
         elif "Prime Contract" in current_menu:
-            st.title("📑 Prime Contract")
-            st.info("Prime contract management and administration")
+            try:
+                from modules.contracts.prime_contract import render_prime_contract
+                render_prime_contract()
+            except (ImportError, AttributeError):
+                st.title("📑 Prime Contract")
+                st.info("Prime contract management and administration")
         elif "Change Orders" in current_menu:
-            st.title("🔧 Change Orders")
-            st.info("Construction change order tracking and approval")
+            try:
+                from modules.contracts.change_orders import render_change_orders
+                render_change_orders()
+            except (ImportError, AttributeError):
+                st.title("🔧 Change Orders")
+                st.info("Construction change order tracking and approval")
         elif "Clash Detection" in current_menu:
             st.title("🎯 Clash Detection")
             st.info("BIM model clash detection and resolution")
@@ -718,11 +738,19 @@ def main_clean():
             st.title("📋 Inspections")
             st.info("Construction inspections and compliance verification")
         elif "Budget" in current_menu:
-            st.title("💵 Budget")
-            st.info("Detailed budget tracking and financial management")
+            try:
+                from modules.cost.budget import render_budget
+                render_budget()
+            except (ImportError, AttributeError):
+                st.title("💵 Budget")
+                st.info("Detailed budget tracking and financial management - Highland Tower Development")
         elif "Business Intelligence" in current_menu:
-            st.title("📊 Business Intelligence")
-            st.info("Advanced analytics and business intelligence dashboards")
+            try:
+                from modules.analytics.business_intelligence import render_business_intelligence
+                render_business_intelligence()
+            except (ImportError, AttributeError):
+                st.title("📊 Business Intelligence")
+                st.info("Advanced analytics and business intelligence dashboards")
         else:
             st.title(f"{current_menu}")
             st.info("Module content will be displayed here.")

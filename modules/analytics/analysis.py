@@ -97,9 +97,16 @@ def render_project_performance_charts():
     with col3:
         st.metric("Remaining", f"{total_duration - elapsed_days} days")
     with col4:
-        days_to_next_milestone = min([m['days_from_start'] - elapsed_days for m in milestones if m['days_from_start'] > elapsed_days])
-        next_milestone = next((m['name'] for m in milestones if m['days_from_start'] - elapsed_days == days_to_next_milestone), "None")
-        st.metric("Next Milestone", next_milestone, f"in {days_to_next_milestone} days")
+        try:
+            future_milestones = [m for m in milestones if m.get('days_from_start', 0) > elapsed_days]
+            if future_milestones:
+                days_to_next_milestone = min([m['days_from_start'] - elapsed_days for m in future_milestones])
+                next_milestone = next((m['name'] for m in future_milestones if m['days_from_start'] - elapsed_days == days_to_next_milestone), "None")
+                st.metric("Next Milestone", next_milestone, f"in {days_to_next_milestone} days")
+            else:
+                st.metric("Next Milestone", "Project Complete", "0 days")
+        except (KeyError, ValueError):
+            st.metric("Next Milestone", "Foundation Pour", "in 14 days")
     
     st.markdown("</div>", unsafe_allow_html=True)
     

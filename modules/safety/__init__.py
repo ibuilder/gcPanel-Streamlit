@@ -13,10 +13,11 @@ The module follows the standardized CRUD styling for consistent user experience.
 import streamlit as st
 import pandas as pd
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 import random
 import os
 import json
+import uuid
 
 from assets.crud_styler import apply_crud_styles
 from modules.crud_template import CrudModule

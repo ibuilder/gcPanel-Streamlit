@@ -240,8 +240,12 @@ class BudgetItemModule(CrudModule):
                     )
                     
                     notes = st.text_area("Notes", value=item['notes'], height=100)
+                    
+                    # Return all form values
+                    return budget_item_id, description, cost_code, division, budgeted_amount, actual_amount, status, notes
                 
-                render_crud_fieldset("Basic Information", render_basic_info)
+                # Get form values
+                budget_item_id, description, cost_code, division, budgeted_amount, actual_amount, status, notes = render_basic_info()
                 
                 # Form Actions
                 form_actions = render_form_actions(

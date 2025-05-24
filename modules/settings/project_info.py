@@ -611,6 +611,158 @@ def render_form():
                     st.error("Error updating contact information")
     
     with tab3:
+        st.subheader("📋 Project Delivery Method")
+        st.markdown("**Configure the construction project delivery method for Highland Tower Development**")
+        
+        with st.form("project_delivery_method_form"):
+            st.markdown("### Construction Project Delivery Methods")
+            st.markdown("*Based on industry standards from AIA and construction best practices*")
+            
+            # Primary Delivery Method Selection
+            delivery_method = st.selectbox(
+                "Primary Project Delivery Method",
+                options=[
+                    "",
+                    "Design-Bid-Build (Traditional)",
+                    "Design-Build (D-B)",
+                    "Construction Manager at Risk (CMAR)",
+                    "Construction Manager as Advisor (CMA)",
+                    "Integrated Project Delivery (IPD)",
+                    "Public-Private Partnership (P3)",
+                    "Build-Operate-Transfer (BOT)"
+                ],
+                index=0 if not project_info.get('project_delivery_method', {}).get('value') else 
+                      next((i for i, option in enumerate([
+                          "", "Design-Bid-Build (Traditional)", "Design-Build (D-B)",
+                          "Construction Manager at Risk (CMAR)", "Construction Manager as Advisor (CMA)",
+                          "Integrated Project Delivery (IPD)", "Public-Private Partnership (P3)",
+                          "Build-Operate-Transfer (BOT)"
+                      ]) if option == project_info.get('project_delivery_method', {}).get('value')), 0),
+                help="Select the primary project delivery method being used for this project"
+            )
+            
+            # Show delivery method description
+            delivery_descriptions = {
+                "Design-Bid-Build (Traditional)": "Traditional sequential approach where design is completed first, then bid, then built. Owner has separate contracts with architect and contractor.",
+                "Design-Build (D-B)": "Single entity provides both design and construction services under one contract, reducing project risk and timeline.",
+                "Construction Manager at Risk (CMAR)": "CM provides preconstruction services then enters into GMP contract to deliver the project, sharing construction risk.",
+                "Construction Manager as Advisor (CMA)": "CM acts as owner's agent throughout design and construction, providing expertise without construction risk.",
+                "Integrated Project Delivery (IPD)": "Collaborative delivery method integrating people, systems, and practices into a process that harnesses talents of all participants.",
+                "Public-Private Partnership (P3)": "Long-term contract between public agency and private sector entity for public infrastructure or services.",
+                "Build-Operate-Transfer (BOT)": "Private entity finances, builds, and operates facility for specified period before transferring to public sector."
+            }
+            
+            if delivery_method and delivery_method in delivery_descriptions:
+                st.info(f"**{delivery_method}:** {delivery_descriptions[delivery_method]}")
+            
+            st.markdown("---")
+            
+            # Contract Type Selection
+            contract_type = st.selectbox(
+                "Primary Contract Type",
+                options=[
+                    "",
+                    "Lump Sum (Fixed Price)",
+                    "Cost Plus Fixed Fee",
+                    "Cost Plus Percentage",
+                    "Guaranteed Maximum Price (GMP)",
+                    "Unit Price Contract",
+                    "Time and Materials",
+                    "Design-Build Lump Sum",
+                    "Progressive Design-Build"
+                ],
+                index=0 if not project_info.get('project_contract_type', {}).get('value') else
+                      next((i for i, option in enumerate([
+                          "", "Lump Sum (Fixed Price)", "Cost Plus Fixed Fee", "Cost Plus Percentage",
+                          "Guaranteed Maximum Price (GMP)", "Unit Price Contract", "Time and Materials",
+                          "Design-Build Lump Sum", "Progressive Design-Build"
+                      ]) if option == project_info.get('project_contract_type', {}).get('value')), 0),
+                help="Select the primary contract structure for the project"
+            )
+            
+            # Procurement Strategy
+            procurement_strategy = st.selectbox(
+                "Procurement Strategy",
+                options=[
+                    "",
+                    "Open Competitive Bidding",
+                    "Invitation to Bid (ITB)",
+                    "Request for Proposals (RFP)",
+                    "Request for Qualifications (RFQ)",
+                    "Negotiated Selection",
+                    "Best Value Selection",
+                    "Qualifications Based Selection (QBS)",
+                    "Two-Step Selection Process"
+                ],
+                index=0 if not project_info.get('project_procurement_strategy', {}).get('value') else
+                      next((i for i, option in enumerate([
+                          "", "Open Competitive Bidding", "Invitation to Bid (ITB)", "Request for Proposals (RFP)",
+                          "Request for Qualifications (RFQ)", "Negotiated Selection", "Best Value Selection",
+                          "Qualifications Based Selection (QBS)", "Two-Step Selection Process"
+                      ]) if option == project_info.get('project_procurement_strategy', {}).get('value')), 0),
+                help="Select the procurement and contractor selection strategy"
+            )
+            
+            # Delivery Method Benefits and Considerations
+            if delivery_method:
+                st.markdown("### Key Characteristics")
+                
+                benefits_considerations = {
+                    "Design-Bid-Build (Traditional)": {
+                        "benefits": ["Clear price before construction", "Competitive bidding", "Established legal framework", "Owner control over design"],
+                        "considerations": ["Longer project duration", "Limited contractor input during design", "Potential for change orders"]
+                    },
+                    "Design-Build (D-B)": {
+                        "benefits": ["Single point of responsibility", "Faster project delivery", "Early contractor involvement", "Reduced change orders"],
+                        "considerations": ["Less owner control over design details", "Need for clear performance specifications", "Contractor selection complexity"]
+                    },
+                    "Construction Manager at Risk (CMAR)": {
+                        "benefits": ["Early cost feedback", "Constructability input", "Phased construction possible", "Risk transfer to CM"],
+                        "considerations": ["GMP negotiation complexity", "Need for experienced CM", "Potential cost growth before GMP"]
+                    },
+                    "Construction Manager as Advisor (CMA)": {
+                        "benefits": ["Independent cost advice", "No construction conflicts of interest", "Owner retains control", "Objective oversight"],
+                        "considerations": ["Owner retains construction risk", "Need separate contractor procurement", "Additional fee for CM services"]
+                    },
+                    "Integrated Project Delivery (IPD)": {
+                        "benefits": ["Enhanced collaboration", "Shared risk/reward", "Innovation encouraged", "Reduced waste"],
+                        "considerations": ["Complex contractual arrangements", "Cultural change required", "Limited legal precedent"]
+                    }
+                }
+                
+                if delivery_method in benefits_considerations:
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.markdown("**Key Benefits:**")
+                        for benefit in benefits_considerations[delivery_method]["benefits"]:
+                            st.markdown(f"• {benefit}")
+                    
+                    with col2:
+                        st.markdown("**Key Considerations:**")
+                        for consideration in benefits_considerations[delivery_method]["considerations"]:
+                            st.markdown(f"• {consideration}")
+            
+            # Submit button
+            if st.form_submit_button("Save Project Delivery Method"):
+                # Update delivery method fields
+                updates = {
+                    'project_delivery_method': delivery_method,
+                    'project_contract_type': contract_type,
+                    'project_procurement_strategy': procurement_strategy
+                }
+                
+                success = True
+                for key, value in updates.items():
+                    if not update_project_info(key, value):
+                        success = False
+                
+                if success:
+                    st.success("Project delivery method updated successfully")
+                else:
+                    st.error("Error updating project delivery method")
+    
+    with tab4:
         st.subheader("AIA Contract Document Numbering")
         st.markdown("**Configure contract documents using the official AIA numbering system**")
         

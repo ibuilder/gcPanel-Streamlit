@@ -29,11 +29,26 @@ def apply_theme():
         st.markdown("""
         <style>
             .stApp { background-color: #0e1117; color: white; }
-            section[data-testid="stSidebar"] { background-color: #262730; }
+            section[data-testid="stSidebar"] { 
+                background-color: #262730; 
+                color: white;
+            }
+            section[data-testid="stSidebar"] .stMarkdown { color: white; }
+            section[data-testid="stSidebar"] h1, 
+            section[data-testid="stSidebar"] h2, 
+            section[data-testid="stSidebar"] h3, 
+            section[data-testid="stSidebar"] h4, 
+            section[data-testid="stSidebar"] h5, 
+            section[data-testid="stSidebar"] h6 { color: white; }
+            section[data-testid="stSidebar"] p { color: #e2e8f0; }
+            section[data-testid="stSidebar"] .stSelectbox label { color: white; }
+            section[data-testid="stSidebar"] .stButton label { color: white; }
             .main .block-container { background-color: #0e1117; color: white; padding-top: 1rem; }
             [data-testid="metric-container"] { background-color: #262730; border: 1px solid #464854; color: white; }
             .stButton > button { background-color: #3498db; color: white; border: none; }
             .stButton > button:hover { background-color: #2980b9; }
+            .sidebar .sidebar-content { color: white; }
+            div[data-testid="stSidebar"] > div { color: white; }
         </style>
         """, unsafe_allow_html=True)
     else:
@@ -285,21 +300,431 @@ def render_main_content():
     
     if current_menu == "Dashboard":
         render_dashboard()
+    elif current_menu == "Preconstruction":
+        render_preconstruction()
+    elif current_menu == "Engineering":
+        render_engineering()
+    elif current_menu == "Field Operations":
+        render_field_operations()
+    elif current_menu == "Safety":
+        render_safety()
+    elif current_menu == "Contracts":
+        render_contracts()
+    elif current_menu == "Cost Management":
+        render_cost_management()
+    elif current_menu == "BIM":
+        render_bim()
+    elif current_menu == "Closeout":
+        render_closeout()
+    elif current_menu == "Analytics":
+        render_analytics()
+    elif current_menu == "Documents":
+        render_documents()
     else:
         st.title(f"🔧 {current_menu}")
-        st.info(f"The {current_menu} module is being developed. Coming soon!")
+        st.info(f"The {current_menu} module is being set up.")
+
+def render_preconstruction():
+    """Render Preconstruction module"""
+    st.title("🏗️ Preconstruction")
+    
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Dashboard", "Site Analysis", "Estimating", "Value Engineering", "Bid Management"])
+    
+    with tab1:
+        st.subheader("Preconstruction Dashboard")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Planning Phase", "85%", "5% this week")
+        with col2:
+            st.metric("Estimates Completed", "12/15", "2 pending")
+        with col3:
+            st.metric("Bid Packages", "8/10", "Final 2 in review")
         
-        # Module-specific placeholder content
-        if current_menu == "Safety":
-            st.subheader("Safety Overview")
-            st.success("Zero incidents this month")
-            st.write("Last safety meeting: January 15, 2025")
-        elif current_menu == "Analytics":
-            st.subheader("Project Analytics")
-            st.write("Performance metrics and reporting tools")
-        elif current_menu == "BIM":
-            st.subheader("BIM Integration")
-            st.write("3D model viewing and collaboration tools")
+        st.write("**Current Activities:**")
+        st.write("• Site survey completion - 95% done")
+        st.write("• Soil testing analysis - In progress")
+        st.write("• Permit applications submitted")
+        st.write("• Subcontractor bid review ongoing")
+    
+    with tab2:
+        st.subheader("Site Analysis")
+        st.write("**Site Conditions:**")
+        st.success("✅ Geotechnical report completed")
+        st.info("🔄 Environmental assessment in progress")
+        st.warning("⚠️ Utility coordination pending")
+    
+    with tab3:
+        st.subheader("Estimating & Takeoffs")
+        st.write("**Cost Estimates:**")
+        st.write("• Foundation: $2.1M")
+        st.write("• Structure: $15.8M")
+        st.write("• MEP: $8.4M")
+        st.write("• Finishes: $12.2M")
+        st.write("• Site work: $3.5M")
+    
+    with tab4:
+        st.subheader("Value Engineering")
+        st.write("**Savings Opportunities:**")
+        st.write("• Alternative foundation system: $350K savings")
+        st.write("• MEP efficiency upgrades: $180K savings")
+        st.write("• Material substitutions: $95K savings")
+    
+    with tab5:
+        st.subheader("Bid Management")
+        st.write("**Active Bid Packages:**")
+        st.write("• Excavation & Site Work - 5 bidders")
+        st.write("• Concrete & Masonry - 7 bidders")
+        st.write("• Steel Structure - 4 bidders")
+
+def render_engineering():
+    """Render Engineering module"""
+    st.title("⚙️ Engineering")
+    
+    tab1, tab2, tab3, tab4 = st.tabs(["RFIs", "Submittals", "Transmittals", "Design Coordination"])
+    
+    with tab1:
+        st.subheader("RFIs (Request for Information)")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Open RFIs", "12", "-3 this week")
+        with col2:
+            st.metric("Pending Response", "8", "2 overdue")
+        with col3:
+            st.metric("Avg Response Time", "3.2 days", "Target: 3 days")
+    
+    with tab2:
+        st.subheader("Submittals")
+        st.write("**Recent Submittals:**")
+        st.success("✅ HVAC Equipment - Approved")
+        st.warning("⏳ Elevator Systems - Under Review")
+        st.info("📋 Window Systems - Submitted")
+    
+    with tab3:
+        st.subheader("Transmittals")
+        st.write("**Document Transmittals:**")
+        st.write("• Structural drawings revision 3")
+        st.write("• MEP coordination drawings")
+        st.write("• Architectural details package")
+    
+    with tab4:
+        st.subheader("Design Coordination")
+        st.write("**Coordination Status:**")
+        st.write("• Architectural-Structural: 95% complete")
+        st.write("• MEP-Structural: 87% complete")
+        st.write("• Fire protection integration: 92% complete")
+
+def render_field_operations():
+    """Render Field Operations module"""
+    st.title("👷 Field Operations")
+    
+    tab1, tab2, tab3, tab4 = st.tabs(["Daily Reports", "Progress Tracking", "Quality Control", "Inspections"])
+    
+    with tab1:
+        st.subheader("Daily Reports")
+        st.write("**Today's Activities:**")
+        st.write("• Concrete pour - Level 8 deck")
+        st.write("• MEP rough-in - Levels 6-7")
+        st.write("• Drywall installation - Level 4")
+        st.write("• Site utilities installation")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Crew Size", "45", "+5 today")
+        with col2:
+            st.metric("Weather", "Clear", "Good conditions")
+    
+    with tab2:
+        st.subheader("Progress Tracking")
+        st.write("**Weekly Progress:**")
+        progress_data = pd.DataFrame({
+            'Activity': ['Foundation', 'Structure', 'MEP', 'Finishes'],
+            'Planned': [100, 75, 45, 20],
+            'Actual': [100, 78, 42, 18]
+        })
+        st.dataframe(progress_data)
+    
+    with tab3:
+        st.subheader("Quality Control")
+        st.write("**QC Checkpoints:**")
+        st.success("✅ Concrete strength tests passed")
+        st.success("✅ Structural inspections current")
+        st.warning("⚠️ Waterproofing inspection pending")
+    
+    with tab4:
+        st.subheader("Inspections")
+        st.write("**Upcoming Inspections:**")
+        st.write("• Foundation final - January 28")
+        st.write("• Electrical rough-in - January 30")
+        st.write("• Fire sprinkler - February 2")
+
+def render_safety():
+    """Render Safety module"""
+    st.title("🦺 Safety")
+    
+    tab1, tab2, tab3, tab4 = st.tabs(["Dashboard", "Incidents", "Training", "Compliance"])
+    
+    with tab1:
+        st.subheader("Safety Dashboard")
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Days Without Incident", "156", "+1")
+        with col2:
+            st.metric("Safety Score", "98%", "+0.5%")
+        with col3:
+            st.metric("Training Completion", "94%", "Target: 95%")
+        with col4:
+            st.metric("Inspections This Week", "12", "All passed")
+    
+    with tab2:
+        st.subheader("Incident Reports")
+        st.success("🎉 Zero incidents this month!")
+        st.write("**Recent Safety Highlights:**")
+        st.write("• New safety harness training completed")
+        st.write("• Updated fall protection protocols")
+        st.write("• Weekly toolbox talks conducted")
+    
+    with tab3:
+        st.subheader("Training Records")
+        st.write("**Required Training Status:**")
+        st.write("• OSHA 30-Hour: 89% completion")
+        st.write("• Fall Protection: 96% completion")
+        st.write("• Equipment Operation: 92% completion")
+    
+    with tab4:
+        st.subheader("Compliance Monitoring")
+        st.write("**Regulatory Compliance:**")
+        st.success("✅ OSHA compliance current")
+        st.success("✅ EPA requirements met")
+        st.info("📋 Monthly safety audit scheduled")
+
+def render_contracts():
+    """Render Contracts module"""
+    st.title("📄 Contracts")
+    
+    tab1, tab2, tab3, tab4 = st.tabs(["Prime Contract", "Subcontracts", "Change Orders", "Procurement"])
+    
+    with tab1:
+        st.subheader("Prime Contract")
+        st.write("**Contract Details:**")
+        st.write("• Contract Value: $45.5M")
+        st.write("• Duration: 24 months")
+        st.write("• Completion: March 2026")
+        st.write("• Performance: On schedule")
+    
+    with tab2:
+        st.subheader("Subcontracts")
+        st.write("**Major Subcontractors:**")
+        st.write("• Excavation: ABC Earthworks - $1.2M")
+        st.write("• Concrete: Metro Concrete - $8.5M")
+        st.write("• Steel: Steel Solutions - $6.8M")
+        st.write("• MEP: Technical Systems - $9.2M")
+    
+    with tab3:
+        st.subheader("Change Orders")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Pending COs", "3", "Review needed")
+        with col2:
+            st.metric("Approved COs", "$125K", "Within budget")
+    
+    with tab4:
+        st.subheader("Procurement")
+        st.write("**Material Orders:**")
+        st.write("• Structural steel: Delivered")
+        st.write("• Windows: In production")
+        st.write("• HVAC equipment: Ordered")
+
+def render_cost_management():
+    """Render Cost Management module"""
+    st.title("💰 Cost Management")
+    
+    tab1, tab2, tab3, tab4 = st.tabs(["Budget", "Cash Flow", "Billing", "Forecasting"])
+    
+    with tab1:
+        st.subheader("Budget Overview")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Original Budget", "$45.5M", "Baseline")
+        with col2:
+            st.metric("Current Budget", "$45.7M", "+$200K COs")
+        with col3:
+            st.metric("Spent to Date", "$30.4M", "67% of budget")
+    
+    with tab2:
+        st.subheader("Cash Flow Analysis")
+        st.write("**Monthly Cash Flow:**")
+        st.write("• January: $2.8M projected")
+        st.write("• February: $3.1M projected")
+        st.write("• March: $2.9M projected")
+    
+    with tab3:
+        st.subheader("AIA Billing (G702/G703)")
+        st.write("**Current Application:**")
+        st.write("• Application #8 - January 2025")
+        st.write("• Amount: $2,847,500")
+        st.write("• Status: Under review")
+    
+    with tab4:
+        st.subheader("Cost Forecasting")
+        st.write("**Projected Final Cost:**")
+        st.success("✅ On budget: $45.7M projected final")
+        st.write("• Remaining work: $15.3M")
+        st.write("• Contingency available: $450K")
+
+def render_bim():
+    """Render BIM module"""
+    st.title("🏢 BIM")
+    
+    tab1, tab2, tab3, tab4 = st.tabs(["Model Viewer", "Clash Detection", "4D Scheduling", "Model Coordination"])
+    
+    with tab1:
+        st.subheader("3D Model Viewer")
+        st.info("📱 Interactive 3D model viewer will load here")
+        st.write("**Model Information:**")
+        st.write("• Last updated: January 25, 2025")
+        st.write("• Model size: 485 MB")
+        st.write("• Elements: 12,847 objects")
+    
+    with tab2:
+        st.subheader("Clash Detection")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Active Clashes", "8", "-5 resolved")
+        with col2:
+            st.metric("Critical Clashes", "2", "Priority")
+        
+        st.write("**Recent Clashes:**")
+        st.warning("⚠️ HVAC duct conflicts with structural beam - Level 8")
+        st.info("🔄 Electrical conduit routing issue - Level 6")
+    
+    with tab3:
+        st.subheader("4D Scheduling")
+        st.write("**Construction Sequence:**")
+        st.write("• Foundation: Complete")
+        st.write("• Structure: 78% complete")
+        st.write("• MEP rough-in: 42% complete")
+        st.write("• Exterior envelope: 25% complete")
+    
+    with tab4:
+        st.subheader("Model Coordination")
+        st.write("**Coordination Status:**")
+        st.success("✅ Architectural model: Up to date")
+        st.success("✅ Structural model: Up to date")
+        st.warning("⚠️ MEP model: Update pending")
+
+def render_closeout():
+    """Render Closeout module"""
+    st.title("✅ Closeout")
+    
+    tab1, tab2, tab3, tab4 = st.tabs(["Punchlist", "Documentation", "Commissioning", "Handover"])
+    
+    with tab1:
+        st.subheader("Punchlist Management")
+        st.write("**Completion Status:**")
+        st.write("• Total items: 847")
+        st.write("• Completed: 623 (74%)")
+        st.write("• Remaining: 224")
+        st.write("• Critical: 12 items")
+    
+    with tab2:
+        st.subheader("Project Documentation")
+        st.write("**Required Documents:**")
+        st.success("✅ As-built drawings")
+        st.success("✅ Operation manuals")
+        st.warning("⏳ Warranty documentation")
+        st.info("📋 Final inspections pending")
+    
+    with tab3:
+        st.subheader("Systems Commissioning")
+        st.write("**Commissioning Status:**")
+        st.write("• HVAC systems: 85% complete")
+        st.write("• Fire safety: 92% complete")
+        st.write("• Electrical: 78% complete")
+        st.write("• Elevators: 95% complete")
+    
+    with tab4:
+        st.subheader("Project Handover")
+        st.write("**Handover Preparation:**")
+        st.write("• Training schedules prepared")
+        st.write("• Maintenance manuals compiled")
+        st.write("• Warranty periods documented")
+        st.write("• Final walkthrough scheduled")
+
+def render_analytics():
+    """Render Analytics module"""
+    st.title("📈 Analytics")
+    
+    tab1, tab2, tab3, tab4 = st.tabs(["KPIs", "Performance", "Trends", "Reports"])
+    
+    with tab1:
+        st.subheader("Key Performance Indicators")
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Schedule Performance", "102%", "+2% ahead")
+        with col2:
+            st.metric("Cost Performance", "99.2%", "Under budget")
+        with col3:
+            st.metric("Quality Score", "96%", "+1% improvement")
+        with col4:
+            st.metric("Safety Rating", "98%", "Excellent")
+    
+    with tab2:
+        st.subheader("Project Performance")
+        st.write("**Performance Trends:**")
+        st.write("• Productivity up 8% this quarter")
+        st.write("• Rework reduced by 15%")
+        st.write("• Material waste down 12%")
+    
+    with tab3:
+        st.subheader("Trend Analysis")
+        st.write("**Data Insights:**")
+        st.write("• Weather delays decreased 20%")
+        st.write("• Subcontractor performance improved")
+        st.write("• Change order frequency stable")
+    
+    with tab4:
+        st.subheader("Reports")
+        st.write("**Available Reports:**")
+        st.write("• Weekly progress report")
+        st.write("• Monthly financial summary")
+        st.write("• Safety performance report")
+        st.write("• Quality metrics dashboard")
+
+def render_documents():
+    """Render Documents module"""
+    st.title("📁 Documents")
+    
+    tab1, tab2, tab3, tab4 = st.tabs(["Drawings", "Specifications", "Correspondence", "Photos"])
+    
+    with tab1:
+        st.subheader("Project Drawings")
+        st.write("**Drawing Sets:**")
+        st.write("• Architectural: 45 sheets")
+        st.write("• Structural: 32 sheets")
+        st.write("• MEP: 68 sheets")
+        st.write("• Site/Civil: 12 sheets")
+    
+    with tab2:
+        st.subheader("Technical Specifications")
+        st.write("**Specification Sections:**")
+        st.write("• Division 03 - Concrete")
+        st.write("• Division 05 - Metals")
+        st.write("• Division 23 - HVAC")
+        st.write("• Division 26 - Electrical")
+    
+    with tab3:
+        st.subheader("Project Correspondence")
+        st.write("**Recent Communications:**")
+        st.write("• Architect coordination meeting notes")
+        st.write("• Owner approval requests")
+        st.write("• Permit agency responses")
+    
+    with tab4:
+        st.subheader("Photo Documentation")
+        st.write("**Photo Categories:**")
+        st.write("• Progress photos: 1,247 images")
+        st.write("• Quality documentation: 423 images")
+        st.write("• Safety inspections: 89 images")
 
 def main():
     """Main application entry point"""

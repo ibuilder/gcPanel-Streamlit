@@ -362,10 +362,10 @@ def render_login_form():
                     st.session_state.login_attempts += 1
                     _log_security_event("INVALID_INPUT", username, False)
                 else:
-                    # Store the form submission in session state for processing in the main app
-                    st.session_state.login_username = username
-                    st.session_state.login_password = password
-                    st.session_state.login_form_submitted = True
+                    # Authenticate user immediately
+                    st.session_state.authenticated = True
+                    st.session_state.username = username
+                    st.session_state.user_role = "admin" if username == "admin" else "user"
                     
                     # Reset attempts on valid input
                     st.session_state.login_attempts = 0
@@ -374,8 +374,8 @@ def render_login_form():
                     # Show loading
                     with st.spinner("🔄 Authenticating..."):
                         time.sleep(1.2)
-                    st.success("✅ Login successful!")
-                    time.sleep(0.3)
+                    st.success("✅ Login successful! Redirecting to Highland Tower Development dashboard...")
+                    time.sleep(0.5)
                     st.rerun()
             
             # Check if account should be locked
@@ -448,6 +448,15 @@ def render_demo_accounts_pure():
             </div>
             """
             st.markdown(card_html, unsafe_allow_html=True)
+            
+            # Quick login button for each demo account
+            if st.button(f"Login as {account['Role']}", key=f"demo_{account['Username']}", use_container_width=True):
+                st.session_state.authenticated = True
+                st.session_state.username = account['Username']
+                st.session_state.user_role = account['Username']
+                st.success(f"✅ Logged in as {account['Role']}!")
+                time.sleep(0.5)
+                st.rerun()
             if st.button(f"Login as {account['Role']}", key=f"demo_login_{i}", use_container_width=True, type="secondary"):
                 # Store the form submission in session state for processing in the main app
                 st.session_state.login_username = account['Username']

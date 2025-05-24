@@ -137,6 +137,14 @@ def render_sidebar():
                 st.session_state["current_menu"] = "Daily Reports"
                 st.rerun()
             
+            if st.button("📄 Submittals", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "Submittals" else "secondary"):
+                st.session_state["current_menu"] = "Submittals"
+                st.rerun()
+            
+            if st.button("📤 Transmittals", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "Transmittals" else "secondary"):
+                st.session_state["current_menu"] = "Transmittals"
+                st.rerun()
+            
             if st.button("📅 Scheduling", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "Scheduling" else "secondary"):
                 st.session_state["current_menu"] = "Scheduling"
                 st.rerun()
@@ -319,74 +327,64 @@ def render_dashboard():
                 title='Project Phase Progress (%)', barmode='group')
     st.plotly_chart(fig, use_container_width=True)
 
+@st.cache_resource
+def get_module_loader():
+    """Cached module loader for better performance"""
+    return {
+        "Preconstruction": lambda: __import__('modules.preconstruction', fromlist=['render']).render(),
+        "Engineering": lambda: __import__('modules.engineering', fromlist=['render']).render(),
+        "Field Operations": lambda: __import__('modules.field_operations', fromlist=['render']).render(),
+        "Safety": lambda: __import__('modules.safety', fromlist=['render']).render(),
+        "Contracts": lambda: __import__('modules.contracts', fromlist=['render']).render(),
+        "Cost Management": lambda: __import__('modules.cost_management', fromlist=['render']).render(),
+        "Closeout": lambda: __import__('modules.closeout', fromlist=['render']).render(),
+        "Analytics": lambda: __import__('modules.analytics', fromlist=['render']).render(),
+        "RFIs": lambda: __import__('modules.rfis', fromlist=['render']).render(),
+        "Daily Reports": lambda: __import__('modules.daily_reports', fromlist=['render']).render(),
+        "Submittals": lambda: __import__('modules.submittals', fromlist=['render']).render(),
+        "Transmittals": lambda: __import__('modules.transmittals', fromlist=['render']).render(),
+        "Settings": lambda: __import__('modules.settings', fromlist=['render']).render(),
+        "AI Assistant": lambda: __import__('modules.ai_assistant', fromlist=['render']).render(),
+        "Mobile Companion": lambda: __import__('modules.mobile_companion', fromlist=['render']).render(),
+        "Scheduling": lambda: __import__('modules.scheduling', fromlist=['render']).render(),
+    }
+
 def render_main_content():
-    """Render main content based on selected module"""
+    """Optimized main content renderer with efficient module loading"""
     current_menu = st.session_state.get("current_menu", "Dashboard")
     
-    # Add modules path to make imports work
-    import sys
-    import os
-    if '.' not in sys.path:
-        sys.path.append('.')
-    
-    try:
-        if current_menu == "Dashboard":
-            render_dashboard()
-        elif current_menu == "Preconstruction":
-            from modules.preconstruction import render as render_preconstruction
-            render_preconstruction()
-        elif current_menu == "Engineering":
-            from modules.engineering import render as render_engineering
-            render_engineering()
-        elif current_menu == "Field Operations":
-            from modules.field_operations import render as render_field
-            render_field()
-        elif current_menu == "Safety":
-            from modules.safety import render as render_safety
-            render_safety()
-        elif current_menu == "Contracts":
-            from modules.contracts import render as render_contracts
-            render_contracts()
-        elif current_menu == "Cost Management":
-            from modules.cost_management import render as render_cost
-            render_cost()
-        elif current_menu == "BIM":
-            from modules.bim import render as render_bim
-            render_bim()
-        elif current_menu == "Closeout":
-            from modules.closeout import render as render_closeout
-            render_closeout()
-        elif current_menu == "Analytics":
-            from modules.analytics import render as render_analytics
-            render_analytics()
-        elif current_menu == "Documents":
-            from modules.documents import render as render_documents
-            render_documents()
-        elif current_menu == "RFIs":
-            from modules.rfis import render as render_rfis
-            render_rfis()
-        elif current_menu == "Daily Reports":
-            from modules.daily_reports import render as render_daily
-            render_daily()
-        elif current_menu == "Settings":
-            from modules.settings import render as render_settings
-            render_settings()
-        elif current_menu == "AI Assistant":
-            import modules.ai_assistant as ai_module
-            ai_module.render()
-        elif current_menu == "Mobile Companion":
-            import modules.mobile_companion as mobile_module
-            mobile_module.render()
-        elif current_menu == "Scheduling":
-            from modules.scheduling import render as render_scheduling
-            render_scheduling()
-        else:
-            st.title(f"🔧 {current_menu}")
-            st.info(f"The {current_menu} module is being connected.")
-    
-    except Exception as e:
-        st.error(f"Error loading {current_menu} module: {str(e)}")
-        st.info("Please try selecting a different module or refresh the page.")
+    # Performance optimization with spinner
+    with st.spinner(f"Loading {current_menu}..."):
+        try:
+            if current_menu == "Dashboard":
+                render_dashboard()
+            elif current_menu == "BIM":
+                # BIM with fallback to viewer
+                try:
+                    __import__('modules.bim', fromlist=['render']).render()
+                except ImportError:
+                    __import__('modules.bim_viewer.basic_viewer', fromlist=['render']).render()
+            elif current_menu == "Documents":
+                # Documents with fallback to PDF viewer
+                try:
+                    __import__('modules.documents', fromlist=['render']).render()
+                except ImportError:
+                    __import__('modules.pdf_viewer.pdf_viewer', fromlist=['render']).render()
+            else:
+                # Load from cached module loader
+                module_loader = get_module_loader()
+                if current_menu in module_loader:
+                    module_loader[current_menu]()
+                else:
+                    st.title(f"🔧 {current_menu}")
+                    st.info(f"The {current_menu} module is being connected.")
+        
+        except ImportError as e:
+            st.error(f"Module not found: {current_menu}")
+            st.info("This module may not be fully implemented yet.")
+        except Exception as e:
+            st.error(f"Error loading {current_menu}: {str(e)}")
+            st.info("Please try refreshing or selecting a different module.")
 
 # Removed placeholder functions - now using actual sophisticated modules
 

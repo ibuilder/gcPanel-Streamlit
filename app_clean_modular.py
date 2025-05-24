@@ -298,83 +298,102 @@ def render_main_content():
     """Render main content based on selected module"""
     current_menu = st.session_state.get("current_menu", "Dashboard")
     
-    if current_menu == "Dashboard":
-        render_dashboard()
-    elif current_menu == "Preconstruction":
-        render_preconstruction()
-    elif current_menu == "Engineering":
-        render_engineering()
-    elif current_menu == "Field Operations":
-        render_field_operations()
-    elif current_menu == "Safety":
-        render_safety()
-    elif current_menu == "Contracts":
-        render_contracts()
-    elif current_menu == "Cost Management":
-        render_cost_management()
-    elif current_menu == "BIM":
-        render_bim()
-    elif current_menu == "Closeout":
-        render_closeout()
-    elif current_menu == "Analytics":
-        render_analytics()
-    elif current_menu == "Documents":
-        render_documents()
-    else:
-        st.title(f"🔧 {current_menu}")
-        st.info(f"The {current_menu} module is being set up.")
+    try:
+        if current_menu == "Dashboard":
+            render_dashboard()
+        elif current_menu == "Preconstruction":
+            # Import and use the sophisticated preconstruction module
+            import modules.preconstruction
+            modules.preconstruction.render()
+        elif current_menu == "Engineering":
+            # Import the advanced engineering module
+            try:
+                import modules.engineering
+                modules.engineering.render()
+            except ImportError:
+                import modules.rfis
+                modules.rfis.render()
+        elif current_menu == "Field Operations":
+            # Import field operations with daily reports and photo logs
+            try:
+                import modules.field_operations
+                modules.field_operations.render()
+            except ImportError:
+                import modules.daily_reports
+                modules.daily_reports.render()
+        elif current_menu == "Safety":
+            # Import safety management with incident tracking
+            try:
+                import modules.safety
+                modules.safety.render()
+            except ImportError:
+                st.title("🦺 Safety Management")
+                st.info("Safety module loading...")
+        elif current_menu == "Contracts":
+            # Import contracts with CRUD functionality
+            try:
+                import modules.contracts
+                modules.contracts.render()
+            except ImportError:
+                st.title("📄 Contract Management")
+                st.info("Contracts module loading...")
+        elif current_menu == "Cost Management":
+            # Import the sophisticated cost management with CRUD
+            try:
+                import modules.cost_management
+                modules.cost_management.render()
+            except ImportError:
+                st.title("💰 Cost Management")
+                st.info("Cost management module loading...")
+        elif current_menu == "BIM":
+            # Import BIM with 3D viewer and clash detection
+            try:
+                import modules.bim
+                modules.bim.render()
+            except ImportError:
+                try:
+                    import modules.bim_viewer.basic_viewer
+                    modules.bim_viewer.basic_viewer.render()
+                except ImportError:
+                    st.title("🏢 BIM Management")
+                    st.info("BIM module loading...")
+        elif current_menu == "Closeout":
+            # Import closeout module
+            try:
+                import modules.closeout
+                modules.closeout.render()
+            except ImportError:
+                st.title("✅ Project Closeout")
+                st.info("Closeout module loading...")
+        elif current_menu == "Analytics":
+            # Import analytics module
+            try:
+                import modules.analytics
+                modules.analytics.render()
+            except ImportError:
+                st.title("📈 Analytics & Business Intelligence")
+                st.info("Analytics module loading...")
+        elif current_menu == "Documents":
+            # Import document management
+            try:
+                import modules.documents
+                modules.documents.render()
+            except ImportError:
+                try:
+                    import modules.pdf_viewer.pdf_viewer
+                    modules.pdf_viewer.pdf_viewer.render()
+                except ImportError:
+                    st.title("📁 Document Management")
+                    st.info("Documents module loading...")
+        else:
+            st.title(f"🔧 {current_menu}")
+            st.info(f"The {current_menu} module is being connected.")
+    
+    except Exception as e:
+        st.error(f"Error loading {current_menu} module: {str(e)}")
+        st.info("Please try selecting a different module or refresh the page.")
 
-def render_preconstruction():
-    """Render Preconstruction module"""
-    st.title("🏗️ Preconstruction")
-    
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Dashboard", "Site Analysis", "Estimating", "Value Engineering", "Bid Management"])
-    
-    with tab1:
-        st.subheader("Preconstruction Dashboard")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("Planning Phase", "85%", "5% this week")
-        with col2:
-            st.metric("Estimates Completed", "12/15", "2 pending")
-        with col3:
-            st.metric("Bid Packages", "8/10", "Final 2 in review")
-        
-        st.write("**Current Activities:**")
-        st.write("• Site survey completion - 95% done")
-        st.write("• Soil testing analysis - In progress")
-        st.write("• Permit applications submitted")
-        st.write("• Subcontractor bid review ongoing")
-    
-    with tab2:
-        st.subheader("Site Analysis")
-        st.write("**Site Conditions:**")
-        st.success("✅ Geotechnical report completed")
-        st.info("🔄 Environmental assessment in progress")
-        st.warning("⚠️ Utility coordination pending")
-    
-    with tab3:
-        st.subheader("Estimating & Takeoffs")
-        st.write("**Cost Estimates:**")
-        st.write("• Foundation: $2.1M")
-        st.write("• Structure: $15.8M")
-        st.write("• MEP: $8.4M")
-        st.write("• Finishes: $12.2M")
-        st.write("• Site work: $3.5M")
-    
-    with tab4:
-        st.subheader("Value Engineering")
-        st.write("**Savings Opportunities:**")
-        st.write("• Alternative foundation system: $350K savings")
-        st.write("• MEP efficiency upgrades: $180K savings")
-        st.write("• Material substitutions: $95K savings")
-    
-    with tab5:
-        st.subheader("Bid Management")
-        st.write("**Active Bid Packages:**")
-        st.write("• Excavation & Site Work - 5 bidders")
-        st.write("• Concrete & Masonry - 7 bidders")
-        st.write("• Steel Structure - 4 bidders")
+# Removed placeholder functions - now using actual sophisticated modules
 
 def render_engineering():
     """Render Engineering module"""

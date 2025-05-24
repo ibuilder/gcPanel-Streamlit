@@ -196,25 +196,7 @@ def _handle_action_buttons(current_menu):
     if current_menu in PAGES_WITH_ACTIONS:
         render_action_bar(current_menu)
 
-def render_rfis():
-    """Render the RFIs module"""
-    from modules.rfis import render
-    render()
 
-def render_submittals():
-    """Render the Submittals module"""
-    from modules.submittals import render
-    render()
-
-def render_transmittals():
-    """Render the Transmittals module"""
-    from modules.transmittals import render
-    render()
-
-def render_daily_reports_standalone():
-    """Render the standalone Daily Reports module"""
-    from modules.daily_reports import render
-    render()
 
 def render_selected_module(current_menu):
     """

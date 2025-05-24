@@ -726,17 +726,33 @@ def main_clean():
                 st.title("🔧 Change Orders")
                 st.info("Construction change order tracking and approval")
         elif "Clash Detection" in current_menu:
-            st.title("🎯 Clash Detection")
-            st.info("BIM model clash detection and resolution")
+            try:
+                from modules.bim.clash_detection import render_clash_detection
+                render_clash_detection()
+            except (ImportError, AttributeError):
+                st.title("🎯 Clash Detection")
+                st.info("BIM model clash detection and resolution")
         elif "Resource Management" in current_menu:
-            st.title("👥 Resource Management")
-            st.info("Team coordination, equipment, and material management")
+            try:
+                from modules.resources.management import render_resource_management
+                render_resource_management()
+            except (ImportError, AttributeError):
+                st.title("👥 Resource Management")
+                st.info("Team coordination, equipment, and material management")
         elif "Quality Control" in current_menu:
-            st.title("🔍 Quality Control")
-            st.info("Quality assurance and control processes")
+            try:
+                from modules.quality.control import render_quality_control
+                render_quality_control()
+            except (ImportError, AttributeError):
+                st.title("🔍 Quality Control")
+                st.info("Quality assurance and control processes")
         elif "Inspections" in current_menu:
-            st.title("📋 Inspections")
-            st.info("Construction inspections and compliance verification")
+            try:
+                from modules.quality.inspections import render_inspections
+                render_inspections()
+            except (ImportError, AttributeError):
+                st.title("📋 Inspections")
+                st.info("Construction inspections and compliance verification")
         elif "Budget" in current_menu:
             try:
                 from modules.cost.budget import render_budget

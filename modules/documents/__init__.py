@@ -416,6 +416,22 @@ def get_highland_tower_drawings():
     """Return Highland Tower Development drawing data"""
     return [
         {
+            "drawing_id": "DWG-000",
+            "drawing_number": "HTD-MASTER",
+            "title": "Highland Tower Development - Complete Construction Plans",
+            "discipline": "All Disciplines",
+            "level": "All Levels", 
+            "revision": "CURRENT",
+            "revision_date": "2025-05-24",
+            "issued_for": "Construction",
+            "scale": "Various",
+            "sheet_size": "D",
+            "file_path": "data/documents/drawings/Highland-Tower-Construction-Plans.pdf",
+            "file_size_mb": 1.5,
+            "status": "Current",
+            "notes": "Complete construction plan set for Highland Tower Development - Authentic construction documents from sample plan set"
+        },
+        {
             "drawing_id": "DWG-001",
             "drawing_number": "A-101",
             "title": "Level 1 Floor Plan - Highland Tower",

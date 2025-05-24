@@ -326,27 +326,27 @@ def render_login_form():
     password = st.text_input(
         "🔒 Password", 
         type="password", 
-            key="password_input", 
-            placeholder="Enter your password",
-            help="Minimum 8 characters"
-        )
-        
-        # Options row
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            remember = st.checkbox("Remember me", value=False)
-        with col2:
-            if st.button("Forgot password?", type="secondary"):
-                st.info("Contact IT for password reset")
-        
-        # Show remaining attempts if any failures
-        if st.session_state.login_attempts > 0:
-            remaining_attempts = 5 - st.session_state.login_attempts
-            if remaining_attempts > 0:
-                st.warning(f"⚠️ {remaining_attempts} login attempts remaining before temporary lockout")
-        
-        # Enhanced login button with validation
-        if st.button("🚀 Sign In Securely", use_container_width=True, type="primary", key="signin_btn"):
+        key="password_input", 
+        placeholder="Enter your password",
+        help="Minimum 8 characters"
+    )
+    
+    # Options row
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        remember = st.checkbox("Remember me", value=False)
+    with col2:
+        if st.button("Forgot password?", type="secondary"):
+            st.info("Contact IT for password reset")
+    
+    # Show remaining attempts if any failures
+    if st.session_state.login_attempts > 0:
+        remaining_attempts = 5 - st.session_state.login_attempts
+        if remaining_attempts > 0:
+            st.warning(f"⚠️ {remaining_attempts} login attempts remaining before temporary lockout")
+    
+    # Enhanced login button with validation
+    if st.button("🚀 Sign In Securely", use_container_width=True, type="primary", key="signin_btn"):
             if not username or not password:
                 st.error("⚠️ Please enter both username/email and password")
                 st.session_state.login_attempts += 1
@@ -382,28 +382,20 @@ def render_login_form():
                 st.error("🔒 Account locked for 15 minutes due to multiple failed attempts")
                 st.rerun()
         
-        # OAuth section
-        st.markdown("---")
-        st.markdown("**Or continue with SSO:**")
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("🌐 Google", use_container_width=True, key="google_sso"):
-                st.info("🔧 Contact IT to enable Google SSO")
-                _log_security_event("SSO_ATTEMPT", "google_workspace", False)
-                
-        with col2:
-            if st.button("💼 Microsoft", use_container_width=True, key="microsoft_sso"):
-                st.info("🔧 Contact IT to enable Microsoft SSO")
-                _log_security_event("SSO_ATTEMPT", "microsoft_365", False)
+    # OAuth section
+    st.markdown("---")
+    st.markdown("**Or continue with SSO:**")
     
-    with tabs[1]:
-        # Pure Python demo accounts section
-        render_demo_accounts_pure()
-    
-    with tabs[2]:
-        # Pure Python registration section
-        render_registration_request()
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("🌐 Google", use_container_width=True, key="google_sso"):
+            st.info("🔧 Contact IT to enable Google SSO")
+            _log_security_event("SSO_ATTEMPT", "google_workspace", False)
+            
+    with col2:
+        if st.button("💼 Microsoft", use_container_width=True, key="microsoft_sso"):
+            st.info("🔧 Contact IT to enable Microsoft SSO")
+            _log_security_event("SSO_ATTEMPT", "microsoft_365", False)
 
 def render_demo_accounts_pure():
     """Render demo accounts section in pure Python."""

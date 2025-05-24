@@ -56,6 +56,9 @@ def init_database():
             ('project_value', '', 'Total project value/budget'),
             ('project_square_footage', '', 'Total square footage of the project'),
             ('project_stories', '', 'Number of stories/floors'),
+            ('project_delivery_method', '', 'Construction project delivery method'),
+            ('project_contract_type', '', 'Primary contract structure'),
+            ('project_procurement_strategy', '', 'Procurement and bidding strategy'),
             ('project_timezone', 'America/New_York', 'Project timezone')
         ]
         
@@ -226,6 +229,26 @@ def render_list():
             st.write("**Project Metrics:**")
             for metric in metrics:
                 st.write(metric)
+        
+        # Project Delivery Method Section
+        st.markdown("---")
+        st.subheader("📋 Project Delivery Method")
+        
+        delivery_info = []
+        if project_info.get('project_delivery_method', {}).get('value'):
+            delivery_info.append(f"**Delivery Method:** {project_info['project_delivery_method']['value']}")
+        
+        if project_info.get('project_contract_type', {}).get('value'):
+            delivery_info.append(f"**Contract Type:** {project_info['project_contract_type']['value']}")
+        
+        if project_info.get('project_procurement_strategy', {}).get('value'):
+            delivery_info.append(f"**Procurement Strategy:** {project_info['project_procurement_strategy']['value']}")
+        
+        if delivery_info:
+            for info in delivery_info:
+                st.write(info)
+        else:
+            st.info("Project delivery method not yet defined. Use the edit form to configure.")
     
     with col2:
         st.subheader("Project Contacts")
@@ -318,7 +341,7 @@ def render_form():
         return
     
     # Create tabs for different sections
-    tab1, tab2, tab3, tab4 = st.tabs(["Project Details", "Project Contacts", "Contract Information", "Project Settings"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Project Details", "Project Contacts", "Project Delivery Method", "Contract Information", "Project Settings"])
     
     with tab1:
         st.subheader("Project Details")

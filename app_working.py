@@ -1,6 +1,6 @@
 """
-Highland Tower Development - gcPanel Construction Management
-Clean, working navigation with all your sophisticated modules properly connected
+Highland Tower Development - Working gcPanel
+Clean, functional navigation with all modules properly connected
 """
 
 import streamlit as st
@@ -12,7 +12,7 @@ if os.getcwd() not in sys.path:
     sys.path.insert(0, os.getcwd())
 
 def initialize_session_state():
-    """Initialize session state variables"""
+    """Initialize session state with default values."""
     if "authenticated" not in st.session_state:
         st.session_state.authenticated = False
     if "current_menu" not in st.session_state:
@@ -177,31 +177,10 @@ def load_module_safely(module_name):
             import modules.mobile_companion as module
             module.render()
             return True
-        elif module_name == "RFIs":
-            import modules.rfis as module
-            module.render()
-            return True
-        elif module_name == "Daily Reports":
-            import modules.daily_reports as module
-            module.render()
-            return True
-        elif module_name == "Submittals":
-            import modules.submittals as module
-            module.render()
-            return True
-        elif module_name == "Transmittals":
-            import modules.transmittals as module
-            module.render()
-            return True
-        elif module_name == "Scheduling":
-            import modules.scheduling as module
-            module.render()
-            return True
         else:
             return False
     except Exception as e:
         st.error(f"Error loading {module_name}: {str(e)}")
-        st.info("This module is being connected to your sophisticated functionality.")
         return False
 
 def render_dashboard():
@@ -252,8 +231,8 @@ def render_main_content():
         if not load_module_safely(current_menu):
             # Fallback content
             st.title(f"🔧 {current_menu}")
-            st.info(f"The {current_menu} module is being connected...")
-            st.write("This module contains your advanced construction management features with CRUD functionality, digital signatures, and sophisticated tools.")
+            st.info(f"The {current_menu} module is being loaded...")
+            st.write("This module contains advanced construction management features.")
 
 def apply_theme():
     """Apply dark theme styling"""

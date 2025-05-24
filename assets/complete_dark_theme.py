@@ -343,7 +343,7 @@ def apply_complete_dark_theme():
         text-transform: uppercase !important;
     }
     
-    /* Hide Streamlit Elements */
+    /* COMPLETELY ELIMINATE SIDEBAR AND STREAMLIT ELEMENTS */
     #MainMenu, footer, header, .stDeployButton {
         visibility: hidden !important;
         display: none !important;
@@ -352,6 +352,37 @@ def apply_complete_dark_theme():
     [data-testid="stToolbar"] {
         visibility: hidden !important;
         display: none !important;
+    }
+    
+    /* AGGRESSIVE SIDEBAR REMOVAL */
+    [data-testid="stSidebar"],
+    .css-1d391kg,
+    .css-1lcbmhc,
+    .css-17eq0hr,
+    section[data-testid="stSidebar"],
+    .st-emotion-cache-1d391kg,
+    .st-emotion-cache-1lcbmhc,
+    .st-emotion-cache-17eq0hr,
+    [data-testid="collapsedControl"],
+    button[kind="headerNoPadding"],
+    .stSidebar {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        min-width: 0 !important;
+        max-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Force Main Content to Full Width */
+    .main .block-container {
+        margin-left: 0 !important;
+        padding-left: 2rem !important;
+    }
+    
+    .stApp > div:first-child {
+        margin-left: 0 !important;
     }
     
     /* Mobile Responsive Dark */

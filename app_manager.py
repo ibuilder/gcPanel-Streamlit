@@ -289,8 +289,32 @@ def render_selected_module(current_menu):
         "Admin": lambda: modules.admin.render()
     }
     
-    # Render the appropriate module based on the current menu selection
+    # Enhanced module rendering with fallback handling
+    module_rendered = False
+    
+    # First try direct mapping
     if current_menu in module_mapping:
-        module_mapping[current_menu]()
-    else:
-        st.error(f"Module '{current_menu}' not found")
+        try:
+            module_mapping[current_menu]()
+            module_rendered = True
+        except Exception as e:
+            st.error(f"Error loading {current_menu}: {str(e)}")
+    
+    # If not found, try finding the display name from MENU_MAP
+    if not module_rendered:
+        from app_config import MENU_MAP, MENU_OPTIONS
+        
+        # Try to find matching display name
+        for display_name in MENU_OPTIONS:
+            if MENU_MAP.get(display_name) == current_menu and display_name in module_mapping:
+                try:
+                    module_mapping[display_name]()
+                    module_rendered = True
+                    break
+                except Exception as e:
+                    st.error(f"Error loading {display_name}: {str(e)}")
+    
+    # Final fallback
+    if not module_rendered:
+        st.warning(f"Module '{current_menu}' not available")
+        st.info("Please select a module from the navigation dropdown above")

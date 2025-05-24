@@ -166,8 +166,8 @@ def render_fixed_header():
         )
         
         # Update current menu if selection changed
-        if selected_menu != current_menu_option:
-            new_menu = MENU_MAP[selected_menu]
+        if selected_menu and selected_menu != current_menu_option:
+            new_menu = MENU_MAP.get(selected_menu, selected_menu)
             st.session_state.current_menu = new_menu
             st.rerun()
     

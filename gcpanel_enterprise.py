@@ -596,16 +596,62 @@ def render_login():
     with tabs[1]:
         st.markdown("""
         <div class="enterprise-card">
-            <h2 style="color: #4A90E2;">🏗️ About Highland Tower Development</h2>
-            <p><strong>Project Vision:</strong> A stunning 15-story mixed-use development that will become a cornerstone of the community.</p>
+            <h2 style="color: #4A90E2;">🏗️ About gcPanel Enterprise Construction Platform</h2>
+            <p><strong>Professional Construction Management:</strong> gcPanel is the industry-leading platform that transforms complex construction projects into manageable, organized workflows.</p>
             
-            <h3 style="color: #4A90E2;">📊 Project Scale</h3>
+            <h3 style="color: #4A90E2;">🎯 Highland Tower Development Project</h3>
             <ul>
                 <li><strong>Investment:</strong> $45.5 Million</li>
                 <li><strong>Residential Units:</strong> 120 modern apartments</li>
                 <li><strong>Commercial Spaces:</strong> 8 retail units</li>
                 <li><strong>Height:</strong> 15 stories above ground + 2 below</li>
                 <li><strong>Timeline:</strong> 24-month construction period</li>
+                <li><strong>Total Square Footage:</strong> 168,500 sq ft</li>
+            </ul>
+            
+            <h3 style="color: #4A90E2;">🚀 Complete Module Suite</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                <div>
+                    <h4 style="color: #6F42C1;">📊 Core Modules</h4>
+                    <ul style="font-size: 0.9rem;">
+                        <li><strong>Dashboard</strong> - Project overview & KPIs</li>
+                        <li><strong>PreConstruction</strong> - Planning & design phase</li>
+                        <li><strong>Engineering</strong> - RFIs, submittals & drawings</li>
+                        <li><strong>Field Operations</strong> - Daily reports & management</li>
+                        <li><strong>Safety</strong> - Safety management & compliance</li>
+                        <li><strong>Contracts</strong> - Contract tracking & management</li>
+                        <li><strong>Cost Management</strong> - Budget, invoicing & payments</li>
+                        <li><strong>BIM</strong> - 3D models & clash detection</li>
+                        <li><strong>Closeout</strong> - Project completion & handover</li>
+                        <li><strong>Analytics</strong> - AI insights & reporting</li>
+                        <li><strong>Documents</strong> - Document control center</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: #6F42C1;">⚡ Advanced Tools</h4>
+                    <ul style="font-size: 0.9rem;">
+                        <li><strong>RFIs</strong> - Request for Information</li>
+                        <li><strong>Daily Reports</strong> - Daily progress tracking</li>
+                        <li><strong>Submittals</strong> - Submittal management</li>
+                        <li><strong>Transmittals</strong> - Document transmittals</li>
+                        <li><strong>Scheduling</strong> - Project scheduling</li>
+                        <li><strong>AI Assistant</strong> - AI-powered assistance</li>
+                        <li><strong>Mobile Companion</strong> - Mobile field tools</li>
+                        <li><strong>Settings</strong> - System configuration</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <h3 style="color: #4A90E2;">✨ Enterprise Features</h3>
+            <ul>
+                <li><strong>Real-time Collaboration:</strong> Multiple users, instant updates</li>
+                <li><strong>AI-Powered Analytics:</strong> Predictive insights and cost forecasting</li>
+                <li><strong>Mobile Integration:</strong> Field access from any device</li>
+                <li><strong>Digital Signatures:</strong> Streamlined approval workflows</li>
+                <li><strong>3D BIM Visualization:</strong> Interactive 3D model viewing</li>
+                <li><strong>Automated Reporting:</strong> Custom reports and dashboards</li>
+                <li><strong>Security & Compliance:</strong> Enterprise-grade security protocols</li>
+                <li><strong>Integration Ready:</strong> Connects with existing tools</li>
             </ul>
             
             <h3 style="color: #4A90E2;">🚀 What gcPanel Does For You</h3>

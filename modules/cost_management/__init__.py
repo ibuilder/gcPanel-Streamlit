@@ -988,14 +988,12 @@ def render():
         st.info("Change order management functionality available here")
     
     with tab4:
-        # AI-Powered Cost Forecasting
-        render_ai_cost_forecasting()
-        
-        # Budget Optimization
-        render_budget_optimization()
-        
-        # Real-Time Cost Tracking
-        render_real_time_cost_tracking()
+        # Analytics tab - refer to centralized Analytics module
+        st.markdown("### 📊 Cost Analytics")
+        st.info("📈 Complete cost analytics are available in the centralized Analytics module")
+        if st.button("📊 View Cost Analytics", type="primary"):
+            st.session_state.current_menu = "📊 Analytics"
+            st.rerun()
     
     # Create tabs for different cost management sections
     tab1, tab2, tab3, tab4 = st.tabs(["Budget Overview", "Budget Items", "Invoices", "AIA G702/G703 Billing"])

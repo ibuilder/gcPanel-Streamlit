@@ -931,8 +931,8 @@ def render_contract_risk_assessment():
         st.info("📋 Annual contract review due next month")
 
 def render():
-    """Render the Enhanced Contracts Management module."""
-    st.title("📄 Enhanced Contract Management")
+    """Render the Contracts Management module."""
+    st.title("📄 Contract Management")
     
     # Create tabs for different contract types and analytics
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Owner Contracts", "Subcontracts", "Change Orders", "Owner Change Orders", "Risk Analysis", "Analytics"])

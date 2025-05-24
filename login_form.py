@@ -299,16 +299,6 @@ def render_login_form():
         st.error(f"🔒 Account temporarily locked due to multiple failed attempts. Try again in {minutes_remaining} minutes.")
         return
     
-    # Show demo accounts prominently at the top
-    st.markdown("### 🎯 Quick Demo Access - Highland Tower Development")
-    st.markdown("**Try the platform instantly with these demo accounts:**")
-    
-    # Demo accounts section
-    render_demo_accounts_pure()
-    
-    # Divider
-    st.markdown("---")
-    
     # Production login form section
     st.markdown("### 🔐 Sign In to Your Account")
     
@@ -379,20 +369,13 @@ def render_login_form():
             st.error("🔒 Account locked for 15 minutes due to multiple failed attempts")
             st.rerun()
         
-    # OAuth section
+    # Demo accounts section at the bottom
     st.markdown("---")
-    st.markdown("**Or continue with SSO:**")
+    st.markdown("### 🎯 Quick Demo Access - Highland Tower Development")
+    st.markdown("**Try the platform instantly with these demo accounts:**")
     
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("🌐 Google", use_container_width=True, key="google_sso"):
-            st.info("🔧 Contact IT to enable Google SSO")
-            _log_security_event("SSO_ATTEMPT", "google_workspace", False)
-            
-    with col2:
-        if st.button("💼 Microsoft", use_container_width=True, key="microsoft_sso"):
-            st.info("🔧 Contact IT to enable Microsoft SSO")
-            _log_security_event("SSO_ATTEMPT", "microsoft_365", False)
+    # Demo accounts section
+    render_demo_accounts_pure()
 
 def render_demo_accounts_pure():
     """Render demo accounts section in pure Python."""

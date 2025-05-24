@@ -944,7 +944,7 @@ def render():
     render_contract_risk_assessment()
     
     # Create tabs for different contract types
-    tab1, tab2, tab3 = st.tabs(["Owner Contracts", "Subcontracts", "Change Orders"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Owner Contracts", "Subcontracts", "Change Orders", "Analytics"])
     
     # Owner Contracts Tab
     with tab1:
@@ -966,3 +966,7 @@ def render():
     with tab3:
         change_orders = ChangeOrderModule()
         change_orders.render()
+    
+    # Analytics Tab
+    with tab4:
+        render_enhanced_contract_analytics()

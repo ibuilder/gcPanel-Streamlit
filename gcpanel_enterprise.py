@@ -557,34 +557,34 @@ def render_dashboard():
     # Master Builder Command Center Banner
     health_status = st.session_state.system_health
     st.markdown(f"""
-    <div class="enterprise-card" style="background: linear-gradient(135deg, #4A90E2 0%, #5BA0F2 100%); color: white; text-align: center;">
-        <h4 style="margin: 0; color: white;">👑 Master Builder Command Center Active</h4>
+    <div class="enterprise-card" style="background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%); color: white; text-align: center;">
+        <h4 style="margin: 0; color: white;">EXECUTIVE COMMAND CENTER</h4>
         <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">
-            $150M Project Authority • {health_status['active_users']} Team Members Under Command • All Systems Connected
+            Highland Tower Development • $150M Project Value • {health_status['active_users']} Active Personnel • All Systems Operational
         </p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Leadership Authority Panel
+    # Executive Control Panel
     st.markdown("""
-    <div class="enterprise-card" style="background: linear-gradient(135deg, #28A745 0%, #34CE57 100%); color: white;">
-        <h4 style="margin: 0; color: white;">🎯 Your Leadership Command Suite</h4>
+    <div class="enterprise-card" style="background: linear-gradient(135deg, #1B4F72 0%, #2E86C1 100%); color: white;">
+        <h4 style="margin: 0; color: white;">EXECUTIVE CONTROL SUITE</h4>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
             <div style="text-align: center;">
-                <h5 style="color: white; margin: 0;">Information Dominance</h5>
-                <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">You see problems before they happen</p>
+                <h5 style="color: white; margin: 0;">Predictive Intelligence</h5>
+                <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Advanced analytics identify risks before manifestation</p>
             </div>
             <div style="text-align: center;">
-                <h5 style="color: white; margin: 0;">Process Control</h5>
-                <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">All decisions flow through you</p>
+                <h5 style="color: white; margin: 0;">Decision Authority</h5>
+                <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Centralized approval workflows ensure compliance</p>
             </div>
             <div style="text-align: center;">
-                <h5 style="color: white; margin: 0;">Team Performance</h5>
-                <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Data shows who delivers excellence</p>
+                <h5 style="color: white; margin: 0;">Performance Analytics</h5>
+                <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Real-time metrics drive operational excellence</p>
             </div>
             <div style="text-align: center;">
-                <h5 style="color: white; margin: 0;">Future Vision</h5>
-                <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Predictive tools guide your team</p>
+                <h5 style="color: white; margin: 0;">Strategic Planning</h5>
+                <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">AI-powered forecasting optimizes resource allocation</p>
             </div>
         </div>
     </div>
@@ -664,11 +664,11 @@ def render_dashboard():
     with col2:
         st.markdown("""
         <div class="enterprise-card">
-            <h4 style="color: #28A745;">👑 Master Builder Authority</h4>
-            <p><strong>Information Dominance:</strong> You see critical path delays 2 weeks before your teams do.</p>
-            <p><strong>Performance Transparency:</strong> Real data shows Steel Team 94% efficiency, MEP Team needs guidance at 76%.</p>
-            <p><strong>Decision Control:</strong> Every change order, material approval, and quality sign-off flows through your command center.</p>
-            <p style="color: #4A90E2; font-weight: bold;">Technology amplifies your leadership - you remain the Master Builder in control.</p>
+            <h4 style="color: #1B4F72;">OPERATIONAL EXCELLENCE FRAMEWORK</h4>
+            <p><strong>Risk Mitigation:</strong> Advanced algorithms identify critical path deviations 14 days in advance.</p>
+            <p><strong>Performance Metrics:</strong> Steel Operations achieving 94% efficiency targets, MEP requiring intervention at 76%.</p>
+            <p><strong>Workflow Authorization:</strong> Change orders, material approvals, and quality certifications require executive authorization.</p>
+            <p style="color: #1B4F72; font-weight: bold;">Enterprise technology enhances management oversight and operational control.</p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -677,25 +677,25 @@ def render_dashboard():
     # Charts with psychological context
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("📈 Master Builder Progress Command")
-        st.markdown("*Your vision materializing through controlled excellence*")
+        st.subheader("📈 Executive Progress Analytics")
+        st.markdown("*Strategic oversight of project execution and performance metrics*")
         
-        # Team Performance Leaderboard
+        # Operations Performance Analytics
         st.markdown("""
-        <div class="enterprise-card" style="background: linear-gradient(135deg, #6F42C1 0%, #8B5FBF 100%); color: white;">
-            <h4 style="color: white; margin: 0;">👑 Team Performance Under Your Command</h4>
+        <div class="enterprise-card" style="background: linear-gradient(135deg, #1B4F72 0%, #2E86C1 100%); color: white;">
+            <h4 style="color: white; margin: 0;">OPERATIONS PERFORMANCE ANALYTICS</h4>
             <div style="margin-top: 1rem;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span>🥇 Steel Team (Leader: Rodriguez)</span><span style="color: #FFD700;">94% Efficiency</span>
+                    <span>Steel Operations (Supervisor: Rodriguez)</span><span style="color: #00FF00;">94% Target Achievement</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span>🥈 Concrete Team (Leader: Johnson)</span><span style="color: #C0C0C0;">89% Efficiency</span>
+                    <span>Concrete Operations (Supervisor: Johnson)</span><span style="color: #90EE90;">89% Target Achievement</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span>🥉 Framing Team (Leader: Chen)</span><span style="color: #CD7F32;">85% Efficiency</span>
+                    <span>Framing Operations (Supervisor: Chen)</span><span style="color: #FFD700;">85% Target Achievement</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span>⚠️ MEP Team (Leader: Williams)</span><span style="color: #FFA500;">76% - Needs Guidance</span>
+                    <span>MEP Operations (Supervisor: Williams)</span><span style="color: #FF6B6B;">76% - Intervention Required</span>
                 </div>
             </div>
         </div>

@@ -299,87 +299,112 @@ def render_login_form():
         st.error(f"🔒 Account temporarily locked due to multiple failed attempts. Try again in {minutes_remaining} minutes.")
         return
     
-    # Production login form section
-    st.markdown("### 🔐 Sign In to Your Account")
+    # Create tabs for organized access
+    tabs = st.tabs(["🔐 Login", "🎯 Demo Accounts", "📝 Register"])
     
-    # Login form
-    username = st.text_input(
-        "📧 Email or Username", 
-        key="username_input", 
-        placeholder="Enter your email",
-        help="Use your company email address"
-    )
-    
-    password = st.text_input(
-        "🔒 Password", 
-        type="password", 
-        key="password_input", 
-        placeholder="Enter your password",
-        help="Minimum 8 characters"
-    )
-    
-    # Options row
-    col1, col2 = st.columns([1, 1])
-    with col1:
-        remember = st.checkbox("Remember me", value=False)
-    with col2:
-        if st.button("Forgot password?", type="secondary"):
-            st.info("Contact IT for password reset")
-    
-    # Show remaining attempts if any failures
-    if st.session_state.login_attempts > 0:
-        remaining_attempts = 5 - st.session_state.login_attempts
-        if remaining_attempts > 0:
-            st.warning(f"⚠️ {remaining_attempts} login attempts remaining before temporary lockout")
-    
-    # Enhanced login button with validation
-    if st.button("🚀 Sign In Securely", use_container_width=True, type="primary", key="signin_btn"):
-        if not username or not password:
-            st.error("⚠️ Please enter both username/email and password")
-            st.session_state.login_attempts += 1
-        else:
-            # Validate input security
-            is_valid, error_msg = _validate_input_security(username, password)
-            if not is_valid:
-                st.error(f"⚠️ {error_msg}")
+    with tabs[0]:
+        # Production login form section
+        st.markdown("### Sign In to Your Account")
+        
+        # Login form
+        username = st.text_input(
+            "📧 Email or Username", 
+            key="username_input", 
+            placeholder="Enter your email",
+            help="Use your company email address"
+        )
+        
+        password = st.text_input(
+            "🔒 Password", 
+            type="password", 
+            key="password_input", 
+            placeholder="Enter your password",
+            help="Minimum 8 characters"
+        )
+        
+        # Options row
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            remember = st.checkbox("Remember me", value=False)
+        with col2:
+            if st.button("Forgot password?", type="secondary"):
+                st.info("Contact IT for password reset")
+        
+        # Show remaining attempts if any failures
+        if st.session_state.login_attempts > 0:
+            remaining_attempts = 5 - st.session_state.login_attempts
+            if remaining_attempts > 0:
+                st.warning(f"⚠️ {remaining_attempts} login attempts remaining before temporary lockout")
+        
+        # Enhanced login button with validation
+        if st.button("🚀 Sign In Securely", use_container_width=True, type="primary", key="signin_btn"):
+            if not username or not password:
+                st.error("⚠️ Please enter both username/email and password")
                 st.session_state.login_attempts += 1
-                _log_security_event("INVALID_INPUT", username, False)
             else:
-                # Store the form submission in session state for processing in the main app
-                st.session_state.login_username = username
-                st.session_state.login_password = password
-                st.session_state.login_form_submitted = True
-                
-                # Reset attempts on valid input
-                st.session_state.login_attempts = 0
-                _log_security_event("LOGIN_ATTEMPT", username, True)
-                
-                # Show loading
-                with st.spinner("🔄 Authenticating..."):
-                    time.sleep(1.2)
-                st.success("✅ Login successful!")
-                time.sleep(0.3)
+                # Validate input security
+                is_valid, error_msg = _validate_input_security(username, password)
+                if not is_valid:
+                    st.error(f"⚠️ {error_msg}")
+                    st.session_state.login_attempts += 1
+                    _log_security_event("INVALID_INPUT", username, False)
+                else:
+                    # Store the form submission in session state for processing in the main app
+                    st.session_state.login_username = username
+                    st.session_state.login_password = password
+                    st.session_state.login_form_submitted = True
+                    
+                    # Reset attempts on valid input
+                    st.session_state.login_attempts = 0
+                    _log_security_event("LOGIN_ATTEMPT", username, True)
+                    
+                    # Show loading
+                    with st.spinner("🔄 Authenticating..."):
+                        time.sleep(1.2)
+                    st.success("✅ Login successful!")
+                    time.sleep(0.3)
+                    st.rerun()
+            
+            # Check if account should be locked
+            if st.session_state.login_attempts >= 5:
+                st.session_state.account_locked = True
+                st.session_state.lock_until = datetime.now() + timedelta(minutes=15)
+                _log_security_event("ACCOUNT_LOCKED", username, False)
+                st.error("🔒 Account locked for 15 minutes due to multiple failed attempts")
                 st.rerun()
-        
-        # Check if account should be locked
-        if st.session_state.login_attempts >= 5:
-            st.session_state.account_locked = True
-            st.session_state.lock_until = datetime.now() + timedelta(minutes=15)
-            _log_security_event("ACCOUNT_LOCKED", username, False)
-            st.error("🔒 Account locked for 15 minutes due to multiple failed attempts")
-            st.rerun()
-        
-    # Demo accounts section at the bottom
-    st.markdown("---")
-    st.markdown("### 🎯 Quick Demo Access - Highland Tower Development")
-    st.markdown("**Try the platform instantly with these demo accounts:**")
     
-    # Demo accounts section
-    render_demo_accounts_pure()
+    with tabs[1]:
+        # Demo accounts section
+        st.markdown("### Quick Access Demo Accounts")
+        st.markdown("**Try the platform instantly with these demo accounts:**")
+        render_demo_accounts_pure()
+    
+    with tabs[2]:
+        # Registration section
+        st.markdown("### Request Project Access")
+        st.markdown("**Registration for Highland Tower Development is managed by your project administrator.**")
+        
+        st.info("📧 Contact your project manager to request access with the following information:")
+        
+        with st.expander("Required Information for Account Request"):
+            st.markdown("""
+            **Personal Information:**
+            - Full Name & Professional Credentials
+            - Company Name & Address
+            - Role on the Project
+            - Contact Information (Email & Phone)
+            
+            **Project Details:**
+            - Highland Tower Development Access Level Requested
+            - Reporting Manager/Supervisor
+            - Expected Project Duration
+            """)
+        
+        if st.button("📧 Contact Project Manager", use_container_width=True, type="secondary"):
+            st.success("📧 Please email admin@highlandtower.com with your access request")
 
 def render_demo_accounts_pure():
     """Render demo accounts section in pure Python."""
-    st.markdown("### 🎭 Quick Access Demo Accounts")
     st.markdown("Choose a role to instantly explore different permission levels:")
     
     # Create enhanced demo accounts with better organization

@@ -944,12 +944,17 @@ def render():
     render_contract_risk_assessment()
     
     # Create tabs for different contract types
-    tab1, tab2, tab3, tab4 = st.tabs(["Owner Contracts", "Subcontracts", "Change Orders", "Analytics"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Owner Contracts", "Subcontracts", "Change Orders", "Owner Change Orders", "Analytics"])
     
     # Owner Contracts Tab
     with tab1:
         owner_contracts = OwnerContractModule()
         owner_contracts.render()
+        
+        # Add SOV Management section
+        st.markdown("---")
+        from modules.contracts.sov_manager import render_contract_sov_section
+        render_contract_sov_section()
     
     # Subcontracts Tab
     with tab2:
@@ -967,7 +972,12 @@ def render():
         change_orders = ChangeOrderModule()
         change_orders.render()
     
-    # Analytics Tab
+    # Owner Change Orders Tab
     with tab4:
+        from modules.contracts.owner_change_orders import render_owner_change_orders
+        render_owner_change_orders()
+    
+    # Analytics Tab
+    with tab5:
         st.markdown("### 📊 Contract Analytics")
         st.info("Enhanced contract analytics coming soon")

@@ -382,6 +382,167 @@ def render_project_analytics_dashboard():
             st.markdown("- 💬 15 new messages")
             st.markdown("- 📊 3 reports submitted")
 
+def render_cost_analytics():
+    """Render centralized cost management analytics"""
+    st.markdown("### 💰 Cost Management Analytics")
+    
+    # Cost performance metrics
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Total Budget", "$45.5M", "Project budget")
+    with col2:
+        st.metric("Spent to Date", "$30.2M", "68% complete")
+    with col3:
+        st.metric("Remaining", "$15.3M", "32% remaining")
+    with col4:
+        st.metric("Variance", "-$1.2M", "Under budget")
+    
+    st.markdown("---")
+    
+    # AI-Powered Cost Forecasting
+    st.markdown("#### 🤖 AI-Powered Cost Forecasting")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Predictive Cost Analysis**")
+        forecast_data = pd.DataFrame({
+            'Month': ['Current', 'Next', 'Month 2', 'Month 3'],
+            'Predicted Cost': [30200000, 34500000, 38800000, 42100000],
+            'Confidence': [95, 87, 72, 58]
+        })
+        st.line_chart(forecast_data.set_index('Month')['Predicted Cost'])
+    
+    with col2:
+        st.markdown("**Cost Risk Indicators**")
+        st.warning("⚠️ Material costs trending 5% above forecast")
+        st.success("✅ Labor efficiency up 8% this week")
+        st.info("📊 Projected completion within budget")
+
+def render_contract_analytics():
+    """Render centralized contract analytics"""
+    st.markdown("### 📄 Contract Analytics")
+    
+    # Contract performance metrics
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("**Contract Values**")
+        st.metric("Total Contract Value", "$45.5M", "Highland Tower")
+        st.metric("Executed to Date", "$32.8M", "72% complete")
+        st.metric("Remaining Value", "$12.7M", "28% remaining")
+    
+    with col2:
+        st.markdown("**Contract Compliance**")
+        st.metric("Change Orders", "8", "+2 this month")
+        st.metric("Avg Processing Time", "5.2 days", "-1.3 vs target")
+        st.metric("Signature Compliance", "96%", "+4% this quarter")
+    
+    with col3:
+        st.markdown("**Financial Health**")
+        st.metric("Payment Applications", "12", "All current")
+        st.metric("Retainage Held", "$1.64M", "5% of completed work")
+        st.metric("Outstanding Invoices", "$245K", "Within terms")
+
+def render_safety_analytics():
+    """Render centralized safety analytics"""
+    st.markdown("### 🦺 Safety Management Analytics")
+    
+    # Safety performance metrics
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Safety Score", "98%", "0 incidents this week")
+    with col2:
+        st.metric("Days Since Incident", "45", "+45 days")
+    with col3:
+        st.metric("Training Compliance", "94%", "+2% this month")
+    with col4:
+        st.metric("Inspections Completed", "23", "This month")
+    
+    st.markdown("---")
+    
+    # AI-Powered Safety Monitoring
+    st.markdown("#### 🤖 AI-Powered Safety Monitoring")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Risk Assessment**")
+        st.success("✅ Low risk areas: 85% of site")
+        st.warning("⚠️ Medium risk areas: 12% of site")
+        st.error("🔴 High risk areas: 3% of site")
+    
+    with col2:
+        st.markdown("**Safety Predictions**")
+        st.info("📊 Weather-related risks low next 3 days")
+        st.warning("⚠️ Increased activity on floors 12-15")
+
+def render_engineering_analytics():
+    """Render centralized engineering analytics"""
+    st.markdown("### 🔧 Engineering Analytics")
+    
+    # Engineering performance metrics
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("RFIs Processed", "127", "+12 this month")
+    with col2:
+        st.metric("Avg Response Time", "3.2 days", "-0.8 vs target")
+    with col3:
+        st.metric("Submittals Approved", "89%", "+5% this quarter")
+    with col4:
+        st.metric("Drawing Revisions", "45", "This phase")
+    
+    st.markdown("---")
+    
+    # Technical Review Analytics
+    st.markdown("#### 📐 Technical Review System")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Review Status**")
+        st.success("✅ Structural reviews: 95% complete")
+        st.warning("⚠️ MEP reviews: 78% complete")
+        st.info("📋 Architectural reviews: 92% complete")
+    
+    with col2:
+        st.markdown("**Quality Metrics**")
+        st.metric("Review Accuracy", "96%", "+2% improvement")
+        st.metric("Revision Cycles", "2.1", "Average per drawing")
+
+def render_field_analytics():
+    """Render centralized field operations analytics"""
+    st.markdown("### 🚧 Field Operations Analytics")
+    
+    # Field performance metrics
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Daily Reports", "156", "This month")
+    with col2:
+        st.metric("Field Issues", "23", "Active")
+    with col3:
+        st.metric("Quality Inspections", "89", "Completed")
+    with col4:
+        st.metric("Equipment Utilization", "87%", "+5% this week")
+    
+    st.markdown("---")
+    
+    # Field Operations Tracking
+    st.markdown("#### 📱 GPS-Enabled Operations")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Team Activity**")
+        st.success("✅ 24 workers checked in today")
+        st.info("📍 GPS tracking active on all zones")
+        st.warning("⚠️ Zone 3 requires additional supervision")
+    
+    with col2:
+        st.markdown("**Productivity Metrics**")
+        st.metric("Tasks Completed", "47", "Today")
+        st.metric("Productivity Index", "112%", "+12% vs baseline")
+
 def render_reports_overview():
     """Render comprehensive reports overview with enterprise features."""
     st.markdown("### 📋 Enterprise Reporting Center")

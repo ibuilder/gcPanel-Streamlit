@@ -123,69 +123,18 @@ def login_page():
             
             return
     
-    # Regular login page with construction theme
+    # Clean Highland Tower Development header
     st.markdown("""
-    <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="font-size: 2.5rem; margin-top: 10px;">
-            <span style="color: #2b579a; font-weight: 700;">gc</span><span style="color: #333; font-weight: 700;">Panel</span>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h1 style="font-size: 2.2rem; margin: 0; color: #ffffff;">
+            🏗️ gcPanel - Highland Tower Development
         </h1>
-        <div style="display: flex; justify-content: center; margin-top: -5px; margin-bottom: 15px;">
-            <div style="display: flex; align-items: center; background-color: #f9a01b; color: white; padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
-                <svg style="margin-right: 5px;" width="16" height="16" viewBox="0 0 24 24" fill="white">
-                    <path d="M14,6L10.25,11L13.1,14.8L11.5,16L7,11L11,6H14M19,6L14.7,11L13.1,14.8L14.7,16L19,11L19,6H19M6.83,16H19V18H6.83L6.83,16Z"/>
-                </svg>
-                Highland Tower Development
-            </div>
-        </div>
-        <p style="font-size: 1.2rem; color: #666; max-width: 450px; margin: 0 auto;">Your centralized platform for construction project management and collaboration</p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Main login container
-    tabs = st.tabs(["Login", "Register", "Demo Accounts"])
-    
-    with tabs[0]:
-        # Standard login form
-        username = st.text_input("Email or Username", key="username_input")
-        password = st.text_input("Password", type="password", key="password_input")
-        
-        # Remember me checkbox
-        remember = st.checkbox("Remember me", value=False)
-        
-        # Login button
-        if st.button("Sign In", use_container_width=True, type="primary", key="signin_btn"):
-            if not username or not password:
-                st.error("Please enter both username/email and password")
-            else:
-                # Store the form submission in session state for processing in the main app
-                st.session_state.login_username = username
-                st.session_state.login_password = password
-                st.session_state.login_form_submitted = True
-                
-                # Show a loading message
-                st.success("Authenticating... Please wait.")
-                st.rerun()
-        
-        # Display "forgot password" link
-        st.markdown('<div style="text-align: right;"><a href="#" style="color: #2b579a; font-size: 0.9rem;">Forgot password?</a></div>', 
-                    unsafe_allow_html=True)
-        
-        # Add OAuth buttons directly
-        from components.oauth_login import render_oauth_buttons
-        render_oauth_buttons()
-        
-        # Add the gcPanel information
-        st.markdown("""
-        <div style="text-align: center; margin-top: 25px; padding: 15px; background-color: #f7f7f7; border-radius: 6px; border-left: 4px solid #f9a01b;">
-            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#555" style="margin-right: 8px;">
-                    <path d="M13,9H11V7H13V9M13,17H11V11H13V17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-                </svg>
-                <span style="font-weight: 600; color: #444;">New to gcPanel?</span>
-            </div>
-            <p style="color: #666; font-size: 0.9rem;">Get more information at <a href="http://www.gcpanel.co" target="_blank" style="color: #2b579a; font-weight: 500;">www.gcPanel.co</a></p>
-        </div>
-        """, unsafe_allow_html=True)
+    # Import and use the clean login form
+    from login_form import render_login_form
+    render_login_form()
     
     with tabs[1]:
         st.markdown("""

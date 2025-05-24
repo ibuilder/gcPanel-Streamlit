@@ -1000,6 +1000,9 @@ def render():
     # Create tabs for different cost management sections
     tab1, tab2, tab3, tab4 = st.tabs(["Budget Overview", "Budget Items", "Invoices", "AIA G702/G703 Billing"])
     
+    # Import AIA billing module
+    from modules.cost_management.aia_billing import render_aia_billing
+    
     # Budget Overview Tab
     with tab1:
         budget_module = BudgetItemModule()
@@ -1017,5 +1020,4 @@ def render():
     
     # AIA G702/G703 Billing Tab
     with tab4:
-        aia_billing = AIABillingModule()
-        aia_billing.render()
+        render_aia_billing()

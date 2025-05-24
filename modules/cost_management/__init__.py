@@ -959,16 +959,43 @@ def render_real_time_cost_tracking():
 
 def render():
     """Render the Enhanced Cost Management module."""
-    st.title("💰 Enhanced Cost Management")
+    st.title("💰 Cost Management")
     
-    # AI-Powered Cost Forecasting
-    render_ai_cost_forecasting()
+    # Create tabs for cost management sections
+    tab1, tab2, tab3, tab4 = st.tabs(["Budget Overview", "Invoices", "Change Orders", "Analytics"])
     
-    # Budget Optimization
-    render_budget_optimization()
+    with tab1:
+        # Basic budget overview
+        st.markdown("### Budget Summary")
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Total Budget", "$45.5M", "Project budget")
+        with col2:
+            st.metric("Spent to Date", "$30.2M", "68% complete")
+        with col3:
+            st.metric("Remaining", "$15.3M", "32% remaining")
+        with col4:
+            st.metric("Variance", "-$1.2M", "Under budget")
     
-    # Real-Time Cost Tracking
-    render_real_time_cost_tracking()
+    with tab2:
+        # Invoice management placeholder
+        st.markdown("### Invoice Management")
+        st.info("Invoice management functionality available here")
+    
+    with tab3:
+        # Change orders placeholder
+        st.markdown("### Change Orders")
+        st.info("Change order management functionality available here")
+    
+    with tab4:
+        # AI-Powered Cost Forecasting
+        render_ai_cost_forecasting()
+        
+        # Budget Optimization
+        render_budget_optimization()
+        
+        # Real-Time Cost Tracking
+        render_real_time_cost_tracking()
     
     # Create tabs for different cost management sections
     tab1, tab2, tab3, tab4 = st.tabs(["Budget Overview", "Budget Items", "Invoices", "AIA G702/G703 Billing"])

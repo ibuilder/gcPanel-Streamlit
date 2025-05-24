@@ -139,20 +139,37 @@ def render_dashboard():
     
     st.title("🏗️ Project Dashboard")
     
-    # Current project info
-    current_project = st.session_state.get("current_project", "Highland Tower Development")
+    # Create tabs for dashboard sections
+    tab1, tab2 = st.tabs(["Dashboard Overview", "Analytics"])
     
-    # Enhanced project status with real-time data
-    render_enhanced_project_status_section(current_project)
+    with tab1:
+        # Current project info
+        current_project = st.session_state.get("current_project", "Highland Tower Development")
+        
+        # Basic project status
+        st.markdown("### Project Status")
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Overall Progress", "68%", "+3% this week")
+        with col2:
+            st.metric("Budget Status", "$30.2M", "-$1.3M under budget")
+        with col3:
+            st.metric("Schedule", "On Track", "2 days ahead")
+        with col4:
+            st.metric("Safety Score", "98%", "+2% this month")
     
-    # Real-time critical path alerts
-    render_critical_path_alerts_section()
-    
-    # Weather conditions affecting construction
-    render_weather_impact_section()
-    
-    # Customizable dashboard widgets
-    render_customizable_widgets_section()
+    with tab2:
+        # Enhanced project status with real-time data
+        render_enhanced_project_status_section(current_project)
+        
+        # Real-time critical path alerts
+        render_critical_path_alerts_section()
+        
+        # Weather conditions affecting construction
+        render_weather_impact_section()
+        
+        # Customizable dashboard widgets
+        render_customizable_widgets_section()
     
     # Project Header Card
     st.markdown(

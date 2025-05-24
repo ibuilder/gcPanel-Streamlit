@@ -866,7 +866,7 @@ class InvoiceModule(CrudModule):
 
 
 # Import the AIA Billing functionality
-from modules.cost_management.aia_billing import AIABillingModule
+from modules.cost_management.aia_billing import render_aia_billing
 
 def render_ai_cost_forecasting():
     """Render AI-powered cost forecasting dashboard"""

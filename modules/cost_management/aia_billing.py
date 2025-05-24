@@ -245,8 +245,8 @@ class AIABillingModule:
                 ]
             }
             
-            with open(self.data_file_path, 'w') as f:
-                json.dump(demo_data, f, indent=2)
+        with open(self.data_file_path, 'w') as f:
+            json.dump(demo_data, f, indent=2)
     
     def _load_data(self):
         """Load AIA billing data"""

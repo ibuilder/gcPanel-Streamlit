@@ -60,6 +60,111 @@ def render_drawings_management():
     # Render drawings CRUD interface
     render_drawings_crud()
 
+def render_sheet_numbering_guide():
+    """Render construction document sheet numbering guide"""
+    st.markdown("### 📐 Construction Document Sheet Numbers & Order")
+    st.markdown("**Professional drawing organization following industry standards**")
+    
+    # Sheet numbering reference
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("#### Architectural Drawings")
+        arch_sheets = [
+            ("A000", "Cover Sheet", "Project information, drawing index"),
+            ("A001", "Site Plan", "Site layout, property boundaries"),
+            ("A100", "Floor Plans", "Level plans and layouts"),
+            ("A200", "Elevations", "Exterior building views"),
+            ("A300", "Sections", "Building cross-sections"),
+            ("A400", "Details", "Construction details"),
+            ("A500", "Schedules", "Door, window, room schedules")
+        ]
+        
+        for number, title, desc in arch_sheets:
+            st.markdown(f"**{number}** - {title}")
+            st.markdown(f"<small style='color: #666;'>{desc}</small>", unsafe_allow_html=True)
+            st.markdown("")
+        
+        st.markdown("#### Structural Drawings")
+        struct_sheets = [
+            ("S100", "Foundation Plans", "Foundation layout and details"),
+            ("S200", "Framing Plans", "Structural framing systems"),
+            ("S300", "Details", "Structural connections and details")
+        ]
+        
+        for number, title, desc in struct_sheets:
+            st.markdown(f"**{number}** - {title}")
+            st.markdown(f"<small style='color: #666;'>{desc}</small>", unsafe_allow_html=True)
+            st.markdown("")
+    
+    with col2:
+        st.markdown("#### Mechanical Drawings")
+        mech_sheets = [
+            ("M100", "Plans", "HVAC layout and equipment"),
+            ("M200", "Schedules and Details", "Equipment schedules, details")
+        ]
+        
+        for number, title, desc in mech_sheets:
+            st.markdown(f"**{number}** - {title}")
+            st.markdown(f"<small style='color: #666;'>{desc}</small>", unsafe_allow_html=True)
+            st.markdown("")
+        
+        st.markdown("#### Electrical Drawings")
+        elec_sheets = [
+            ("E100", "Plans", "Power and lighting layout"),
+            ("E200", "Schedules and Details", "Panel schedules, details")
+        ]
+        
+        for number, title, desc in elec_sheets:
+            st.markdown(f"**{number}** - {title}")
+            st.markdown(f"<small style='color: #666;'>{desc}</small>", unsafe_allow_html=True)
+            st.markdown("")
+        
+        st.markdown("#### Other Disciplines")
+        other_sheets = [
+            ("P100", "Plumbing Plans", "Plumbing layout and fixtures"),
+            ("FP100", "Fire Protection Plans", "Sprinkler and fire systems"),
+            ("C100", "Civil Plans", "Site utilities and grading"),
+            ("L100", "Landscape Plans", "Landscaping and irrigation")
+        ]
+        
+        for number, title, desc in other_sheets:
+            st.markdown(f"**{number}** - {title}")
+            st.markdown(f"<small style='color: #666;'>{desc}</small>", unsafe_allow_html=True)
+            st.markdown("")
+    
+    # Highland Tower sheet organization
+    st.markdown("---")
+    st.markdown("#### Highland Tower Development Sheet Organization")
+    
+    highland_sheets = {
+        "A000": "Highland Tower Project Cover Sheet",
+        "A001": "Highland Tower Site Plan", 
+        "A101": "Level 1 Floor Plan - Retail & Lobby",
+        "A102": "Levels 2-15 Typical Residential Floor Plan",
+        "A200": "Building Elevations - North & South",
+        "A201": "Building Elevations - East & West", 
+        "A300": "Building Sections",
+        "A400": "Architectural Details",
+        "S100": "Foundation Plan",
+        "S200": "Structural Framing Plans",
+        "S300": "Structural Details",
+        "M100": "HVAC Plans - Levels 1-15",
+        "M200": "Mechanical Schedules & Details",
+        "E100": "Electrical Plans - Levels 1-15",
+        "E200": "Electrical Schedules & Panel Details",
+        "P100": "Plumbing Plans",
+        "FP100": "Fire Protection Plans"
+    }
+    
+    # Display in organized grid
+    sheet_cols = st.columns(3)
+    for i, (sheet_num, sheet_desc) in enumerate(highland_sheets.items()):
+        with sheet_cols[i % 3]:
+            st.markdown(f"**{sheet_num}**")
+            st.markdown(f"<small>{sheet_desc}</small>", unsafe_allow_html=True)
+            st.markdown("")
+
 def render_specifications_management():
     """Render specifications management organized by CSI divisions"""
     st.markdown("### 📋 Project Specifications - CSI MasterFormat")
@@ -433,7 +538,7 @@ def get_highland_tower_drawings():
         },
         {
             "drawing_id": "DWG-001",
-            "drawing_number": "A-101",
+            "drawing_number": "A101",
             "title": "Level 1 Floor Plan - Highland Tower",
             "discipline": "Architectural",
             "level": "Level 1", 
@@ -442,7 +547,7 @@ def get_highland_tower_drawings():
             "issued_for": "Construction",
             "scale": "1/8\" = 1'-0\"",
             "sheet_size": "D",
-            "file_path": "drawings/architectural/A-101_Rev_C.pdf",
+            "file_path": "drawings/architectural/A101_Rev_C.pdf",
             "file_size_mb": 3.2,
             "status": "Current",
             "notes": "120 residential units layout with retail spaces"
@@ -595,12 +700,50 @@ def render_drawings_crud():
             col1, col2 = st.columns(2)
             
             with col1:
-                drawing_number = st.text_input("Drawing Number", placeholder="A-102")
-                title = st.text_input("Drawing Title", placeholder="Level 2 Floor Plan")
-                discipline = st.selectbox("Discipline", [
-                    "Architectural", "Structural", "Mechanical", "Electrical", "Plumbing", 
-                    "Civil", "Fire Protection", "Landscape"
+                # Sheet Type and Number selection based on authentic standards
+                sheet_type = st.selectbox("Sheet Type", [
+                    "A000 - Cover Sheet",
+                    "A001 - Site Plan", 
+                    "A100 - Floor Plans",
+                    "A200 - Elevations",
+                    "A300 - Sections",
+                    "A400 - Details",
+                    "A500 - Schedules",
+                    "S100 - Foundation Plans",
+                    "S200 - Framing Plans",
+                    "S300 - Structural Details",
+                    "M100 - Mechanical Plans",
+                    "M200 - Mechanical Schedules and Details",
+                    "P100 - Plumbing Plans", 
+                    "P200 - Plumbing Details",
+                    "E100 - Electrical Plans",
+                    "E200 - Electrical Schedules and Details",
+                    "FP100 - Fire Protection Plans",
+                    "C100 - Civil Plans",
+                    "L100 - Landscape Plans"
                 ])
+                
+                # Extract discipline from sheet type
+                sheet_prefix = sheet_type.split(' - ')[0]
+                discipline_map = {
+                    'A': 'Architectural',
+                    'S': 'Structural', 
+                    'M': 'Mechanical',
+                    'P': 'Plumbing',
+                    'E': 'Electrical',
+                    'FP': 'Fire Protection',
+                    'C': 'Civil',
+                    'L': 'Landscape'
+                }
+                discipline = discipline_map.get(sheet_prefix[0], 'Architectural')
+                
+                # Generate drawing number based on sheet type
+                drawing_number = st.text_input("Drawing Number", 
+                                             value=sheet_prefix, 
+                                             help="Auto-generated based on sheet type")
+                
+                title = st.text_input("Drawing Title", 
+                                    placeholder=sheet_type.split(' - ')[1] if ' - ' in sheet_type else "Drawing Title")
                 level = st.selectbox("Building Level", [
                     "Site", "Foundation", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5",
                     "Level 6", "Level 7", "Level 8", "Level 9", "Level 10", "Level 11", "Level 12",

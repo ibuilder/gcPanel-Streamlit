@@ -275,17 +275,8 @@ def render_safety_training_tracker():
         st.markdown("📚 Equipment Safety (8 workers)")
 
 def render():
-    """Render the Enhanced Safety Management module."""
-    st.title("🦺 Enhanced Safety Management")
-    
-    # AI-Powered Safety Monitoring
-    render_ai_safety_monitoring()
-    
-    # Digital Safety Checklists
-    render_digital_safety_checklists()
-    
-    # Safety Training Tracker
-    render_safety_training_tracker()
+    """Render the Safety Management module."""
+    st.title("🦺 Safety Management")
     
     # Create tabs for different safety functions
     tabs = st.tabs(["Dashboard", "Incidents", "Inspections", "Hazards"])

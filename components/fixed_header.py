@@ -5,6 +5,7 @@ This module provides a header component that is positioned correctly at the top 
 """
 
 import streamlit as st
+from app_config import MENU_OPTIONS, MENU_MAP, PROJECT_INFO
 
 def render_fixed_header():
     """
@@ -134,19 +135,27 @@ def render_fixed_header():
     # Column 3: Navigation dropdown
     with header_col3:
         current_menu = st.session_state.get("current_menu", "Dashboard")
-        from app_config import MENU_OPTIONS
+        
+        # Find current menu option with icon
+        current_menu_option = "📊 Dashboard"
+        for option in MENU_OPTIONS:
+            if MENU_MAP[option] == current_menu:
+                current_menu_option = option
+                break
         
         selected_menu = st.selectbox(
-            label="Navigation", # Adding a proper label for accessibility that won't be empty
+            label="Navigation",
             options=MENU_OPTIONS,
-            index=MENU_OPTIONS.index(current_menu) if current_menu in MENU_OPTIONS else 0,
+            index=MENU_OPTIONS.index(current_menu_option),
             key="nav_dropdown",
             label_visibility="collapsed"
         )
         
         # Update current menu if selection changed
-        if selected_menu != current_menu:
-            st.session_state.current_menu = selected_menu
+        if selected_menu != current_menu_option:
+            new_menu = MENU_MAP[selected_menu]
+            st.session_state.current_menu = new_menu
+            st.rerun()
             st.rerun()
     
     # Add a horizontal line below the header

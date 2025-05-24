@@ -32,7 +32,8 @@ def apply_theme():
             section[data-testid="stSidebar"] { background-color: #262730; }
             .main .block-container { background-color: #0e1117; color: white; padding-top: 1rem; }
             [data-testid="metric-container"] { background-color: #262730; border: 1px solid #464854; color: white; }
-            .stButton > button { background-color: #ff4b4b; color: white; border: none; }
+            .stButton > button { background-color: #3498db; color: white; border: none; }
+            .stButton > button:hover { background-color: #2980b9; }
         </style>
         """, unsafe_allow_html=True)
     else:
@@ -43,6 +44,7 @@ def apply_theme():
             .main .block-container { background-color: #ffffff; color: #262730; padding-top: 1rem; }
             [data-testid="metric-container"] { background-color: #f0f2f6; border: 1px solid #d1d5db; color: #262730; }
             .stButton > button { background-color: #3498db; color: white; border: none; }
+            .stButton > button:hover { background-color: #2980b9; }
         </style>
         """, unsafe_allow_html=True)
 
@@ -65,22 +67,51 @@ def render_sidebar():
         
         if is_authenticated:
             st.markdown("### 🧭 Navigation")
-            navigation_options = [
-                "📊 Dashboard", "🏗️ Preconstruction", "⚙️ Engineering", "👷 Field Operations", 
-                "🦺 Safety", "📄 Contracts", "💰 Cost Management", "🏢 BIM", "✅ Closeout", 
-                "📈 Analytics", "📁 Documents"
-            ]
             
-            current_menu = st.selectbox(
-                "Select Module:",
-                navigation_options,
-                index=0,
-                key="navigation_select"
-            )
+            # Create navigation buttons with icons
+            if st.button("📊 Dashboard", use_container_width=True, type="primary" if st.session_state.get("current_menu", "Dashboard") == "Dashboard" else "secondary"):
+                st.session_state["current_menu"] = "Dashboard"
+                st.rerun()
             
-            # Clean the menu selection (remove icons for internal use)
-            clean_menu = current_menu.split(" ", 1)[1] if " " in current_menu else current_menu
-            st.session_state["current_menu"] = clean_menu
+            if st.button("🏗️ Preconstruction", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "Preconstruction" else "secondary"):
+                st.session_state["current_menu"] = "Preconstruction"
+                st.rerun()
+            
+            if st.button("⚙️ Engineering", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "Engineering" else "secondary"):
+                st.session_state["current_menu"] = "Engineering"
+                st.rerun()
+            
+            if st.button("👷 Field Operations", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "Field Operations" else "secondary"):
+                st.session_state["current_menu"] = "Field Operations"
+                st.rerun()
+            
+            if st.button("🦺 Safety", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "Safety" else "secondary"):
+                st.session_state["current_menu"] = "Safety"
+                st.rerun()
+            
+            if st.button("📄 Contracts", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "Contracts" else "secondary"):
+                st.session_state["current_menu"] = "Contracts"
+                st.rerun()
+            
+            if st.button("💰 Cost Management", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "Cost Management" else "secondary"):
+                st.session_state["current_menu"] = "Cost Management"
+                st.rerun()
+            
+            if st.button("🏢 BIM", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "BIM" else "secondary"):
+                st.session_state["current_menu"] = "BIM"
+                st.rerun()
+            
+            if st.button("✅ Closeout", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "Closeout" else "secondary"):
+                st.session_state["current_menu"] = "Closeout"
+                st.rerun()
+            
+            if st.button("📈 Analytics", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "Analytics" else "secondary"):
+                st.session_state["current_menu"] = "Analytics"
+                st.rerun()
+            
+            if st.button("📁 Documents", use_container_width=True, type="primary" if st.session_state.get("current_menu") == "Documents" else "secondary"):
+                st.session_state["current_menu"] = "Documents"
+                st.rerun()
         
         st.divider()
         

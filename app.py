@@ -178,6 +178,22 @@ def main():
             visibility: visible !important;
         }
         
+        /* Ensure buttons remain functional */
+        .stButton > button {
+            display: block !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+        }
+        
+        /* Fix form elements functionality */
+        .stTextInput,
+        .stSelectbox,
+        .stCheckbox,
+        .stButton {
+            display: block !important;
+            visibility: visible !important;
+        }
+        
         /* Force full width layout with zero top spacing */
         .appview-container .main .block-container {
             max-width: 100% !important;

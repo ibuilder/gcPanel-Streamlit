@@ -249,6 +249,22 @@ def _render_ui_framework():
             visibility: visible !important;
         }
         
+        /* Ensure buttons remain functional */
+        .stButton > button {
+            display: block !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+        }
+        
+        /* Fix form elements functionality */
+        .stTextInput,
+        .stSelectbox,
+        .stCheckbox,
+        .stButton {
+            display: block !important;
+            visibility: visible !important;
+        }
+        
         /* Fix navigation dropdown positioning and dark theme styling */
         .stSelectbox {
             margin-top: 0 !important;

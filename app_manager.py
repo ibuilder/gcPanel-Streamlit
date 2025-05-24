@@ -185,6 +185,27 @@ def _render_ui_framework():
             margin-top: 0 !important;
         }
         
+        /* Target every possible container that creates top spacing */
+        .stApp > div {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        
+        .stApp > div > div {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        
+        section.main {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        
+        .main > div {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        
         /* Proper content spacing */
         .streamlit-container {
             padding-top: 0 !important;
@@ -201,21 +222,68 @@ def _render_ui_framework():
         .css-k1vhr4 {display: none !important;}
         .css-1avcm0n {display: none !important;}
         
-        /* Remove element containers and spacing */
-        .element-container {
+        /* Remove element containers and spacing BUT preserve charts */
+        .element-container:not([data-testid*="chart"]) {
             margin: 0 !important; 
             padding: 0 !important;
             border: none !important;
         }
         
-        div[data-testid="element-container"] {
+        div[data-testid="element-container"]:not([data-testid*="chart"]) {
             margin: 0 !important;
             padding: 0 !important;
         }
         
-        /* Fix navigation dropdown positioning */
+        /* Ensure charts and plotly graphs are visible */
+        .js-plotly-plot, .plotly, [data-testid*="chart"] {
+            display: block !important;
+            visibility: visible !important;
+        }
+        
+        /* Preserve chart containers */
+        div[data-testid*="metric"], 
+        div[data-testid*="plotly"], 
+        .stPlotlyChart,
+        .stMetric {
+            display: block !important;
+            visibility: visible !important;
+        }
+        
+        /* Fix navigation dropdown positioning and dark theme styling */
         .stSelectbox {
             margin-top: 0 !important;
+        }
+        
+        /* Dark theme for selectbox dropdown */
+        .stSelectbox > div > div {
+            background-color: rgba(30, 34, 42, 0.95) !important;
+            color: #ffffff !important;
+            border: 2px solid #667eea !important;
+        }
+        
+        .stSelectbox > div > div > div {
+            background-color: rgba(30, 34, 42, 0.95) !important;
+            color: #ffffff !important;
+        }
+        
+        /* Dropdown options styling */
+        .stSelectbox [data-baseweb="select"] > div {
+            background-color: rgba(30, 34, 42, 0.95) !important;
+            color: #ffffff !important;
+        }
+        
+        .stSelectbox [data-baseweb="popover"] {
+            background-color: rgba(30, 34, 42, 0.98) !important;
+        }
+        
+        .stSelectbox [role="option"] {
+            background-color: rgba(30, 34, 42, 0.98) !important;
+            color: #ffffff !important;
+        }
+        
+        .stSelectbox [role="option"]:hover {
+            background-color: rgba(102, 126, 234, 0.3) !important;
+            color: #ffffff !important;
         }
     </style>
     """, unsafe_allow_html=True)

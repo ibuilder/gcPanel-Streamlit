@@ -103,6 +103,27 @@ def main():
             margin-top: 0 !important;
         }
         
+        /* Target every possible container that creates top spacing */
+        .stApp > div {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        
+        .stApp > div > div {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        
+        section.main {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        
+        .main > div {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        
         /* Completely hide all sidebar elements and controls from all pages */
         [data-testid="stSidebar"] {display: none !important;}
         .st-emotion-cache-1c7y2kd {display: none !important;}
@@ -130,16 +151,31 @@ def main():
         .css-k1vhr4 {display: none !important;}
         .css-1avcm0n {display: none !important;}
         
-        /* Remove element containers and spacing */
-        .element-container {
+        /* Remove element containers and spacing BUT preserve charts */
+        .element-container:not([data-testid*="chart"]) {
             margin: 0 !important; 
             padding: 0 !important;
             border: none !important;
         }
         
-        div[data-testid="element-container"] {
+        div[data-testid="element-container"]:not([data-testid*="chart"]) {
             margin: 0 !important;
             padding: 0 !important;
+        }
+        
+        /* Ensure charts and plotly graphs are visible */
+        .js-plotly-plot, .plotly, [data-testid*="chart"] {
+            display: block !important;
+            visibility: visible !important;
+        }
+        
+        /* Preserve chart containers */
+        div[data-testid*="metric"], 
+        div[data-testid*="plotly"], 
+        .stPlotlyChart,
+        .stMetric {
+            display: block !important;
+            visibility: visible !important;
         }
         
         /* Force full width layout with zero top spacing */

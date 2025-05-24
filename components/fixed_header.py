@@ -138,27 +138,31 @@ def render_fixed_header():
         </div>
         """, unsafe_allow_html=True)
     
-    # Column 3: Navigation dropdown with debug info
+    # Column 3: Clean Navigation dropdown
     with header_col3:
         current_menu = st.session_state.get("current_menu", "Dashboard")
-        
-        # Debug: Print available options
-        st.write(f"Debug - Available options: {len(MENU_OPTIONS)}")
-        st.write(f"Current menu: {current_menu}")
         
         # Find current menu option with icon
         current_menu_option = "📊 Dashboard"
         for option in MENU_OPTIONS:
-            if MENU_MAP[option] == current_menu:
+            if MENU_MAP.get(option) == current_menu:
                 current_menu_option = option
                 break
+        
+        # Ensure we have a valid index
+        try:
+            default_index = MENU_OPTIONS.index(current_menu_option)
+        except ValueError:
+            default_index = 0
+            current_menu_option = MENU_OPTIONS[0]
         
         selected_menu = st.selectbox(
             label="Navigation",
             options=MENU_OPTIONS,
-            index=MENU_OPTIONS.index(current_menu_option) if current_menu_option in MENU_OPTIONS else 0,
-            key=f"nav_dropdown_{len(MENU_OPTIONS)}",  # Force refresh with dynamic key
-            label_visibility="collapsed"
+            index=default_index,
+            key="main_navigation_dropdown",
+            label_visibility="collapsed",
+            help="Select module to navigate"
         )
         
         # Update current menu if selection changed

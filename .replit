@@ -2,7 +2,7 @@ modules = ["python-3.11"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["cargo", "freetype", "glibcLocales", "libiconv", "rustc"]
+packages = ["cargo", "freetype", "glibcLocales", "lcms2", "libiconv", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "openssl", "pkg-config", "rustc", "tcl", "tk", "zlib"]
 
 [deployment]
 deploymentTarget = "autoscale"
@@ -24,6 +24,10 @@ args = "gcPanel Server"
 task = "workflow.run"
 args = "gcPanel Sidebar"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "gcPanel Enterprise"
+
 [[workflows.workflow]]
 name = "gcPanel Server"
 author = "agent"
@@ -40,6 +44,15 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "streamlit run app_simple.py --server.port 5000"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "gcPanel Enterprise"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "streamlit run app_enterprise.py --server.port 5000"
 waitForPort = 5000
 
 [[ports]]

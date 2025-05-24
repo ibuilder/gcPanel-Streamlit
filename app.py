@@ -587,44 +587,57 @@ def main_clean():
             import modules.analytics
             modules.analytics.render_analytics_dashboard()
         elif "Preconstruction" in current_menu:
-            st.title("📋 Preconstruction")
-            st.info("Preconstruction planning and documentation")
+            # Import and render the actual preconstruction module
+            import modules.PreConstruction
+            modules.PreConstruction.render()
         elif "Engineering" in current_menu:
-            st.title("⚙️ Engineering")
-            st.info("Engineering documents and specifications")
+            # Import and render the actual engineering module
+            from modules.engineering import render
+            render()
         elif "Field Operations" in current_menu:
-            st.title("👷 Field Operations")
-            st.info("Daily field activities and progress tracking")
+            # Import and render the actual field operations module
+            from modules.field_operations import render
+            render()
         elif "Safety" in current_menu:
-            st.title("🦺 Safety")
-            st.info("Safety compliance and incident tracking")
+            # Import and render the actual safety module
+            from modules.safety import render
+            render()
         elif "Contracts" in current_menu:
-            st.title("📄 Contracts")
-            st.info("Contract management and compliance")
+            # Import and render the actual contracts module
+            import modules.contracts
+            modules.contracts.render()
         elif "Cost Management" in current_menu:
-            st.title("💰 Cost Management")
-            st.info("Budget tracking and cost analysis")
+            # Import and render the actual cost management module
+            from modules.cost_management import render
+            render()
         elif "BIM" in current_menu:
-            st.title("🏢 BIM")
-            st.info("Building Information Modeling")
+            # Import and render the actual BIM module
+            from modules.bim import render_bim
+            render_bim()
         elif "Closeout" in current_menu:
-            st.title("✅ Closeout")
-            st.info("Project closeout and documentation")
+            # Import and render the actual closeout module
+            from modules.closeout import render
+            render()
         elif "Documents" in current_menu:
-            st.title("📁 Documents")
-            st.info("Document management and storage")
+            # Import and render the actual documents module
+            from modules.documents import render
+            render()
         elif "Daily Reports" in current_menu:
-            st.title("📝 Daily Reports")
-            st.info("Daily construction progress reports and field logs")
+            # Import and render the actual daily reports module
+            from modules.field_operations import render_daily_reports
+            render_daily_reports()
         elif "RFIs" in current_menu:
-            st.title("❓ RFIs - Requests for Information")
-            st.info("Track and manage RFIs for Highland Tower Development")
+            # Import and render the actual RFIs module
+            from modules.rfis import render
+            render()
         elif "Submittals" in current_menu:
-            st.title("📤 Submittals")
-            st.info("Review and approve construction submittals")
+            # Import and render the actual submittals module
+            from modules.engineering.submittal_packages import render as render_submittal_packages
+            render_submittal_packages()
         elif "Transmittals" in current_menu:
-            st.title("📨 Transmittals")
-            st.info("Document transmittal tracking and management")
+            # Import and render the actual transmittals module
+            from modules.engineering.transmittals import render as render_transmittals
+            render_transmittals()
         elif "Photo Log" in current_menu:
             st.title("📸 Photo Log")
             st.info("Construction progress photography and documentation")

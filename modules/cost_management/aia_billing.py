@@ -22,8 +22,8 @@ class AIABillingModule:
     
     def _initialize_demo_data(self):
         """Initialize AIA billing data if it doesn't exist"""
-        if not os.path.exists(self.data_file_path):
-            demo_data = {
+        # Always reinitialize to ensure proper format
+        demo_data = {
                 "project_info": {
                     "project_name": "Highland Tower Development",
                     "project_number": "HTD-2024-001",

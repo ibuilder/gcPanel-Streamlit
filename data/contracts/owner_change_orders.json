@@ -1,0 +1,90 @@
+{
+  "change_orders": [
+    {
+      "oco_number": "OCO-001",
+      "title": "Additional Elevator Shaft Fireproofing",
+      "description": "Owner requested additional fireproofing in elevator shafts per new fire marshal requirements",
+      "amount": 125000.0,
+      "type": "Addition",
+      "status": "Approved",
+      "date_issued": "2024-03-15",
+      "date_approved": "2024-03-22",
+      "reason": "Code Compliance",
+      "affected_sov_items": [
+        "07 00 00"
+      ],
+      "justification": "Required by updated fire code for high-rise buildings",
+      "approved_by": "Highland Development LLC",
+      "contractor_acceptance": "Accepted"
+    },
+    {
+      "oco_number": "OCO-002",
+      "title": "Upgraded HVAC Controls System",
+      "description": "Upgrade to smart building automation system for energy efficiency",
+      "amount": 275000.0,
+      "type": "Addition",
+      "status": "Approved",
+      "date_issued": "2024-04-08",
+      "date_approved": "2024-04-15",
+      "reason": "Owner Enhancement",
+      "affected_sov_items": [
+        "15 00 00"
+      ],
+      "justification": "Owner requested upgrade for LEED certification and operating cost reduction",
+      "approved_by": "Highland Development LLC",
+      "contractor_acceptance": "Accepted"
+    },
+    {
+      "oco_number": "OCO-003",
+      "title": "Premium Lobby Finishes",
+      "description": "Upgrade lobby finishes from standard to premium materials",
+      "amount": 185000.0,
+      "type": "Addition",
+      "status": "Approved",
+      "date_issued": "2024-04-20",
+      "date_approved": "2024-04-28",
+      "reason": "Design Enhancement",
+      "affected_sov_items": [
+        "09 00 00"
+      ],
+      "justification": "Owner upgrade to attract premium tenants",
+      "approved_by": "Highland Development LLC",
+      "contractor_acceptance": "Accepted"
+    },
+    {
+      "oco_number": "OCO-004",
+      "title": "Rooftop Solar Panel Infrastructure",
+      "description": "Add structural support and electrical infrastructure for future solar installation",
+      "amount": 95000.0,
+      "type": "Addition",
+      "status": "Pending Approval",
+      "date_issued": "2024-05-10",
+      "date_approved": null,
+      "reason": "Future Proofing",
+      "affected_sov_items": [
+        "05 00 00",
+        "16 00 00"
+      ],
+      "justification": "Owner wants future solar capability without roof modifications",
+      "approved_by": null,
+      "contractor_acceptance": "Under Review"
+    },
+    {
+      "oco_number": "OCO-005",
+      "title": "Delete Alternate Paving Option",
+      "description": "Remove decorative paving upgrade, use standard concrete",
+      "amount": -45000.0,
+      "type": "Deletion",
+      "status": "Approved",
+      "date_issued": "2024-05-05",
+      "date_approved": "2024-05-12",
+      "reason": "Cost Reduction",
+      "affected_sov_items": [
+        "03 00 00"
+      ],
+      "justification": "Owner cost savings measure",
+      "approved_by": "Highland Development LLC",
+      "contractor_acceptance": "Accepted"
+    }
+  ]
+}

@@ -934,17 +934,8 @@ def render():
     """Render the Enhanced Contracts Management module."""
     st.title("📄 Enhanced Contract Management")
     
-    # Contract Analytics Dashboard
-    render_contract_analytics()
-    
-    # Digital Contract Workflow
-    render_digital_contract_workflow()
-    
-    # Contract Risk Assessment
-    render_contract_risk_assessment()
-    
-    # Create tabs for different contract types
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Owner Contracts", "Subcontracts", "Change Orders", "Owner Change Orders", "Analytics"])
+    # Create tabs for different contract types and analytics
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Owner Contracts", "Subcontracts", "Change Orders", "Owner Change Orders", "Risk Analysis", "Analytics"])
     
     # Owner Contracts Tab
     with tab1:
@@ -977,7 +968,12 @@ def render():
         from modules.contracts.owner_change_orders import render_owner_change_orders
         render_owner_change_orders()
     
-    # Analytics Tab
+    # Risk Analysis Tab
     with tab5:
-        st.markdown("### 📊 Contract Analytics")
-        st.info("Enhanced contract analytics coming soon")
+        render_contract_risk_assessment()
+    
+    # Analytics Tab
+    with tab6:
+        render_contract_analytics()
+        st.markdown("---")
+        render_digital_contract_workflow()

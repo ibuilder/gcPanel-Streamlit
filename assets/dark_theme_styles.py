@@ -11,7 +11,7 @@ Modern dark theme optimized for construction project management with:
 import streamlit as st
 
 def apply_dark_theme_styles():
-    """Apply comprehensive dark theme styling for Highland Tower Development."""
+    """Apply comprehensive full dark theme styling for Highland Tower Development."""
     
     dark_theme_css = """
     <style>
@@ -19,44 +19,74 @@ def apply_dark_theme_styles():
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
     
-    /* Root Variables for Dark Theme */
+    /* Root Variables for Complete Dark Theme */
     :root {
-        --primary-bg: #0f1419;
-        --secondary-bg: #1a1f2e;
-        --card-bg: #242b3d;
-        --accent-bg: #2d3748;
-        --border-color: #3a4553;
-        --text-primary: #e2e8f0;
-        --text-secondary: #a0aec0;
-        --text-muted: #718096;
-        --accent-blue: #4299e1;
-        --accent-green: #48bb78;
-        --accent-orange: #ed8936;
-        --accent-red: #f56565;
-        --accent-purple: #9f7aea;
-        --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+        --primary-bg: #0a0e13;
+        --secondary-bg: #151a23;
+        --card-bg: #1e2533;
+        --accent-bg: #252d3a;
+        --surface-bg: #2a3441;
+        --border-color: #364253;
+        --border-light: #4a5568;
+        --text-primary: #f7fafc;
+        --text-secondary: #e2e8f0;
+        --text-muted: #a0aec0;
+        --text-disabled: #718096;
+        --accent-blue: #63b3ed;
+        --accent-green: #68d391;
+        --accent-orange: #fbb040;
+        --accent-red: #fc8181;
+        --accent-purple: #b794f6;
+        --accent-yellow: #faf089;
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.6);
+        --gradient-primary: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        --gradient-accent: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
     }
     
-    /* Base Application Styling */
+    /* Complete Dark Base Application */
+    html, body, [data-testid="stAppViewContainer"] {
+        background: var(--primary-bg) !important;
+        color: var(--text-primary) !important;
+    }
+    
     .stApp {
-        background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%) !important;
+        background: var(--primary-bg) !important;
         color: var(--text-primary) !important;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
     }
     
-    /* Hide Streamlit Branding */
-    #MainMenu, footer, header {
+    /* Hide ALL Streamlit Branding and Elements */
+    #MainMenu, footer, header, .stDeployButton, .stDecoration {
         visibility: hidden !important;
+        display: none !important;
+    }
+    
+    [data-testid="stToolbar"] {
+        visibility: hidden !important;
+        display: none !important;
+    }
+    
+    /* Force Dark Background Everywhere */
+    .main, [data-testid="stMain"], [data-testid="stAppViewContainer"] > .main {
+        background: var(--primary-bg) !important;
+        color: var(--text-primary) !important;
     }
     
     /* Full Width Dark Container */
-    .main .block-container {
+    .main .block-container, [data-testid="stMain"] .block-container {
         max-width: 100% !important;
         padding-left: 2rem !important;
         padding-right: 2rem !important;
         padding-top: 1rem !important;
+        background: var(--primary-bg) !important;
+        color: var(--text-primary) !important;
+    }
+    
+    /* Force Dark on All Containers */
+    [data-testid="stVerticalBlock"], [data-testid="stHorizontalBlock"], .element-container {
         background: transparent !important;
+        color: var(--text-primary) !important;
     }
     
     /* Dark Cards and Containers */
@@ -77,14 +107,36 @@ def apply_dark_theme_styles():
         transform: translateY(-2px) !important;
     }
     
-    /* Dark Theme Headers and Text */
-    h1, h2, h3, h4, h5, h6 {
+    /* Complete Dark Text and Headers */
+    h1, h2, h3, h4, h5, h6, p, span, div, label {
         color: var(--text-primary) !important;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
         font-weight: 600 !important;
     }
     
-    .stMarkdown {
+    .stMarkdown, .stMarkdown > div, .stText {
         color: var(--text-primary) !important;
+        background: transparent !important;
+    }
+    
+    /* Force Dark on ALL Text Elements */
+    [data-testid="stMarkdownContainer"], 
+    [data-testid="stText"],
+    .stMarkdown p,
+    .stMarkdown div,
+    .stMarkdown span {
+        color: var(--text-primary) !important;
+        background: transparent !important;
+    }
+    
+    /* Dark Title Elements */
+    [data-testid="stHeader"] h1,
+    [data-testid="stSubheader"] h2,
+    .stTitle {
+        color: var(--text-primary) !important;
+        background: transparent !important;
     }
     
     /* Dark Metrics Cards */

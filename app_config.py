@@ -33,6 +33,7 @@ MENU_OPTIONS = [
     "❓ RFIs",
     "📦 Submittals",
     "📤 Transmittals",
+    "📝 Daily Reports",
     "🚧 Field Operations",
     "📄 Documents",
     "🏢 BIM",

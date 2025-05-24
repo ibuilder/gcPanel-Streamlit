@@ -60,8 +60,32 @@ def render_sidebar():
         
         st.divider()
         
+        # Navigation Menu (moved up below logo)
+        is_authenticated = st.session_state.get("authenticated", False)
+        
+        if is_authenticated:
+            st.markdown("### 🧭 Navigation")
+            navigation_options = [
+                "📊 Dashboard", "🏗️ Preconstruction", "⚙️ Engineering", "👷 Field Operations", 
+                "🦺 Safety", "📄 Contracts", "💰 Cost Management", "🏢 BIM", "✅ Closeout", 
+                "📈 Analytics", "📁 Documents"
+            ]
+            
+            current_menu = st.selectbox(
+                "Select Module:",
+                navigation_options,
+                index=0,
+                key="navigation_select"
+            )
+            
+            # Clean the menu selection (remove icons for internal use)
+            clean_menu = current_menu.split(" ", 1)[1] if " " in current_menu else current_menu
+            st.session_state["current_menu"] = clean_menu
+        
+        st.divider()
+        
         # Project Information
-        st.markdown("### Highland Tower Development")
+        st.markdown("### 🏗️ Highland Tower Development")
         st.markdown("""
         **Project Value:** $45.5M  
         **Type:** Mixed-Use Development  
@@ -73,7 +97,6 @@ def render_sidebar():
         st.divider()
         
         # User info or About section
-        is_authenticated = st.session_state.get("authenticated", False)
         
         if is_authenticated:
             current_user = st.session_state.get("username", "Project Manager")
@@ -100,30 +123,10 @@ def render_sidebar():
             if st.button("🌐 Visit www.gcpanel.co", use_container_width=True, type="primary"):
                 st.markdown("[Visit gcPanel.co](https://www.gcpanel.co)")
         
-        st.divider()
-        
-        # Navigation Menu
+        # Quick Actions (for authenticated users only)
         if is_authenticated:
-            st.markdown("### Navigation")
-            navigation_options = [
-                "Dashboard", "Preconstruction", "Engineering", "Field Operations", 
-                "Safety", "Contracts", "Cost Management", "BIM", "Closeout", 
-                "Analytics", "Documents"
-            ]
-            
-            current_menu = st.selectbox(
-                "Select Module:",
-                navigation_options,
-                index=navigation_options.index(st.session_state.get("current_menu", "Dashboard")),
-                key="navigation_select"
-            )
-            
-            st.session_state["current_menu"] = current_menu
-            
             st.divider()
-            
-            # Quick Actions
-            st.markdown("### Quick Actions")
+            st.markdown("### ⚡ Quick Actions")
             if st.button("📊 View Reports", use_container_width=True):
                 st.session_state["current_menu"] = "Analytics"
                 st.rerun()

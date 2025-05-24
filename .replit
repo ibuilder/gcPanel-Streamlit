@@ -32,6 +32,10 @@ args = "gcPanel Enterprise"
 task = "workflow.run"
 args = "gcPanel Fixed"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "gcPanel Clean"
+
 [[workflows.workflow]]
 name = "gcPanel Server"
 author = "agent"
@@ -66,6 +70,15 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "streamlit run app_fixed.py --server.port 5000"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "gcPanel Clean"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "streamlit run app_clean_modular.py --server.port 5000"
 waitForPort = 5000
 
 [[ports]]

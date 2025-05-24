@@ -865,4 +865,6 @@ def main_clean():
         st.info("Please try selecting a different module.")
 
 if __name__ == "__main__":
-    main_clean()
+    # Use the clean modular version
+    import app_clean_modular
+    app_clean_modular.main()

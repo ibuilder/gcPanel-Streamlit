@@ -249,6 +249,8 @@ def render_selected_module(current_menu):
         "Project Information": render_project_information,
         "📅 Schedule": render_scheduling,
         "Schedule": render_scheduling,
+        "🤝 Meeting Management": lambda: modules.meetings.render(),
+        "meetings": lambda: modules.meetings.render(),
         "⚠️ Safety": render_safety,
         "Safety": render_safety,
         "📝 Contracts": lambda: modules.contracts.render(),

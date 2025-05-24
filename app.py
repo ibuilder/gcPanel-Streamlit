@@ -75,11 +75,11 @@ def main():
         # Apply enhanced UI styles for professional, enterprise-grade appearance
         apply_enhanced_styles()
         
-        # Apply construction industry specific styling and animations
-        from assets.enhanced_construction_ui import apply_enhanced_construction_styles
+        # Apply clean modern styling and construction animations
+        from assets.clean_modern_styles import apply_clean_modern_styles
         from assets.construction_dashboard_js import add_construction_dashboard_js, add_construction_help_button
         
-        apply_enhanced_construction_styles()
+        apply_clean_modern_styles()
         add_construction_dashboard_js()
         add_construction_help_button()
         

@@ -109,8 +109,8 @@ def render_fixed_header():
     </style>
     """, unsafe_allow_html=True)
     
-    # Create a three-column layout for the header with no padding
-    header_col1, header_col2, header_col3 = st.columns([1, 2, 1])
+    # Create a four-column layout for the header with no padding
+    header_col1, header_col2, header_col3, header_col4 = st.columns([1, 2, 1, 0.5])
     
     # Column 1: Logo
     with header_col1:
@@ -156,6 +156,20 @@ def render_fixed_header():
             new_menu = MENU_MAP[selected_menu]
             st.session_state.current_menu = new_menu
             st.rerun()
+    
+    # Column 4: User menu and logout
+    with header_col4:
+        user = st.session_state.get("user", {})
+        user_name = user.get("full_name", "User")
+        
+        # Create a simple logout button
+        if st.button("🚪 Logout", key="logout_btn", help=f"Logout {user_name}"):
+            # Clear authentication
+            st.session_state.authenticated = False
+            if "user" in st.session_state:
+                del st.session_state.user
+            if "token" in st.session_state:
+                del st.session_state.token
             st.rerun()
     
     # Add a horizontal line below the header

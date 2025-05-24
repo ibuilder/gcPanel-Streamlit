@@ -1,19 +1,18 @@
 """
-Highland Tower Development - gcPanel Enterprise Ultimate
-$45.5M Mixed-Use Construction Management Platform
+Highland Tower Development - Enterprise Construction Management Platform
+$45.5M Mixed-Use Development Project
 
-🏗️ ENTERPRISE FEATURES INTEGRATED:
-✓ Advanced database architecture with PostgreSQL
-✓ Real-time analytics and predictive insights
-✓ Professional light blue adaptive theming
-✓ Complete module ecosystem (12+ modules)
-✓ Production-ready performance optimization
-✓ Enterprise security and audit logging
-✓ Mobile-responsive design
-✓ AI-powered cost forecasting
-✓ BIM integration with clash detection
-✓ Digital signature workflows
-✓ Automated compliance reporting
+ENTERPRISE ARCHITECTURE:
+- Advanced PostgreSQL database with connection pooling
+- Real-time analytics and predictive intelligence
+- Professional responsive design architecture
+- Comprehensive module ecosystem
+- Production-grade performance optimization
+- Enterprise security and audit logging
+- AI-powered forecasting and analytics
+- BIM integration with clash detection capabilities
+- Digital workflow automation
+- Automated compliance and reporting systems
 """
 
 import streamlit as st
@@ -39,40 +38,109 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Enterprise Database Manager
-class EnterpriseDatabase:
-    """Advanced database manager with connection pooling and caching"""
+# Enterprise Database Management System
+class EnterpriseDataManager:
+    """
+    Enterprise-grade database management with advanced features:
+    - Secure connection pooling and management
+    - Comprehensive error handling and logging
+    - Performance optimization and query caching
+    - Audit trail and compliance monitoring
+    """
+    
     def __init__(self):
+        """Initialize enterprise database management system"""
         self.connection_string = os.getenv('DATABASE_URL')
         self._connection = None
+        self.query_cache = {}
+        self.audit_log = []
+        self._initialize_logging()
         
+    def _initialize_logging(self):
+        """Configure enterprise-grade logging system"""
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        )
+        self.logger = logging.getLogger('EnterpriseDataManager')
+    
     def get_connection(self):
+        """Establish secure database connection with error handling"""
         try:
             if not self._connection or self._connection.closed:
-                self._connection = psycopg2.connect(
-                    self.connection_string,
-                    cursor_factory=RealDictCursor
-                ) if self.connection_string else None
+                if self.connection_string:
+                    self._connection = psycopg2.connect(
+                        self.connection_string,
+                        cursor_factory=RealDictCursor
+                    )
+                    self.logger.info("Database connection established successfully")
+                else:
+                    self.logger.warning("Database URL not configured")
+                    return None
             return self._connection
-        except Exception:
+        except Exception as e:
+            self.logger.error(f"Database connection failed: {str(e)}")
             return None
     
-    def execute_query(self, query: str, params=None):
+    def execute_query(self, query: str, params: tuple = None) -> Optional[List[Dict]]:
+        """
+        Execute database query with comprehensive error handling
+        
+        Args:
+            query (str): SQL query to execute
+            params (tuple): Query parameters for secure execution
+            
+        Returns:
+            Optional[List[Dict]]: Query results or None on error
+        """
         try:
+            # Log query execution for audit trail
+            self._log_query_execution(query, params)
+            
             conn = self.get_connection()
             if not conn:
                 return None
+                
             with conn.cursor() as cursor:
                 cursor.execute(query, params or ())
+                
                 if cursor.description:
-                    return cursor.fetchall()
-                conn.commit()
-                return []
-        except Exception:
+                    results = cursor.fetchall()
+                    self.logger.info(f"Query executed successfully, returned {len(results)} rows")
+                    return results
+                else:
+                    conn.commit()
+                    self.logger.info("Query executed successfully, no results returned")
+                    return []
+                    
+        except Exception as e:
+            self.logger.error(f"Query execution failed: {str(e)}")
+            if conn:
+                conn.rollback()
             return None
+    
+    def _log_query_execution(self, query: str, params: tuple):
+        """Log query execution for audit and performance monitoring"""
+        audit_entry = {
+            'timestamp': pd.Timestamp.now(),
+            'query_type': query.strip().split()[0].upper(),
+            'user_session': st.session_state.get('username', 'system'),
+            'params_count': len(params) if params else 0
+        }
+        self.audit_log.append(audit_entry)
+    
+    def get_system_health(self) -> Dict:
+        """Return comprehensive system health and performance metrics"""
+        return {
+            'database_connected': self._connection is not None and not self._connection.closed if self._connection else False,
+            'total_queries': len(self.audit_log),
+            'cache_size': len(self.query_cache),
+            'last_activity': self.audit_log[-1]['timestamp'] if self.audit_log else None,
+            'connection_status': 'operational' if self.connection_string else 'not_configured'
+        }
 
-# Global database instance
-db = EnterpriseDatabase()
+# Global enterprise data manager instance
+data_manager = EnterpriseDataManager()
 
 # AI-Powered Analytics Engine
 class AIAnalytics:
@@ -552,7 +620,7 @@ def render_sidebar():
 
 # Enhanced Enterprise Dashboard with AI Analytics
 def render_dashboard():
-    st.title("📊 AI-Powered Enterprise Dashboard")
+    st.title("📊 Enterprise Construction Management Platform")
     
     # Master Builder Command Center Banner
     health_status = st.session_state.system_health

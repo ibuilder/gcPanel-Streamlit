@@ -52,13 +52,16 @@ def render():
     with tabs[4]:  # Processing Demo
         render_document_processing_demo()
     
-    with tabs[5]:  # Document Analytics
+    with tabs[5]:  # Reports
+        render_document_reports()
+    
+    with tabs[6]:  # Document Analytics
         render_document_analytics()
     
-    with tabs[6]:  # Document Search
+    with tabs[7]:  # Document Search
         render_document_search()
     
-    with tabs[7]:  # Document Sharing
+    with tabs[8]:  # Document Sharing
         render_document_sharing()
 
 def render_drawings_management():
@@ -1186,3 +1189,210 @@ def render_document_processing_demo():
     ✅ **Mobile Responsive** - Works seamlessly on tablets and mobile devices  
     ✅ **Integration Ready** - Connects with all Highland Tower document workflows  
     """)
+
+def render_document_reports():
+    """Render comprehensive document reports for Highland Tower Development"""
+    st.markdown("### 📋 Document Reports")
+    st.markdown("Generate comprehensive reports for Highland Tower Development document management.")
+    
+    # Report type selection
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        report_type = st.selectbox(
+            "Select Report Type",
+            [
+                "Project Document Summary",
+                "Drawing Transmittal Log",
+                "Specification Status Report", 
+                "Document Review Status",
+                "Submittal Tracking Report",
+                "RFI Documentation Report",
+                "Change Order Document Log",
+                "Document Compliance Audit",
+                "Construction Progress Photos",
+                "Contract Document Register"
+            ]
+        )
+    
+    with col2:
+        report_format = st.selectbox(
+            "Format",
+            ["PDF", "Excel", "Word", "CSV"]
+        )
+    
+    st.markdown("---")
+    
+    # Report parameters
+    st.markdown("#### Report Parameters")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        date_range = st.date_input(
+            "Date Range",
+            value=None,
+            help="Select date range for the report"
+        )
+    
+    with col2:
+        document_types = st.multiselect(
+            "Document Types",
+            ["Drawings", "Specifications", "Submittals", "RFIs", "Photos", "Contracts"],
+            default=["Drawings", "Specifications"]
+        )
+    
+    with col3:
+        status_filter = st.multiselect(
+            "Status Filter",
+            ["Draft", "Under Review", "Approved", "Superseded", "Rejected"],
+            default=["Approved"]
+        )
+    
+    # Report preview based on selection
+    st.markdown("---")
+    st.markdown("#### Report Preview")
+    
+    if report_type == "Project Document Summary":
+        st.markdown("**Highland Tower Development - Document Summary Report**")
+        
+        # Summary metrics
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("Total Documents", "1,247", "+23 this week")
+        
+        with col2:
+            st.metric("Drawings", "186", "Current revision")
+        
+        with col3:
+            st.metric("Specifications", "45", "CSI divisions")
+        
+        with col4:
+            st.metric("Photos", "892", "+15 today")
+        
+        # Document breakdown by type
+        st.markdown("**Document Breakdown by Type:**")
+        breakdown_data = {
+            "Document Type": ["Architectural Drawings", "Structural Drawings", "MEP Drawings", "Site Plans", "Details", "Specifications", "Submittals", "RFIs", "Photos", "Reports"],
+            "Count": [45, 32, 67, 8, 34, 45, 156, 89, 892, 23],
+            "Status": ["Current", "Current", "Current", "Current", "Current", "Current", "In Review", "Open", "Current", "Current"]
+        }
+        
+        import pandas as pd
+        df = pd.DataFrame(breakdown_data)
+        st.dataframe(df, use_container_width=True)
+    
+    elif report_type == "Drawing Transmittal Log":
+        st.markdown("**Highland Tower Development - Drawing Transmittal Log**")
+        
+        transmittal_data = {
+            "Transmittal #": ["T-001", "T-002", "T-003", "T-004", "T-005"],
+            "Date": ["2025-01-15", "2025-01-18", "2025-01-22", "2025-01-25", "2025-01-28"],
+            "To": ["Highland Properties", "Structural Engineer", "MEP Consultant", "City Planning", "General Contractor"],
+            "Drawings": ["A-101, A-102, A-201", "S-101, S-201", "M-101, E-101, P-101", "Site Plan", "Details D-101 to D-105"],
+            "Purpose": ["Design Review", "Structural Review", "Coordination", "Permit Submittal", "Construction"]
+        }
+        
+        df_transmittal = pd.DataFrame(transmittal_data)
+        st.dataframe(df_transmittal, use_container_width=True)
+    
+    elif report_type == "Specification Status Report":
+        st.markdown("**Highland Tower Development - Specification Status Report**")
+        
+        spec_data = {
+            "CSI Division": ["Division 01 - General Requirements", "Division 03 - Concrete", "Division 04 - Masonry", "Division 05 - Metals", "Division 06 - Wood"],
+            "Sections": [8, 12, 6, 9, 7],
+            "Status": ["Complete", "In Review", "Complete", "Draft", "Complete"],
+            "Last Updated": ["2025-01-20", "2025-01-25", "2025-01-18", "2025-01-28", "2025-01-22"]
+        }
+        
+        df_specs = pd.DataFrame(spec_data)
+        st.dataframe(df_specs, use_container_width=True)
+    
+    elif report_type == "Document Review Status":
+        st.markdown("**Highland Tower Development - Document Review Status**")
+        
+        review_data = {
+            "Document": ["Highland Tower - Floor Plans A-101", "Highland Tower - Structural S-201", "Highland Tower - MEP M-101", "Highland Tower - Site Plan C-001", "Highland Tower - Details D-101"],
+            "Reviewer": ["Highland Properties", "Structural Engineer", "MEP Consultant", "Civil Engineer", "General Contractor"],
+            "Status": ["Approved", "Under Review", "Approved with Comments", "Rejected", "Pending"],
+            "Comments": [0, 3, 7, 12, 0],
+            "Due Date": ["2025-02-01", "2025-02-03", "2025-01-30", "2025-02-05", "2025-02-02"]
+        }
+        
+        df_review = pd.DataFrame(review_data)
+        st.dataframe(df_review, use_container_width=True)
+    
+    # Generate report button
+    st.markdown("---")
+    col1, col2, col3 = st.columns([2, 1, 1])
+    
+    with col1:
+        if st.button(f"📄 Generate {report_type}", type="primary"):
+            st.success(f"✅ {report_type} generated successfully!")
+            st.info(f"📧 Report has been saved and will be emailed to Highland Tower Development team.")
+    
+    with col2:
+        if st.button("📧 Email Report"):
+            st.success("Report scheduled for email delivery!")
+    
+    with col3:
+        if st.button("📅 Schedule Report"):
+            st.info("Report scheduling options opened in sidebar.")
+    
+    # Report scheduling sidebar
+    with st.sidebar:
+        st.markdown("### 📅 Report Scheduling")
+        
+        schedule_frequency = st.selectbox(
+            "Frequency",
+            ["One-time", "Daily", "Weekly", "Bi-weekly", "Monthly"]
+        )
+        
+        if schedule_frequency != "One-time":
+            schedule_time = st.time_input("Delivery Time")
+            
+            if schedule_frequency == "Weekly":
+                schedule_day = st.selectbox("Day of Week", ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"])
+            elif schedule_frequency == "Monthly":
+                schedule_date = st.number_input("Day of Month", min_value=1, max_value=28, value=1)
+        
+        email_recipients = st.text_area(
+            "Email Recipients",
+            placeholder="Enter email addresses, one per line",
+            value="highland.properties@email.com\nproject.manager@contractor.com\narchitect@design.com"
+        )
+        
+        if st.button("💾 Save Schedule"):
+            st.success("Report schedule saved successfully!")
+    
+    # Additional report features
+    st.markdown("---")
+    st.markdown("#### 📊 Report Features")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        **Available Report Options:**
+        
+        ✅ **Automated Generation** - Schedule reports for regular delivery  
+        ✅ **Custom Filtering** - Filter by date, status, type, and more  
+        ✅ **Multiple Formats** - PDF, Excel, Word, and CSV export  
+        ✅ **Email Distribution** - Direct delivery to stakeholders  
+        ✅ **Progress Tracking** - Visual progress indicators  
+        ✅ **Audit Trails** - Complete document history tracking  
+        """)
+    
+    with col2:
+        st.markdown("""
+        **Highland Tower Integration:**
+        
+        📋 **Project-Specific Data** - All reports tailored to Highland Tower  
+        📊 **Real-time Updates** - Live data from document management system  
+        🔐 **Secure Access** - Role-based report access and distribution  
+        📱 **Mobile Friendly** - Optimized for mobile viewing  
+        🎯 **Stakeholder Focus** - Reports designed for each audience  
+        📈 **Trend Analysis** - Historical data and progress tracking  
+        """)

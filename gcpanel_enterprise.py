@@ -200,116 +200,317 @@ def initialize_session_state():
 
 # Apply enterprise theme
 def apply_enterprise_theme():
-    theme = st.session_state.get('theme', 'dark')
-    
-    if theme == 'dark':
-        colors = {
-            'primary': '#4A90E2',
-            'secondary': '#5BA0F2',
-            'accent': '#6BB6FF',
-            'success': '#28A745',
-            'bg_primary': '#1A1D29',
-            'bg_secondary': '#252A3A',
-            'bg_card': '#2D3348',
-            'text_primary': '#FFFFFF',
-            'text_secondary': '#B8BCC8'
-        }
-    else:
-        colors = {
-            'primary': '#2E7BD4',
-            'secondary': '#1E6BBF',
-            'accent': '#0A5AA3',
-            'success': '#218838',
-            'bg_primary': '#FFFFFF',
-            'bg_secondary': '#F8F9FA',
-            'bg_card': '#FFFFFF',
-            'text_primary': '#212529',
-            'text_secondary': '#6C757D'
-        }
-    
-    st.markdown(f"""
+    """Apply sophisticated professional enterprise styling"""
+    st.markdown("""
     <style>
-    .stApp {{
-        background: linear-gradient(135deg, {colors['bg_primary']} 0%, {colors['bg_secondary']} 100%);
-        font-family: 'Inter', 'Segoe UI', sans-serif;
-    }}
-    h1, h2, h3 {{ color: {colors['primary']} !important; font-weight: 600; }}
-    .stSidebar {{ 
-        background: {colors['bg_card']}; 
-        border-right: 6px solid {colors['primary']};
-        position: relative;
-        box-shadow: 6px 0 15px rgba(74, 144, 226, 0.3);
-    }}
-    .stSidebar::after {{
+    /* Import Professional Typography */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
+    /* Global Professional Foundation */
+    .stApp {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        color: #0f172a;
+        line-height: 1.6;
+    }
+    
+    /* Professional Header Hierarchy */
+    h1 {
+        color: #1e40af !important;
+        font-weight: 800 !important;
+        font-size: 2.5rem !important;
+        letter-spacing: -0.025em !important;
+        margin-bottom: 1.5rem !important;
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    h2 {
+        color: #1e40af !important;
+        font-weight: 700 !important;
+        font-size: 1.875rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    h3 {
+        color: #374151 !important;
+        font-weight: 600 !important;
+        font-size: 1.5rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    /* Executive Sidebar Design */
+    .stSidebar {
+        background: linear-gradient(180deg, #1e40af 0%, #1e3a8a 50%, #1e2d69 100%) !important;
+        border-right: 4px solid #3b82f6 !important;
+        box-shadow: 8px 0 32px rgba(30, 64, 175, 0.2) !important;
+    }
+    
+    .stSidebar .stMarkdown {
+        color: #ffffff !important;
+        font-weight: 500 !important;
+    }
+    
+    .stSidebar h1, .stSidebar h2, .stSidebar h3 {
+        color: #ffffff !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Executive Button Styling */
+    .stButton > button {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 0.875rem 2rem !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+        letter-spacing: 0.025em !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.25) !important;
+        text-transform: uppercase !important;
+        min-height: 3rem !important;
+    }
+    
+    .stButton > button:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4) !important;
+    }
+    
+    .stButton > button:active {
+        transform: translateY(0) !important;
+        box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3) !important;
+    }
+    
+    /* Professional Metric Cards */
+    .stMetric {
+        background: white !important;
+        padding: 2rem !important;
+        border-radius: 16px !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 8px 32px rgba(148, 163, 184, 0.12) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        position: relative !important;
+        overflow: hidden !important;
+    }
+    
+    .stMetric::before {
         content: '';
         position: absolute;
         top: 0;
-        right: -6px;
-        width: 6px;
-        height: 100%;
-        background: linear-gradient(180deg, {colors['primary']} 0%, {colors['secondary']} 25%, {colors['success']} 50%, {colors['secondary']} 75%, {colors['primary']} 100%);
-        animation: pulse-border 4s ease-in-out infinite;
-        z-index: 1000;
-    }}
-    .stSidebar::before {{
-        content: '⭐ ✨ 🌟 ⭐ ✨ 🌟 ⭐ ✨ 🌟 ⭐ ✨ 🌟 ⭐ ✨ 🌟 ⭐ ✨ 🌟 ⭐ ✨ 🌟';
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%);
+    }
+    
+    .stMetric:hover {
+        transform: translateY(-4px) !important;
+        box-shadow: 0 16px 48px rgba(59, 130, 246, 0.2) !important;
+    }
+    
+    .stMetric > div {
+        color: #1e293b !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Professional Input Fields */
+    .stSelectbox > div > div,
+    .stTextInput > div > div > input,
+    .stTextArea > div > div > textarea {
+        background: white !important;
+        border: 2px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        padding: 1rem !important;
+        font-size: 0.95rem !important;
+        font-weight: 500 !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 2px 8px rgba(148, 163, 184, 0.1) !important;
+    }
+    
+    .stSelectbox > div > div:focus-within,
+    .stTextInput > div > div > input:focus,
+    .stTextArea > div > div > textarea:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1), 0 4px 16px rgba(59, 130, 246, 0.15) !important;
+        outline: none !important;
+    }
+    
+    /* Executive Data Tables */
+    .stDataFrame {
+        border: none !important;
+        border-radius: 16px !important;
+        overflow: hidden !important;
+        box-shadow: 0 8px 32px rgba(148, 163, 184, 0.12) !important;
+        background: white !important;
+    }
+    
+    .stDataFrame th {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
+        color: white !important;
+        font-weight: 700 !important;
+        padding: 1.25rem !important;
+        border: none !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        font-size: 0.875rem !important;
+    }
+    
+    .stDataFrame td {
+        padding: 1rem 1.25rem !important;
+        border: none !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+        font-weight: 500 !important;
+        color: #374151 !important;
+    }
+    
+    .stDataFrame tbody tr:hover {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+    }
+    
+    /* Professional Tab System */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin-bottom: 2rem !important;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background: white !important;
+        color: #64748b !important;
+        border: 2px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        padding: 1rem 2rem !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+        margin: 0 !important;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+        color: white !important;
+        border-color: #3b82f6 !important;
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.25) !important;
+    }
+    
+    /* Professional Status Indicators */
+    .status-indicator {
+        display: inline-flex !important;
+        align-items: center !important;
+        padding: 0.5rem 1rem !important;
+        border-radius: 25px !important;
+        font-size: 0.875rem !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        gap: 0.5rem !important;
+    }
+    
+    .status-operational {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+        color: white !important;
+        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3) !important;
+    }
+    
+    .status-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+        color: white !important;
+        box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3) !important;
+    }
+    
+    .status-error {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+        color: white !important;
+        box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3) !important;
+    }
+    
+    /* Professional Alert System */
+    .stAlert {
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 1.5rem !important;
+        font-weight: 500 !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* Enterprise Card Components */
+    .enterprise-card {
+        background: white !important;
+        padding: 2rem !important;
+        border-radius: 16px !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 8px 32px rgba(148, 163, 184, 0.1) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        margin-bottom: 2rem !important;
+        position: relative !important;
+        overflow: hidden !important;
+    }
+    
+    .enterprise-card::before {
+        content: '';
         position: absolute;
         top: 0;
-        right: -12px;
-        width: 12px;
-        height: 2000px;
-        font-size: 14px;
-        line-height: 40px;
-        color: #FFD700;
-        animation: star-scroll 8s linear infinite;
-        z-index: 1001;
-        text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
-        writing-mode: vertical-lr;
-        text-orientation: mixed;
-    }}
-    @keyframes pulse-border {{
-        0%, 100% {{
-            background: linear-gradient(180deg, {colors['primary']} 0%, {colors['secondary']} 25%, {colors['success']} 50%, {colors['secondary']} 75%, {colors['primary']} 100%);
-            box-shadow: 0 0 15px rgba(74, 144, 226, 0.5);
-        }}
-        25% {{
-            background: linear-gradient(180deg, {colors['secondary']} 0%, {colors['accent']} 25%, #FFD700 50%, {colors['accent']} 75%, {colors['secondary']} 100%);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
-        }}
-        50% {{
-            background: linear-gradient(180deg, {colors['success']} 0%, #34CE57 25%, #FFD700 50%, #34CE57 75%, {colors['success']} 100%);
-            box-shadow: 0 0 25px rgba(40, 167, 69, 0.8);
-        }}
-        75% {{
-            background: linear-gradient(180deg, {colors['accent']} 0%, {colors['primary']} 25%, {colors['success']} 50%, {colors['primary']} 75%, {colors['accent']} 100%);
-            box-shadow: 0 0 20px rgba(74, 144, 226, 0.6);
-        }}
-    }}
-    @keyframes star-scroll {{
-        0% {{
-            transform: translateY(0px);
-        }}
-        100% {{
-            transform: translateY(-320px);
-        }}
-    }}
-    .stButton > button {{
-        background: linear-gradient(135deg, {colors['primary']} 0%, {colors['secondary']} 100%);
-        color: white; border: none; border-radius: 8px; padding: 0.5rem 1rem;
-        font-weight: 500; transition: all 0.2s ease;
-    }}
-    .stButton > button:hover {{
-        background: linear-gradient(135deg, {colors['secondary']} 0%, {colors['accent']} 100%);
-        transform: translateY(-1px);
-    }}
-    .stMetric {{
-        background: {colors['bg_card']}; padding: 1.5rem; border-radius: 12px;
-        border-left: 4px solid {colors['primary']}; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }}
-    .enterprise-card {{
-        background: {colors['bg_card']}; padding: 1.5rem; border-radius: 12px;
-        border: 1px solid {colors['primary']}20; margin: 1rem 0;
-    }}
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+    }
+    
+    .enterprise-card:hover {
+        transform: translateY(-4px) !important;
+        box-shadow: 0 16px 48px rgba(59, 130, 246, 0.15) !important;
+    }
+    
+    /* Remove Streamlit Branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    .stDeployButton {visibility: hidden;}
+    
+    /* Professional Loading States */
+    .stSpinner > div {
+        border-color: #3b82f6 transparent #3b82f6 transparent !important;
+        width: 3rem !important;
+        height: 3rem !important;
+        border-width: 3px !important;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .stMetric, .enterprise-card {
+            padding: 1.5rem !important;
+            margin-bottom: 1.5rem !important;
+        }
+        
+        .stButton > button {
+            padding: 0.75rem 1.5rem !important;
+            font-size: 0.875rem !important;
+        }
+        
+        h1 {
+            font-size: 2rem !important;
+        }
+    }
+    
+    /* Professional Animations */
+    @keyframes slideInFromTop {
+        0% {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .main .block-container {
+        animation: slideInFromTop 0.6s ease-out;
+    }
     </style>
     """, unsafe_allow_html=True)
 

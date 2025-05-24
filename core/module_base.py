@@ -32,9 +32,9 @@ class BaseModule(ABC):
         """Return module configuration."""
         pass
     
-    def render_header(self, title: str = None) -> None:
+    def render_header(self, title: Optional[str] = None) -> None:
         """Render standardized module header."""
-        display_title = title or f"{self.module_icon} {self.module_name}"
+        display_title = title if title is not None else f"{self.module_icon} {self.module_name}"
         st.title(display_title)
         
     def render_metrics(self, metrics: List[Dict[str, Any]]) -> None:
@@ -96,14 +96,14 @@ class BaseModule(ABC):
                     else:
                         st.markdown(f"**{column}**: {value}")
     
-    def log_action(self, action: str, details: Dict[str, Any] = None) -> None:
+    def log_action(self, action: str, details: Optional[Dict[str, Any]] = None) -> None:
         """Log user actions for audit trail."""
         log_entry = {
             "timestamp": datetime.now().isoformat(),
             "module": self.module_name,
             "action": action,
             "user": st.session_state.get("current_user", {}).get("name", "Unknown"),
-            "details": details or {}
+            "details": details if details is not None else {}
         }
         
         # Store in session state for now (will be moved to database)

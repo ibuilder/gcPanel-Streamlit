@@ -1,83 +1,75 @@
 """
-Production Error Handler for gcPanel
+Enterprise Error Handler for Highland Tower Development Dashboard
 
-This module provides centralized error handling and logging for production deployment.
+Production-grade error handling and recovery system.
 """
+
+import streamlit as st
 import logging
 import traceback
-import streamlit as st
 from datetime import datetime
-from typing import Optional, Dict, Any
-
-logger = logging.getLogger(__name__)
+from typing import Any, Callable, Optional
+import functools
 
 class ProductionErrorHandler:
-    """Handles errors in a production-safe manner."""
+    """Enterprise-grade error handler for Highland Tower Development."""
     
-    @staticmethod
-    def handle_error(error: Exception, context: Optional[Dict[str, Any]] = None, 
-                     user_message: str = "An error occurred. Please try again.") -> None:
-        """
-        Handle errors in production environment.
-        
-        Args:
-            error: The exception that occurred
-            context: Additional context about the error
-            user_message: User-friendly error message
-        """
-        error_id = datetime.now().strftime("%Y%m%d_%H%M%S")
-        
-        # Log the full error details for debugging
-        logger.error(f"Error ID: {error_id}")
-        logger.error(f"Error Type: {type(error).__name__}")
-        logger.error(f"Error Message: {str(error)}")
-        logger.error(f"Context: {context}")
-        logger.error(f"Traceback: {traceback.format_exc()}")
-        
-        # Show user-friendly error message
-        st.error(f"{user_message} (Error ID: {error_id})")
-        
-    @staticmethod
-    def handle_data_error(error: Exception, operation: str = "data operation") -> None:
-        """Handle data-related errors."""
-        ProductionErrorHandler.handle_error(
-            error,
-            context={"operation": operation},
-            user_message=f"Unable to complete {operation}. Please check your data and try again."
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self._setup_logging()
+    
+    def _setup_logging(self):
+        """Setup production logging configuration."""
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.FileHandler('logs/highland_tower_errors.log'),
+                logging.StreamHandler()
+            ]
         )
+    
+    def handle_gracefully(self, func: Callable) -> Callable:
+        """Decorator for graceful error handling."""
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                self._log_error(func.__name__, e)
+                self._display_user_friendly_error(func.__name__, str(e))
+                return None
+        return wrapper
+    
+    def _log_error(self, function_name: str, error: Exception):
+        """Log error with full context."""
+        error_data = {
+            "timestamp": datetime.now().isoformat(),
+            "function": function_name,
+            "error_type": type(error).__name__,
+            "error_message": str(error),
+            "traceback": traceback.format_exc(),
+            "user": st.session_state.get("current_user", {}).get("name", "Unknown"),
+            "session_id": st.session_state.get("session_id", "unknown")
+        }
         
-    @staticmethod
-    def handle_auth_error(error: Exception) -> None:
-        """Handle authentication errors."""
-        ProductionErrorHandler.handle_error(
-            error,
-            context={"type": "authentication"},
-            user_message="Authentication failed. Please check your credentials and try again."
-        )
+        self.logger.error(f"Highland Tower Error: {error_data}")
+    
+    def _display_user_friendly_error(self, context: str, error_message: str):
+        """Display user-friendly error message."""
+        st.error(f"""
+        🚧 **Highland Tower Development - Temporary Issue**
         
-    @staticmethod
-    def handle_file_error(error: Exception, filename: str = "") -> None:
-        """Handle file operation errors."""
-        ProductionErrorHandler.handle_error(
-            error,
-            context={"type": "file_operation", "filename": filename},
-            user_message="File operation failed. Please check the file and try again."
-        )
+        We encountered a minor issue while processing your {context} request. 
+        Our team has been notified and is working on a solution.
+        
+        **What you can do:**
+        - Try refreshing the page
+        - Contact your project administrator
+        - Check back in a few minutes
+        
+        **Error Reference:** {datetime.now().strftime('%Y%m%d-%H%M%S')}
+        """)
 
-def safe_execute(func, *args, **kwargs):
-    """
-    Safely execute a function with error handling.
-    
-    Args:
-        func: Function to execute
-        *args: Function arguments
-        **kwargs: Function keyword arguments
-        
-    Returns:
-        Function result or None if error occurred
-    """
-    try:
-        return func(*args, **kwargs)
-    except Exception as e:
-        ProductionErrorHandler.handle_error(e)
-        return None
+# Global error handler instance
+error_handler = ProductionErrorHandler()

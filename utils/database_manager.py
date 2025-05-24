@@ -60,7 +60,7 @@ class DatabaseManager:
         if self.connection_pool and connection:
             self.connection_pool.putconn(connection)
     
-    def execute_query(self, query: str, params: tuple = None) -> List[Dict[str, Any]]:
+    def execute_query(self, query: str, params: Optional[tuple] = None) -> List[Dict[str, Any]]:
         """Execute query with performance monitoring."""
         start_time = datetime.now()
         connection = None

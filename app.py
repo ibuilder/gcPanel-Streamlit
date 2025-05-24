@@ -24,7 +24,7 @@ import streamlit as st
 import logging
 import os
 from utils.ui_manager import set_page_config
-import app_manager
+# import app_manager  # Temporarily disabled to fix module errors
 
 # Import production configuration
 from config.production import ProductionConfig, setup_logging
@@ -84,135 +84,66 @@ def main():
         add_construction_dashboard_js()
         add_construction_help_button()
         
-        # Remove sidebar and ensure full width layout
-        st.markdown("""
-        <style>
-        /* ELIMINATE ALL unnecessary containers and divs throughout the app */
-        .main .block-container {
-            padding: 0 !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-            margin: 0 !important;
-            margin-top: 0 !important;
-            max-width: 100% !important;
-        }
-        
-        /* Remove ALL spacing from app container */
-        .stApp {
-            padding-top: 0 !important;
-            margin-top: 0 !important;
-        }
-        
-        /* Target every possible container that creates top spacing */
-        .stApp > div {
-            padding-top: 0 !important;
-            margin-top: 0 !important;
-        }
-        
-        .stApp > div > div {
-            padding-top: 0 !important;
-            margin-top: 0 !important;
-        }
-        
-        section.main {
-            padding-top: 0 !important;
-            margin-top: 0 !important;
-        }
-        
-        .main > div {
-            padding-top: 0 !important;
-            margin-top: 0 !important;
-        }
-        
-        /* Completely hide all sidebar elements and controls from all pages */
-        [data-testid="stSidebar"] {display: none !important;}
-        .st-emotion-cache-1c7y2kd {display: none !important;}
-        button[kind="headerNoPadding"] {display: none !important;}
-        section[data-testid="stSidebarContent"] {display: none !important;}
-        .st-emotion-cache-z5fcl4 {display: none !important;}
-        section[data-testid="stSidebarUserContent"] {display: none !important;}
-        .st-emotion-cache-10oheav {visibility: hidden !important;}
-        [data-testid="collapsedControl"] {display: none !important;}
-        #Sidebar {display: none !important;}
-        nav[data-testid="stSidebar"] {display: none !important;}
-        nav.st-emotion-cache-zq5wmm.ezrtsby0 {display: none !important;}
-        .css-1d391kg {display: none !important;}
-        .st-hy {display: none !important;}
-        .st-emotion-cache-ue6h4q {display: none !important;}
-        
-        /* Target specific container classes that create extra divs */
-        .css-1rs6os {display: none !important;}
-        .css-17ziqus {display: none !important;}
-        .css-12oz5g7 {display: none !important;}
-        .css-1y4p8pa {display: none !important;}
-        .css-91z34k {display: none !important;}
-        .css-1wrcr25 {display: none !important;}
-        .css-18e3th9 {display: none !important;}
-        .css-k1vhr4 {display: none !important;}
-        .css-1avcm0n {display: none !important;}
-        
-        /* Remove element containers and spacing BUT preserve charts */
-        .element-container:not([data-testid*="chart"]) {
-            margin: 0 !important; 
-            padding: 0 !important;
-            border: none !important;
-        }
-        
-        div[data-testid="element-container"]:not([data-testid*="chart"]) {
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-        
-        /* Ensure charts and plotly graphs are visible */
-        .js-plotly-plot, .plotly, [data-testid*="chart"] {
-            display: block !important;
-            visibility: visible !important;
-        }
-        
-        /* Preserve chart containers */
-        div[data-testid*="metric"], 
-        div[data-testid*="plotly"], 
-        .stPlotlyChart,
-        .stMetric {
-            display: block !important;
-            visibility: visible !important;
-        }
-        
-        /* Ensure buttons remain functional */
-        .stButton > button {
-            display: block !important;
-            visibility: visible !important;
-            pointer-events: auto !important;
-        }
-        
-        /* Fix form elements functionality */
-        .stTextInput,
-        .stSelectbox,
-        .stCheckbox,
-        .stButton {
-            display: block !important;
-            visibility: visible !important;
-        }
-        
-        /* Force full width layout with zero top spacing */
-        .appview-container .main .block-container {
-            max-width: 100% !important;
-            padding-left: 2rem !important;
-            padding-right: 2rem !important;
-            padding-top: 0 !important;
-            margin-top: 0 !important;
-        }
-        
-        .stApp > div:first-child {
-            margin-left: 0px !important;
-        }
-        
-        .css-18e3th9, .css-1d391kg {
-            padding-left: 0rem !important;
-            padding-right: 0rem !important;
-        }
-        </style>
-        """, unsafe_allow_html=True)
+        # Clean layout with proper sidebar functionality
+        if st.session_state.get("authenticated", False):
+            # Show sidebar and clean layout for logged-in users
+            st.markdown("""
+            <style>
+            /* Remove empty divs and extra spacing */
+            .main .block-container {
+                padding-top: 0rem !important;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+                max-width: 100% !important;
+            }
+            
+            /* Hide ALL empty divs that create spacing */
+            .stApp > div:empty {
+                display: none !important;
+            }
+            
+            .stApp > div > div:empty {
+                display: none !important;
+            }
+            
+            /* Remove top padding from first container */
+            .stApp > div:first-child {
+                padding-top: 0 !important;
+                margin-top: 0 !important;
+            }
+            
+            /* Ensure sidebar is visible and styled */
+            [data-testid="stSidebar"] {
+                display: block !important;
+                visibility: visible !important;
+            }
+            
+            .css-1d391kg {
+                background-color: #1e2228 !important;
+                padding-top: 1rem !important;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+        else:
+            # Hide sidebar for login page
+            st.markdown("""
+            <style>
+            [data-testid="stSidebar"] {
+                display: none !important;
+            }
+            
+            /* Clean login page layout */
+            .main .block-container {
+                padding-top: 0rem !important;
+                max-width: 100% !important;
+            }
+            
+            /* Hide empty divs */
+            .stApp > div:empty {
+                display: none !important;
+            }
+            </style>
+            """, unsafe_allow_html=True)
         
         # Initialize session state variables from app_manager
         app_manager.initialize_session_state()

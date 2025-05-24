@@ -115,23 +115,36 @@ def render_login_form():
         z-index: 1000;
     }
     
-    /* Form elements */
+    /* Form elements - Dark theme styling */
     .stTextInput > div > div > input {
+        background-color: rgba(30, 34, 42, 0.95) !important;
         border: 2px solid #667eea !important;
+        color: #ffffff !important;
         border-radius: 10px !important;
-        background: white !important;
-        color: #333 !important;
         font-size: 16px !important;
         padding: 0.75rem !important;
     }
     
     .stTextInput > div > div > input:focus {
+        background-color: rgba(35, 39, 47, 0.98) !important;
         border-color: #764ba2 !important;
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2) !important;
+        color: #ffffff !important;
     }
     
     .stTextInput > div > div > input::placeholder {
-        color: #999 !important;
+        color: rgba(255, 255, 255, 0.6) !important;
+    }
+    
+    /* Password field specific styling */
+    input[type="password"] {
+        background-color: rgba(30, 34, 42, 0.95) !important;
+        color: #ffffff !important;
+    }
+    
+    input[type="password"]:focus {
+        background-color: rgba(35, 39, 47, 0.98) !important;
+        color: #ffffff !important;
     }
     
     /* Button improvements */

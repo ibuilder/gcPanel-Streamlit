@@ -27,7 +27,10 @@ def render_settings():
         
     with categories[3]:  # Data Management
         render_data_management()
-        
+
+def render():
+    """Main render function for the Settings module"""
+    render_settings()
     with categories[4]:  # System
         render_system_settings()
         

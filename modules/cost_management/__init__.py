@@ -1023,3 +1023,7 @@ def render():
     # AIA G702/G703 Billing Tab
     with tab4:
         render_aia_billing()
+
+def render():
+    """Main render function for the Cost Management module"""
+    render_cost_management()

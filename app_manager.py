@@ -19,6 +19,9 @@ from utils.cache_manager import CacheManager
 from utils.responsive_ui import apply_all_responsive_styles, detect_mobile
 from utils.search_manager import SearchManager
 
+# Import enhanced core system
+from core.app_core import app_core
+
 # Import modules for standalone functionality
 import modules.daily_reports
 import modules.rfis
@@ -63,18 +66,22 @@ import modules.PreConstruction
 
 def initialize_session_state():
     """
-    Initialize session state variables from config and set up required app state.
+    Initialize enhanced session state with enterprise features.
     
     This function initializes:
     1. Default session state variables from app_config
-    2. Notification system state
-    3. Application cache for performance optimization
-    4. Search system state
-    5. Any other required application state variables
+    2. Enhanced notification system with real-time alerts
+    3. Advanced caching and performance optimization
+    4. Global search and filtering system
+    5. Real-time collaboration features
+    6. Audit logging and security monitoring
     """
     _initialize_default_state()
     _initialize_notifications()
     _initialize_cache_system()
+    
+    # Initialize enhanced core system
+    app_core.initialize_application()
     
     # Initialize search system
     SearchManager.initialize()

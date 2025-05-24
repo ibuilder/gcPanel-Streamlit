@@ -449,7 +449,10 @@ def render_sidebar():
         navigation_options = [
             "🏗️ Dashboard", "📋 Preconstruction", "⚙️ Engineering", "👷 Field Operations", 
             "🦺 Safety", "📄 Contracts", "💰 Cost Management", "🏢 BIM", "✅ Closeout", 
-            "📊 Analytics", "📁 Documents"
+            "📊 Analytics", "📁 Documents", "📝 Daily Reports", "❓ RFIs", "📤 Submittals", 
+            "📨 Transmittals", "📸 Photo Log", "👁️ Safety Observations", "⚠️ Incidents", 
+            "📑 Prime Contract", "🔧 Change Orders", "🎯 Clash Detection", "👥 Resource Management",
+            "🔍 Quality Control", "📋 Inspections", "💵 Budget", "📊 Business Intelligence"
         ]
         
         # Handle default selection with icons
@@ -610,6 +613,51 @@ def main_clean():
         elif "Documents" in current_menu:
             st.title("📁 Documents")
             st.info("Document management and storage")
+        elif "Daily Reports" in current_menu:
+            st.title("📝 Daily Reports")
+            st.info("Daily construction progress reports and field logs")
+        elif "RFIs" in current_menu:
+            st.title("❓ RFIs - Requests for Information")
+            st.info("Track and manage RFIs for Highland Tower Development")
+        elif "Submittals" in current_menu:
+            st.title("📤 Submittals")
+            st.info("Review and approve construction submittals")
+        elif "Transmittals" in current_menu:
+            st.title("📨 Transmittals")
+            st.info("Document transmittal tracking and management")
+        elif "Photo Log" in current_menu:
+            st.title("📸 Photo Log")
+            st.info("Construction progress photography and documentation")
+        elif "Safety Observations" in current_menu:
+            st.title("👁️ Safety Observations")
+            st.info("Field safety observations and compliance tracking")
+        elif "Incidents" in current_menu:
+            st.title("⚠️ Incident Reports")
+            st.info("Safety incident reporting and investigation")
+        elif "Prime Contract" in current_menu:
+            st.title("📑 Prime Contract")
+            st.info("Prime contract management and administration")
+        elif "Change Orders" in current_menu:
+            st.title("🔧 Change Orders")
+            st.info("Construction change order tracking and approval")
+        elif "Clash Detection" in current_menu:
+            st.title("🎯 Clash Detection")
+            st.info("BIM model clash detection and resolution")
+        elif "Resource Management" in current_menu:
+            st.title("👥 Resource Management")
+            st.info("Team coordination, equipment, and material management")
+        elif "Quality Control" in current_menu:
+            st.title("🔍 Quality Control")
+            st.info("Quality assurance and control processes")
+        elif "Inspections" in current_menu:
+            st.title("📋 Inspections")
+            st.info("Construction inspections and compliance verification")
+        elif "Budget" in current_menu:
+            st.title("💵 Budget")
+            st.info("Detailed budget tracking and financial management")
+        elif "Business Intelligence" in current_menu:
+            st.title("📊 Business Intelligence")
+            st.info("Advanced analytics and business intelligence dashboards")
         else:
             st.title(f"{current_menu}")
             st.info("Module content will be displayed here.")

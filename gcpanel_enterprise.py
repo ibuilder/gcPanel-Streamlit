@@ -534,14 +534,13 @@ def render_login():
     </div>
     """, unsafe_allow_html=True)
     
-    # Emotional Intelligence - Addressing the overwhelm
+    # Project Overview
     st.markdown("""
     <div class="enterprise-card" style="background: linear-gradient(135deg, #28A745 0%, #34CE57 100%); color: white; text-align: center;">
-        <h3 style="margin: 0; color: white;">🌟 Building Dreams Into Reality</h3>
+        <h3 style="margin: 0; color: white;">Highland Tower Development</h3>
         <p style="margin: 0.5rem 0 0 0; opacity: 0.9; line-height: 1.6;">
-            Managing a $45.5M project feels overwhelming? That's normal! You're orchestrating the creation of 
-            120 homes and 8 businesses where families will live and dreams will flourish. 
-            <strong>gcPanel makes the complex simple.</strong>
+            Managing a $45.5M project with 120 residential units and 8 retail spaces. 
+            <strong>gcPanel makes complex construction management simple.</strong>
         </p>
     </div>
     """, unsafe_allow_html=True)

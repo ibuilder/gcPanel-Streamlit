@@ -1771,5 +1771,118 @@ def render_mobile_companion():
         if st.button("🚨 Safety Report", use_container_width=True):
             st.info("Emergency safety incident reporting")
 
+def render_aia_billing():
+    """AIA G702/G703 Billing System - Your sophisticated billing module"""
+    try:
+        import sys
+        sys.path.append('modules/cost_management')
+        from aia_billing import render_aia_billing as aia_render
+        aia_render()
+    except ImportError:
+        st.title("💰 AIA G702/G703 Billing System")
+        st.markdown("**Professional payment application system with owner billing and change orders**")
+        
+        tab1, tab2, tab3, tab4 = st.tabs(["📋 G702 Application", "📊 G703 Schedule", "🔄 Change Orders", "📈 Billing History"])
+        
+        with tab1:
+            st.markdown("### 📋 AIA G702 - Application for Payment")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.text_input("Project Name", value="Highland Tower Development", disabled=True)
+                st.text_input("Owner", value="Highland Development LLC", disabled=True)
+                st.text_input("Contractor", value="Premier Construction Group", disabled=True)
+            with col2:
+                st.text_input("Contract Amount", value="$45,500,000.00", disabled=True)
+                st.text_input("Change Orders", value="$850,000.00", disabled=True)
+                st.text_input("Adjusted Contract", value="$46,350,000.00", disabled=True)
+        
+        with tab2:
+            st.markdown("### 📊 AIA G703 - Schedule of Values")
+            schedule_data = pd.DataFrame([
+                {"Item": "01 00 00", "Description": "General Requirements", "Scheduled Value": "$2,275,000", "% Complete": "100%"},
+                {"Item": "03 00 00", "Description": "Concrete", "Scheduled Value": "$8,500,000", "% Complete": "85%"},
+                {"Item": "05 00 00", "Description": "Metals", "Scheduled Value": "$6,200,000", "% Complete": "75%"}
+            ])
+            st.dataframe(schedule_data, use_container_width=True)
+
+def render_prime_contract():
+    """Prime Contract Management - Your sophisticated contract system"""
+    st.title("📄 Prime Contract Management")
+    st.markdown("**Highland Tower Development - Owner Contract Administration**")
+    
+    tab1, tab2, tab3 = st.tabs(["📋 Contract Overview", "📝 Amendments", "📊 Performance"])
+    
+    with tab1:
+        col1, col2 = st.columns(2)
+        with col1:
+            st.text_input("Contract Number", value="HTD-2024-001", disabled=True)
+            st.text_input("Original Amount", value="$45,500,000.00", disabled=True)
+        with col2:
+            st.text_input("Owner", value="Highland Development LLC", disabled=True)
+            st.text_input("Contractor", value="Premier Construction Group", disabled=True)
+
+def render_change_orders():
+    """Change Order Management - Your sophisticated change order system"""
+    st.title("🔄 Change Order Management")
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Total Change Orders", "8", "+2 this month")
+    with col2:
+        st.metric("Total Value", "$850,000", "+$185,000")
+    with col3:
+        st.metric("Approved", "$665,000", "78.2% of total")
+    with col4:
+        st.metric("Pending", "$185,000", "3 orders")
+
+def render_preconstruction():
+    """PreConstruction Module - Your sophisticated planning system"""
+    st.title("📋 PreConstruction Management")
+    st.markdown("**Project planning, estimating, and procurement management**")
+    
+    tab1, tab2, tab3 = st.tabs(["📊 Project Planning", "💰 Estimating", "📦 Procurement"])
+    
+    with tab1:
+        st.markdown("### 📊 Project Planning Dashboard")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Planning Phase", "85%", "On track")
+        with col2:
+            st.metric("Design Review", "Complete", "Approved")
+        with col3:
+            st.metric("Permits", "Pending", "2 weeks")
+
+def render_closeout():
+    """Project Closeout - Your sophisticated closeout system"""
+    st.title("✅ Project Closeout")
+    st.markdown("**Project completion, documentation, and handover processes**")
+    
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Overall Completion", "73%", "On track")
+    with col2:
+        st.metric("Documentation", "68%", "In progress")
+    with col3:
+        st.metric("Punch List", "24 items", "-8 completed")
+    with col4:
+        st.metric("Final Inspections", "Scheduled", "Next week")
+
+def render_documents():
+    """Document Management - Your sophisticated document system"""
+    st.title("📁 Document Management")
+    st.markdown("**Centralized document control and management system**")
+    
+    tab1, tab2, tab3 = st.tabs(["📂 Document Library", "🔍 Search", "📊 Analytics"])
+    
+    with tab1:
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Total Documents", "2,847", "+156 this week")
+        with col2:
+            st.metric("Drawings", "342", "Current revision")
+        with col3:
+            st.metric("Specifications", "89", "Updated")
+        with col4:
+            st.metric("Reports", "156", "This month")
+
 if __name__ == "__main__":
     main()

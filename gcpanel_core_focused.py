@@ -545,9 +545,10 @@ def get_user_role_permissions():
             "role_name": "Administrator",
             "modules": ["Dashboard", "PreConstruction", "Engineering", "Field Operations", "Safety", 
                        "Contracts", "Cost Management", "Unit Prices", "Deliveries", "Daily Reports", "Progress Photos", "Quality Control",
-                       "Material Management", "BIM", "Analytics", "Submittals", "Transmittals", 
+                       "Material Management", "BIM", "Analytics", "Submittals", "Transmittals", "RFIs", "Scheduling",
                        "Equipment Tracking", "AI Assistant", "Mobile Companion", "AIA Billing",
-                       "Prime Contract", "Change Orders", "Closeout", "Documents", "Admin Settings"],
+                       "Prime Contract", "Change Orders", "Closeout", "Documents", "Admin Settings",
+                       "Subcontractor Management", "Inspections", "Issues & Risks", "Performance Snapshot"],
             "permissions": ["read_all", "write_all", "manage_users", "view_audit_logs", "approve_changes"]
         },
         "manager": {

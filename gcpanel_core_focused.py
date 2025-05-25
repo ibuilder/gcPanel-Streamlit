@@ -745,14 +745,16 @@ def render_main_content():
             from modules.safety import render as safety_render
             module_functions["Safety"] = safety_render
         except ImportError:
-            module_functions["Safety"] = render_safety
+            # Use the local fallback function defined in this file
+            module_functions["Safety"] = lambda: render_safety()
         
         # Contracts with prime contracts and change orders
         try:
             from modules.contracts import render as contracts_render
             module_functions["Contracts"] = contracts_render
         except ImportError:
-            module_functions["Contracts"] = render_contracts
+            # Use the local fallback function defined in this file
+            module_functions["Contracts"] = lambda: render_contracts()
         
         # Cost Management with AIA billing
         try:

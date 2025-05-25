@@ -157,98 +157,41 @@ def render_rfis():
                 if st.button(f"📎 View Details", key=f"details_{rfi['RFI #']}"):
                     st.info("Opening detailed RFI view...")
 
-def render_drawing_management():
-    """Render drawing management interface"""
-    st.markdown("### Engineering Drawing Management")
+def render_engineering_coordination():
+    """Render engineering coordination interface - streamlined without duplicate drawing management"""
+    st.markdown("### Engineering Coordination")
     
-    # Drawing statistics
+    # Quick navigation to Documents for drawing management
+    st.info("📐 **Drawing Management** is available in the **Documents** section for comprehensive document control and version management.")
+    
+    # Engineering coordination metrics
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.metric("Total Drawings", "347", "+12 this week")
+        st.metric("Active RFIs", "23", "+3 this week")
     with col2:
-        st.metric("Current Revision", "Rev 3", "Latest update")
+        st.metric("Structural Progress", "85%", "Level 13 complete")
     with col3:
-        st.metric("Pending Reviews", "8", "⏳")
+        st.metric("MEP Coordination", "68%", "On schedule")
     with col4:
-        st.metric("Disciplines", "6", "Active sets")
+        st.metric("Engineering Issues", "12", "-3 resolved")
     
-    # Drawing upload
-    with st.expander("📁 Upload New Drawing", expanded=False):
-        with st.form("upload_drawing"):
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                sheet_number = st.text_input("Sheet Number", placeholder="S-101")
-                drawing_title = st.text_input("Drawing Title", placeholder="Foundation Plan - Level B2")
-                discipline = st.selectbox("Discipline", [
-                    "Architectural (A)", "Structural (S)", "Mechanical (M)", 
-                    "Electrical (E)", "Plumbing (P)", "Civil (C)"
-                ])
-            
-            with col2:
-                revision = st.text_input("Revision", placeholder="Rev 3")
-                revision_date = st.date_input("Revision Date", datetime.now())
-                drawing_phase = st.selectbox("Phase", [
-                    "Schematic Design", "Design Development", "Construction Documents", 
-                    "Issued for Construction", "As-Built"
-                ])
-            
-            drawing_file = st.file_uploader("Upload Drawing File", type=['dwg', 'pdf', 'dxf'])
-            drawing_notes = st.text_area("Revision Notes", placeholder="Describe changes in this revision...")
-            
-            if st.form_submit_button("Upload Drawing", type="primary"):
-                if sheet_number and drawing_title and drawing_file:
-                    st.success(f"✅ Drawing {sheet_number} uploaded successfully!")
-                    st.info("Drawing added to Highland Tower project library")
-                else:
-                    st.error("Please fill in all required fields")
+    # Quick coordination actions
+    st.markdown("#### Quick Engineering Actions")
     
-    # Drawing library
-    st.markdown("#### Highland Tower Drawing Library")
+    col1, col2, col3 = st.columns(3)
     
-    drawing_data = {
-        'Sheet #': ['A-101', 'A-201', 'S-101', 'S-201', 'M-101', 'E-101', 'P-101', 'C-101'],
-        'Title': [
-            'Ground Floor Plan', 'Typical Residential Floor Plan', 'Foundation Plan',
-            'Typical Floor Framing', 'HVAC Plan - Ground Floor', 'Electrical Plan - Ground Floor',
-            'Plumbing Plan - Ground Floor', 'Site Plan'
-        ],
-        'Discipline': ['Architectural', 'Architectural', 'Structural', 'Structural', 'Mechanical', 'Electrical', 'Plumbing', 'Civil'],
-        'Revision': ['Rev 3', 'Rev 2', 'Rev 4', 'Rev 3', 'Rev 2', 'Rev 1', 'Rev 2', 'Rev 1'],
-        'Date': ['2025-01-25', '2025-01-20', '2025-01-27', '2025-01-23', '2025-01-18', '2025-01-15', '2025-01-19', '2025-01-10'],
-        'Status': ['Current', 'Current', 'Current', 'Current', 'Under Review', 'Current', 'Current', 'Current'],
-        'Size (MB)': [2.3, 1.8, 3.1, 2.7, 1.9, 1.2, 1.5, 4.2]
-    }
-    
-    df_drawings = pd.DataFrame(drawing_data)
-    
-    # Filter and search
-    col1, col2 = st.columns(2)
     with col1:
-        search_term = st.text_input("🔍 Search drawings", placeholder="Sheet number or title...")
-    with col2:
-        discipline_filter = st.selectbox("Filter by Discipline", ["All", "Architectural", "Structural", "Mechanical", "Electrical", "Plumbing", "Civil"])
+        if st.button("📝 Create New RFI", use_container_width=True):
+            st.success("RFI creation form opened")
     
-    # Display drawings
-    for index, drawing in df_drawings.iterrows():
-        with st.expander(f"📐 {drawing['Sheet #']} - {drawing['Title']} ({drawing['Revision']})"):
-            col1, col2, col3 = st.columns(3)
-            
-            with col1:
-                st.markdown(f"**Discipline:** {drawing['Discipline']}")
-                st.markdown(f"**Revision:** {drawing['Revision']}")
-                st.markdown(f"**Date:** {drawing['Date']}")
-            
-            with col2:
-                st.markdown(f"**Status:** {drawing['Status']}")
-                st.markdown(f"**File Size:** {drawing['Size (MB)']} MB")
-            
-            with col3:
-                if st.button(f"📥 Download", key=f"download_{drawing['Sheet #']}"):
-                    st.success(f"Downloading {drawing['Sheet #']}")
-                if st.button(f"👁️ View", key=f"view_{drawing['Sheet #']}"):
-                    st.info(f"Opening {drawing['Sheet #']} in viewer")
+    with col2:
+        if st.button("🔍 View Active Issues", use_container_width=True):
+            st.info("Opening engineering issues dashboard")
+    
+    with col3:
+        if st.button("📊 Coordination Report", use_container_width=True):
+            st.info("Generating MEP coordination report")
 
 def render_structural():
     """Render structural engineering interface"""

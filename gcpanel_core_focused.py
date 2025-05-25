@@ -419,25 +419,37 @@ def render_sidebar():
             apply_theme()
             st.rerun()
         
-        # Admin Settings (admin only) - Moved to bottom
+        # Administration (admin only) - Professional & Organized
         if user_role == "admin":
             st.markdown("---")
             st.markdown("### ⚙️ Administration")
-            admin_buttons = [
+            
+            # Core Admin Functions - Most Used
+            st.markdown("**System Management**")
+            core_admin = [
                 ("👥 User Management", "User Management"),
                 ("🔐 Security Settings", "Security Settings"),
-                ("📊 System Analytics", "System Analytics"),
-                ("🗄️ Database Admin", "Database Admin"),
-                ("🔧 System Settings", "System Settings"),
-                ("📋 Audit Logs", "Audit Logs"),
-                ("🔄 Backup & Restore", "Backup & Restore"),
-                ("🚀 Deployment", "Deployment")
+                ("📊 System Analytics", "System Analytics")
             ]
             
-            for display_name, admin_module in admin_buttons:
+            for display_name, admin_module in core_admin:
                 if st.button(display_name, key=f"admin_{admin_module}", use_container_width=True):
                     st.session_state.current_menu = admin_module
                     st.rerun()
+            
+            # Advanced Admin Functions
+            with st.expander("🔧 Advanced Administration"):
+                advanced_admin = [
+                    ("🗄️ Database Admin", "Database Admin"),
+                    ("📋 Audit Logs", "Audit Logs"),
+                    ("🔄 Backup & Restore", "Backup & Restore"),
+                    ("🚀 Deployment Tools", "Deployment")
+                ]
+                
+                for display_name, admin_module in advanced_admin:
+                    if st.button(display_name, key=f"adv_admin_{admin_module}", use_container_width=True):
+                        st.session_state.current_menu = admin_module
+                        st.rerun()
         
         if st.button("🚪 Logout", use_container_width=True, type="secondary"):
             st.session_state.authenticated = False

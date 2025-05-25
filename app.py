@@ -32,10 +32,8 @@ def main():
     - Quality control and progress photos
     - Mobile-responsive design
     """
-    # Apply Highland Tower enterprise styling
-    apply_highland_tower_styling()
-    
     # Run the Highland Tower Core Focused application
+    # (styling is now handled within the main function)
     highland_tower_main()
 
 if __name__ == "__main__":

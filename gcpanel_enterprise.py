@@ -1925,17 +1925,41 @@ def render_main_content():
         "Settings": render_settings
     }
     
-    # Instant module loading with professional display
-    try:
-        if current_menu in module_functions:
+    # Premium module loading experience with smooth animations
+    if current_menu in module_functions:
+        # Add loading animation for premium feel
+        loading_placeholder = st.empty()
+        with loading_placeholder:
+            st.markdown(f"""
+            <div style="text-align: center; padding: 2rem;">
+                <div style="color: #4A90E2; font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem;">
+                    ⚡ Loading {current_menu}...
+                </div>
+                <div style="width: 200px; height: 4px; background: #e2e8f0; border-radius: 2px; margin: 0 auto;">
+                    <div style="width: 100%; height: 100%; background: linear-gradient(90deg, #4A90E2, #357ABD); border-radius: 2px;"></div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Small delay for premium loading effect
+        import time
+        time.sleep(0.5)
+        
+        # Clear loading and render module
+        loading_placeholder.empty()
+        
+        try:
+            # Add module loaded animation wrapper
+            st.markdown('<div class="module-loaded">', unsafe_allow_html=True)
             module_functions[current_menu]()
-        else:
-            # Professional fallback for modules under development
-            render_module_under_development(current_menu)
+            st.markdown('</div>', unsafe_allow_html=True)
             
-    except Exception as e:
-        # Robust error handling with user-friendly recovery
-        render_module_error(current_menu, str(e))
+        except Exception as e:
+            # Sophisticated error handling
+            render_module_error(current_menu, str(e))
+    else:
+        # Premium fallback for modules under development
+        render_module_under_development(current_menu)
 
 # Main application
 def main():

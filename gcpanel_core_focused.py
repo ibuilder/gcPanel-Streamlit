@@ -47,16 +47,19 @@ def apply_theme():
     }
     
     section[data-testid="stSidebar"] button {
-        background: rgba(30, 64, 175, 0.2) !important;
+        background: linear-gradient(135deg, #0ea5e9, #38bdf8) !important;
         color: white !important;
-        border: 1px solid rgba(59, 130, 246, 0.3) !important;
+        border: 1px solid #0284c7 !important;
         border-radius: 8px !important;
         transition: all 0.3s ease !important;
+        font-weight: 500 !important;
+        box-shadow: 0 2px 4px rgba(14, 165, 233, 0.3) !important;
     }
     
     section[data-testid="stSidebar"] button:hover {
-        background: rgba(59, 130, 246, 0.4) !important;
-        transform: translateX(5px) !important;
+        background: linear-gradient(135deg, #0284c7, #0ea5e9) !important;
+        transform: translateX(5px) scale(1.02) !important;
+        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4) !important;
     }
     
     .metric-card {

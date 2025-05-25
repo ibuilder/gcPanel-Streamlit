@@ -60,6 +60,10 @@ args = "gcPanel Refactored"
 task = "workflow.run"
 args = "gcPanel Pure Python"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "gcPanel Production"
+
 [[workflows.workflow]]
 name = "gcPanel Sidebar"
 author = "agent"
@@ -159,6 +163,19 @@ task = "shell.exec"
 args = "streamlit run gcpanel_pure_python.py --server.port 5000"
 waitForPort = 5000
 
+[[workflows.workflow]]
+name = "gcPanel Production"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "streamlit run gcpanel_production_ready.py --server.port 5001"
+waitForPort = 5001
+
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 5001
+externalPort = 3000

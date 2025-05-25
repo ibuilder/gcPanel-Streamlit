@@ -714,29 +714,29 @@ def render_main_content():
         
         # Dashboard module with business intelligence
         try:
-            from modules.dashboard import render
-            module_functions["Dashboard"] = render
+            from modules.dashboard import render_dashboard as dashboard_render
+            module_functions["Dashboard"] = dashboard_render
         except ImportError:
             module_functions["Dashboard"] = render_dashboard
         
         # PreConstruction with estimating and bid management
         try:
-            from modules.preconstruction import render
-            module_functions["PreConstruction"] = render
+            from modules.preconstruction import render_preconstruction as precon_render
+            module_functions["PreConstruction"] = precon_render
         except ImportError:
             module_functions["PreConstruction"] = render_preconstruction
         
         # Engineering with RFIs, submittals, transmittals
         try:
-            from modules.engineering import render
-            module_functions["Engineering"] = render
+            from modules.engineering import render_engineering as eng_render
+            module_functions["Engineering"] = eng_render
         except ImportError:
             module_functions["Engineering"] = render_engineering
         
         # Field Operations with daily reports and checklists
         try:
-            from modules.field_operations import render
-            module_functions["Field Operations"] = render
+            from modules.field_operations import render_field_operations as field_render
+            module_functions["Field Operations"] = field_render
         except ImportError:
             module_functions["Field Operations"] = render_field_operations
         
@@ -766,8 +766,8 @@ def render_main_content():
         
         # Cost Management with AIA billing
         try:
-            from modules.cost_management import render
-            module_functions["Cost Management"] = render
+            from modules.cost_management import render_cost_management as cost_render
+            module_functions["Cost Management"] = cost_render
             # Also try to load AIA billing specifically
             from modules.cost_management.aia_billing import render_aia_billing as aia_render
             module_functions["AIA G702/G703 Billing"] = aia_render
@@ -777,22 +777,22 @@ def render_main_content():
         
         # BIM with model viewer and clash detection
         try:
-            from modules.bim import render_bim
-            module_functions["BIM"] = render_bim
+            from modules.bim import render_bim as bim_render
+            module_functions["BIM"] = bim_render
         except ImportError:
             module_functions["BIM"] = render_bim
         
         # Analytics with business intelligence
         try:
-            from modules.analytics import render
-            module_functions["Analytics"] = render
+            from modules.analytics import render_analytics as analytics_render
+            module_functions["Analytics"] = analytics_render
         except ImportError:
             module_functions["Analytics"] = render_analytics
         
         # Documents with PDF management
         try:
-            from modules.documents import render
-            module_functions["Documents"] = render
+            from modules.documents import render_documents as docs_render
+            module_functions["Documents"] = docs_render
         except ImportError:
             module_functions["Documents"] = render_documents
         
@@ -805,22 +805,22 @@ def render_main_content():
         
         # Closeout with project completion
         try:
-            from modules.closeout import render
-            module_functions["Closeout"] = render
+            from modules.closeout import render_closeout as closeout_render
+            module_functions["Closeout"] = closeout_render
         except ImportError:
             module_functions["Closeout"] = render_closeout
         
         # AI Assistant
         try:
-            from modules.ai_assistant import render
-            module_functions["AI Assistant"] = render
+            from modules.ai_assistant import render_ai_assistant as ai_render
+            module_functions["AI Assistant"] = ai_render
         except ImportError:
             module_functions["AI Assistant"] = render_ai_assistant
         
         # Mobile Companion
         try:
-            from modules.mobile_companion import render
-            module_functions["Mobile Companion"] = render
+            from modules.mobile_companion import render_mobile_companion as mobile_render
+            module_functions["Mobile Companion"] = mobile_render
         except ImportError:
             module_functions["Mobile Companion"] = render_mobile_companion
         

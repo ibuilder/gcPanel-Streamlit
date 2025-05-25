@@ -1707,12 +1707,11 @@ def render_main_content():
         try:
             from modules.cost_management import render_cost_management as cost_render
             module_functions["Cost Management"] = cost_render
-            # Also try to load AIA billing specifically
-            from modules.cost_management.aia_billing import render_aia_billing as aia_render
-            module_functions["AIA G702/G703 Billing"] = aia_render
         except ImportError:
             module_functions["Cost Management"] = render_cost_management
-            module_functions["AIA G702/G703 Billing"] = render_aia_billing
+        
+        # AIA G702/G703 Billing (separate module)
+        module_functions["AIA G702/G703 Billing"] = render_aia_billing
         
         # Unit Prices module for advanced cost intelligence
         try:

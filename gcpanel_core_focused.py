@@ -1298,29 +1298,123 @@ def render_submittals():
                     - **Activity:** {submittal['Views']} views, {submittal['Comments']} comments
                     """)
                 
-                # Action buttons with real-time capabilities
-                action_col1, action_col2, action_col3, action_col4, action_col5 = st.columns(5)
+                # Standard CRUD Action Buttons
+                st.markdown("---")
+                action_col1, action_col2, action_col3, action_col4 = st.columns(4)
                 
                 with action_col1:
-                    if st.button(f"📋 Review & Approve", key=f"review_{submittal['ID']}", use_container_width=True):
-                        st.success(f"✅ Opening comprehensive review interface for {submittal['ID']}")
-                        st.info("🔄 Real-time notifications sent to project team")
+                    if st.button(f"👁️ View Details", key=f"view_{submittal['ID']}", use_container_width=True, type="secondary"):
+                        st.session_state[f"view_mode_{submittal['ID']}"] = True
+                        st.rerun()
                 
                 with action_col2:
-                    if st.button(f"💬 Add Comment", key=f"comment_{submittal['ID']}", use_container_width=True):
-                        st.info(f"💬 Comment thread opened for {submittal['ID']}")
+                    if st.button(f"✏️ Edit", key=f"edit_{submittal['ID']}", use_container_width=True):
+                        st.session_state[f"edit_mode_{submittal['ID']}"] = True
+                        st.rerun()
                 
                 with action_col3:
-                    if st.button(f"📎 View Files", key=f"files_{submittal['ID']}", use_container_width=True):
-                        st.info(f"📁 Document viewer opened for {submittal['Attachments']} files")
+                    if st.button(f"📋 Review", key=f"review_{submittal['ID']}", use_container_width=True, type="primary"):
+                        st.session_state[f"review_mode_{submittal['ID']}"] = True
+                        st.rerun()
                 
                 with action_col4:
-                    if st.button(f"📊 Track History", key=f"history_{submittal['ID']}", use_container_width=True):
-                        st.info(f"📈 Full audit trail and version history for {submittal['ID']}")
+                    if st.button(f"🗑️ Archive", key=f"delete_{submittal['ID']}", use_container_width=True):
+                        st.warning(f"⚠️ Archive {submittal['ID']}? This action can be undone.")
+                        if st.button(f"Confirm Archive", key=f"confirm_delete_{submittal['ID']}"):
+                            st.success(f"✅ {submittal['ID']} archived successfully")
                 
-                with action_col5:
-                    if st.button(f"🔄 Update Status", key=f"status_{submittal['ID']}", use_container_width=True):
-                        st.success(f"🔄 Status change workflow initiated for {submittal['ID']}")
+                # Handle CRUD operations
+                if st.session_state.get(f"view_mode_{submittal['ID']}", False):
+                    st.markdown("### 👁️ Detailed View Mode")
+                    with st.container():
+                        st.markdown(f"""
+                        **Complete Submittal Details for {submittal['ID']}**
+                        
+                        **📋 Basic Information:**
+                        - Title: {submittal['Item']}
+                        - Specification: {submittal['Spec']}
+                        - Status: {submittal['Status']}
+                        - Priority: {submittal['Priority']}
+                        
+                        **👥 People & Timeline:**
+                        - Contractor: {submittal['Contractor']}
+                        - Reviewer: {submittal['Reviewer']}
+                        - Submitted: {submittal['Submitted']}
+                        - Due Date: {submittal['Due']}
+                        - Days in Review: {submittal['Days']}
+                        
+                        **💰 Impact Analysis:**
+                        - Cost Impact: {submittal['Cost Impact']}
+                        - Schedule Impact: {submittal['Schedule Impact']}
+                        
+                        **📊 Activity Metrics:**
+                        - Document Attachments: {submittal['Attachments']} files
+                        - Comments: {submittal['Comments']} entries
+                        - Views: {submittal['Views']} total views
+                        """)
+                        
+                        if st.button(f"Close View", key=f"close_view_{submittal['ID']}"):
+                            st.session_state[f"view_mode_{submittal['ID']}"] = False
+                            st.rerun()
+                
+                if st.session_state.get(f"edit_mode_{submittal['ID']}", False):
+                    st.markdown("### ✏️ Edit Mode")
+                    with st.form(f"edit_form_{submittal['ID']}"):
+                        edit_col1, edit_col2 = st.columns(2)
+                        
+                        with edit_col1:
+                            edit_title = st.text_input("Title", value=submittal['Item'])
+                            edit_priority = st.selectbox("Priority", ["Critical", "High", "Standard", "Low"], 
+                                                       index=["Critical", "High", "Standard", "Low"].index(submittal['Priority']))
+                            edit_cost = st.text_input("Cost Impact", value=submittal['Cost Impact'])
+                        
+                        with edit_col2:
+                            edit_reviewer = st.text_input("Reviewer", value=submittal['Reviewer'])
+                            edit_status = st.selectbox("Status", ["Under Review", "Approved", "Revision Required", "Pending"])
+                            edit_schedule = st.text_input("Schedule Impact", value=submittal['Schedule Impact'])
+                        
+                        edit_notes = st.text_area("Additional Notes", placeholder="Add any updates or changes...")
+                        
+                        submit_col1, submit_col2 = st.columns(2)
+                        with submit_col1:
+                            if st.form_submit_button("💾 Save Changes", use_container_width=True, type="primary"):
+                                st.success(f"✅ {submittal['ID']} updated successfully!")
+                                st.session_state[f"edit_mode_{submittal['ID']}"] = False
+                                st.rerun()
+                        
+                        with submit_col2:
+                            if st.form_submit_button("❌ Cancel", use_container_width=True):
+                                st.session_state[f"edit_mode_{submittal['ID']}"] = False
+                                st.rerun()
+                
+                if st.session_state.get(f"review_mode_{submittal['ID']}", False):
+                    st.markdown("### 📋 Review & Approval Interface")
+                    with st.form(f"review_form_{submittal['ID']}"):
+                        review_decision = st.radio("Review Decision", 
+                                                 ["✅ Approve", "🔄 Request Revisions", "❌ Reject"], 
+                                                 horizontal=True)
+                        
+                        review_comments = st.text_area("Review Comments", 
+                                                     placeholder="Provide detailed feedback for the contractor...")
+                        
+                        if review_decision == "🔄 Request Revisions":
+                            revision_deadline = st.date_input("Revision Deadline")
+                            critical_issues = st.multiselect("Critical Issues", 
+                                                            ["Specification Compliance", "Technical Details", "Documentation", "Code Requirements"])
+                        
+                        review_col1, review_col2 = st.columns(2)
+                        with review_col1:
+                            if st.form_submit_button("📤 Submit Review", use_container_width=True, type="primary"):
+                                st.balloons()
+                                st.success(f"✅ Review submitted for {submittal['ID']}!")
+                                st.info("📧 Automatic notification sent to contractor")
+                                st.session_state[f"review_mode_{submittal['ID']}"] = False
+                                st.rerun()
+                        
+                        with review_col2:
+                            if st.form_submit_button("❌ Cancel Review", use_container_width=True):
+                                st.session_state[f"review_mode_{submittal['ID']}"] = False
+                                st.rerun()
     
     with tab2:
         st.markdown("### ✅ Smart Submittal Creation with AI Assistance")

@@ -115,22 +115,6 @@ def render_sidebar():
         </div>
         """, unsafe_allow_html=True)
         
-        # About section
-        st.markdown("### ℹ️ About gcPanel")
-        st.markdown("""
-        **Enterprise Construction Management Platform**
-        
-        Built specifically for Highland Tower Development to outperform Procore with:
-        
-        • **Advanced BIM Integration** - 3D model coordination
-        • **AI-Powered Analytics** - Predictive insights
-        • **Real-time Collaboration** - Field to office connectivity
-        • **Mobile-First Design** - Works anywhere
-        • **Enterprise Security** - Bank-level protection
-        
-        *Transforming construction through intelligent technology*
-        """)
-        
         st.markdown("### 🎯 Core Management")
         core_modules = [
             ("📊 Dashboard", "Dashboard"),
@@ -814,8 +798,8 @@ def render_main_content():
         
         # Scheduling with progress tracking
         try:
-            from modules.scheduling import render
-            module_functions["Scheduling"] = render
+            from modules.scheduling import render_scheduling as scheduling_render
+            module_functions["Scheduling"] = scheduling_render
         except ImportError:
             module_functions["Scheduling"] = render_scheduling
         

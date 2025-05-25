@@ -11,11 +11,70 @@ from datetime import datetime, timedelta
 import plotly.express as px
 import plotly.graph_objects as go
 
+def get_user_role_permissions():
+    """Define role-based module access permissions for Highland Tower Development"""
+    return {
+        "admin": {
+            "role_name": "Administrator",
+            "modules": ["Dashboard", "PreConstruction", "Engineering", "Field Operations", "Safety", 
+                       "Contracts", "Cost Management", "Daily Reports", "Progress Photos", "Quality Control",
+                       "Material Management", "BIM", "Analytics", "Submittals", "Transmittals", 
+                       "Equipment Tracking", "AI Assistant", "Mobile Companion", "AIA Billing",
+                       "Prime Contract", "Change Orders", "Closeout", "Documents", "Admin Settings"],
+            "permissions": ["read_all", "write_all", "manage_users", "view_audit_logs", "approve_changes"]
+        },
+        "manager": {
+            "role_name": "Project Manager", 
+            "modules": ["Dashboard", "PreConstruction", "Engineering", "Field Operations", "Safety",
+                       "Contracts", "Cost Management", "Daily Reports", "Progress Photos", "Quality Control",
+                       "Material Management", "BIM", "Analytics", "Submittals", "Transmittals",
+                       "AIA Billing", "Prime Contract", "Change Orders", "Closeout", "Documents"],
+            "permissions": ["read_all", "write_rfis", "write_daily_reports", "write_quality", "approve_changes"]
+        },
+        "superintendent": {
+            "role_name": "Superintendent",
+            "modules": ["Dashboard", "Field Operations", "Safety", "Daily Reports", "Progress Photos",
+                       "Quality Control", "Material Management", "Equipment Tracking", "Mobile Companion"],
+            "permissions": ["read_daily_reports", "write_daily_reports", "read_quality", "write_quality", "read_safety", "write_safety"]
+        },
+        "foreman": {
+            "role_name": "Foreman",
+            "modules": ["Dashboard", "Field Operations", "Safety", "Daily Reports", "Progress Photos",
+                       "Quality Control", "Material Management", "Mobile Companion"],
+            "permissions": ["read_daily_reports", "write_daily_reports", "read_quality", "read_safety"]
+        },
+        "inspector": {
+            "role_name": "Quality Inspector",
+            "modules": ["Dashboard", "Quality Control", "Safety", "Progress Photos", "Daily Reports"],
+            "permissions": ["read_quality", "write_quality", "read_safety", "read_daily_reports"]
+        },
+        "user": {
+            "role_name": "Standard User",
+            "modules": ["Dashboard", "Daily Reports", "Progress Photos"],
+            "permissions": ["read_daily_reports", "read_quality"]
+        }
+    }
+
+def check_module_access(module_name):
+    """Check if current user has access to specified module"""
+    if not st.session_state.get("authenticated", False):
+        return False
+    
+    user_role = st.session_state.get("user_role", "user")
+    role_permissions = get_user_role_permissions()
+    
+    if user_role in role_permissions:
+        return module_name in role_permissions[user_role]["modules"]
+    
+    return False
+
 def initialize_session_state():
-    """Initialize session state with default values."""
+    """Initialize session state with role-based security."""
     defaults = {
         "authenticated": False,
         "username": "",
+        "user_role": "",
+        "user_permissions": [],
         "current_menu": "Dashboard",
         "project_name": "Highland Tower Development",
         "project_value": "$45.5M",
@@ -223,11 +282,12 @@ def render_header():
     """, unsafe_allow_html=True)
 
 def render_sidebar():
-    """Render comprehensive sidebar with theme toggle"""
+    """Render role-based sidebar with permissions control"""
     with st.sidebar:
+        # Project information
         st.markdown(f"""
         <div class="project-info">
-            <h3 style="color: #60a5fa; margin: 0 0 1rem 0;">Project Overview</h3>
+            <h3 style="color: #60a5fa; margin: 0 0 1rem 0;">Highland Tower Development</h3>
             <p><strong>Investment:</strong> {st.session_state.project_value}</p>
             <p><strong>Residential:</strong> {st.session_state.residential_units} units</p>
             <p><strong>Retail:</strong> {st.session_state.retail_units} spaces</p>
@@ -235,6 +295,19 @@ def render_sidebar():
         </div>
         """, unsafe_allow_html=True)
         
+        # User role information
+        user_role = st.session_state.get("user_role", "user")
+        role_permissions = get_user_role_permissions()
+        role_info = role_permissions.get(user_role, role_permissions["user"])
+        
+        st.markdown(f"""
+        <div style="background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+            <p><strong>User:</strong> {st.session_state.get('username', 'Guest')}</p>
+            <p><strong>Role:</strong> {role_info['role_name']}</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Core Management Modules (filtered by permissions)
         st.markdown("### 🎯 Core Management")
         core_modules = [
             ("📊 Dashboard", "Dashboard"),
@@ -249,46 +322,79 @@ def render_sidebar():
         ]
         
         for display_name, module in core_modules:
-            if st.button(display_name, key=f"core_{module}", use_container_width=True):
-                st.session_state.current_menu = module
-                st.rerun()
+            if check_module_access(module):
+                if st.button(display_name, key=f"core_{module}", use_container_width=True):
+                    st.session_state.current_menu = module
+                    st.rerun()
         
-        st.markdown("### 🔧 Advanced Tools")
-        advanced_tools = [
-            ("📝 RFIs", "RFIs"),
-            ("📊 Daily Reports", "Daily Reports"),
-            ("📤 Submittals", "Submittals"),
-            ("📨 Transmittals", "Transmittals"),
-            ("📅 Scheduling", "Scheduling"),
-            ("🔍 Quality Control", "Quality Control"),
-            ("📦 Material Management", "Material Management"),
-            ("🚛 Equipment Tracking", "Equipment Tracking"),
+        # Advanced Tools (filtered by permissions)
+        advanced_available = any(check_module_access(tool) for _, tool in [
+            ("📝 RFIs", "RFIs"), ("📊 Daily Reports", "Daily Reports"),
+            ("📤 Submittals", "Submittals"), ("📨 Transmittals", "Transmittals"),
+            ("📅 Scheduling", "Scheduling"), ("🔍 Quality Control", "Quality Control"),
+            ("📦 Material Management", "Material Management"), ("🚛 Equipment Tracking", "Equipment Tracking"),
             ("📸 Progress Photos", "Progress Photos")
-        ]
+        ])
         
-        for display_name, tool in advanced_tools:
-            if st.button(display_name, key=f"tool_{tool}", use_container_width=True):
-                st.session_state.current_menu = tool
-                st.rerun()
+        if advanced_available:
+            st.markdown("### 🔧 Advanced Tools")
+            advanced_tools = [
+                ("📝 RFIs", "RFIs"),
+                ("📊 Daily Reports", "Daily Reports"),
+                ("📤 Submittals", "Submittals"),
+                ("📨 Transmittals", "Transmittals"),
+                ("📅 Scheduling", "Scheduling"),
+                ("🔍 Quality Control", "Quality Control"),
+                ("📦 Material Management", "Material Management"),
+                ("🚛 Equipment Tracking", "Equipment Tracking"),
+                ("📸 Progress Photos", "Progress Photos")
+            ]
+            
+            for display_name, tool in advanced_tools:
+                if check_module_access(tool):
+                    if st.button(display_name, key=f"tool_{tool}", use_container_width=True):
+                        st.session_state.current_menu = tool
+                        st.rerun()
         
-        st.markdown("### 🤖 Intelligence")
-        ai_modules = [
-            ("📈 Analytics", "Analytics"),
-            ("🤖 AI Assistant", "AI Assistant"),
+        # Intelligence & Analytics (filtered by permissions)
+        ai_available = any(check_module_access(module) for _, module in [
+            ("📈 Analytics", "Analytics"), ("🤖 AI Assistant", "AI Assistant"),
             ("📱 Mobile Companion", "Mobile Companion")
-        ]
+        ])
         
-        for display_name, module in ai_modules:
-            if st.button(display_name, key=f"ai_{module}", use_container_width=True):
-                st.session_state.current_menu = module
+        if ai_available:
+            st.markdown("### 🤖 Intelligence")
+            ai_modules = [
+                ("📈 Analytics", "Analytics"),
+                ("🤖 AI Assistant", "AI Assistant"),
+                ("📱 Mobile Companion", "Mobile Companion")
+            ]
+            
+            for display_name, module in ai_modules:
+                if check_module_access(module):
+                    if st.button(display_name, key=f"ai_{module}", use_container_width=True):
+                        st.session_state.current_menu = module
+                        st.rerun()
+        
+        # Admin Settings (admin only)
+        if user_role == "admin":
+            st.markdown("### ⚙️ Administration")
+            if st.button("🔧 Admin Settings", key="admin_settings", use_container_width=True):
+                st.session_state.current_menu = "Admin Settings"
                 st.rerun()
         
-        # Theme toggle at bottom
+        # Theme toggle and logout
         st.markdown("---")
         current_theme = "🌙 Dark Mode" if st.session_state.theme == "light" else "☀️ Light Mode"
         if st.button(current_theme, use_container_width=True):
             st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
-            apply_theme()  # Apply theme immediately
+            apply_theme()
+            st.rerun()
+        
+        if st.button("🚪 Logout", use_container_width=True, type="secondary"):
+            st.session_state.authenticated = False
+            st.session_state.user_role = ""
+            st.session_state.current_menu = "Dashboard"
             st.rerun()
 
 def render_login():
@@ -315,8 +421,23 @@ def render_login():
             submitted = st.form_submit_button("Access Dashboard", use_container_width=True, type="primary")
             
             if submitted and username and password:
+                # Assign roles based on username for Highland Tower Development
+                role_mapping = {
+                    "admin": "admin",
+                    "manager": "manager", 
+                    "superintendent": "superintendent",
+                    "foreman": "foreman",
+                    "inspector": "inspector",
+                    "user": "user"
+                }
+                
+                user_role = role_mapping.get(username.lower(), "user")
+                role_permissions = get_user_role_permissions()
+                
                 st.session_state.authenticated = True
                 st.session_state.username = username
+                st.session_state.user_role = user_role
+                st.session_state.user_permissions = role_permissions[user_role]["permissions"]
                 st.rerun()
         
         # Login credentials help

@@ -165,8 +165,10 @@ def render_sidebar():
         
         # Theme toggle at bottom
         st.markdown("---")
-        if st.button("🌓 Toggle Theme", use_container_width=True):
+        current_theme = "🌙 Dark Mode" if st.session_state.theme == "light" else "☀️ Light Mode"
+        if st.button(current_theme, use_container_width=True):
             st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
+            apply_theme()  # Apply theme immediately
             st.rerun()
 
 def render_login():
@@ -187,7 +189,7 @@ def render_login():
             username = st.text_input("Username", placeholder="Enter your username")
             password = st.text_input("Password", type="password", placeholder="Enter your password")
             
-            submitted = st.form_submit_button("Access Dashboard", use_container_width=True)
+            submitted = st.form_submit_button("Access Dashboard", use_container_width=True, type="primary")
             
             if submitted and username and password:
                 st.session_state.authenticated = True
@@ -834,18 +836,28 @@ def render_main_content():
         
     except Exception as e:
         st.error(f"Error loading sophisticated modules: {str(e)}")
-        # Fallback to basic functions
+        # Fallback to basic functions - these are defined below
         module_functions = {
             "Dashboard": render_dashboard,
             "PreConstruction": render_preconstruction,
             "Engineering": render_engineering,
             "Field Operations": render_field_operations,
-            "Safety": render_safety,
-            "Contracts": render_contracts,
+            "Safety": lambda: render_safety(),
+            "Contracts": lambda: render_contracts(),
             "Cost Management": render_cost_management,
-            "BIM": render_bim,
+            "BIM": lambda: render_bim(),
             "Analytics": render_analytics,
             "Documents": render_documents,
+            "Scheduling": lambda: render_scheduling(),
+            "AI Assistant": lambda: render_ai_assistant(),
+            "Mobile Companion": lambda: render_mobile_companion(),
+            "Prime Contract": lambda: render_prime_contract(),
+            "Change Orders": lambda: render_change_orders(),
+            "AIA G702/G703 Billing": lambda: render_aia_billing(),
+            "Recent Reports": lambda: render_recent_reports(),
+            "Daily Reports": lambda: render_daily_reports(),
+            "Quality Control": lambda: render_quality_control(),
+            "Material Management": lambda: render_material_management(),
         }
     
     if current_menu in module_functions:

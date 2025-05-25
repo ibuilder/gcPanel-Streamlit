@@ -939,13 +939,14 @@ def render_sidebar():
 
         # Analytics & Intelligence (consolidated)
         analytics_available = any(check_module_access(module) for _, module in [
-            ("📈 Analytics", "Analytics"), ("🤖 AI Assistant", "AI Assistant")
+            ("📈 Analytics", "Analytics"), ("🤖 AI Assistant", "AI Assistant"), ("📊 Performance Snapshot", "Performance Snapshot")
         ])
         
         if analytics_available:
             st.markdown("### 📊 Analytics & AI")
             analytics_modules = [
                 ("📈 Analytics", "Analytics"),
+                ("📊 Performance Snapshot", "Performance Snapshot"),
                 ("🤖 AI Assistant", "AI Assistant")
             ]
             

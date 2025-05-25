@@ -292,19 +292,22 @@ def render_sidebar():
             st.rerun()
 
 def render_login():
-    """Render clean login form"""
+    """Enhanced login form with comprehensive about section"""
     st.markdown("""
-    <div style="text-align: center; padding: 3rem 0;">
-        <h2 style="color: #60a5fa; margin-bottom: 2rem;">Access Your Project Dashboard</h2>
-        <p style="color: #94a3b8; margin-bottom: 2rem;">
-            Construction management platform better than Procore
+    <div style="text-align: center; padding: 2rem 0;">
+        <h1 style="color: #60a5fa; font-size: 3.5rem; margin-bottom: 1rem;">gcPanel</h1>
+        <h2 style="color: #94a3b8; font-size: 1.8rem; margin-bottom: 0.5rem;">Highland Tower Development</h2>
+        <p style="color: #64748b; font-size: 1.2rem; margin-bottom: 3rem;">
+            Enterprise Construction Management Platform
         </p>
     </div>
     """, unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns([1, 2, 1])
+    # Login and About sections
+    col1, col2 = st.columns([1, 1])
     
-    with col2:
+    with col1:
+        st.markdown("### 🔐 Project Access")
         with st.form("login_form", clear_on_submit=False):
             username = st.text_input("Username", placeholder="Enter your username")
             password = st.text_input("Password", type="password", placeholder="Enter your password")
@@ -315,6 +318,75 @@ def render_login():
                 st.session_state.authenticated = True
                 st.session_state.username = username
                 st.rerun()
+        
+        # Login credentials help
+        with st.expander("🔑 Access Credentials"):
+            st.markdown("""
+            **Available Access Levels:**
+            - **admin** / admin123 - Full system access
+            - **manager** / manager123 - Project management access  
+            - **user** / user123 - Standard user access
+            """)
+    
+    with col2:
+        st.markdown("### 📋 About gcPanel")
+        st.markdown("""
+        **🏗️ Highland Tower Development**
+        - **Investment:** $45.5M Mixed-Use Project
+        - **Scale:** 120 Residential + 8 Retail Units
+        - **Structure:** 15 Stories Above + 2 Below Ground
+        - **Status:** Active Development Phase
+        
+        **⚡ Enterprise Features:**
+        - Real-time project dashboard with KPIs
+        - Advanced BIM with 3D clash detection
+        - Comprehensive safety management
+        - AIA G702/G703 billing system
+        - Contract and change order management
+        - Field operations with crew tracking
+        - AI-powered analytics and insights
+        
+        **🎯 Better Than Procore:**
+        - Sophisticated module architecture
+        - Professional enterprise styling
+        - Advanced weather impact tracking
+        - Integrated cost management
+        - Mobile-first field operations
+        """)
+        
+        # System capabilities
+        with st.expander("🚀 Advanced Capabilities"):
+            st.markdown("""
+            **Core Management Modules:**
+            - PreConstruction with estimating
+            - Engineering coordination
+            - Field operations management
+            - Safety compliance tracking
+            - Contract administration
+            - Cost control and billing
+            - BIM coordination
+            - Project closeout
+            
+            **Intelligence & Analytics:**
+            - Real-time performance metrics
+            - Predictive analytics
+            - AI-powered insights
+            - Mobile companion app
+            - Advanced reporting
+            """)
+        
+        # Technology showcase
+        with st.expander("💻 Technology Stack"):
+            st.markdown("""
+            **Enterprise Architecture:**
+            - Streamlit enterprise web platform
+            - PostgreSQL database with connection pooling
+            - Modular component architecture
+            - Professional UI/UX design
+            - Real-time data synchronization
+            - Mobile-responsive interface
+            - Advanced security framework
+            """)
 
 def render_dashboard():
     """Enterprise dashboard with advanced analytics and real-time insights"""

@@ -118,6 +118,30 @@ def render_labor_section(user_role, user_company):
     """Labor rates and crew management"""
     st.header("👷 Labor Rate Management")
     
+    # Action buttons based on role
+    if user_role in ["admin", "project_manager", "site_superintendent"]:
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            if st.button("📥 Receive Labor", type="primary"):
+                st.session_state.show_receive_labor = True
+        with col2:
+            if st.button("➕ Add Crew"):
+                st.session_state.show_add_crew = True
+        with col3:
+            if st.button("📊 Update Rates"):
+                st.session_state.show_update_rates = True
+        with col4:
+            if st.button("📈 Labor Analytics"):
+                st.session_state.show_labor_analytics = True
+    
+    # Receive Labor form
+    if st.session_state.get("show_receive_labor", False):
+        render_receive_labor_form(user_role, user_company)
+    
+    # Add Crew form
+    if st.session_state.get("show_add_crew", False):
+        render_add_crew_form(user_role, user_company)
+    
     # Labor rates data
     labor_data = get_highland_tower_labor_rates()
     
@@ -426,3 +450,152 @@ def create_variance_analysis():
                 color_continuous_scale="RdYlBu_r")
     
     st.plotly_chart(fig, use_container_width=True)
+
+def render_receive_labor_form(user_role, user_company):
+    """Render form for receiving labor on Highland Tower Development"""
+    st.subheader("📥 Receive Labor - Highland Tower Development")
+    
+    with st.form("receive_labor_form"):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("**Labor Details**")
+            crew_type = st.selectbox("Crew Type", [
+                "Structural Steel Workers", "Concrete Workers", "Electricians", 
+                "Plumbers", "HVAC Technicians", "General Laborers", "Equipment Operators"
+            ])
+            crew_size = st.number_input("Number of Workers", min_value=1, max_value=50, value=8)
+            shift_type = st.selectbox("Shift", ["Day Shift", "Night Shift", "Weekend"])
+            start_time = st.time_input("Start Time", value=pd.to_datetime("07:00").time())
+            
+        with col2:
+            st.markdown("**Assignment Details**")
+            work_location = st.selectbox("Work Location", [
+                "Level 13 - Steel Erection", "Level 11 - MEP Rough-in", 
+                "Level 9 - Concrete Pour", "Site Yard", "Basement - Foundation"
+            ])
+            supervisor = st.selectbox("Supervisor", [
+                "Mike Rodriguez - Steel Foreman", "Sarah Chen - Concrete Foreman",
+                "David Park - MEP Supervisor", "Lisa Johnson - General Foreman"
+            ])
+            work_description = st.text_area("Work Description", 
+                placeholder="Describe the specific work to be performed...")
+            estimated_duration = st.number_input("Estimated Duration (hours)", min_value=1, max_value=16, value=8)
+        
+        # Safety requirements
+        st.markdown("**Safety Requirements**")
+        safety_col1, safety_col2 = st.columns(2)
+        with safety_col1:
+            safety_meeting = st.checkbox("Pre-shift safety meeting completed", value=True)
+            ppe_verified = st.checkbox("PPE verified and documented", value=True)
+        with safety_col2:
+            hazard_assessment = st.checkbox("Job hazard assessment completed", value=True)
+            permits_current = st.checkbox("All permits current and valid", value=True)
+        
+        submitted = st.form_submit_button("✅ Confirm Labor Received", type="primary")
+        
+        if submitted:
+            st.success(f"✅ Labor received: {crew_size} {crew_type} assigned to {work_location}")
+            st.info(f"📋 Supervisor: {supervisor} | Estimated: {estimated_duration} hours")
+            st.session_state.show_receive_labor = False
+            st.rerun()
+
+def render_add_crew_form(user_role, user_company):
+    """Render form for adding new crew to Highland Tower Development"""
+    st.subheader("➕ Add New Crew - Highland Tower Development")
+    
+    with st.form("add_crew_form"):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("**Crew Information**")
+            crew_name = st.text_input("Crew Name", placeholder="Steel Crew Alpha")
+            trade = st.selectbox("Trade", [
+                "Structural Steel", "Concrete", "Electrical", "Plumbing", 
+                "HVAC", "General Labor", "Equipment Operation", "Carpentry"
+            ])
+            crew_leader = st.text_input("Crew Leader", placeholder="John Smith")
+            contact_number = st.text_input("Contact Number", placeholder="(555) 123-4567")
+            
+        with col2:
+            st.markdown("**Crew Composition**")
+            journeymen = st.number_input("Journeymen", min_value=0, max_value=20, value=3)
+            apprentices = st.number_input("Apprentices", min_value=0, max_value=10, value=2)
+            helpers = st.number_input("Helpers/Laborers", min_value=0, max_value=15, value=3)
+            total_crew = journeymen + apprentices + helpers
+            st.metric("Total Crew Size", total_crew)
+        
+        # Rate information
+        st.markdown("**Rate Information**")
+        rate_col1, rate_col2, rate_col3 = st.columns(3)
+        with rate_col1:
+            journeyman_rate = st.number_input("Journeyman Rate ($/hr)", min_value=25.0, max_value=100.0, value=42.50)
+        with rate_col2:
+            apprentice_rate = st.number_input("Apprentice Rate ($/hr)", min_value=15.0, max_value=60.0, value=32.50)
+        with rate_col3:
+            helper_rate = st.number_input("Helper Rate ($/hr)", min_value=15.0, max_value=40.0, value=22.50)
+        
+        # Certifications
+        st.markdown("**Certifications & Requirements**")
+        cert_col1, cert_col2 = st.columns(2)
+        with cert_col1:
+            osha_certified = st.checkbox("OSHA 30 Certified", value=True)
+            drug_tested = st.checkbox("Drug testing current", value=True)
+        with cert_col2:
+            background_checked = st.checkbox("Background check completed", value=True)
+            union_status = st.selectbox("Union Status", ["Union", "Non-Union", "Mixed"])
+        
+        submitted = st.form_submit_button("👥 Add Crew to Project", type="primary")
+        
+        if submitted:
+            daily_cost = (journeymen * journeyman_rate + apprentices * apprentice_rate + helpers * helper_rate) * 8
+            st.success(f"✅ Crew '{crew_name}' added to Highland Tower Development")
+            st.info(f"💰 Estimated daily cost: ${daily_cost:,.2f}")
+            st.session_state.show_add_crew = False
+            st.rerun()
+
+def render_labor_analytics_section():
+    """Render labor analytics and performance metrics"""
+    st.subheader("📈 Labor Analytics - Highland Tower Development")
+    
+    # Performance metrics
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Productivity Rate", "112%", "+8% this week")
+    with col2:
+        st.metric("Attendance Rate", "94.5%", "+2.1%")
+    with col3:
+        st.metric("Safety Score", "98.2%", "0 incidents")
+    with col4:
+        st.metric("Overtime Hours", "124 hrs", "-15% vs last week")
+    
+    # Labor productivity chart
+    productivity_data = pd.DataFrame({
+        "Week": ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
+        "Steel_Crew": [98, 102, 108, 112, 115],
+        "Concrete_Crew": [95, 101, 105, 110, 112],
+        "MEP_Crew": [88, 92, 98, 105, 108]
+    })
+    
+    fig = px.line(productivity_data, x="Week", y=["Steel_Crew", "Concrete_Crew", "MEP_Crew"],
+                 title="Weekly Productivity Index by Trade (%)",
+                 labels={"value": "Productivity Index (%)", "variable": "Crew Type"})
+    st.plotly_chart(fig, use_container_width=True)
+    
+    # Labor cost analysis
+    st.markdown("#### 💰 Labor Cost Analysis")
+    cost_breakdown = pd.DataFrame({
+        "Trade": ["Structural Steel", "Concrete", "Electrical", "Plumbing", "HVAC"],
+        "Budgeted_Hours": [2400, 1800, 1600, 1200, 1000],
+        "Actual_Hours": [2280, 1850, 1520, 1180, 980],
+        "Variance_Hours": [-120, 50, -80, -20, -20],
+        "Cost_Impact": [-5040, 2100, -3360, -840, -840]
+    })
+    
+    st.dataframe(cost_breakdown, use_container_width=True)
+    
+    # Action recommendations
+    st.markdown("#### 🎯 Recommendations")
+    st.success("✅ Steel crew exceeding productivity targets - consider bonus incentive")
+    st.warning("⚠️ Concrete crew slightly over budget - monitor for next pour")
+    st.info("💡 Overall labor efficiency up 8% - excellent progress")

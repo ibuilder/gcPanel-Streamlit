@@ -3457,21 +3457,23 @@ def render_change_orders():
         st.metric("Pending", "$185,000", "3 orders")
 
 def render_preconstruction():
-    """PreConstruction Module - Your sophisticated planning system"""
-    st.title("📋 PreConstruction Management")
-    st.markdown("**Project planning, estimating, and procurement management**")
+    """PreConstruction Module - Highland Tower Development Planning System"""
+    st.title("📋 PreConstruction Management - Highland Tower Development")
+    st.markdown("**Project planning, estimating, procurement, and bidding management for $45.5M mixed-use development**")
     
-    tab1, tab2, tab3 = st.tabs(["📊 Project Planning", "💰 Estimating", "📦 Procurement"])
+    tab1, tab2, tab3, tab4 = st.tabs(["💰 Estimating", "📦 Procurement", "🏢 Bidder Management", "📊 Project Planning"])
     
     with tab1:
-        st.markdown("### 📊 Project Planning Dashboard")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("Planning Phase", "85%", "On track")
-        with col2:
-            st.metric("Design Review", "Complete", "Approved")
-        with col3:
-            st.metric("Permits", "Pending", "2 weeks")
+        render_estimating_section()
+    
+    with tab2:
+        render_procurement_section()
+    
+    with tab3:
+        render_bidder_management_section()
+    
+    with tab4:
+        render_project_planning_section()
 
 def render_closeout():
     """Project Closeout - Your sophisticated closeout system"""
@@ -3487,6 +3489,155 @@ def render_closeout():
         st.metric("Punch List", "24 items", "-8 completed")
     with col4:
         st.metric("Final Inspections", "Scheduled", "Next week")
+
+def render_estimating_section():
+    """Comprehensive estimating for Highland Tower Development"""
+    st.header("💰 Project Estimating - Highland Tower Development")
+    st.markdown("**Cost estimation and analysis for $45.5M mixed-use development**")
+    
+    # Estimating action buttons
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        if st.button("📊 New Estimate", type="primary"):
+            st.session_state.show_new_estimate = True
+    with col2:
+        if st.button("📈 Cost Analysis"):
+            st.session_state.show_cost_analysis = True
+    with col3:
+        if st.button("📋 Export Estimate"):
+            st.success("📄 Estimate exported to Excel")
+    with col4:
+        if st.button("🔄 Update Pricing"):
+            st.success("💰 Current market pricing updated")
+    
+    # Current estimates display
+    st.subheader("📋 Highland Tower Development Estimates")
+    
+    estimates_data = pd.DataFrame([
+        {
+            "Estimate ID": "EST-HTD-001",
+            "Name": "Highland Tower - Full Building",
+            "Type": "Construction Documents",
+            "Total Cost": "$45,500,000",
+            "Cost/SF": "$270.18",
+            "Status": "Current",
+            "Date": "2025-05-20"
+        },
+        {
+            "Estimate ID": "EST-HTD-002", 
+            "Name": "Foundation Package",
+            "Type": "Bid Package",
+            "Total Cost": "$8,750,000",
+            "Cost/SF": "$51.93",
+            "Status": "Final",
+            "Date": "2025-05-15"
+        }
+    ])
+    
+    st.dataframe(estimates_data, use_container_width=True, hide_index=True)
+
+def render_procurement_section():
+    """Comprehensive procurement for Highland Tower Development"""
+    st.header("📦 Procurement Management - Highland Tower Development")
+    st.markdown("**Material and equipment procurement for $45.5M project**")
+    
+    # Procurement action buttons
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        if st.button("🛒 New Purchase Order", type="primary"):
+            st.session_state.show_new_po = True
+    with col2:
+        if st.button("📋 Vendor Quotes"):
+            st.session_state.show_vendor_quotes = True
+    with col3:
+        if st.button("📊 Procurement Analytics"):
+            st.session_state.show_procurement_analytics = True
+    with col4:
+        if st.button("🚚 Track Deliveries"):
+            st.session_state.show_delivery_tracking = True
+    
+    # Active procurement display
+    st.subheader("📋 Active Procurement - Highland Tower Development")
+    
+    procurement_data = pd.DataFrame([
+        {
+            "PO Number": "PO-HTD-001",
+            "Vendor": "Steel Fabricators Inc",
+            "Description": "Structural Steel Package",
+            "Amount": "$2,850,000",
+            "Status": "Approved",
+            "Delivery": "2025-06-15"
+        },
+        {
+            "PO Number": "PO-HTD-002",
+            "Vendor": "NYC Concrete Supply", 
+            "Description": "Ready Mix Concrete",
+            "Amount": "$875,000",
+            "Status": "In Transit",
+            "Delivery": "2025-05-28"
+        }
+    ])
+    
+    st.dataframe(procurement_data, use_container_width=True, hide_index=True)
+
+def render_bidder_management_section():
+    """Comprehensive bidder management and profiles"""
+    st.header("🏢 Bidder Management - Highland Tower Development")
+    st.markdown("**Qualified contractor and vendor management system**")
+    
+    # Bidder management buttons
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        if st.button("➕ Add New Bidder", type="primary"):
+            st.session_state.show_add_bidder = True
+    with col2:
+        if st.button("📋 Bidder Database"):
+            st.session_state.show_bidder_database = True
+    with col3:
+        if st.button("📊 Bid Analysis"):
+            st.session_state.show_bid_analysis = True
+    with col4:
+        if st.button("✅ Qualification Review"):
+            st.session_state.show_qualification_review = True
+    
+    # Qualified bidders database
+    st.subheader("👥 Qualified Bidders Database")
+    
+    bidders_data = pd.DataFrame([
+        {
+            "Company": "Steel Fabricators Inc",
+            "Trade": "Structural Steel",
+            "Experience": "25 years",
+            "Rating": "A+",
+            "Max Project": "$100M",
+            "Status": "Pre-Qualified",
+            "Last Project": "Metro Tower - $85M"
+        },
+        {
+            "Company": "Elite MEP Systems", 
+            "Trade": "MEP",
+            "Experience": "18 years", 
+            "Rating": "A",
+            "Max Project": "$50M",
+            "Status": "Active Bidder",
+            "Last Project": "City Center - $45M"
+        }
+    ])
+    
+    st.dataframe(bidders_data, use_container_width=True, hide_index=True)
+
+def render_project_planning_section():
+    """Project planning dashboard"""
+    st.header("📊 Project Planning Dashboard")
+    st.markdown("**Highland Tower Development - Planning Overview**")
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Planning Phase", "85%", "On track")
+    with col2:
+        st.metric("Design Review", "Complete", "Approved")
+    with col3:
+        st.metric("Permits", "Pending", "2 weeks")
 
 def render_documents():
     """Document Management - Your sophisticated document system"""

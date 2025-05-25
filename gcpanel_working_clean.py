@@ -28,79 +28,83 @@ def initialize_session_state():
             st.session_state[key] = value
 
 def apply_professional_theme():
-    """Apply professional enterprise styling"""
+    """Apply sophisticated enterprise styling - better than light/dark"""
     st.markdown("""
     <style>
+    /* Premium Enterprise Theme - Sophisticated Blue-Gray Palette */
     .stApp {
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%);
     }
     
-    .css-1d391kg {
-        background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
-    }
-    
-    .css-1d391kg .css-1v0mbdj {
-        background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
-    }
-    
+    /* Sidebar - Deep Professional Navy */
+    .css-1d391kg, 
     section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
-        border-right: 2px solid #3b82f6;
+        background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #334155 100%) !important;
+        border-right: 3px solid #3b82f6;
+        box-shadow: 4px 0 20px rgba(15, 23, 42, 0.3);
     }
     
-    section[data-testid="stSidebar"] .css-1v0mbdj {
+    /* All Sidebar Text - Crisp White */
+    section[data-testid="stSidebar"] * {
         color: white !important;
     }
     
-    section[data-testid="stSidebar"] h3 {
-        color: white !important;
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3,
+    section[data-testid="stSidebar"] h4,
+    section[data-testid="stSidebar"] h5,
+    section[data-testid="stSidebar"] h6 {
+        color: #f8fafc !important;
         font-weight: 600 !important;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
     
-    section[data-testid="stSidebar"] p {
-        color: white !important;
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] span,
+    section[data-testid="stSidebar"] div,
+    section[data-testid="stSidebar"] strong {
+        color: #e2e8f0 !important;
     }
     
-    section[data-testid="stSidebar"] .css-1v0mbdj p {
-        color: white !important;
-    }
-    
-    section[data-testid="stSidebar"] .css-1v0mbdj strong {
-        color: white !important;
-    }
-    
-    section[data-testid="stSidebar"] .css-1v0mbdj span {
-        color: white !important;
-    }
-    
+    /* Navigation Buttons - Glass Morphism Effect */
     section[data-testid="stSidebar"] button {
-        background: rgba(255, 255, 255, 0.1) !important;
+        background: rgba(255, 255, 255, 0.08) !important;
         color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 8px !important;
-        transition: all 0.3s ease !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 12px !important;
+        backdrop-filter: blur(10px) !important;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+        font-weight: 500 !important;
     }
     
     section[data-testid="stSidebar"] button:hover {
-        background: rgba(255, 255, 255, 0.2) !important;
-        border-color: #fbbf24 !important;
-        transform: translateX(5px) !important;
+        background: rgba(59, 130, 246, 0.2) !important;
+        border-color: #60a5fa !important;
+        transform: translateX(8px) scale(1.02) !important;
+        box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3) !important;
     }
     
+    /* Input Fields - Modern Glass Design */
     section[data-testid="stSidebar"] input {
-        background: rgba(255, 255, 255, 0.9) !important;
-        color: #1e40af !important;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        border-radius: 8px !important;
+        background: rgba(248, 250, 252, 0.95) !important;
+        color: #1e293b !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 10px !important;
+        backdrop-filter: blur(5px) !important;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1) !important;
     }
     
-    section[data-testid="stSidebar"] input::placeholder {
-        color: #64748b !important;
+    section[data-testid="stSidebar"] input:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
     }
     
     section[data-testid="stSidebar"] label {
-        color: white !important;
-        font-weight: 500 !important;
+        color: #f1f5f9 !important;
+        font-weight: 600 !important;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
     }
     
     .enterprise-header {

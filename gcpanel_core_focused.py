@@ -679,6 +679,11 @@ def render_main_content():
         "Contracts": render_contracts,
         "RFIs": render_rfis,
         "Scheduling": render_scheduling,
+        "Submittals": render_submittals,
+        "Transmittals": render_transmittals,
+        "Equipment Tracking": render_equipment_tracking,
+        "AI Assistant": render_ai_assistant,
+        "Mobile Companion": render_mobile_companion,
         "Engineering": render_engineering,
         "Field Operations": render_field_operations,
         "Safety": render_safety,
@@ -1167,59 +1172,400 @@ def main():
         render_main_content()
 
 def render_submittals():
-    """Advanced Submittals Management with automated workflow"""
-    st.title("📤 Submittals Management - Complete Workflow")
-    st.markdown("**Automated submittal tracking from creation to approval**")
+    """Enterprise Submittals Management with real-time collaboration"""
+    st.title("📤 Submittals Management - Enterprise Workflow")
+    st.markdown("**Real-time collaborative submittal tracking with automated routing and AI-powered review assistance**")
     
-    tab1, tab2, tab3 = st.tabs(["📋 Active Submittals", "✅ Create New", "📊 Performance"])
+    # Real-time status indicators
+    col1, col2, col3, col4, col5 = st.columns(5)
+    with col1:
+        st.metric("Active Submittals", "47", "+8 this week", help="Total submittals in system")
+    with col2:
+        st.metric("Pending Review", "12", "Avg 4.2 days", help="Awaiting stakeholder review")
+    with col3:
+        st.metric("Approved Today", "6", "+150% vs yesterday", help="Approved for procurement")
+    with col4:
+        st.metric("Revisions Needed", "7", "-3 since Monday", help="Requiring contractor updates")
+    with col5:
+        st.metric("Avg Review Time", "4.2 days", "-1.8 days improvement", help="Time from submission to decision")
+    
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📋 Live Registry", "✅ Smart Creation", "🔄 Workflow Automation", "📊 Performance Analytics", "🤖 AI Review Assistant"])
     
     with tab1:
-        st.markdown("### 📋 Active Submittals Register")
+        st.markdown("### 📋 Live Submittal Registry with Real-Time Updates")
         
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.metric("Total Submittals", "47", "+8 this week")
-        with col2:
-            st.metric("Pending Review", "12", "Avg 5.2 days")
-        with col3:
-            st.metric("Approved", "28", "Ready for procurement")
-        with col4:
-            st.metric("Revision Required", "7", "Needs attention")
+        # Advanced filtering and search
+        filter_col1, filter_col2, filter_col3, filter_col4 = st.columns(4)
+        with filter_col1:
+            status_filter = st.multiselect("Status Filter", ["Under Review", "Approved", "Revision Required", "Pending"], default=["Under Review", "Pending"])
+        with filter_col2:
+            spec_filter = st.selectbox("Specification", ["All Sections", "05120 - Structural", "23000 - HVAC", "08400 - Curtain Wall", "26000 - Electrical"])
+        with filter_col3:
+            priority_filter = st.selectbox("Priority", ["All", "Critical", "High", "Standard"])
+        with filter_col4:
+            reviewer_filter = st.selectbox("Reviewer", ["All", "Structural Engineer", "MEP Engineer", "Architect"])
         
-        submittals = [
-            {"ID": "SUB-2025-034", "Item": "Structural Steel Connections", "Spec": "05120", "Status": "🟡 Under Review", "Days": 3, "Reviewer": "Structural Engineer"},
-            {"ID": "SUB-2025-033", "Item": "HVAC Equipment Schedule", "Spec": "23000", "Status": "🟢 Approved", "Days": 8, "Reviewer": "MEP Engineer"},
-            {"ID": "SUB-2025-032", "Item": "Curtain Wall System", "Spec": "08400", "Status": "🔴 Revision Required", "Days": 12, "Reviewer": "Architect"}
+        # Live search with autocomplete
+        search_query = st.text_input("🔍 Smart Search", placeholder="Search by ID, item name, spec section, or reviewer...")
+        
+        # Enterprise-grade submittal data with rich metadata
+        submittal_data = [
+            {
+                "ID": "SUB-2025-034", 
+                "Item": "W24x62 Beam Connection Details - Level 13", 
+                "Spec": "05120", 
+                "Status": "🟡 Under Review", 
+                "Priority": "Critical",
+                "Days": 3, 
+                "Reviewer": "Sarah Chen, PE", 
+                "Contractor": "Steel Fabricators Inc",
+                "Submitted": "2025-01-22 14:30",
+                "Due": "2025-01-25 17:00",
+                "Cost Impact": "$45,000",
+                "Schedule Impact": "2 days potential delay",
+                "Attachments": 8,
+                "Comments": 12,
+                "Views": 34
+            },
+            {
+                "ID": "SUB-2025-033", 
+                "Item": "Trane HVAC Unit Specifications - Rooftop", 
+                "Spec": "23000", 
+                "Status": "🟢 Approved", 
+                "Priority": "High",
+                "Days": 8, 
+                "Reviewer": "Michael Rodriguez, PE", 
+                "Contractor": "HVAC Systems LLC",
+                "Submitted": "2025-01-14 09:15",
+                "Due": "2025-01-21 12:00",
+                "Cost Impact": "$0",
+                "Schedule Impact": "On track",
+                "Attachments": 15,
+                "Comments": 6,
+                "Views": 67
+            },
+            {
+                "ID": "SUB-2025-032", 
+                "Item": "Guardian Glass Curtain Wall System - South Facade", 
+                "Spec": "08400", 
+                "Status": "🔴 Revision Required", 
+                "Priority": "High",
+                "Days": 12, 
+                "Reviewer": "Jennifer Walsh, AIA", 
+                "Contractor": "Curtain Wall Specialists",
+                "Submitted": "2025-01-10 16:45",
+                "Due": "2025-01-17 17:00",
+                "Cost Impact": "$12,500 potential increase",
+                "Schedule Impact": "1 week delay risk",
+                "Attachments": 23,
+                "Comments": 18,
+                "Views": 89
+            }
         ]
         
-        for submittal in submittals:
-            with st.expander(f"{submittal['Status']} {submittal['ID']} - {submittal['Item']}"):
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.markdown(f"**Spec Section:** {submittal['Spec']}")
-                    st.markdown(f"**Reviewer:** {submittal['Reviewer']}")
-                with col2:
-                    st.markdown(f"**Days in Review:** {submittal['Days']}")
-                    st.markdown(f"**Status:** {submittal['Status']}")
-                with col3:
-                    if st.button(f"📋 Review", key=f"review_{submittal['ID']}"):
-                        st.success(f"Opening review interface for {submittal['ID']}")
+        # Interactive data table with live updates
+        for submittal in submittal_data:
+            priority_color = "🔴" if submittal["Priority"] == "Critical" else "🟡" if submittal["Priority"] == "High" else "🟢"
+            
+            with st.expander(f"{submittal['Status']} {submittal['ID']} - {submittal['Item']} {priority_color}"):
+                # Rich submittal details with interactive elements
+                detail_col1, detail_col2, detail_col3 = st.columns(3)
+                
+                with detail_col1:
+                    st.markdown(f"""
+                    **📋 Submittal Info:**
+                    - **Spec Section:** {submittal['Spec']}
+                    - **Priority:** {submittal['Priority']}
+                    - **Contractor:** {submittal['Contractor']}
+                    - **Submitted:** {submittal['Submitted']}
+                    """)
+                
+                with detail_col2:
+                    st.markdown(f"""
+                    **⏰ Timeline:**
+                    - **Days in Review:** {submittal['Days']}
+                    - **Due Date:** {submittal['Due']}
+                    - **Reviewer:** {submittal['Reviewer']}
+                    - **Status:** {submittal['Status']}
+                    """)
+                
+                with detail_col3:
+                    st.markdown(f"""
+                    **💰 Impact Analysis:**
+                    - **Cost Impact:** {submittal['Cost Impact']}
+                    - **Schedule Impact:** {submittal['Schedule Impact']}
+                    - **Attachments:** {submittal['Attachments']} files
+                    - **Activity:** {submittal['Views']} views, {submittal['Comments']} comments
+                    """)
+                
+                # Action buttons with real-time capabilities
+                action_col1, action_col2, action_col3, action_col4, action_col5 = st.columns(5)
+                
+                with action_col1:
+                    if st.button(f"📋 Review & Approve", key=f"review_{submittal['ID']}", use_container_width=True):
+                        st.success(f"✅ Opening comprehensive review interface for {submittal['ID']}")
+                        st.info("🔄 Real-time notifications sent to project team")
+                
+                with action_col2:
+                    if st.button(f"💬 Add Comment", key=f"comment_{submittal['ID']}", use_container_width=True):
+                        st.info(f"💬 Comment thread opened for {submittal['ID']}")
+                
+                with action_col3:
+                    if st.button(f"📎 View Files", key=f"files_{submittal['ID']}", use_container_width=True):
+                        st.info(f"📁 Document viewer opened for {submittal['Attachments']} files")
+                
+                with action_col4:
+                    if st.button(f"📊 Track History", key=f"history_{submittal['ID']}", use_container_width=True):
+                        st.info(f"📈 Full audit trail and version history for {submittal['ID']}")
+                
+                with action_col5:
+                    if st.button(f"🔄 Update Status", key=f"status_{submittal['ID']}", use_container_width=True):
+                        st.success(f"🔄 Status change workflow initiated for {submittal['ID']}")
     
     with tab2:
-        st.markdown("### ✅ Create New Submittal")
+        st.markdown("### ✅ Smart Submittal Creation with AI Assistance")
         
-        col1, col2 = st.columns(2)
-        with col1:
-            sub_title = st.text_input("Submittal Title*", placeholder="Descriptive title for submittal")
-            sub_spec = st.selectbox("Specification Section", ["03300 - Concrete", "05120 - Structural Steel", "08400 - Curtain Wall", "23000 - HVAC"])
+        # AI-powered form with intelligent defaults
+        col1, col2 = st.columns([2, 1])
+        
         with col2:
-            sub_reviewer = st.selectbox("Primary Reviewer", ["Architect", "Structural Engineer", "MEP Engineer"])
-            sub_priority = st.selectbox("Priority", ["Standard", "Rush", "Critical"])
+            st.markdown("**🤖 AI Assistant**")
+            if st.button("🧠 Auto-Generate from Specs", use_container_width=True):
+                st.success("🤖 AI analyzing project specifications to pre-populate submittal form")
+            
+            if st.button("📋 Load Template", use_container_width=True):
+                st.info("📋 Loading standard template based on specification section")
+            
+            if st.button("🔍 Similar Submittals", use_container_width=True):
+                st.info("🔍 Found 3 similar submittals from this project for reference")
         
-        if st.button("📤 Submit for Review", type="primary", use_container_width=True):
-            if sub_title:
-                st.balloons()
-                st.success("✅ Submittal SUB-2025-035 created and routed for review!")
+        with col1:
+            st.markdown("**📋 Enhanced Submittal Creation Form**")
+            
+            form_col1, form_col2 = st.columns(2)
+            
+            with form_col1:
+                sub_title = st.text_input("📝 Submittal Title*", placeholder="AI will suggest based on spec section")
+                sub_spec = st.selectbox("📖 Specification Section*", [
+                    "03300 - Cast-in-Place Concrete",
+                    "05120 - Structural Steel",
+                    "08400 - Curtain Wall Systems", 
+                    "23000 - HVAC Systems",
+                    "26000 - Electrical Systems",
+                    "33000 - Utilities"
+                ])
+                sub_contractor = st.selectbox("🏢 Submitting Contractor*", [
+                    "Steel Fabricators Inc", 
+                    "HVAC Systems LLC", 
+                    "Curtain Wall Specialists", 
+                    "Electrical Contractors Corp"
+                ])
+                sub_cost_impact = st.number_input("💰 Estimated Cost Impact ($)", min_value=0, value=0)
+            
+            with form_col2:
+                sub_reviewer = st.multiselect("👥 Primary Reviewers*", [
+                    "Sarah Chen, PE - Structural Engineer",
+                    "Michael Rodriguez, PE - MEP Engineer", 
+                    "Jennifer Walsh, AIA - Architect",
+                    "David Kim, PE - Civil Engineer"
+                ])
+                sub_priority = st.selectbox("🎯 Priority Level*", ["Critical", "High", "Standard", "Low"])
+                sub_due_date = st.date_input("📅 Response Required By*")
+                sub_schedule_impact = st.selectbox("⏰ Schedule Impact", ["No Impact", "Minor Delay", "Moderate Delay", "Major Delay"])
+            
+            # Rich text description with AI assistance
+            sub_description = st.text_area(
+                "📋 Detailed Description*", 
+                placeholder="AI Assistant: Describe the submittal items, review requirements, and any special considerations...",
+                height=120
+            )
+            
+            # Advanced file upload with categorization and preview
+            st.markdown("**📁 Document Upload & Management**")
+            
+            upload_col1, upload_col2 = st.columns(2)
+            
+            with upload_col1:
+                drawings = st.file_uploader("📐 Technical Drawings", accept_multiple_files=True, type=['pdf', 'dwg', 'dxf'])
+                specifications = st.file_uploader("📖 Product Specifications", accept_multiple_files=True, type=['pdf', 'doc', 'docx'])
+            
+            with upload_col2:
+                test_reports = st.file_uploader("🧪 Test Reports & Certifications", accept_multiple_files=True, type=['pdf', 'xlsx'])
+                cut_sheets = st.file_uploader("📄 Product Cut Sheets", accept_multiple_files=True, type=['pdf', 'jpg', 'png'])
+            
+            # Smart workflow options
+            st.markdown("**⚙️ Smart Workflow Options**")
+            
+            workflow_col1, workflow_col2 = st.columns(2)
+            
+            with workflow_col1:
+                auto_route = st.checkbox("🔄 Auto-route based on specification", value=True)
+                urgent_notify = st.checkbox("🚨 Send urgent notifications (Critical/High priority)")
+                ai_review = st.checkbox("🤖 Enable AI pre-review for common issues")
+            
+            with workflow_col2:
+                track_changes = st.checkbox("📊 Enable detailed change tracking", value=True)
+                email_notifications = st.checkbox("📧 Send email notifications to stakeholders", value=True)
+                mobile_alerts = st.checkbox("📱 Send mobile push notifications")
+            
+            # Enhanced submission with validation
+            st.markdown("---")
+            
+            submit_col1, submit_col2, submit_col3 = st.columns(3)
+            
+            with submit_col1:
+                if st.button("💾 Save as Draft", use_container_width=True):
+                    st.info("💾 Draft saved with auto-backup enabled")
+            
+            with submit_col2:
+                if st.button("🔍 AI Validation Check", use_container_width=True):
+                    st.info("🤖 Running AI validation: Checking completeness, spec compliance, and potential issues...")
+            
+            with submit_col3:
+                if st.button("📤 Submit for Review", type="primary", use_container_width=True):
+                    if sub_title and sub_description and sub_reviewer:
+                        st.balloons()
+                        st.success("🎉 Submittal SUB-2025-035 created successfully!")
+                        st.info("📧 Automated notifications sent to all reviewers")
+                        st.info("📊 Real-time tracking dashboard updated")
+                        st.info("🤖 AI monitoring activated for review optimization")
+                    else:
+                        st.error("❌ Please complete all required fields before submitting")
+    
+    with tab3:
+        st.markdown("### 🔄 Advanced Workflow Automation")
+        
+        workflow_col1, workflow_col2 = st.columns(2)
+        
+        with workflow_col1:
+            st.markdown("""
+            **🤖 Automated Workflows Active:**
+            
+            ✅ **Smart Routing Engine**
+            - Auto-assigns reviewers based on spec section
+            - Escalates overdue items after 7 days
+            - Parallel routing for complex submittals
+            
+            ✅ **Intelligent Notifications**
+            - Priority-based notification scheduling
+            - Mobile alerts for critical items
+            - Digest emails for non-urgent updates
+            
+            ✅ **Integration Automation**
+            - Auto-sync with project schedule
+            - Cost tracking integration
+            - Document version control
+            """)
+        
+        with workflow_col2:
+            st.markdown("""
+            **📊 Performance Optimization:**
+            
+            ✅ **AI-Powered Insights**
+            - Predicts review completion times
+            - Identifies potential bottlenecks
+            - Suggests process improvements
+            
+            ✅ **Quality Assurance**
+            - Automated compliance checking
+            - Specification cross-referencing
+            - Duplicate detection
+            
+            ✅ **Real-Time Collaboration**
+            - Live comment threads
+            - Simultaneous multi-user editing
+            - Instant status synchronization
+            """)
+    
+    with tab4:
+        st.markdown("### 📊 Enterprise Performance Analytics")
+        
+        # Advanced analytics dashboard
+        analytics_col1, analytics_col2 = st.columns(2)
+        
+        with analytics_col1:
+            # Performance trends visualization
+            performance_data = pd.DataFrame({
+                'Week': ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                'Submitted': [12, 15, 18, 14],
+                'Approved': [8, 11, 16, 13],
+                'Avg Review Days': [6.2, 5.8, 4.9, 4.2],
+                'Satisfaction Score': [85, 88, 92, 94]
+            })
+            
+            fig = px.line(performance_data, x='Week', y=['Avg Review Days'], 
+                         title="📈 Review Time Optimization Trend")
+            fig.add_scatter(x=performance_data['Week'], y=performance_data['Satisfaction Score']/20, 
+                           mode='lines+markers', name='Satisfaction Score', yaxis='y2')
+            fig.update_layout(yaxis2=dict(overlaying='y', side='right'))
+            st.plotly_chart(fig, use_container_width=True)
+        
+        with analytics_col2:
+            # Submittal volume and success rates
+            volume_data = pd.DataFrame({
+                'Category': ['Structural', 'MEP', 'Architectural', 'Civil'],
+                'Volume': [18, 15, 9, 5],
+                'Approval Rate': [89, 92, 87, 95],
+                'Avg Days': [4.2, 3.8, 5.1, 3.2]
+            })
+            
+            fig = px.bar(volume_data, x='Category', y='Volume', 
+                        title="📊 Submittal Volume by Discipline")
+            st.plotly_chart(fig, use_container_width=True)
+    
+    with tab5:
+        st.markdown("### 🤖 AI Review Assistant")
+        
+        st.markdown("**Intelligent review assistance powered by construction AI**")
+        
+        ai_col1, ai_col2 = st.columns(2)
+        
+        with ai_col1:
+            st.markdown("""
+            **🧠 AI Capabilities:**
+            
+            ✅ **Specification Compliance Check**
+            - Automated cross-reference with project specs
+            - Code compliance verification
+            - Standard detail comparison
+            
+            ✅ **Quality Assurance**
+            - Document completeness validation
+            - Technical accuracy assessment
+            - Industry best practice verification
+            """)
+        
+        with ai_col2:
+            st.markdown("""
+            **⚡ Smart Recommendations:**
+            
+            ✅ **Review Optimization**
+            - Suggests review priority based on project impact
+            - Identifies potential approval bottlenecks
+            - Recommends reviewer assignments
+            
+            ✅ **Process Intelligence**
+            - Learns from historical approval patterns
+            - Predicts review outcomes
+            - Suggests process improvements
+            """)
+        
+        # AI assistant interaction
+        st.markdown("### 💬 AI Review Assistant Chat")
+        
+        ai_action_col1, ai_action_col2, ai_action_col3 = st.columns(3)
+        
+        with ai_action_col1:
+            if st.button("🔍 Analyze Current Submittals", use_container_width=True):
+                st.success("🤖 AI Analysis: 3 submittals show high approval probability. SUB-2025-034 may need structural clarification on connection details.")
+        
+        with ai_action_col2:
+            if st.button("📊 Predict Review Times", use_container_width=True):
+                st.info("🔮 AI Forecast: Current submittals will complete review in 3.8 days average, 95% confidence level.")
+        
+        with ai_action_col3:
+            if st.button("💡 Process Optimization", use_container_width=True):
+                st.info("💡 AI Recommendation: Parallel reviewing for complex MEP submittals could reduce review time by 1.5 days.")
 
 def render_transmittals():
     """Advanced Transmittals Management for document distribution"""

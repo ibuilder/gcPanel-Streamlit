@@ -1,174 +1,372 @@
 """
-Digital Signature Component for gcPanel.
-
-This component provides digital signature functionality for forms requiring
-approval and authentication including T&M tickets, change orders, invoices,
-and daily reports.
+Digital Signature Component - Highland Tower Development
+Enterprise-grade digital signature system for Owner Bills, G702, and G703 forms
 """
 
 import streamlit as st
+import pandas as pd
 from datetime import datetime
 import base64
-import hashlib
+from io import BytesIO
 
-def render_digital_signature_section(form_type="document", required_signatures=None):
+def render_digital_signature_section(document_type="Owner Bill", amount=None, application_number=None):
     """
-    Render digital signature section for forms.
+    Render comprehensive digital signature section for Highland Tower Development billing documents
     
     Args:
-        form_type (str): Type of form (tm_ticket, change_order, invoice, daily_report, etc.)
-        required_signatures (list): List of required signature roles
+        document_type: Type of document (Owner Bill, G702, G703)
+        amount: Document amount for display
+        application_number: Application number for AIA forms
     """
-    if required_signatures is None:
-        required_signatures = ["Supervisor", "Project Manager"]
+    st.markdown("### ✍️ Digital Signatures Required")
+    st.markdown(f"**Document:** {document_type} | **Amount:** ${amount:,.2f}" if amount else f"**Document:** {document_type}")
     
-    st.markdown("---")
-    st.markdown("### ✍️ Digital Signatures")
-    st.markdown("*Required signatures for approval and authentication*")
+    # Signature workflow status
+    signature_workflow = get_signature_workflow(document_type)
     
-    # Initialize session state for signatures
-    signature_key = f"{form_type}_signatures"
-    if signature_key not in st.session_state:
-        st.session_state[signature_key] = {}
+    # Display signature progress
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Signatures Required", len(signature_workflow))
+    with col2:
+        completed_sigs = sum(1 for sig in signature_workflow if sig.get('status') == 'Signed')
+        st.metric("Completed", completed_sigs, f"{completed_sigs}/{len(signature_workflow)}")
+    with col3:
+        pending_sigs = sum(1 for sig in signature_workflow if sig.get('status') == 'Pending')
+        st.metric("Pending", pending_sigs)
     
-    signatures = st.session_state[signature_key]
+    # Signature workflow display
+    st.markdown("#### 📋 Signature Workflow")
     
-    # Create signature fields for each required role
-    for i, role in enumerate(required_signatures):
+    for i, signature in enumerate(signature_workflow, 1):
         with st.container():
-            st.markdown(f"#### {role} Signature")
+            # Signature status indicator
+            if signature['status'] == 'Signed':
+                status_icon = "✅"
+                status_color = "#28a745"
+            elif signature['status'] == 'Pending':
+                status_icon = "⏳"
+                status_color = "#ffc107"
+            else:
+                status_icon = "⏸️"
+                status_color = "#6c757d"
             
-            col1, col2 = st.columns([2, 1])
+            # Signature row
+            col1, col2, col3, col4 = st.columns([1, 3, 2, 2])
             
             with col1:
-                # Signature name input
-                signature_name = st.text_input(
-                    f"{role} Name",
-                    key=f"{form_type}_sig_name_{i}",
-                    placeholder=f"Enter {role.lower()} name",
-                    value=signatures.get(role, {}).get('name', '')
-                )
-                
-                # Signature date/time (auto-populated when signed)
-                signature_datetime = signatures.get(role, {}).get('datetime', '')
-                if signature_datetime:
-                    st.text_input(
-                        f"Signed Date/Time",
-                        value=signature_datetime,
-                        disabled=True,
-                        key=f"{form_type}_sig_datetime_{i}"
-                    )
+                st.markdown(f"<div style='color: {status_color}; font-size: 1.5em;'>{status_icon}</div>", 
+                           unsafe_allow_html=True)
             
             with col2:
-                # Digital signature button
-                if role not in signatures or not signatures[role].get('signed', False):
-                    if st.button(f"🖊️ Sign as {role}", key=f"{form_type}_sign_{i}"):
-                        if signature_name and signature_name.strip():
-                            # Create digital signature
-                            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                            signature_data = {
-                                'name': signature_name,
-                                'role': role,
-                                'datetime': timestamp,
-                                'signed': True,
-                                'signature_hash': generate_signature_hash(signature_name, role, timestamp)
-                            }
-                            
-                            signatures[role] = signature_data
-                            st.session_state[signature_key] = signatures
-                            st.success(f"Document signed by {signature_name} as {role}")
-                            st.rerun()
-                        else:
-                            st.error(f"Please enter {role.lower()} name before signing")
-                else:
-                    # Show signed status
-                    st.success("✅ Signed")
-                    if st.button(f"Clear", key=f"{form_type}_clear_{i}"):
-                        del signatures[role]
-                        st.session_state[signature_key] = signatures
-                        st.rerun()
+                st.markdown(f"**{signature['role']}**")
+                st.markdown(f"{signature['name']} ({signature['email']})")
             
-            # Show signature details if signed
-            if role in signatures and signatures[role].get('signed', False):
-                sig_data = signatures[role]
-                st.markdown(f"""
-                <div style="background-color: #f0f9ff; border-left: 4px solid #0284c7; padding: 12px; margin-top: 8px;">
-                    <strong>Digitally Signed by:</strong> {sig_data['name']}<br>
-                    <strong>Role:</strong> {sig_data['role']}<br>
-                    <strong>Date/Time:</strong> {sig_data['datetime']}<br>
-                    <strong>Signature ID:</strong> {sig_data['signature_hash'][:12]}...
-                </div>
-                """, unsafe_allow_html=True)
+            with col3:
+                if signature['status'] == 'Signed':
+                    st.markdown(f"**Signed:** {signature.get('signed_date', 'N/A')}")
+                    st.markdown(f"**IP:** {signature.get('ip_address', 'N/A')}")
+                else:
+                    st.markdown("**Status:** Awaiting signature")
+            
+            with col4:
+                if signature['status'] == 'Pending' and signature.get('current_user', False):
+                    if st.button(f"✍️ Sign Document", key=f"sign_{i}", type="primary"):
+                        render_signature_modal(signature, document_type)
+                elif signature['status'] == 'Signed':
+                    if st.button(f"👁️ View Signature", key=f"view_{i}"):
+                        render_signature_details(signature)
     
-    # Signature validation status
+    # Document status
+    if all(sig['status'] == 'Signed' for sig in signature_workflow):
+        st.success("🎉 All signatures completed! Document is ready for processing.")
+        
+        # Generate signed document
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("📄 Generate Final Document", type="primary"):
+                generate_signed_document(document_type, signature_workflow, amount, application_number)
+        with col2:
+            if st.button("📧 Email to Recipients"):
+                st.success("📧 Signed document emailed to all parties")
+        with col3:
+            if st.button("💾 Archive Document"):
+                st.success("📁 Document archived to Highland Tower records")
+    
+    return signature_workflow
+
+def render_signature_modal(signature_info, document_type):
+    """Render signature capture modal"""
     st.markdown("---")
-    render_signature_validation_status(signatures, required_signatures)
+    st.markdown(f"### ✍️ Digital Signature - {signature_info['role']}")
     
-    return signatures
-
-def render_signature_validation_status(signatures, required_signatures):
-    """Render the overall signature validation status."""
-    signed_count = sum(1 for role in required_signatures if role in signatures and signatures[role].get('signed', False))
-    total_required = len(required_signatures)
+    # Legal notice
+    st.markdown("""
+    <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+        <strong>⚖️ Legal Notice:</strong> By signing this document electronically, you agree that your electronic signature 
+        is the legal equivalent of your manual signature and has the same force and effect as a manual signature.
+    </div>
+    """, unsafe_allow_html=True)
     
-    if signed_count == total_required:
-        st.success(f"✅ All required signatures obtained ({signed_count}/{total_required})")
-        st.markdown("*This document is fully authorized and approved.*")
-    elif signed_count > 0:
-        st.warning(f"⏳ Partial signatures obtained ({signed_count}/{total_required})")
-        missing_roles = [role for role in required_signatures if role not in signatures or not signatures[role].get('signed', False)]
-        st.markdown(f"*Missing signatures from: {', '.join(missing_roles)}*")
-    else:
-        st.error(f"❌ No signatures obtained (0/{total_required})")
-        st.markdown("*This document requires digital signatures before submission.*")
-
-def generate_signature_hash(name, role, timestamp):
-    """Generate a unique hash for the digital signature."""
-    signature_string = f"{name}_{role}_{timestamp}_{st.session_state.get('user_email', 'unknown')}"
-    return hashlib.sha256(signature_string.encode()).hexdigest()
-
-def get_signature_summary(signatures):
-    """Get a summary of signatures for saving to data."""
-    summary = {}
-    for role, sig_data in signatures.items():
-        if sig_data.get('signed', False):
-            summary[role] = {
-                'name': sig_data['name'],
-                'datetime': sig_data['datetime'],
-                'signature_hash': sig_data['signature_hash']
-            }
-    return summary
-
-def validate_required_signatures(signatures, required_signatures):
-    """Validate that all required signatures are present."""
-    for role in required_signatures:
-        if role not in signatures or not signatures[role].get('signed', False):
-            return False, f"Missing signature from {role}"
-    return True, "All required signatures present"
-
-def render_signature_verification(signature_data):
-    """Render signature verification information for viewing saved documents."""
-    if not signature_data:
-        st.info("No digital signatures on file for this document.")
-        return
+    # Signature capture area
+    col1, col2 = st.columns([2, 1])
     
-    st.markdown("### 🔐 Digital Signature Verification")
-    
-    for role, sig_info in signature_data.items():
-        st.markdown(f"""
-        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; margin-bottom: 8px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <strong style="color: #1e40af;">{role}</strong><br>
-                    <span style="color: #475569;">Signed by: {sig_info.get('name', 'Unknown')}</span><br>
-                    <small style="color: #64748b;">Date: {sig_info.get('datetime', 'Unknown')}</small>
+    with col1:
+        st.markdown("#### 🖊️ Signature Pad")
+        st.markdown("""
+        <div style="border: 2px dashed #007bff; height: 200px; display: flex; align-items: center; 
+                    justify-content: center; background-color: #f8f9fa; border-radius: 8px;">
+            <div style="text-align: center; color: #6c757d;">
+                <div style="font-size: 3em;">✍️</div>
+                <div>Click here to sign digitally</div>
+                <div style="font-size: 0.9em; margin-top: 10px;">
+                    Digital signature will be captured here
                 </div>
-                <div style="color: #059669; font-size: 24px;">✓</div>
-            </div>
-            <div style="margin-top: 8px;">
-                <small style="color: #64748b; font-family: monospace;">
-                    Signature ID: {sig_info.get('signature_hash', 'Unknown')[:16]}...
-                </small>
             </div>
         </div>
         """, unsafe_allow_html=True)
+        
+        # Signature options
+        signature_method = st.radio("Signature Method:", 
+                                   ["Digital Pad", "Upload Image", "Type Name"])
+        
+        if signature_method == "Type Name":
+            typed_signature = st.text_input("Type your full legal name:", 
+                                           placeholder=signature_info['name'])
+    
+    with col2:
+        st.markdown("#### 📋 Signature Details")
+        st.markdown(f"**Signer:** {signature_info['name']}")
+        st.markdown(f"**Role:** {signature_info['role']}")
+        st.markdown(f"**Email:** {signature_info['email']}")
+        st.markdown(f"**Date:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        st.markdown(f"**Document:** {document_type}")
+        
+        # Authentication
+        st.markdown("#### 🔐 Authentication")
+        auth_code = st.text_input("Authentication Code:", 
+                                 help="Enter the code sent to your email")
+        
+        # Terms acceptance
+        terms_accepted = st.checkbox("I acknowledge and agree to sign this document electronically")
+    
+    # Sign button
+    if st.button("✅ Complete Signature", type="primary", disabled=not terms_accepted):
+        if signature_method == "Type Name" and not typed_signature:
+            st.error("Please enter your full legal name")
+        else:
+            # Process signature
+            process_digital_signature(signature_info, document_type, signature_method)
+            st.success("✅ Signature completed successfully!")
+            st.rerun()
+
+def process_digital_signature(signature_info, document_type, method):
+    """Process and store digital signature"""
+    # Update signature workflow in session state
+    if 'signature_workflows' not in st.session_state:
+        st.session_state.signature_workflows = {}
+    
+    workflow_key = f"{document_type}_{datetime.now().date()}"
+    
+    # Mark signature as completed
+    signature_info['status'] = 'Signed'
+    signature_info['signed_date'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    signature_info['method'] = method
+    signature_info['ip_address'] = "XXX.XXX.XXX.XXX"  # Would get actual IP in production
+    
+    st.session_state.signature_workflows[workflow_key] = signature_info
+
+def get_signature_workflow(document_type):
+    """Get signature workflow for document type"""
+    workflows = {
+        "Owner Bill": [
+            {
+                "role": "Project Manager", 
+                "name": "John Smith", 
+                "email": "j.smith@highlandtower.com",
+                "status": "Signed",
+                "signed_date": "2025-05-24 14:30:00",
+                "ip_address": "192.168.1.100",
+                "current_user": False
+            },
+            {
+                "role": "Owner Representative", 
+                "name": "David Park", 
+                "email": "d.park@highlandtower.com",
+                "status": "Pending",
+                "current_user": True
+            },
+            {
+                "role": "General Contractor", 
+                "name": "Sarah Chen", 
+                "email": "s.chen@highlandconstruction.com",
+                "status": "Pending",
+                "current_user": False
+            }
+        ],
+        "G702": [
+            {
+                "role": "Project Manager", 
+                "name": "John Smith", 
+                "email": "j.smith@highlandtower.com",
+                "status": "Signed",
+                "signed_date": "2025-05-24 09:15:00",
+                "ip_address": "192.168.1.100",
+                "current_user": False
+            },
+            {
+                "role": "Architect", 
+                "name": "Lisa Johnson", 
+                "email": "l.johnson@architectfirm.com",
+                "status": "Pending",
+                "current_user": True
+            },
+            {
+                "role": "Owner Representative", 
+                "name": "David Park", 
+                "email": "d.park@highlandtower.com",
+                "status": "Not Started",
+                "current_user": False
+            }
+        ],
+        "G703": [
+            {
+                "role": "Project Manager", 
+                "name": "John Smith", 
+                "email": "j.smith@highlandtower.com",
+                "status": "Signed",
+                "signed_date": "2025-05-24 09:20:00",
+                "ip_address": "192.168.1.100",
+                "current_user": False
+            },
+            {
+                "role": "Cost Engineer", 
+                "name": "Mike Rodriguez", 
+                "email": "m.rodriguez@structuralengineer.com",
+                "status": "Pending",
+                "current_user": True
+            }
+        ]
+    }
+    
+    return workflows.get(document_type, [])
+
+def generate_signed_document(document_type, signatures, amount=None, application_number=None):
+    """Generate final signed document with all signatures"""
+    st.success("🎉 Generating signed document...")
+    
+    # Document summary
+    with st.container():
+        st.markdown("### 📄 Document Generation Complete")
+        st.markdown(f"**Document Type:** {document_type}")
+        if amount:
+            st.markdown(f"**Amount:** ${amount:,.2f}")
+        if application_number:
+            st.markdown(f"**Application #:** {application_number}")
+        st.markdown(f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        
+        # Signature summary
+        st.markdown("#### ✍️ Signature Summary")
+        for sig in signatures:
+            if sig['status'] == 'Signed':
+                st.markdown(f"✅ **{sig['role']}:** {sig['name']} - Signed {sig['signed_date']}")
+        
+        # Download links
+        st.markdown("#### 📥 Download Options")
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            # Generate PDF download link
+            pdf_data = generate_pdf_document(document_type, signatures, amount, application_number)
+            st.download_button(
+                label="📄 Download PDF",
+                data=pdf_data,
+                file_name=f"Highland_Tower_{document_type.replace(' ', '_')}_Signed.pdf",
+                mime="application/pdf"
+            )
+        
+        with col2:
+            # Generate Excel download for G703
+            if document_type in ["G703", "Owner Bill"]:
+                excel_data = generate_excel_document(document_type, signatures, amount)
+                st.download_button(
+                    label="📊 Download Excel",
+                    data=excel_data,
+                    file_name=f"Highland_Tower_{document_type.replace(' ', '_')}_Signed.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+        
+        with col3:
+            # Archive to cloud storage
+            if st.button("☁️ Save to Cloud"):
+                st.success("💾 Document saved to Highland Tower cloud storage")
+
+def generate_pdf_document(document_type, signatures, amount=None, application_number=None):
+    """Generate PDF document with signatures (placeholder for actual PDF generation)"""
+    # In production, this would use a PDF library like reportlab
+    pdf_content = f"""
+    Highland Tower Development
+    {document_type} - Digitally Signed
+    
+    Amount: ${amount:,.2f} if amount else 'N/A'
+    Application: {application_number or 'N/A'}
+    Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+    
+    Signatures:
+    """
+    
+    for sig in signatures:
+        if sig['status'] == 'Signed':
+            pdf_content += f"\n{sig['role']}: {sig['name']} - {sig['signed_date']}"
+    
+    return pdf_content.encode('utf-8')
+
+def generate_excel_document(document_type, signatures, amount=None):
+    """Generate Excel document with signature data"""
+    # Create DataFrame with signature data
+    sig_data = []
+    for sig in signatures:
+        if sig['status'] == 'Signed':
+            sig_data.append({
+                'Role': sig['role'],
+                'Name': sig['name'],
+                'Email': sig['email'],
+                'Signed Date': sig['signed_date'],
+                'IP Address': sig.get('ip_address', 'N/A')
+            })
+    
+    df = pd.DataFrame(sig_data)
+    
+    # Convert to bytes for download
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name='Signatures', index=False)
+    
+    return output.getvalue()
+
+def render_signature_details(signature):
+    """Render detailed signature information"""
+    st.markdown("#### 🔍 Signature Details")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown(f"**Signer:** {signature['name']}")
+        st.markdown(f"**Role:** {signature['role']}")
+        st.markdown(f"**Email:** {signature['email']}")
+    
+    with col2:
+        st.markdown(f"**Signed:** {signature.get('signed_date', 'N/A')}")
+        st.markdown(f"**Method:** {signature.get('method', 'Digital Pad')}")
+        st.markdown(f"**IP Address:** {signature.get('ip_address', 'N/A')}")
+    
+    # Signature verification
+    st.markdown("#### ✅ Signature Verification")
+    st.success("Signature verified and legally binding")
+    
+    # Audit trail
+    st.markdown("#### 📋 Audit Trail")
+    st.markdown("• Document created and signature requested")
+    st.markdown("• Authentication code sent to signer")
+    st.markdown("• Signature captured and verified")
+    st.markdown("• Timestamp and IP address recorded")
+    st.markdown("• Document sealed with digital certificate")

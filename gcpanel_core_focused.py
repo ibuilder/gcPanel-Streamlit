@@ -2075,6 +2075,11 @@ def render_cost_management():
         if st.button("📤 Generate Owner Bill", type="primary"):
             st.success("✅ Owner bill generated and ready for submission")
             
+            # Import and render digital signature section
+            from components.digital_signature import render_digital_signature_section
+            st.divider()
+            render_digital_signature_section("Owner Bill", bill_amount, None)
+            
     with tab5:
         st.markdown("### 📄 AIA G702/G703 Application & Certificate for Payment")
         st.markdown("**Standard AIA billing forms for Highland Tower Development**")
@@ -2107,6 +2112,11 @@ def render_cost_management():
                 st.success("G703 Schedule of Values generated")
             if st.button("📤 Submit Application", use_container_width=True, type="primary"):
                 st.success("Payment application submitted to owner")
+                
+                # Add digital signature section for G702
+                from components.digital_signature import render_digital_signature_section
+                st.divider()
+                render_digital_signature_section("G702", None, app_number)
 
 def render_recent_reports():
     """Recent Daily Reports Management"""
@@ -2558,9 +2568,11 @@ def render_daily_reports():
         for activity in activities:
             icon_color = "🟢" if activity["type"] == "completion" else "🔵" if activity["type"] == "photo" else "🟡" if activity["type"] == "alert" else "⚪"
             
+            # Enterprise-grade error handling for activity display
+            location_text = f" at {activity.get('location', 'Highland Tower')}" if activity.get('location') else ""
             st.markdown(f"""
             <div style="background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 8px; margin: 0.5rem 0; border-left: 4px solid #3b82f6;">
-                {icon_color} <strong>{activity['time']}</strong> - {activity['user']} {activity['action']} at {activity['location']}
+                {activity.get('icon', '📋')} <strong>{activity.get('time', 'Recently')}</strong> - {activity.get('user', 'System')}: {activity.get('action', 'Activity logged')}{location_text}
             </div>
             """, unsafe_allow_html=True)
         

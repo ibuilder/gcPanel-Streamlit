@@ -274,7 +274,7 @@ def render_header():
     """Render professional header"""
     st.markdown(f"""
     <div class="enterprise-header">
-        <h1 style="margin: 0; font-size: 2rem;">🏗️ gcPanel - Better than Procore</h1>
+        <h1 style="margin: 0; font-size: 2rem;">🏗️ gcPanel Construction Management</h1>
         <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">
             {st.session_state.project_name} • {st.session_state.project_value} Investment
         </p>

@@ -306,93 +306,29 @@ def render_sidebar():
         st.caption(f"**{role_info['role_name']}**")
         st.info("🏗️ Highland Tower Development")
         
-        # Enhanced User Actions with Professional Styling
-        st.markdown("### 👤 User Actions")
+        # Streamlined User & Admin Controls
+        user_col1, user_col2 = st.columns(2)
         
-        # Profile management buttons
-        profile_col1, profile_col2 = st.columns(2)
-        
-        with profile_col1:
-            if st.button("👤 View Profile", use_container_width=True, key="view_profile"):
-                st.info(f"""
-                **👤 User Profile - {username}**
-                
-                **📋 Account Details:**
-                - **Role:** {role_info['role_name']}
-                - **Access Level:** {user_role.title()}
-                - **Project:** Highland Tower Development
-                - **Department:** {
-                    'Administration' if user_role == 'admin' else
-                    'Project Management' if user_role == 'manager' else
-                    'Field Operations' if user_role in ['superintendent', 'foreman'] else
-                    'Quality Control' if user_role == 'inspector' else
-                    'General Access'
-                }
-                
-                **🔐 Permissions:** {len(role_info['permissions'])} active permissions
-                **📊 Module Access:** {len(role_info['modules'])} modules available
-                """)
-        
-        with profile_col2:
+        with user_col1:
             if st.button("⚙️ Settings", use_container_width=True, key="user_settings"):
-                st.info("""
-                **⚙️ User Preferences**
-                
-                - 🎨 Theme: Professional Dark Mode
-                - 📱 Mobile Sync: Enabled
-                - 🔔 Notifications: Real-time alerts active
-                - 📊 Dashboard: Highland Tower layout
-                - 🔐 Security: 2FA recommended
-                """)
+                st.success("Settings panel opened")
         
-        # Admin-specific features
-        if user_role == "admin":
-            st.markdown("### 🔧 Admin Tools")
-            
-            admin_col1, admin_col2 = st.columns(2)
-            
-            with admin_col1:
-                if st.button("👥 User Management", use_container_width=True, key="user_mgmt"):
-                    st.success("🔧 **Admin Panel Access**\n\nManage Highland Tower team members, roles, and permissions.")
-                    
-            with admin_col2:
-                if st.button("📊 System Status", use_container_width=True, key="system_status"):
-                    st.info("""
-                    **📊 System Health Dashboard**
-                    
-                    - ✅ Database: Online (PostgreSQL)
-                    - ✅ Authentication: Active
-                    - ✅ File Storage: Available
-                    - ✅ Performance: Optimal
-                    """)
+        with user_col2:
+            if user_role == "admin":
+                if st.button("🔧 Admin", use_container_width=True, key="admin_tools"):
+                    st.success("Admin panel accessed")
+            else:
+                if st.button("👤 Profile", use_container_width=True, key="user_profile"):
+                    st.info(f"Profile: {role_info['role_name']}")
         
-        # Security and logout section
-        st.markdown("---")
-        
-        logout_col1, logout_col2 = st.columns(2)
-        
-        with logout_col1:
-            if st.button("🔐 Security", use_container_width=True, key="security"):
-                st.warning("""
-                **🔐 Security Center**
-                
-                - **Last Login:** Today, 8:30 AM
-                - **Session:** Active (2 hours)
-                - **Location:** Highland Tower Site Office
-                - **Device:** Secure workstation
-                
-                ⚠️ **Recommendation:** Enable 2FA for enhanced security
-                """)
-        
-        with logout_col2:
-            if st.button("🚪 Logout", use_container_width=True, type="secondary", key="logout_btn"):
-                # Clear session and redirect to login
-                st.session_state.authenticated = False
-                st.session_state.user_role = ""
-                st.session_state.username = ""
-                st.session_state.current_menu = "Dashboard"
-                st.success("✅ Successfully logged out. Redirecting to login...")
-                st.rerun()
+        # Logout button
+        if st.button("🚪 Logout", use_container_width=True, type="secondary", key="logout_btn"):
+            st.session_state.authenticated = False
+            st.session_state.user_role = ""
+            st.session_state.username = ""
+            st.session_state.current_menu = "Dashboard"
+            st.success("✅ Logged out successfully")
+            st.rerun()
         
         # Core Tools - Most Used Daily Operations
         st.markdown("### ⚡ Core Tools")

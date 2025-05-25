@@ -69,6 +69,33 @@ def apply_theme():
         border-radius: 10px;
         margin-bottom: 1rem;
         box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        color: #f1f5f9 !important;
+    }
+    
+    /* Enhanced dark theme support for BIM and other modules */
+    .stSelectbox > div > div {
+        background-color: rgba(30, 41, 59, 0.8) !important;
+        color: #f1f5f9 !important;
+    }
+    
+    .stTextInput > div > div > input {
+        background-color: rgba(30, 41, 59, 0.8) !important;
+        color: #f1f5f9 !important;
+        border: 1px solid #475569 !important;
+    }
+    
+    .stDataFrame {
+        background-color: rgba(30, 41, 59, 0.9) !important;
+    }
+    
+    /* BIM module specific dark theme enhancements */
+    .clash-item {
+        background-color: rgba(30, 41, 59, 0.8) !important;
+        border: 1px solid #475569 !important;
+        border-radius: 8px !important;
+        padding: 1rem !important;
+        margin-bottom: 0.5rem !important;
+        color: #f1f5f9 !important;
     }
     
     .enterprise-header {
@@ -797,7 +824,7 @@ def render_main_content():
         
         # Closeout with project completion
         try:
-            from modules.closeout import render_closeout as closeout_render
+            from modules.closeout import render as closeout_render
             module_functions["Closeout"] = closeout_render
         except ImportError:
             module_functions["Closeout"] = render_closeout

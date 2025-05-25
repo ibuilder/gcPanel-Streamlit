@@ -1240,12 +1240,12 @@ def render_main_content():
         except ImportError:
             module_functions["AI Assistant"] = render_ai_assistant
         
-        # Mobile Companion
+        # Mobile Companion (Fixed)
         try:
-            from modules.mobile_companion import render_mobile_companion as mobile_render
+            from modules.mobile_companion_fixed import render_mobile_companion as mobile_render
             module_functions["Mobile Companion"] = mobile_render
         except ImportError:
-            module_functions["Mobile Companion"] = render_mobile_companion
+            module_functions["Mobile Companion"] = lambda: st.info("Mobile interface loading...")
         
         # Additional specialized modules
         module_functions.update({

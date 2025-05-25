@@ -673,31 +673,70 @@ def render_main_content():
     """Render main content based on selected menu"""
     current_menu = st.session_state.current_menu
     
-    # Complete module functions with advanced features
-    module_functions = {
-        "Dashboard": render_dashboard,
-        "Contracts": render_contracts,
-        "RFIs": render_rfis,
-        "Scheduling": render_scheduling,
-        "Submittals": render_submittals,
-        "Transmittals": render_transmittals,
-        "Equipment Tracking": render_equipment_tracking,
-        "AI Assistant": render_ai_assistant,
-        "Mobile Companion": render_mobile_companion,
-        "Engineering": render_engineering,
-        "Field Operations": render_field_operations,
-        "Safety": render_safety,
-        "Cost Management": render_cost_management,
-        "AIA G702/G703 Billing": render_aia_billing,
-        "Prime Contract": render_prime_contract,
-        "Change Orders": render_change_orders,
-        "Daily Reports": render_daily_reports,
-        "Progress Photos": render_progress_photos,
-        "Quality Control": render_quality_control,
-        "Material Management": render_material_management,
-        "BIM": render_bim,
-        "Analytics": render_analytics,
-    }
+    # Your sophisticated modules - directly imported from your existing codebase
+    try:
+        # Import your actual sophisticated modules
+        from modules.dashboard import render as render_dashboard_module
+        from modules.preconstruction import render as render_preconstruction_module
+        from modules.engineering import render as render_engineering_module
+        from modules.field_operations import render as render_field_operations_module
+        from modules.safety import render as render_safety_module
+        from modules.contracts import render as render_contracts_module
+        from modules.cost_management import render as render_cost_management_module
+        from modules.bim import render_bim as render_bim_module
+        from modules.closeout import render as render_closeout_module
+        from modules.analytics import render as render_analytics_module
+        from modules.documents import render as render_documents_module
+        from modules.scheduling import render as render_scheduling_module
+        from modules.ai_assistant import render as render_ai_assistant_module
+        from modules.mobile_companion import render as render_mobile_companion_module
+        
+        # Map to your actual sophisticated modules
+        module_functions = {
+            "Dashboard": render_dashboard_module,
+            "PreConstruction": render_preconstruction_module,
+            "Engineering": render_engineering_module,
+            "Field Operations": render_field_operations_module,
+            "Safety": render_safety_module,
+            "Contracts": render_contracts_module,
+            "Cost Management": render_cost_management_module,
+            "AIA G702/G703 Billing": render_aia_billing,
+            "Prime Contract": render_prime_contract,
+            "Change Orders": render_change_orders,
+            "BIM": render_bim_module,
+            "Closeout": render_closeout_module,
+            "Analytics": render_analytics_module,
+            "Documents": render_documents_module,
+            "Scheduling": render_scheduling_module,
+            "AI Assistant": render_ai_assistant_module,
+            "Mobile Companion": render_mobile_companion_module,
+            "Recent Reports": render_recent_reports,
+            "Daily Reports": render_daily_reports,
+            "Quality Control": render_quality_control,
+            "Material Management": render_material_management,
+        }
+    except ImportError as e:
+        # Fallback to built-in functions if modules not available
+        module_functions = {
+            "Dashboard": render_dashboard,
+            "PreConstruction": render_preconstruction,
+            "Engineering": render_engineering,
+            "Field Operations": render_field_operations,
+            "Safety": render_safety,
+            "Contracts": render_contracts,
+            "Cost Management": render_cost_management,
+            "AIA G702/G703 Billing": render_aia_billing,
+            "Prime Contract": render_prime_contract,
+            "Change Orders": render_change_orders,
+            "BIM": render_bim,
+            "Closeout": render_closeout,
+            "Analytics": render_analytics,
+            "Documents": render_documents,
+            "Recent Reports": render_recent_reports,
+            "Daily Reports": render_daily_reports,
+            "Quality Control": render_quality_control,
+            "Material Management": render_material_management,
+        }
     
     if current_menu in module_functions:
         module_functions[current_menu]()

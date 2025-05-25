@@ -53,12 +53,24 @@ def apply_professional_theme():
     }
     
     section[data-testid="stSidebar"] h3 {
-        color: #fbbf24 !important;
+        color: white !important;
         font-weight: 600 !important;
     }
     
     section[data-testid="stSidebar"] p {
-        color: #e2e8f0 !important;
+        color: white !important;
+    }
+    
+    section[data-testid="stSidebar"] .css-1v0mbdj p {
+        color: white !important;
+    }
+    
+    section[data-testid="stSidebar"] .css-1v0mbdj strong {
+        color: white !important;
+    }
+    
+    section[data-testid="stSidebar"] .css-1v0mbdj span {
+        color: white !important;
     }
     
     section[data-testid="stSidebar"] button {
@@ -73,6 +85,22 @@ def apply_professional_theme():
         background: rgba(255, 255, 255, 0.2) !important;
         border-color: #fbbf24 !important;
         transform: translateX(5px) !important;
+    }
+    
+    section[data-testid="stSidebar"] input {
+        background: rgba(255, 255, 255, 0.9) !important;
+        color: #1e40af !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        border-radius: 8px !important;
+    }
+    
+    section[data-testid="stSidebar"] input::placeholder {
+        color: #64748b !important;
+    }
+    
+    section[data-testid="stSidebar"] label {
+        color: white !important;
+        font-weight: 500 !important;
     }
     
     .enterprise-header {

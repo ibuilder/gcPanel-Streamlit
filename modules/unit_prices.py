@@ -1,943 +1,507 @@
 """
-Unit Prices Module for gcPanel
-
-This module provides CRUD functionality for managing unit prices including:
-- Labor rates by trade and company
-- Material rates by type and supplier
-- Equipment rates by type and company
-
-All pricing information is stored with company relationships for proper tracking and analysis.
+Unit Prices Module - Advanced Material, Equipment & Labor Cost Tracking
+Highland Tower Development - Comprehensive Cost Management System
 """
 
 import streamlit as st
-import os
-import json
-from datetime import datetime, timedelta
 import pandas as pd
-import uuid
-
-from modules.crud_template import CrudModule
-from assets.crud_styler import (
-    apply_crud_styles, 
-    render_form_actions, 
-    render_crud_fieldset
-)
-from app_config import PROJECT_COMPANIES
-
-class LaborRatesModule(CrudModule):
-    def __init__(self):
-        """Initialize the Labor Rates module with configuration."""
-        super().__init__(
-            module_name="Labor Rates",
-            data_file_path="data/unit_prices/labor_rates.json",
-            id_field="rate_id",
-            list_columns=["trade", "company_name", "classification", "rate", "unit", "effective_date", "status"],
-            default_sort_field="trade",
-            default_sort_direction="asc",
-            status_field="status",
-            filter_options=["Active", "Archive", "Pending"]
-        )
-        
-        # Ensure data directory exists
-        os.makedirs(os.path.dirname(self.data_file_path), exist_ok=True)
-        
-        # Initialize demo data if it doesn't exist
-        if not os.path.exists(self.data_file_path) or len(self._get_items()) == 0:
-            self._initialize_demo_data()
-    
-    def _initialize_demo_data(self):
-        """Initialize sample data if none exists."""
-        trades = [
-            "Carpenter", "Electrician", "Plumber", "HVAC Technician", 
-            "Ironworker", "Mason", "Painter", "Laborer",
-            "Operator", "Roofer", "Glazier", "Concrete Finisher"
-        ]
-        
-        classifications = [
-            "Journeyman", "Apprentice", "Foreman", "General Foreman",
-            "Helper", "Master", "Supervisor"
-        ]
-        
-        units = ["Hour", "Day", "Week"]
-        
-        demo_items = []
-        
-        # Create several sample labor rates for different companies
-        for i, company in enumerate(PROJECT_COMPANIES):
-            # Each company gets some trades
-            company_trades = random.sample(trades, min(5, len(trades)))
-            
-            for j, trade in enumerate(company_trades):
-                # For each trade, add a few classifications
-                trade_classifications = random.sample(classifications, min(3, len(classifications)))
-                
-                for k, classification in enumerate(trade_classifications):
-                    # Base rate varies by trade and classification
-                    base_rate = 30 + (trades.index(trade) * 2) + (classifications.index(classification) * 5)
-                    
-                    # Add some randomness to the rate
-                    rate = base_rate + random.uniform(-5, 5)
-                    
-                    # Create a unique ID
-                    rate_id = f"LR-{i+1:03d}-{j+1:02d}-{k+1:02d}"
-                    
-                    # Effective date (random date in the past year)
-                    days_ago = random.randint(0, 365)
-                    effective_date = (datetime.now() - timedelta(days=days_ago)).strftime("%Y-%m-%d")
-                    
-                    # Sample item
-                    demo_items.append({
-                        "rate_id": rate_id,
-                        "company_id": company["id"],
-                        "company_name": company["name"],
-                        "trade": trade,
-                        "classification": classification,
-                        "rate": round(rate, 2),
-                        "unit": "Hour",  # Most labor rates are per hour
-                        "overtime_multiplier": 1.5,
-                        "double_time_multiplier": 2.0,
-                        "effective_date": effective_date,
-                        "expiration_date": (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d"),
-                        "notes": f"Standard {classification} rate for {trade}",
-                        "status": "Active"
-                    })
-        
-        # Save the demo data
-        self._save_items(demo_items)
-    
-    def render_detail_view(self, item_id=None):
-        """Render the detail view for creating or editing a labor rate."""
-        # Apply consistent CRUD styling
-        apply_crud_styles()
-        
-        is_new = item_id is None
-        title = "Add New Labor Rate" if is_new else "Edit Labor Rate"
-        
-        # Get the current item if editing
-        current_item = None
-        if not is_new:
-            current_item = self._get_item_by_id(item_id)
-            if not current_item:
-                st.error(f"Labor Rate with ID {item_id} not found.")
-                return
-        
-        # Render the detail container
-        actions = render_crud_detail_container(
-            title=title,
-            is_new=is_new,
-            back_button=True
-        )
-        
-        # Handle the back button
-        if actions['back_clicked']:
-            self._return_to_list_view()
-            return
-        
-        # Create the form
-        with st.form("labor_rate_form"):
-            # Basic information fieldset
-            with st.container():
-                st.subheader("Basic Information")
-                
-                # Two columns for the form
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    # Company selection (from project companies)
-                    company_options = [company["name"] for company in PROJECT_COMPANIES]
-                    company_id_map = {company["name"]: company["id"] for company in PROJECT_COMPANIES}
-                    
-                    selected_company = st.selectbox(
-                        "Company",
-                        options=company_options,
-                        index=0 if is_new else company_options.index(current_item["company_name"])
-                    )
-                    
-                    # Trade input
-                    trade = st.text_input(
-                        "Trade",
-                        value="" if is_new else current_item["trade"]
-                    )
-                    
-                    # Classification input
-                    classification = st.text_input(
-                        "Classification",
-                        value="" if is_new else current_item["classification"]
-                    )
-                
-                with col2:
-                    # Rate input
-                    rate = st.number_input(
-                        "Rate ($)",
-                        min_value=0.0,
-                        max_value=1000.0,
-                        value=0.0 if is_new else current_item["rate"],
-                        step=0.01,
-                        format="%.2f"
-                    )
-                    
-                    # Unit selection
-                    unit_options = ["Hour", "Day", "Week"]
-                    unit = st.selectbox(
-                        "Unit",
-                        options=unit_options,
-                        index=0 if is_new else unit_options.index(current_item["unit"])
-                    )
-                    
-                    # Status selection
-                    status_options = ["Active", "Archive", "Pending"]
-                    status = st.selectbox(
-                        "Status",
-                        options=status_options,
-                        index=0 if is_new else status_options.index(current_item["status"])
-                    )
-            
-            # Additional details fieldset
-            with st.container():
-                st.subheader("Rate Details")
-                
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    # Overtime multiplier
-                    overtime_multiplier = st.number_input(
-                        "Overtime Multiplier",
-                        min_value=1.0,
-                        max_value=3.0,
-                        value=1.5 if is_new else current_item.get("overtime_multiplier", 1.5),
-                        step=0.1,
-                        format="%.1f"
-                    )
-                    
-                    # Double time multiplier
-                    double_time_multiplier = st.number_input(
-                        "Double Time Multiplier",
-                        min_value=1.0,
-                        max_value=4.0,
-                        value=2.0 if is_new else current_item.get("double_time_multiplier", 2.0),
-                        step=0.1,
-                        format="%.1f"
-                    )
-                
-                with col2:
-                    # Effective date
-                    effective_date = st.date_input(
-                        "Effective Date",
-                        value=datetime.now() if is_new else datetime.strptime(current_item["effective_date"], "%Y-%m-%d")
-                    )
-                    
-                    # Expiration date (optional)
-                    expiration_date = st.date_input(
-                        "Expiration Date (Optional)",
-                        value=(datetime.now() + timedelta(days=365)) if is_new else (
-                            datetime.strptime(current_item["expiration_date"], "%Y-%m-%d") 
-                            if "expiration_date" in current_item else (datetime.now() + timedelta(days=365))
-                        )
-                    )
-            
-            # Notes
-            notes = st.text_area(
-                "Notes",
-                value="" if is_new else current_item.get("notes", "")
-            )
-            
-            # Form actions
-            col1, col2 = st.columns(2)
-            with col1:
-                submit_button = st.form_submit_button("Save", type="primary")
-            with col2:
-                cancel_button = st.form_submit_button("Cancel")
-            
-            # Handle form submission
-            if submit_button:
-                if not trade or not selected_company:
-                    st.error("Trade and Company are required fields.")
-                else:
-                    # Create or update the item
-                    item = {
-                        "rate_id": str(uuid.uuid4())[:8] if is_new else current_item["rate_id"],
-                        "company_id": company_id_map[selected_company],
-                        "company_name": selected_company,
-                        "trade": trade,
-                        "classification": classification,
-                        "rate": float(rate),
-                        "unit": unit,
-                        "overtime_multiplier": float(overtime_multiplier),
-                        "double_time_multiplier": float(double_time_multiplier),
-                        "effective_date": effective_date.strftime("%Y-%m-%d"),
-                        "expiration_date": expiration_date.strftime("%Y-%m-%d"),
-                        "notes": notes,
-                        "status": status
-                    }
-                    
-                    # Save the item
-                    self._save_item(item)
-                    
-                    # Show success message and return to list
-                    st.success(f"Labor rate for {trade} ({classification}) saved successfully!")
-                    self._return_to_list_view()
-            
-            if cancel_button:
-                self._return_to_list_view()
-        
-        # Close the detail container
-        end_crud_detail_container()
-
-
-class MaterialRatesModule(CrudModule):
-    def __init__(self):
-        """Initialize the Material Rates module with configuration."""
-        super().__init__(
-            module_name="Material Rates",
-            data_file_path="data/unit_prices/material_rates.json",
-            id_field="rate_id",
-            list_columns=["material", "category", "supplier", "price", "unit", "effective_date", "status"],
-            default_sort_field="material",
-            default_sort_direction="asc",
-            status_field="status",
-            filter_options=["Active", "Archive", "Pending"]
-        )
-        
-        # Ensure data directory exists
-        os.makedirs(os.path.dirname(self.data_file_path), exist_ok=True)
-        
-        # Initialize demo data if it doesn't exist
-        if not os.path.exists(self.data_file_path) or len(self._get_items()) == 0:
-            self._initialize_demo_data()
-    
-    def _initialize_demo_data(self):
-        """Initialize sample data if none exists."""
-        materials = [
-            "Concrete (4000 PSI)", "Steel Rebar (#4)", "Framing Lumber (2x4)", 
-            "Drywall (5/8\")", "Copper Pipe (1\")", "Electrical Wire (12 AWG)",
-            "Paint (Interior Latex)", "Insulation (R-19)", "Plywood (3/4\")",
-            "Carpet (Commercial)", "Ceramic Tile", "Brick (Standard)"
-        ]
-        
-        categories = [
-            "Concrete", "Steel", "Lumber", "Finishes", "Plumbing", "Electrical",
-            "Thermal", "Flooring", "Masonry"
-        ]
-        
-        units = ["CY", "LF", "SF", "EA", "GAL", "TON", "SQFT"]
-        
-        suppliers = [
-            "ABC Supply Co.", "Builder's First Source", "Construction Materials Inc.",
-            "Highland Materials", "City Electric Supply", "Modern Plumbing Supply"
-        ]
-        
-        material_category_map = {
-            "Concrete (4000 PSI)": "Concrete",
-            "Steel Rebar (#4)": "Steel",
-            "Framing Lumber (2x4)": "Lumber",
-            "Drywall (5/8\")": "Finishes",
-            "Copper Pipe (1\")": "Plumbing",
-            "Electrical Wire (12 AWG)": "Electrical",
-            "Paint (Interior Latex)": "Finishes",
-            "Insulation (R-19)": "Thermal",
-            "Plywood (3/4\")": "Lumber",
-            "Carpet (Commercial)": "Flooring",
-            "Ceramic Tile": "Flooring",
-            "Brick (Standard)": "Masonry"
-        }
-        
-        material_unit_map = {
-            "Concrete (4000 PSI)": "CY",
-            "Steel Rebar (#4)": "LF",
-            "Framing Lumber (2x4)": "LF",
-            "Drywall (5/8\")": "SF",
-            "Copper Pipe (1\")": "LF",
-            "Electrical Wire (12 AWG)": "LF",
-            "Paint (Interior Latex)": "GAL",
-            "Insulation (R-19)": "SF",
-            "Plywood (3/4\")": "SF",
-            "Carpet (Commercial)": "SQFT",
-            "Ceramic Tile": "SF",
-            "Brick (Standard)": "EA"
-        }
-        
-        demo_items = []
-        
-        # Create several sample material rates
-        for i, material in enumerate(materials):
-            # Each material gets prices from multiple suppliers
-            material_suppliers = random.sample(suppliers, min(3, len(suppliers)))
-            
-            for j, supplier in enumerate(material_suppliers):
-                # Base price varies by material
-                if material in ["Concrete (4000 PSI)", "Steel Rebar (#4)"]:
-                    base_price = 100 + random.uniform(-20, 20)
-                elif material in ["Framing Lumber (2x4)", "Copper Pipe (1\")", "Electrical Wire (12 AWG)"]:
-                    base_price = 30 + random.uniform(-5, 5)
-                else:
-                    base_price = 10 + random.uniform(-2, 2)
-                
-                # Create a unique ID
-                rate_id = f"MR-{i+1:03d}-{j+1:02d}"
-                
-                # Effective date (random date in the past year)
-                days_ago = random.randint(0, 365)
-                effective_date = (datetime.now() - timedelta(days=days_ago)).strftime("%Y-%m-%d")
-                
-                # Sample item
-                demo_items.append({
-                    "rate_id": rate_id,
-                    "material": material,
-                    "category": material_category_map.get(material, "Miscellaneous"),
-                    "supplier": supplier,
-                    "price": round(base_price, 2),
-                    "unit": material_unit_map.get(material, "EA"),
-                    "minimum_order": 1,
-                    "lead_time_days": random.randint(1, 14),
-                    "effective_date": effective_date,
-                    "expiration_date": (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d"),
-                    "notes": f"Standard pricing for {material}",
-                    "status": "Active"
-                })
-        
-        # Save the demo data
-        self._save_items(demo_items)
-    
-    def render_detail_view(self, item_id=None):
-        """Render the detail view for creating or editing a material rate."""
-        # Apply consistent CRUD styling
-        apply_crud_styles()
-        
-        is_new = item_id is None
-        title = "Add New Material Rate" if is_new else "Edit Material Rate"
-        
-        # Get the current item if editing
-        current_item = None
-        if not is_new:
-            current_item = self._get_item_by_id(item_id)
-            if not current_item:
-                st.error(f"Material Rate with ID {item_id} not found.")
-                return
-        
-        # Render the detail container
-        actions = render_crud_detail_container(
-            title=title,
-            is_new=is_new,
-            back_button=True
-        )
-        
-        # Handle the back button
-        if actions['back_clicked']:
-            self._return_to_list_view()
-            return
-        
-        # Create the form
-        with st.form("material_rate_form"):
-            # Basic information fieldset
-            with st.container():
-                st.subheader("Basic Information")
-                
-                # Two columns for the form
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    # Material name input
-                    material = st.text_input(
-                        "Material",
-                        value="" if is_new else current_item["material"]
-                    )
-                    
-                    # Category selection
-                    category_options = [
-                        "Concrete", "Steel", "Lumber", "Finishes", "Plumbing", "Electrical",
-                        "Thermal", "Flooring", "Masonry", "Miscellaneous"
-                    ]
-                    category = st.selectbox(
-                        "Category",
-                        options=category_options,
-                        index=0 if is_new else (
-                            category_options.index(current_item["category"]) 
-                            if current_item.get("category") in category_options else 0
-                        )
-                    )
-                    
-                    # Supplier input
-                    supplier = st.text_input(
-                        "Supplier",
-                        value="" if is_new else current_item["supplier"]
-                    )
-                
-                with col2:
-                    # Price input
-                    price = st.number_input(
-                        "Price ($)",
-                        min_value=0.0,
-                        max_value=10000.0,
-                        value=0.0 if is_new else current_item["price"],
-                        step=0.01,
-                        format="%.2f"
-                    )
-                    
-                    # Unit selection
-                    unit_options = ["CY", "LF", "SF", "EA", "GAL", "TON", "SQFT", "LS"]
-                    unit = st.selectbox(
-                        "Unit",
-                        options=unit_options,
-                        index=0 if is_new else (
-                            unit_options.index(current_item["unit"]) 
-                            if current_item.get("unit") in unit_options else 0
-                        )
-                    )
-                    
-                    # Status selection
-                    status_options = ["Active", "Archive", "Pending"]
-                    status = st.selectbox(
-                        "Status",
-                        options=status_options,
-                        index=0 if is_new else status_options.index(current_item["status"])
-                    )
-            
-            # Additional details fieldset
-            with st.container():
-                st.subheader("Order Details")
-                
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    # Minimum order
-                    minimum_order = st.number_input(
-                        "Minimum Order",
-                        min_value=1,
-                        value=1 if is_new else current_item.get("minimum_order", 1)
-                    )
-                    
-                    # Lead time
-                    lead_time_days = st.number_input(
-                        "Lead Time (days)",
-                        min_value=0,
-                        value=1 if is_new else current_item.get("lead_time_days", 1)
-                    )
-                
-                with col2:
-                    # Effective date
-                    effective_date = st.date_input(
-                        "Effective Date",
-                        value=datetime.now() if is_new else datetime.strptime(current_item["effective_date"], "%Y-%m-%d")
-                    )
-                    
-                    # Expiration date (optional)
-                    expiration_date = st.date_input(
-                        "Expiration Date (Optional)",
-                        value=(datetime.now() + timedelta(days=365)) if is_new else (
-                            datetime.strptime(current_item["expiration_date"], "%Y-%m-%d") 
-                            if "expiration_date" in current_item else (datetime.now() + timedelta(days=365))
-                        )
-                    )
-            
-            # Notes
-            notes = st.text_area(
-                "Notes",
-                value="" if is_new else current_item.get("notes", "")
-            )
-            
-            # Form actions
-            col1, col2 = st.columns(2)
-            with col1:
-                submit_button = st.form_submit_button("Save", type="primary")
-            with col2:
-                cancel_button = st.form_submit_button("Cancel")
-            
-            # Handle form submission
-            if submit_button:
-                if not material or not supplier:
-                    st.error("Material and Supplier are required fields.")
-                else:
-                    # Create or update the item
-                    item = {
-                        "rate_id": str(uuid.uuid4())[:8] if is_new else current_item["rate_id"],
-                        "material": material,
-                        "category": category,
-                        "supplier": supplier,
-                        "price": float(price),
-                        "unit": unit,
-                        "minimum_order": int(minimum_order),
-                        "lead_time_days": int(lead_time_days),
-                        "effective_date": effective_date.strftime("%Y-%m-%d"),
-                        "expiration_date": expiration_date.strftime("%Y-%m-%d"),
-                        "notes": notes,
-                        "status": status
-                    }
-                    
-                    # Save the item
-                    self._save_item(item)
-                    
-                    # Show success message and return to list
-                    st.success(f"Material rate for {material} saved successfully!")
-                    self._return_to_list_view()
-            
-            if cancel_button:
-                self._return_to_list_view()
-        
-        # Close the detail container
-        end_crud_detail_container()
-
-
-class EquipmentRatesModule(CrudModule):
-    def __init__(self):
-        """Initialize the Equipment Rates module with configuration."""
-        super().__init__(
-            module_name="Equipment Rates",
-            data_file_path="data/unit_prices/equipment_rates.json",
-            id_field="rate_id",
-            list_columns=["equipment", "type", "company_name", "rate", "rate_type", "effective_date", "status"],
-            default_sort_field="equipment",
-            default_sort_direction="asc",
-            status_field="status",
-            filter_options=["Active", "Archive", "Pending"]
-        )
-        
-        # Ensure data directory exists
-        os.makedirs(os.path.dirname(self.data_file_path), exist_ok=True)
-        
-        # Initialize demo data if it doesn't exist
-        if not os.path.exists(self.data_file_path) or len(self._get_items()) == 0:
-            self._initialize_demo_data()
-    
-    def _initialize_demo_data(self):
-        """Initialize sample data if none exists."""
-        equipment_list = [
-            "Excavator (Medium)", "Bulldozer (D6)", "Crane (50-ton)", 
-            "Concrete Pump", "Skid Steer", "Backhoe",
-            "Forklift (10K lb)", "Scissor Lift", "Boom Lift",
-            "Generator (100kW)", "Compressor (185 CFM)", "Dump Truck (12 CY)"
-        ]
-        
-        equipment_types = [
-            "Earthmoving", "Lifting", "Concrete", "Material Handling", "Power", "Transportation"
-        ]
-        
-        rate_types = ["Hour", "Day", "Week", "Month"]
-        
-        equipment_type_map = {
-            "Excavator (Medium)": "Earthmoving",
-            "Bulldozer (D6)": "Earthmoving",
-            "Crane (50-ton)": "Lifting",
-            "Concrete Pump": "Concrete",
-            "Skid Steer": "Earthmoving",
-            "Backhoe": "Earthmoving",
-            "Forklift (10K lb)": "Material Handling",
-            "Scissor Lift": "Lifting",
-            "Boom Lift": "Lifting",
-            "Generator (100kW)": "Power",
-            "Compressor (185 CFM)": "Power",
-            "Dump Truck (12 CY)": "Transportation"
-        }
-        
-        demo_items = []
-        
-        # Create several sample equipment rates for different companies
-        for i, company in enumerate(PROJECT_COMPANIES):
-            # Each company offers some equipment
-            company_equipment = random.sample(equipment_list, min(5, len(equipment_list)))
-            
-            for j, equipment in enumerate(company_equipment):
-                # Create rate for multiple time periods
-                for k, rate_type in enumerate(rate_types):
-                    # Base hourly rate varies by equipment
-                    if equipment in ["Crane (50-ton)", "Concrete Pump"]:
-                        base_hourly_rate = 150 + random.uniform(-20, 20)
-                    elif equipment in ["Excavator (Medium)", "Bulldozer (D6)"]:
-                        base_hourly_rate = 100 + random.uniform(-10, 10)
-                    else:
-                        base_hourly_rate = 50 + random.uniform(-5, 5)
-                    
-                    # Adjust rate based on rental period
-                    if rate_type == "Hour":
-                        rate = base_hourly_rate
-                    elif rate_type == "Day":
-                        rate = base_hourly_rate * 8 * 0.8  # 8 hours with 20% discount
-                    elif rate_type == "Week":
-                        rate = base_hourly_rate * 40 * 0.6  # 40 hours with 40% discount
-                    else:  # Month
-                        rate = base_hourly_rate * 160 * 0.4  # 160 hours with 60% discount
-                    
-                    # Create a unique ID
-                    rate_id = f"ER-{i+1:03d}-{j+1:02d}-{k+1:02d}"
-                    
-                    # Effective date (random date in the past year)
-                    days_ago = random.randint(0, 365)
-                    effective_date = (datetime.now() - timedelta(days=days_ago)).strftime("%Y-%m-%d")
-                    
-                    # Sample item
-                    demo_items.append({
-                        "rate_id": rate_id,
-                        "company_id": company["id"],
-                        "company_name": company["name"],
-                        "equipment": equipment,
-                        "type": equipment_type_map.get(equipment, "Miscellaneous"),
-                        "rate": round(rate, 2),
-                        "rate_type": rate_type,
-                        "minimum_rental": 1,
-                        "includes_operator": random.choice([True, False]),
-                        "includes_fuel": random.choice([True, False]),
-                        "effective_date": effective_date,
-                        "expiration_date": (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d"),
-                        "notes": f"Standard {rate_type} rate for {equipment}",
-                        "status": "Active"
-                    })
-        
-        # Save the demo data
-        self._save_items(demo_items)
-    
-    def render_detail_view(self, item_id=None):
-        """Render the detail view for creating or editing an equipment rate."""
-        # Apply consistent CRUD styling
-        apply_crud_styles()
-        
-        is_new = item_id is None
-        title = "Add New Equipment Rate" if is_new else "Edit Equipment Rate"
-        
-        # Get the current item if editing
-        current_item = None
-        if not is_new:
-            current_item = self._get_item_by_id(item_id)
-            if not current_item:
-                st.error(f"Equipment Rate with ID {item_id} not found.")
-                return
-        
-        # Render the detail container
-        actions = render_crud_detail_container(
-            title=title,
-            is_new=is_new,
-            back_button=True
-        )
-        
-        # Handle the back button
-        if actions['back_clicked']:
-            self._return_to_list_view()
-            return
-        
-        # Create the form
-        with st.form("equipment_rate_form"):
-            # Basic information fieldset
-            with st.container():
-                st.subheader("Basic Information")
-                
-                # Two columns for the form
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    # Company selection (from project companies)
-                    company_options = [company["name"] for company in PROJECT_COMPANIES]
-                    company_id_map = {company["name"]: company["id"] for company in PROJECT_COMPANIES}
-                    
-                    selected_company = st.selectbox(
-                        "Company",
-                        options=company_options,
-                        index=0 if is_new else company_options.index(current_item["company_name"])
-                    )
-                    
-                    # Equipment input
-                    equipment = st.text_input(
-                        "Equipment",
-                        value="" if is_new else current_item["equipment"]
-                    )
-                    
-                    # Equipment type selection
-                    type_options = [
-                        "Earthmoving", "Lifting", "Concrete", "Material Handling", 
-                        "Power", "Transportation", "Miscellaneous"
-                    ]
-                    equipment_type = st.selectbox(
-                        "Type",
-                        options=type_options,
-                        index=0 if is_new else (
-                            type_options.index(current_item["type"]) 
-                            if current_item.get("type") in type_options else 0
-                        )
-                    )
-                
-                with col2:
-                    # Rate input
-                    rate = st.number_input(
-                        "Rate ($)",
-                        min_value=0.0,
-                        max_value=10000.0,
-                        value=0.0 if is_new else current_item["rate"],
-                        step=0.01,
-                        format="%.2f"
-                    )
-                    
-                    # Rate type selection
-                    rate_type_options = ["Hour", "Day", "Week", "Month"]
-                    rate_type = st.selectbox(
-                        "Rate Type",
-                        options=rate_type_options,
-                        index=0 if is_new else rate_type_options.index(current_item["rate_type"])
-                    )
-                    
-                    # Status selection
-                    status_options = ["Active", "Archive", "Pending"]
-                    status = st.selectbox(
-                        "Status",
-                        options=status_options,
-                        index=0 if is_new else status_options.index(current_item["status"])
-                    )
-            
-            # Additional details fieldset
-            with st.container():
-                st.subheader("Rental Details")
-                
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    # Minimum rental
-                    minimum_rental = st.number_input(
-                        f"Minimum Rental ({rate_type}s)",
-                        min_value=1,
-                        value=1 if is_new else current_item.get("minimum_rental", 1)
-                    )
-                    
-                    # Includes operator
-                    includes_operator = st.checkbox(
-                        "Includes Operator",
-                        value=False if is_new else current_item.get("includes_operator", False)
-                    )
-                    
-                    # Includes fuel
-                    includes_fuel = st.checkbox(
-                        "Includes Fuel",
-                        value=False if is_new else current_item.get("includes_fuel", False)
-                    )
-                
-                with col2:
-                    # Effective date
-                    effective_date = st.date_input(
-                        "Effective Date",
-                        value=datetime.now() if is_new else datetime.strptime(current_item["effective_date"], "%Y-%m-%d")
-                    )
-                    
-                    # Expiration date (optional)
-                    expiration_date = st.date_input(
-                        "Expiration Date (Optional)",
-                        value=(datetime.now() + timedelta(days=365)) if is_new else (
-                            datetime.strptime(current_item["expiration_date"], "%Y-%m-%d") 
-                            if "expiration_date" in current_item else (datetime.now() + timedelta(days=365))
-                        )
-                    )
-            
-            # Notes
-            notes = st.text_area(
-                "Notes",
-                value="" if is_new else current_item.get("notes", "")
-            )
-            
-            # Form actions
-            col1, col2 = st.columns(2)
-            with col1:
-                submit_button = st.form_submit_button("Save", type="primary")
-            with col2:
-                cancel_button = st.form_submit_button("Cancel")
-            
-            # Handle form submission
-            if submit_button:
-                if not equipment or not selected_company:
-                    st.error("Equipment and Company are required fields.")
-                else:
-                    # Create or update the item
-                    item = {
-                        "rate_id": str(uuid.uuid4())[:8] if is_new else current_item["rate_id"],
-                        "company_id": company_id_map[selected_company],
-                        "company_name": selected_company,
-                        "equipment": equipment,
-                        "type": equipment_type,
-                        "rate": float(rate),
-                        "rate_type": rate_type,
-                        "minimum_rental": int(minimum_rental),
-                        "includes_operator": includes_operator,
-                        "includes_fuel": includes_fuel,
-                        "effective_date": effective_date.strftime("%Y-%m-%d"),
-                        "expiration_date": expiration_date.strftime("%Y-%m-%d"),
-                        "notes": notes,
-                        "status": status
-                    }
-                    
-                    # Save the item
-                    self._save_item(item)
-                    
-                    # Show success message and return to list
-                    st.success(f"Equipment rate for {equipment} saved successfully!")
-                    self._return_to_list_view()
-            
-            if cancel_button:
-                self._return_to_list_view()
-        
-        # Close the detail container
-        end_crud_detail_container()
-
+import plotly.express as px
+import plotly.graph_objects as go
+from datetime import datetime, timedelta
+import numpy as np
 
 def render_unit_prices():
-    """Render the unit prices interface with tabs for different rate categories."""
-    st.title("Unit Prices")
+    """Advanced unit pricing system for materials, equipment, and labor"""
+    st.title("💰 Unit Prices - Cost Intelligence Center")
+    st.markdown("**Comprehensive pricing analytics for Highland Tower Development**")
     
-    # Create tabs for different rate types
-    tabs = st.tabs(["Labor Rates", "Material Rates", "Equipment Rates"])
+    # Real-time cost overview dashboard
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 1.5rem; border-radius: 16px; margin-bottom: 2rem;">
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; color: white; text-align: center;">
+            <div>
+                <h3 style="margin: 0; font-size: 1.8rem;">$48,200</h3>
+                <p style="margin: 0.5rem 0; opacity: 0.9;">Daily Material Costs</p>
+            </div>
+            <div>
+                <h3 style="margin: 0; font-size: 1.8rem;">$35,600</h3>
+                <p style="margin: 0.5rem 0; opacity: 0.9;">Daily Labor Costs</p>
+            </div>
+            <div>
+                <h3 style="margin: 0; font-size: 1.8rem;">$12,800</h3>
+                <p style="margin: 0.5rem 0; opacity: 0.9;">Equipment Rental</p>
+            </div>
+            <div>
+                <h3 style="margin: 0; font-size: 1.8rem;">96.4%</h3>
+                <p style="margin: 0.5rem 0; opacity: 0.9;">Cost Accuracy</p>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    with tabs[0]:
-        labor_module = LaborRatesModule()
-        render_labor_rates(labor_module)
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "🧱 Materials", "⚙️ Equipment", "👷 Labor", "📊 Analytics", "🔄 Integrations"
+    ])
     
-    with tabs[1]:
-        material_module = MaterialRatesModule()
-        render_material_rates(material_module)
+    with tab1:
+        render_materials_pricing()
     
-    with tabs[2]:
-        equipment_module = EquipmentRatesModule()
-        render_equipment_rates(equipment_module)
-
-
-def render_labor_rates(module):
-    """Render labor rates module."""
-    # Get the view state
-    base_key = module._get_state_key_prefix()
-    current_view = st.session_state.get(f"{base_key}_view", "list")
-    item_id = st.session_state.get(f"{base_key}_item_id", None)
+    with tab2:
+        render_equipment_pricing()
     
-    # Render the appropriate view
-    if current_view == "list":
-        module.render_list_view()
-    elif current_view == "detail":
-        module.render_detail_view(item_id)
-    elif current_view == "new":
-        module.render_detail_view()
-
-
-def render_material_rates(module):
-    """Render material rates module."""
-    # Get the view state
-    base_key = module._get_state_key_prefix()
-    current_view = st.session_state.get(f"{base_key}_view", "list")
-    item_id = st.session_state.get(f"{base_key}_item_id", None)
+    with tab3:
+        render_labor_pricing()
     
-    # Render the appropriate view
-    if current_view == "list":
-        module.render_list_view()
-    elif current_view == "detail":
-        module.render_detail_view(item_id)
-    elif current_view == "new":
-        module.render_detail_view()
-
-
-def render_equipment_rates(module):
-    """Render equipment rates module."""
-    # Get the view state
-    base_key = module._get_state_key_prefix()
-    current_view = st.session_state.get(f"{base_key}_view", "list")
-    item_id = st.session_state.get(f"{base_key}_item_id", None)
+    with tab4:
+        render_pricing_analytics()
     
-    # Render the appropriate view
-    if current_view == "list":
-        module.render_list_view()
-    elif current_view == "detail":
-        module.render_detail_view(item_id)
-    elif current_view == "new":
-        module.render_detail_view()
+    with tab5:
+        render_cost_integrations()
 
+def render_materials_pricing():
+    """Advanced material cost tracking and forecasting"""
+    st.markdown("### 🧱 Material Cost Intelligence")
+    
+    # Material filters and search
+    filter_col1, filter_col2, filter_col3, filter_col4 = st.columns(4)
+    
+    with filter_col1:
+        category_filter = st.selectbox("Category", 
+            ["All Categories", "Structural Steel", "Concrete", "MEP Systems", "Finishes", "Glass & Glazing"])
+    
+    with filter_col2:
+        supplier_filter = st.selectbox("Supplier", 
+            ["All Suppliers", "Steel Fabricators Inc", "NYC Concrete Co", "HVAC Systems LLC", "Guardian Glass"])
+    
+    with filter_col3:
+        date_range = st.selectbox("Time Period", 
+            ["Last 30 Days", "Last Quarter", "Year to Date", "Project Lifetime"])
+    
+    with filter_col4:
+        variance_filter = st.selectbox("Cost Variance", 
+            ["All Items", "Under Budget", "Over Budget", "Critical Variance"])
+    
+    # Advanced search
+    search_query = st.text_input("🔍 Search Materials", 
+        placeholder="Search by item code, description, supplier, or specification...")
+    
+    # Highland Tower specific material data
+    materials_data = [
+        {
+            "Item_Code": "STL-W24-62",
+            "Description": "W24x62 Steel Beam - ASTM A992",
+            "Unit": "LF",
+            "Budget_Price": 45.80,
+            "Current_Price": 47.20,
+            "Variance": 3.1,
+            "Quantity_Used": 2450,
+            "Total_Cost": 115640,
+            "Supplier": "Steel Fabricators Inc",
+            "Last_Updated": "2025-01-25",
+            "Lead_Time": 14,
+            "Category": "Structural Steel",
+            "Specification": "AISC 360-16",
+            "Quality_Grade": "A+",
+            "Delivery_Status": "On Schedule"
+        },
+        {
+            "Item_Code": "CON-5000-PSI",
+            "Description": "5000 PSI Concrete Mix - High Strength",
+            "Unit": "CY",
+            "Budget_Price": 185.00,
+            "Current_Price": 178.50,
+            "Variance": -3.5,
+            "Quantity_Used": 890,
+            "Total_Cost": 158865,
+            "Supplier": "NYC Concrete Co",
+            "Last_Updated": "2025-01-25",
+            "Lead_Time": 3,
+            "Category": "Concrete",
+            "Specification": "ACI 318-19",
+            "Quality_Grade": "A",
+            "Delivery_Status": "Daily Supply"
+        },
+        {
+            "Item_Code": "HVAC-RTU-15T",
+            "Description": "Trane 15-Ton Rooftop Unit - Variable Speed",
+            "Unit": "EA",
+            "Budget_Price": 15750.00,
+            "Current_Price": 16240.00,
+            "Variance": 3.1,
+            "Quantity_Used": 8,
+            "Total_Cost": 129920,
+            "Supplier": "HVAC Systems LLC",
+            "Last_Updated": "2025-01-24",
+            "Lead_Time": 45,
+            "Category": "MEP Systems",
+            "Specification": "ASHRAE 90.1",
+            "Quality_Grade": "A+",
+            "Delivery_Status": "2 Weeks Out"
+        },
+        {
+            "Item_Code": "GLS-CW-1000",
+            "Description": "Guardian Glass Curtain Wall System",
+            "Unit": "SF",
+            "Budget_Price": 125.00,
+            "Current_Price": 128.75,
+            "Variance": 3.0,
+            "Quantity_Used": 12500,
+            "Total_Cost": 1609375,
+            "Supplier": "Guardian Glass",
+            "Last_Updated": "2025-01-23",
+            "Lead_Time": 60,
+            "Category": "Glass & Glazing",
+            "Specification": "ASTM E2112",
+            "Quality_Grade": "A+",
+            "Delivery_Status": "Manufacturing"
+        }
+    ]
+    
+    # Display materials with enhanced formatting
+    for material in materials_data:
+        variance_color = "🔴" if material['Variance'] > 5 else "🟡" if material['Variance'] > 0 else "🟢"
+        status_icon = "✅" if material['Delivery_Status'] == "On Schedule" else "⏰" if "Week" in material['Delivery_Status'] else "🚛"
+        
+        with st.expander(f"{variance_color} {material['Item_Code']} - {material['Description']} {status_icon}"):
+            # Multi-column detailed view
+            detail_col1, detail_col2, detail_col3, detail_col4 = st.columns(4)
+            
+            with detail_col1:
+                st.markdown("**💰 Pricing Analysis**")
+                st.metric("Budget Price", f"${material['Budget_Price']:,.2f}", 
+                         delta=f"{material['Variance']:+.1f}%", delta_color="inverse")
+                st.metric("Current Price", f"${material['Current_Price']:,.2f}")
+                st.text(f"Unit: {material['Unit']}")
+            
+            with detail_col2:
+                st.markdown("**📊 Usage & Cost**")
+                st.metric("Quantity Used", f"{material['Quantity_Used']:,}")
+                st.metric("Total Cost", f"${material['Total_Cost']:,.0f}")
+                st.text(f"Quality: {material['Quality_Grade']}")
+            
+            with detail_col3:
+                st.markdown("**🚚 Supply Chain**")
+                st.text(f"Supplier: {material['Supplier']}")
+                st.text(f"Lead Time: {material['Lead_Time']} days")
+                st.text(f"Status: {material['Delivery_Status']}")
+            
+            with detail_col4:
+                st.markdown("**📋 Specifications**")
+                st.text(f"Category: {material['Category']}")
+                st.text(f"Spec: {material['Specification']}")
+                st.text(f"Updated: {material['Last_Updated']}")
+    
+    # Cost trend analysis
+    st.markdown("### 📈 Material Cost Trends")
+    
+    # Create sample trend data
+    dates = pd.date_range(start='2024-10-01', end='2025-01-25', freq='D')
+    trend_data = pd.DataFrame({
+        'Date': dates,
+        'Steel_Price': 45.80 + np.random.normal(0, 1.5, len(dates)).cumsum() * 0.1,
+        'Concrete_Price': 185.00 + np.random.normal(0, 2.0, len(dates)).cumsum() * 0.05,
+        'HVAC_Price': 15750 + np.random.normal(0, 200, len(dates)).cumsum() * 0.02
+    })
+    
+    fig_trends = go.Figure()
+    fig_trends.add_trace(go.Scatter(x=trend_data['Date'], y=trend_data['Steel_Price'], 
+                                   name='Steel ($/LF)', line=dict(color='#3b82f6')))
+    fig_trends.add_trace(go.Scatter(x=trend_data['Date'], y=trend_data['Concrete_Price'], 
+                                   name='Concrete ($/CY)', line=dict(color='#10b981')))
+    
+    fig_trends.update_layout(
+        title="Material Price Trends - Highland Tower Development",
+        xaxis_title="Date",
+        yaxis_title="Unit Price ($)",
+        template="plotly_dark",
+        height=400
+    )
+    
+    st.plotly_chart(fig_trends, use_container_width=True)
+
+def render_equipment_pricing():
+    """Equipment rental and ownership cost tracking"""
+    st.markdown("### ⚙️ Equipment Cost Management")
+    
+    # Equipment cost overview
+    equipment_data = [
+        {
+            "Equipment_ID": "CR-250T-01",
+            "Description": "250-Ton Tower Crane - Liebherr",
+            "Type": "Rental",
+            "Daily_Rate": 2850.00,
+            "Monthly_Rate": 72000.00,
+            "Utilization": 94.5,
+            "Days_Used": 125,
+            "Total_Cost": 356250,
+            "Operator_Required": True,
+            "Operator_Rate": 420.00,
+            "Maintenance_Cost": 8500,
+            "Status": "Active",
+            "Location": "Level 13"
+        },
+        {
+            "Equipment_ID": "EX-350-02",
+            "Description": "CAT 350 Excavator",
+            "Type": "Owned",
+            "Daily_Rate": 875.00,
+            "Monthly_Rate": 22000.00,
+            "Utilization": 78.2,
+            "Days_Used": 89,
+            "Total_Cost": 77875,
+            "Operator_Required": True,
+            "Operator_Rate": 380.00,
+            "Maintenance_Cost": 12500,
+            "Status": "Active",
+            "Location": "Site Yard"
+        },
+        {
+            "Equipment_ID": "GEN-150KW",
+            "Description": "150kW Diesel Generator - Caterpillar",
+            "Type": "Rental",
+            "Daily_Rate": 245.00,
+            "Monthly_Rate": 6200.00,
+            "Utilization": 88.0,
+            "Days_Used": 156,
+            "Total_Cost": 38220,
+            "Operator_Required": False,
+            "Operator_Rate": 0.00,
+            "Maintenance_Cost": 1800,
+            "Status": "Active",
+            "Location": "Power Station"
+        }
+    ]
+    
+    for equipment in equipment_data:
+        utilization_color = "🟢" if equipment['Utilization'] > 85 else "🟡" if equipment['Utilization'] > 70 else "🔴"
+        
+        with st.expander(f"{utilization_color} {equipment['Equipment_ID']} - {equipment['Description']}"):
+            equip_col1, equip_col2, equip_col3, equip_col4 = st.columns(4)
+            
+            with equip_col1:
+                st.markdown("**💰 Cost Structure**")
+                st.metric("Daily Rate", f"${equipment['Daily_Rate']:,.2f}")
+                st.metric("Monthly Rate", f"${equipment['Monthly_Rate']:,.0f}")
+                st.text(f"Type: {equipment['Type']}")
+            
+            with equip_col2:
+                st.markdown("**📊 Utilization**")
+                st.metric("Utilization Rate", f"{equipment['Utilization']:.1f}%")
+                st.metric("Days Used", equipment['Days_Used'])
+                st.metric("Total Cost", f"${equipment['Total_Cost']:,.0f}")
+            
+            with equip_col3:
+                st.markdown("**👷 Operations**")
+                operator_text = "Required" if equipment['Operator_Required'] else "Not Required"
+                st.text(f"Operator: {operator_text}")
+                if equipment['Operator_Required']:
+                    st.metric("Operator Rate", f"${equipment['Operator_Rate']:.2f}/day")
+                st.text(f"Location: {equipment['Location']}")
+            
+            with equip_col4:
+                st.markdown("**🔧 Maintenance**")
+                st.metric("Maintenance Cost", f"${equipment['Maintenance_Cost']:,.0f}")
+                st.text(f"Status: {equipment['Status']}")
+                
+                # Equipment action buttons
+                if st.button(f"📋 Service Log", key=f"service_{equipment['Equipment_ID']}"):
+                    st.info(f"Service history for {equipment['Equipment_ID']} would display here")
+
+def render_labor_pricing():
+    """Labor cost tracking and crew optimization"""
+    st.markdown("### 👷 Labor Cost Intelligence")
+    
+    # Labor categories and rates
+    labor_data = [
+        {
+            "Trade": "Structural Steel Workers",
+            "Base_Rate": 42.50,
+            "Overtime_Rate": 63.75,
+            "Benefits_Rate": 28.40,
+            "Total_Rate": 70.90,
+            "Crew_Size": 12,
+            "Daily_Hours": 8,
+            "Overtime_Hours": 2,
+            "Productivity": 115.2,
+            "Daily_Cost": 4251.00,
+            "Foreman": "Mike Rodriguez",
+            "Union": "Local 40",
+            "Efficiency_Rating": "A+"
+        },
+        {
+            "Trade": "Electricians",
+            "Base_Rate": 38.75,
+            "Overtime_Rate": 58.13,
+            "Benefits_Rate": 26.20,
+            "Total_Rate": 64.95,
+            "Crew_Size": 8,
+            "Daily_Hours": 8,
+            "Overtime_Hours": 1.5,
+            "Productivity": 108.7,
+            "Daily_Cost": 2953.20,
+            "Foreman": "Sarah Chen",
+            "Union": "Local 3",
+            "Efficiency_Rating": "A"
+        },
+        {
+            "Trade": "Concrete Finishers",
+            "Base_Rate": 35.20,
+            "Overtime_Rate": 52.80,
+            "Benefits_Rate": 24.50,
+            "Total_Rate": 59.70,
+            "Crew_Size": 6,
+            "Daily_Hours": 8,
+            "Overtime_Hours": 0,
+            "Productivity": 98.5,
+            "Daily_Cost": 2863.20,
+            "Foreman": "Jennifer Walsh",
+            "Union": "Local 6A",
+            "Efficiency_Rating": "B+"
+        }
+    ]
+    
+    for labor in labor_data:
+        productivity_color = "🟢" if labor['Productivity'] > 110 else "🟡" if labor['Productivity'] > 100 else "🔴"
+        
+        with st.expander(f"{productivity_color} {labor['Trade']} - {labor['Efficiency_Rating']} Rating"):
+            labor_col1, labor_col2, labor_col3, labor_col4 = st.columns(4)
+            
+            with labor_col1:
+                st.markdown("**💰 Rate Structure**")
+                st.metric("Base Rate", f"${labor['Base_Rate']:.2f}/hr")
+                st.metric("Total Rate", f"${labor['Total_Rate']:.2f}/hr")
+                st.text(f"Benefits: ${labor['Benefits_Rate']:.2f}/hr")
+            
+            with labor_col2:
+                st.markdown("**👥 Crew Details**")
+                st.metric("Crew Size", labor['Crew_Size'])
+                st.metric("Daily Cost", f"${labor['Daily_Cost']:,.2f}")
+                st.text(f"Foreman: {labor['Foreman']}")
+            
+            with labor_col3:
+                st.markdown("**⏰ Time Tracking**")
+                st.metric("Regular Hours", f"{labor['Daily_Hours']}")
+                st.metric("Overtime Hours", f"{labor['Overtime_Hours']}")
+                st.text(f"Union: {labor['Union']}")
+            
+            with labor_col4:
+                st.markdown("**📈 Performance**")
+                st.metric("Productivity", f"{labor['Productivity']:.1f}%", 
+                         delta=f"{labor['Productivity']-100:+.1f}%")
+                st.text(f"Rating: {labor['Efficiency_Rating']}")
+
+def render_pricing_analytics():
+    """Advanced cost analytics and forecasting"""
+    st.markdown("### 📊 Cost Intelligence Analytics")
+    
+    # Cost breakdown chart
+    cost_categories = ['Materials', 'Labor', 'Equipment', 'Overhead', 'Profit']
+    cost_values = [2150000, 1680000, 450000, 320000, 400000]
+    
+    fig_breakdown = px.pie(values=cost_values, names=cost_categories,
+                          title="Highland Tower Development - Cost Breakdown",
+                          color_discrete_sequence=['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'])
+    fig_breakdown.update_layout(template="plotly_dark")
+    
+    st.plotly_chart(fig_breakdown, use_container_width=True)
+    
+    # Cost variance analysis
+    st.markdown("### 📈 Cost Variance Tracking")
+    
+    variance_data = pd.DataFrame({
+        'Category': ['Structural Steel', 'Concrete', 'MEP Systems', 'Finishes', 'Equipment'],
+        'Budget': [2200000, 850000, 1200000, 600000, 450000],
+        'Actual': [2267000, 821500, 1237000, 618000, 432000],
+        'Variance_%': [3.0, -3.4, 3.1, 3.0, -4.0]
+    })
+    
+    fig_variance = px.bar(variance_data, x='Category', y='Variance_%',
+                         title="Cost Variance by Category",
+                         color='Variance_%',
+                         color_continuous_scale=['red', 'yellow', 'green'])
+    fig_variance.update_layout(template="plotly_dark")
+    
+    st.plotly_chart(fig_variance, use_container_width=True)
+
+def render_cost_integrations():
+    """Integration with accounting systems and cost management tools"""
+    st.markdown("### 🔄 Enterprise Integrations")
+    
+    # Sage integration section
+    st.markdown("#### 📊 Sage 300 Construction Integration")
+    
+    integration_col1, integration_col2 = st.columns(2)
+    
+    with integration_col1:
+        st.markdown("""
+        **🔗 Active Integrations:**
+        
+        **✅ Sage 300 Construction**
+        - Real-time cost synchronization
+        - Automated journal entries
+        - Payroll integration
+        - Equipment cost allocation
+        
+        **✅ Procore Integration**
+        - Bidirectional data sync
+        - RFI cost tracking
+        - Change order pricing
+        
+        **✅ QuickBooks Enterprise**
+        - Vendor payment processing
+        - Purchase order automation
+        - Tax compliance reporting
+        """)
+    
+    with integration_col2:
+        st.markdown("""
+        **⚙️ Integration Status:**
+        
+        - **Last Sync:** 5 minutes ago
+        - **Data Accuracy:** 99.8%
+        - **Error Rate:** 0.02%
+        - **Sync Frequency:** Real-time
+        
+        **📊 Data Flow:**
+        - Daily cost exports to Sage
+        - Hourly labor updates
+        - Real-time material receipts
+        - Automated variance reporting
+        """)
+    
+    # Integration management buttons
+    st.markdown("#### 🛠️ Integration Management")
+    
+    int_col1, int_col2, int_col3, int_col4 = st.columns(4)
+    
+    with int_col1:
+        if st.button("🔄 Sync Now", use_container_width=True):
+            st.success("✅ Manual sync initiated with Sage 300")
+    
+    with int_col2:
+        if st.button("📋 Integration Logs", use_container_width=True):
+            st.info("📊 Integration activity logs would display here")
+    
+    with int_col3:
+        if st.button("⚙️ Configure", use_container_width=True):
+            st.info("🔧 Integration configuration panel would open")
+    
+    with int_col4:
+        if st.button("📊 Reports", use_container_width=True):
+            st.info("📈 Integration performance reports available")
+    
+    # API endpoints and webhook status
+    st.markdown("#### 🌐 API & Webhook Status")
+    
+    api_status = [
+        {"Service": "Sage 300 API", "Status": "✅ Active", "Last_Call": "2 minutes ago", "Response_Time": "245ms"},
+        {"Service": "Procore Webhook", "Status": "✅ Active", "Last_Event": "8 minutes ago", "Response_Time": "180ms"},
+        {"Service": "QuickBooks API", "Status": "✅ Active", "Last_Sync": "15 minutes ago", "Response_Time": "320ms"},
+        {"Service": "Material Suppliers", "Status": "✅ Active", "Last_Update": "1 hour ago", "Response_Time": "156ms"}
+    ]
+    
+    status_df = pd.DataFrame(api_status)
+    st.dataframe(status_df, use_container_width=True)
 
 if __name__ == "__main__":
     render_unit_prices()

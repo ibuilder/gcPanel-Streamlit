@@ -413,13 +413,6 @@ def render_sidebar():
                         st.session_state.current_menu = module
                         st.rerun()
         
-        # Admin Settings (admin only)
-        if user_role == "admin":
-            st.markdown("### ⚙️ Administration")
-            if st.button("🔧 Admin Settings", key="admin_settings", use_container_width=True):
-                st.session_state.current_menu = "Admin Settings"
-                st.rerun()
-        
         # Theme toggle and logout
         st.markdown("---")
         current_theme = "🌙 Dark Mode" if st.session_state.theme == "light" else "☀️ Light Mode"
@@ -427,6 +420,26 @@ def render_sidebar():
             st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
             apply_theme()
             st.rerun()
+        
+        # Admin Settings (admin only) - Moved to bottom
+        if user_role == "admin":
+            st.markdown("---")
+            st.markdown("### ⚙️ Administration")
+            admin_buttons = [
+                ("👥 User Management", "User Management"),
+                ("🔐 Security Settings", "Security Settings"),
+                ("📊 System Analytics", "System Analytics"),
+                ("🗄️ Database Admin", "Database Admin"),
+                ("🔧 System Settings", "System Settings"),
+                ("📋 Audit Logs", "Audit Logs"),
+                ("🔄 Backup & Restore", "Backup & Restore"),
+                ("🚀 Deployment", "Deployment")
+            ]
+            
+            for display_name, admin_module in admin_buttons:
+                if st.button(display_name, key=f"admin_{admin_module}", use_container_width=True):
+                    st.session_state.current_menu = admin_module
+                    st.rerun()
         
         if st.button("🚪 Logout", use_container_width=True, type="secondary"):
             st.session_state.authenticated = False
@@ -1796,7 +1809,8 @@ def render_daily_reports():
             st.plotly_chart(fig_cost, use_container_width=True)
         
         with cost_col2:
-            fig_productivity = px.gauge(
+            fig_productivity = go.Figure(go.Indicator(
+                mode = "gauge+number",
                 value=94.2,
                 title="⚡ Overall Productivity Score",
                 domain={'x': [0, 1], 'y': [0, 1]},
@@ -1810,7 +1824,7 @@ def render_daily_reports():
                                 {'range': [80, 100], 'color': 'lightgreen'}],
                        'threshold': {'line': {'color': "red", 'width': 4},
                                    'thickness': 0.75, 'value': 90}}
-            )
+            ))
             st.plotly_chart(fig_productivity, use_container_width=True)
     
     with tab5:

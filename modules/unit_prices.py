@@ -40,13 +40,13 @@ def render_unit_prices():
     with tab3:
         render_equipment_pricing()
     
-    with tab3:
+    with tab4:
         render_labor_pricing()
     
-    with tab4:
+    with tab5:
         render_pricing_analytics()
     
-    with tab5:
+    with tab6:
         render_cost_integrations()
 
 def render_materials_pricing():
@@ -413,6 +413,47 @@ def render_pricing_analytics():
     fig_variance.update_layout(template="plotly_dark")
     
     st.plotly_chart(fig_variance, use_container_width=True)
+
+def render_material_management():
+    """Comprehensive Material Management integrated with Unit Prices"""
+    st.subheader("📦 Material Management & Inventory")
+    st.markdown("**Real-time inventory tracking integrated with cost analysis**")
+    
+    # Material Overview Dashboard
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Materials On-Site", "847 items", "+23 today")
+    with col2:
+        st.metric("Pending Deliveries", "156 items", "3 delayed")
+    with col3:
+        st.metric("Monthly Consumption", "$285K", "+12% vs plan")
+    with col4:
+        st.metric("Waste Percentage", "2.1%", "-0.3% vs target")
+    
+    # Material Categories with integrated pricing
+    st.markdown("### 🏗️ Material Categories & Current Pricing")
+    
+    material_data = pd.DataFrame({
+        'Category': ['Structural Steel', 'Concrete', 'Rebar', 'Electrical', 'Plumbing', 'Insulation'],
+        'On-Site Qty': [285, 450, 180, 320, 165, 90],
+        'Unit Price': ['$2.85/lb', '$125/cy', '$0.95/lb', '$285/item', '$165/item', '$3.20/sf'],
+        'Total Value': ['$45,200', '$56,250', '$18,900', '$91,200', '$27,225', '$28,800'],
+        'Status': ['In Stock', 'Low Stock', 'In Stock', 'In Stock', 'Critical', 'In Stock']
+    })
+    
+    st.dataframe(material_data, use_container_width=True)
+    
+    # Quick Actions
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("📥 Receive Materials", use_container_width=True):
+            st.success("Material receiving interface opened")
+    with col2:
+        if st.button("📊 Cost Analysis", use_container_width=True):
+            st.success("Detailed cost breakdown available")
+    with col3:
+        if st.button("🚛 Request Delivery", use_container_width=True):
+            st.success("Delivery request form opened")
 
 def render_cost_integrations():
     """Integration with accounting systems and cost management tools"""

@@ -1264,142 +1264,35 @@ def render_dashboard():
             st.session_state.current_menu = "Quality Control"
             st.rerun()
     
-    # Live Activity Feed - Highland Tower Development
-    st.markdown("### 🔔 Highland Tower Development - Recent Activity")
+    # Live Activity Feed
+    st.markdown("### 🔔 Live Project Feed")
     
-    # Enhanced activity feed with better styling
+    # Real-time activity simulation
+    import datetime
+    now = datetime.datetime.now()
+    
     activities = [
-        {
-            "icon": "📊", 
-            "type": "Daily Report", 
-            "message": "Daily Progress Report #147 submitted: Level 13 steel erection 85% complete", 
-            "time": "12 minutes ago",
-            "priority": "SUCCESS",
-            "link": "Daily Reports"
-        },
-        {
-            "icon": "🚨", 
-            "type": "RFI", 
-            "message": "RFI-HTD-089: Structural beam connection detail needed for Level 13 Grid E4", 
-            "time": "25 minutes ago",
-            "priority": "HIGH",
-            "link": "RFIs"
-        },
-        {
-            "icon": "✅", 
-            "type": "Inspection", 
-            "message": "Quality Control: Zone C electrical rough-in inspection passed with approval", 
-            "time": "1 hour ago",
-            "priority": "SUCCESS",
-            "link": "Quality Control"
-        },
-        {
-            "icon": "💰", 
-            "type": "Cost Alert", 
-            "message": "Budget variance alert: Steel materials 3.2% over budget this week", 
-            "time": "2 hours ago",
-            "priority": "WARNING",
-            "link": "Cost Management"
-        },
-        {
-            "icon": "📸", 
-            "type": "Progress Photo", 
-            "message": "Progress photos uploaded: Level 12 interior framing completion documented", 
-            "time": "3 hours ago",
-            "priority": "INFO",
-            "link": "Progress Photos"
-        },
-        {
-            "icon": "🎉", 
-            "type": "Milestone", 
-            "message": "Major milestone achieved: Level 11 MEP rough-in 100% complete", 
-            "time": "4 hours ago",
-            "priority": "SUCCESS",
-            "link": "Scheduling"
-        },
-        {
-            "icon": "👷", 
-            "type": "Crew Update", 
-            "message": "Crew assignment: Team Delta moved to Level 14 preparation work", 
-            "time": "5 hours ago",
-            "priority": "INFO",
-            "link": "Field Operations"
-        },
-        {
-            "icon": "🔍", 
-            "type": "Quality Issue", 
-            "message": "Quality checkpoint: Minor concrete finish touch-up needed Unit 1205", 
-            "time": "6 hours ago",
-            "priority": "WARNING",
-            "link": "Quality Control"
-        }
+        ("🚨", "HIGH", "RFI-2025-089: Structural beam connection detail needed for Level 13", "2 minutes ago"),
+        ("✅", "SUCCESS", "Daily report completed: Zone C electrical rough-in inspection passed", "15 minutes ago"),
+        ("💰", "WARNING", "Cost variance alert: Steel materials 3.2% over budget this week", "28 minutes ago"),
+        ("📸", "INFO", "Progress photos uploaded: Level 12 interior framing completion", "45 minutes ago"),
+        ("🎉", "SUCCESS", "Milestone achieved: Level 11 MEP rough-in 100% complete", "1 hour ago"),
+        ("👷", "INFO", "Crew assignment: Team Delta moved to Level 14 preparation work", "2 hours ago"),
+        ("🔍", "WARNING", "Quality checkpoint: Minor concrete finish touch-up needed Unit 1205", "3 hours ago"),
+        ("📦", "INFO", "Material delivery confirmed: Curtain wall panels Level 8-10 arriving Thursday", "4 hours ago"),
+        ("⚡", "INFO", "MEP coordination meeting completed: Electrical/plumbing conflicts resolved", "5 hours ago"),
+        ("🚛", "SUCCESS", "Equipment delivery: Tower crane maintenance completed ahead of schedule", "6 hours ago")
     ]
     
-    # Create styled activity cards
-    for activity in activities:
-        # Color coding for different priorities
-        if activity["priority"] == "HIGH":
-            border_color = "#dc3545"
-            bg_color = "#f8d7da"
-        elif activity["priority"] == "WARNING":
-            border_color = "#ffc107"
-            bg_color = "#fff3cd"
-        elif activity["priority"] == "SUCCESS":
-            border_color = "#28a745"
-            bg_color = "#d4edda"
+    for icon, priority, message, time in activities:
+        if priority == "HIGH":
+            st.error(f"{icon} **{message}** - *{time}*")
+        elif priority == "WARNING":
+            st.warning(f"{icon} **{message}** - *{time}*")
+        elif priority == "SUCCESS":
+            st.success(f"{icon} **{message}** - *{time}*")
         else:
-            border_color = "#17a2b8"
-            bg_color = "#d1ecf1"
-        
-        # Create clickable activity cards
-        col1, col2 = st.columns([1, 20])
-        
-        with col1:
-            st.markdown(f"""
-            <div style="width: 40px; height: 40px; border-radius: 50%; 
-                       background-color: {bg_color}; border: 2px solid {border_color};
-                       display: flex; align-items: center; justify-content: center; 
-                       font-size: 18px; margin: 5px 0;">
-                {activity['icon']}
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col2:
-            st.markdown(f"""
-            <div style="background-color: {bg_color}; border-left: 4px solid {border_color}; 
-                       padding: 12px; margin: 5px 0; border-radius: 0 8px 8px 0;">
-                <div style="font-weight: 600; color: #333; margin-bottom: 4px;">
-                    {activity['type']}: {activity['message']}
-                </div>
-                <div style="font-size: 12px; color: #666;">
-                    {activity['time']} • Click to view in {activity['link']}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Make activity clickable
-            if st.button(f"View {activity['type']}", key=f"activity_{activity['link']}", help=f"Go to {activity['link']} module"):
-                st.session_state.current_menu = activity['link']
-                st.rerun()
-    
-    # Quick access to Daily Reports
-    st.markdown("---")
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        if st.button("📊 View All Daily Reports", type="primary", use_container_width=True):
-            st.session_state.current_menu = "Daily Reports"
-            st.rerun()
-    
-    with col2:
-        if st.button("📋 Recent Reports Archive", use_container_width=True):
-            st.session_state.current_menu = "Recent Reports"
-            st.rerun()
-    
-    with col3:
-        if st.button("📈 Progress Analytics", use_container_width=True):
-            st.session_state.current_menu = "Analytics"
-            st.rerun()
+            st.info(f"{icon} **{message}** - *{time}*")
 
 def render_contracts():
     """Render comprehensive contracts management"""

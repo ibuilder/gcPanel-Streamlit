@@ -928,6 +928,106 @@ def render_cost_management():
                     title="Budget vs Actual by Category (Millions $)", barmode='group')
         st.plotly_chart(fig, use_container_width=True)
 
+def render_recent_reports():
+    """Recent Daily Reports Management"""
+    st.markdown("### 📋 Recent Daily Reports")
+    st.markdown("**View and manage your submitted daily reports**")
+    
+    # Filter controls
+    filter_col1, filter_col2, filter_col3 = st.columns(3)
+    with filter_col1:
+        date_filter = st.selectbox("Time Period", ["Last 7 Days", "Last 30 Days", "This Month", "All Reports"])
+    with filter_col2:
+        super_filter = st.selectbox("Superintendent", ["All", "John Smith", "Sarah Johnson", "Mike Rodriguez"])
+    with filter_col3:
+        status_filter = st.selectbox("Status", ["All", "Complete", "Pending Review", "Draft"])
+    
+    # Recent reports data from your project
+    reports = [
+        {
+            "Date": "2025-01-25", "Super": "John Smith", "Workers": 45, "Weather": "Clear, 72°F",
+            "Work": "Level 13 concrete pour - 185 CY completed, steel delivery received",
+            "Issues": "None - ahead of schedule", "Status": "✅ Complete", "Time": "5:30 PM"
+        },
+        {
+            "Date": "2025-01-24", "Super": "Sarah Johnson", "Workers": 48, "Weather": "Cloudy, 68°F", 
+            "Work": "Steel erection Level 14 - 12 tons installed, MEP rough-in Level 12",
+            "Issues": "Elevator shaft work delayed 1 hour", "Status": "✅ Complete", "Time": "6:15 PM"
+        },
+        {
+            "Date": "2025-01-23", "Super": "Mike Rodriguez", "Workers": 52, "Weather": "Clear, 75°F",
+            "Work": "Curtain wall south facade installation - 40% complete", 
+            "Issues": "Material delivery 2 hour delay", "Status": "✅ Complete", "Time": "5:45 PM"
+        },
+        {
+            "Date": "2025-01-22", "Super": "John Smith", "Workers": 47, "Weather": "Light Rain, 65°F",
+            "Work": "Interior framing Levels 10-11, electrical rough-in progress",
+            "Issues": "Rain delay 3 hours morning shift", "Status": "✅ Complete", "Time": "7:00 PM"
+        },
+        {
+            "Date": "2025-01-21", "Super": "Sarah Johnson", "Workers": 44, "Weather": "Overcast, 70°F",
+            "Work": "Plumbing rough-in Level 12, HVAC ductwork Level 11",
+            "Issues": "None", "Status": "✅ Complete", "Time": "5:50 PM"
+        }
+    ]
+    
+    # Display reports
+    for report in reports:
+        with st.expander(f"{report['Status']} {report['Date']} - {report['Super']} ({report['Workers']} workers)"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown(f"""
+                **📋 Report Details:**
+                - **Date:** {report['Date']}
+                - **Superintendent:** {report['Super']}
+                - **Workers:** {report['Workers']}
+                - **Submitted:** {report['Time']}
+                """)
+            
+            with col2:
+                st.markdown(f"""
+                **🌤️ Conditions & Status:**
+                - **Weather:** {report['Weather']}
+                - **Status:** {report['Status']}
+                """)
+            
+            st.markdown(f"""
+            **🏗️ Work Performed:**
+            {report['Work']}
+            
+            **⚠️ Issues/Notes:**
+            {report['Issues']}
+            """)
+            
+            # Action buttons
+            btn_col1, btn_col2, btn_col3, btn_col4 = st.columns(4)
+            with btn_col1:
+                if st.button(f"👁️ View Full", key=f"view_{report['Date']}", use_container_width=True):
+                    st.success(f"Opening detailed view for {report['Date']}")
+            with btn_col2:
+                if st.button(f"✏️ Edit", key=f"edit_{report['Date']}", use_container_width=True):
+                    st.info(f"Opening edit mode for {report['Date']}")
+            with btn_col3:
+                if st.button(f"📧 Send", key=f"send_{report['Date']}", use_container_width=True):
+                    st.success("Report sent to stakeholders")
+            with btn_col4:
+                if st.button(f"📥 PDF", key=f"pdf_{report['Date']}", use_container_width=True):
+                    st.info("Generating PDF...")
+    
+    # Summary metrics
+    st.markdown("---")
+    st.markdown("### 📊 Reports Summary")
+    metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
+    with metric_col1:
+        st.metric("Reports This Week", "5", "100% submitted")
+    with metric_col2:
+        st.metric("Avg Workers/Day", "47", "+3 vs last week")
+    with metric_col3:
+        st.metric("Weather Delays", "1", "3 hours total")
+    with metric_col4:
+        st.metric("Issues Reported", "2", "Minor delays only")
+
 def render_daily_reports():
     """Advanced Daily Reporting with automated data collection"""
     st.title("📊 Daily Reports - Project Progress Documentation")

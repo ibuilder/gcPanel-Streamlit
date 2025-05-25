@@ -42,11 +42,21 @@ def apply_highland_tower_styling():
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
     }
 
-    /* Container Styling */
+    /* Container Styling - Production Optimized */
     .main .block-container {
         max-width: 1400px !important;
-        padding: 2rem 3rem !important;
+        padding: 1.5rem 2rem !important;
         background-color: transparent !important;
+        margin: 0 auto !important;
+    }
+    
+    /* Remove extra spacing for production */
+    .element-container {
+        margin-bottom: 1rem !important;
+    }
+    
+    .stMarkdown {
+        margin-bottom: 0.5rem !important;
     }
 
     /* Professional Header */

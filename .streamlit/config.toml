@@ -3,18 +3,13 @@ headless = true
 address = "0.0.0.0"
 port = 5000
 enableCORS = false
-enableXsrfProtection = true
+enableXsrfProtection = false
 
-[global]
-developmentMode = false
-unitTest = false
+[theme]
+primaryColor = "#1e40af"
+backgroundColor = "#f9fafb"
+secondaryBackgroundColor = "#e5e7eb"
+textColor = "#111827"
 
 [browser]
 gatherUsageStats = false
-
-[theme]
-base = "light"
-
-[client]
-toolbarMode = "minimal"
-showErrorDetails = false

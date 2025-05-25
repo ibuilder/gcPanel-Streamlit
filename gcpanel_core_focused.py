@@ -1604,17 +1604,18 @@ def render_daily_reports():
     st.title("📊 Highland Tower Daily Reports")
     st.markdown("**🎯 Advanced AI-Powered Field Reporting System**")
     
-    # Real-time project status bar
-    st.markdown("""
-    <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 1rem; border-radius: 12px; margin-bottom: 2rem;">
-        <div style="display: flex; justify-content: space-between; color: white;">
-            <div><strong>📍 Highland Tower Development</strong></div>
-            <div><strong>🏗️ Level 13 Active</strong></div>
-            <div><strong>👷 89 Workers</strong></div>
-            <div><strong>🌤️ 72°F Clear</strong></div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    # Real-time project status bar using native Streamlit components
+    with st.container():
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.info("📍 Highland Tower Development")
+        with col2:
+            st.info("🏗️ Level 13 Active")
+        with col3:
+            st.info("👷 89 Workers")
+        with col4:
+            st.info("🌤️ 72°F Clear")
     
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "🚀 Smart Report", "📱 Mobile Capture", "🤖 AI Insights", "📊 Analytics", "🔄 Live Feed"

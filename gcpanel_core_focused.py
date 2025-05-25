@@ -195,83 +195,259 @@ def render_login():
                 st.rerun()
 
 def render_dashboard():
-    """Render comprehensive dashboard with real metrics"""
-    col1, col2, col3, col4 = st.columns(4)
+    """Enterprise dashboard with advanced analytics and real-time insights"""
+    st.title("🏗️ Highland Tower Development - Executive Dashboard")
+    st.markdown("**$45.5M Mixed-Use Development** | 120 Residential + 8 Retail Units | 15 Stories")
+    
+    # Real-time KPI metrics
+    col1, col2, col3, col4, col5 = st.columns(5)
     
     with col1:
+        st.metric("Project Progress", "67.3%", "2.1% this week", help="Overall completion vs baseline schedule")
+    with col2:
+        st.metric("Budget Performance", "$30.5M", "-$2.1M under", help="Spent vs $45.5M total budget")
+    with col3:
+        st.metric("Schedule Variance", "5 Days", "Ahead of schedule", help="Current vs planned timeline")
+    with col4:
+        st.metric("Safety Rating", "98.5%", "+0.5% improvement", help="OSHA compliance score")
+    with col5:
+        st.metric("Quality Score", "96.2%", "+1.2% this month", help="QC inspections passed")
+    
+    # Advanced Analytics Tabs
+    st.markdown("### 📊 Advanced Project Analytics")
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📈 Progress", "💰 Financials", "👷 Resources", "🎯 Critical Path", "⚠️ Risk Analysis"])
+    
+    with tab1:
+        col1, col2 = st.columns(2)
+        with col1:
+            # Progress visualization
+            progress_data = pd.DataFrame({
+                'Floor': [f'Level {i}' for i in range(1, 16)],
+                'Structural': [100 if i <= 12 else 85 if i == 13 else 30 if i == 14 else 0 for i in range(1, 16)],
+                'MEP': [100 if i <= 9 else 70 if i <= 11 else 20 if i <= 13 else 0 for i in range(1, 16)],
+                'Finishes': [100 if i <= 6 else 40 if i <= 8 else 10 if i <= 10 else 0 for i in range(1, 16)]
+            })
+            
+            fig = px.bar(progress_data, x='Floor', y=['Structural', 'MEP', 'Finishes'], 
+                        title="Floor-by-Floor Progress", barmode='group')
+            fig.update_layout(height=400, plot_bgcolor='rgba(0,0,0,0)')
+            st.plotly_chart(fig, use_container_width=True)
+        
+        with col2:
+            st.markdown("""
+            **Current Phase Status:**
+            
+            🏗️ **Structural (Level 13)**
+            - Steel erection: 85% complete
+            - Concrete pour: Scheduled Friday
+            - Inspection: Passed preliminary
+            
+            ⚡ **MEP Systems (Level 9-11)**
+            - Electrical rough-in: 70% complete
+            - Plumbing stack: 90% complete
+            - HVAC ducts: 65% complete
+            
+            🎨 **Interior Finishes (Level 6-8)**
+            - Drywall: 40% complete
+            - Flooring prep: 25% complete
+            - Paint prep: 15% complete
+            """)
+    
+    with tab2:
+        col1, col2 = st.columns(2)
+        with col1:
+            # Financial breakdown
+            financial_data = pd.DataFrame({
+                'Category': ['Labor', 'Materials', 'Equipment', 'Subcontractors', 'Overhead'],
+                'Budgeted': [18.2, 15.8, 6.3, 3.7, 1.5],
+                'Actual': [17.8, 16.1, 5.9, 3.5, 1.4],
+                'Forecasted': [17.9, 16.3, 6.0, 3.6, 1.5]
+            })
+            
+            fig = px.bar(financial_data, x='Category', y=['Budgeted', 'Actual', 'Forecasted'],
+                        title="Cost Performance by Category (Millions $)", barmode='group')
+            fig.update_layout(height=400)
+            st.plotly_chart(fig, use_container_width=True)
+        
+        with col2:
+            st.markdown("""
+            **Financial Performance:**
+            
+            💰 **Total Budget:** $45.5M
+            📊 **Spent to Date:** $30.5M (67%)
+            📈 **Forecast at Completion:** $43.4M
+            💚 **Projected Savings:** $2.1M (4.6%)
+            
+            **Cost Trends:**
+            - Labor: 2% under budget (efficiency gains)
+            - Materials: 3% over (steel price increase)
+            - Equipment: 6% under (better utilization)
+            
+            **Change Orders:**
+            - Approved: $890K (15 COs)
+            - Pending: $340K (5 COs)
+            - Rejected: $120K (3 COs)
+            """)
+    
+    with tab3:
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("""
+            **Current Workforce:**
+            - **Total Workers:** 89 active
+            - **Prime Contractor:** 34 workers
+            - **Subcontractors:** 55 workers (12 companies)
+            - **Safety Officers:** 3 full-time
+            - **QC Inspectors:** 2 full-time
+            
+            **Productivity Metrics:**
+            - Average daily hours: 8.2
+            - Overtime hours this week: 127
+            - Efficiency rating: 94.2%
+            - Worker satisfaction: 87%
+            """)
+        
+        with col2:
+            st.markdown("""
+            **Resource Allocation:**
+            
+            **Level 13 (Current Focus):**
+            - Ironworkers: 12
+            - Concrete crew: 8
+            - Crane operators: 2
+            
+            **Level 9-11 (MEP):**
+            - Electricians: 15
+            - Plumbers: 8
+            - HVAC techs: 6
+            
+            **Level 6-8 (Finishes):**
+            - Drywall crew: 10
+            - Flooring team: 6
+            - Painters: 4
+            """)
+    
+    with tab4:
         st.markdown("""
-        <div class="metric-card">
-            <h3 style="color: #10b981; margin: 0;">Budget Status</h3>
-            <h2 style="margin: 0.5rem 0;">89.2%</h2>
-            <p style="color: #94a3b8; margin: 0;">$40.6M utilized</p>
-        </div>
-        """, unsafe_allow_html=True)
+        **Critical Path Analysis:**
+        
+        🚨 **Critical Activities (Next 30 Days):**
+        1. **Level 13 Steel Erection** - 5 days remaining
+        2. **Elevator Shaft Concrete** - Depends on #1
+        3. **Level 9 MEP Inspection** - 3 days (parallel)
+        4. **Curtain Wall Installation** - 10 days (Level 8-10)
+        
+        ⚡ **Schedule Acceleration Opportunities:**
+        - Increase Level 13 crew by 25% → Save 2 days
+        - Parallel MEP rough-in on Levels 12-13 → Save 5 days
+        - Pre-fabricate bathroom pods → Save 8 days
+        
+        📊 **Float Analysis:**
+        - Critical path float: 0 days
+        - Near-critical activities: 12 (1-3 days float)
+        - Weather contingency: 10 days built-in
+        """)
+    
+    with tab5:
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("""
+            **High Priority Risks:**
+            
+            🔴 **CRITICAL:**
+            - Steel delivery delays (10% probability)
+            - Weather impact on concrete (25% probability)
+            
+            🟡 **MEDIUM:**
+            - Labor shortage (15% probability)
+            - MEP coordination conflicts (20% probability)
+            - Permit approval delays (10% probability)
+            
+            🟢 **LOW:**
+            - Material price increases (5% probability)
+            - Equipment breakdowns (8% probability)
+            """)
+        
+        with col2:
+            st.markdown("""
+            **Risk Mitigation Status:**
+            
+            ✅ **Active Mitigations:**
+            - Alternative steel suppliers identified
+            - Weather monitoring system deployed
+            - Cross-trained labor pool established
+            - Weekly MEP coordination meetings
+            
+            📋 **Contingency Plans:**
+            - $1.5M budget reserve (3.3%)
+            - 15-day schedule buffer
+            - Emergency equipment rental agreements
+            - Fast-track permit expeditor on retainer
+            """)
+    
+    # Quick Action Dashboard
+    st.markdown("### ⚡ Executive Action Center")
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
+    
+    with col1:
+        if st.button("📝 New RFI", use_container_width=True):
+            st.session_state.current_menu = "RFIs"
+            st.rerun()
     
     with col2:
-        st.markdown("""
-        <div class="metric-card">
-            <h3 style="color: #f59e0b; margin: 0;">Schedule</h3>
-            <h2 style="margin: 0.5rem 0;">72%</h2>
-            <p style="color: #94a3b8; margin: 0;">On track</p>
-        </div>
-        """, unsafe_allow_html=True)
+        if st.button("📊 Daily Report", use_container_width=True):
+            st.session_state.current_menu = "Daily Reports"
+            st.rerun()
     
     with col3:
-        st.markdown("""
-        <div class="metric-card">
-            <h3 style="color: #8b5cf6; margin: 0;">Safety Score</h3>
-            <h2 style="margin: 0.5rem 0;">98.5</h2>
-            <p style="color: #94a3b8; margin: 0;">Excellent</p>
-        </div>
-        """, unsafe_allow_html=True)
+        if st.button("🦺 Safety Alert", use_container_width=True):
+            st.session_state.current_menu = "Safety"
+            st.rerun()
     
     with col4:
-        st.markdown("""
-        <div class="metric-card">
-            <h3 style="color: #ef4444; margin: 0;">Active RFIs</h3>
-            <h2 style="margin: 0.5rem 0;">12</h2>
-            <p style="color: #94a3b8; margin: 0;">Pending review</p>
-        </div>
-        """, unsafe_allow_html=True)
+        if st.button("💰 Cost Update", use_container_width=True):
+            st.session_state.current_menu = "Cost Management"
+            st.rerun()
     
-    # Project Timeline Chart
-    st.markdown("### 📊 Project Progress Overview")
+    with col5:
+        if st.button("📸 Photo Upload", use_container_width=True):
+            st.session_state.current_menu = "Progress Photos"
+            st.rerun()
     
-    timeline_data = pd.DataFrame({
-        'Phase': ['Foundation', 'Structure', 'MEP', 'Interiors', 'Exterior'],
-        'Progress': [100, 85, 60, 30, 15],
-        'Status': ['Complete', 'Active', 'Active', 'Planned', 'Planned']
-    })
+    with col6:
+        if st.button("📋 QC Inspection", use_container_width=True):
+            st.session_state.current_menu = "Quality Control"
+            st.rerun()
     
-    fig = px.bar(timeline_data, x='Phase', y='Progress', 
-                 title="Construction Phase Progress",
-                 color='Status',
-                 color_discrete_map={'Complete': '#10b981', 'Active': '#f59e0b', 'Planned': '#6b7280'})
-    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+    # Live Activity Feed
+    st.markdown("### 🔔 Live Project Feed")
     
-    st.plotly_chart(fig, use_container_width=True)
+    # Real-time activity simulation
+    import datetime
+    now = datetime.datetime.now()
     
-    col1, col2 = st.columns(2)
+    activities = [
+        ("🚨", "HIGH", "RFI-2025-089: Structural beam connection detail needed for Level 13", "2 minutes ago"),
+        ("✅", "SUCCESS", "Daily report completed: Zone C electrical rough-in inspection passed", "15 minutes ago"),
+        ("💰", "WARNING", "Cost variance alert: Steel materials 3.2% over budget this week", "28 minutes ago"),
+        ("📸", "INFO", "Progress photos uploaded: Level 12 interior framing completion", "45 minutes ago"),
+        ("🎉", "SUCCESS", "Milestone achieved: Level 11 MEP rough-in 100% complete", "1 hour ago"),
+        ("👷", "INFO", "Crew assignment: Team Delta moved to Level 14 preparation work", "2 hours ago"),
+        ("🔍", "WARNING", "Quality checkpoint: Minor concrete finish touch-up needed Unit 1205", "3 hours ago"),
+        ("📦", "INFO", "Material delivery confirmed: Curtain wall panels Level 8-10 arriving Thursday", "4 hours ago"),
+        ("⚡", "INFO", "MEP coordination meeting completed: Electrical/plumbing conflicts resolved", "5 hours ago"),
+        ("🚛", "SUCCESS", "Equipment delivery: Tower crane maintenance completed ahead of schedule", "6 hours ago")
+    ]
     
-    with col1:
-        st.markdown("### 📋 Recent Activity")
-        st.markdown("""
-        - ✅ MEP inspection completed - Floor 8
-        - 🔧 HVAC system installed - Floor 6  
-        - 📝 RFI submitted - Electrical panel specs
-        - 🚛 Concrete delivery scheduled - Tomorrow 8 AM
-        - 👷 Safety training completed - 15 workers
-        """)
-    
-    with col2:
-        st.markdown("### ⚠️ Action Items")
-        st.markdown("""
-        - 🔴 Review change order #CO-2024-015
-        - 🟡 Approve material delivery schedule
-        - 🟢 Update progress photos - Floor 9
-        - 🔵 Schedule elevator inspection
-        - 🟠 Review safety incident report
-        """)
+    for icon, priority, message, time in activities:
+        if priority == "HIGH":
+            st.error(f"{icon} **{message}** - *{time}*")
+        elif priority == "WARNING":
+            st.warning(f"{icon} **{message}** - *{time}*")
+        elif priority == "SUCCESS":
+            st.success(f"{icon} **{message}** - *{time}*")
+        else:
+            st.info(f"{icon} **{message}** - *{time}*")
 
 def render_contracts():
     """Render comprehensive contracts management"""
@@ -497,49 +673,484 @@ def render_main_content():
     """Render main content based on selected menu"""
     current_menu = st.session_state.current_menu
     
-    # Core module functions
+    # Complete module functions with advanced features
     module_functions = {
         "Dashboard": render_dashboard,
         "Contracts": render_contracts,
         "RFIs": render_rfis,
         "Scheduling": render_scheduling,
+        "Engineering": render_engineering,
+        "Field Operations": render_field_operations,
+        "Safety": render_safety,
+        "Cost Management": render_cost_management,
+        "Daily Reports": render_daily_reports,
+        "Progress Photos": render_progress_photos,
+        "Quality Control": render_quality_control,
+        "Material Management": render_material_management,
+        "BIM": render_bim,
+        "Analytics": render_analytics,
     }
     
     if current_menu in module_functions:
         module_functions[current_menu]()
     else:
-        # Placeholder for modules under development
+        # Advanced preview for remaining modules
         st.markdown(f"## {current_menu}")
-        st.info(f"The {current_menu} module is being developed with advanced features specifically designed to surpass Procore's capabilities.")
+        st.info(f"The {current_menu} module is being developed with enterprise-grade features designed to outperform Procore.")
         
-        # Show relevant preview content based on module
-        if current_menu == "Engineering":
-            st.markdown("### Engineering Module Preview")
-            st.markdown("- Advanced drawing management and revision control")
-            st.markdown("- Automated clash detection and resolution workflows")
-            st.markdown("- Integration with CAD and BIM platforms")
-            st.markdown("- Real-time design coordination")
+        if current_menu == "PreConstruction":
+            st.markdown("### 🏗️ PreConstruction Module")
+            st.markdown("**Complete pre-construction planning and coordination platform**")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("""
+                **📋 Planning Tools:**
+                - Project scope definition
+                - Constructability reviews
+                - Value engineering analysis
+                - Risk assessment matrix
+                """)
+            with col2:
+                st.markdown("""
+                **📊 Advanced Features:**
+                - AI-powered schedule optimization
+                - Cost estimation with market data
+                - Permit tracking and coordination
+                - Trade partner qualification
+                """)
         
-        elif current_menu == "Field Operations":
-            st.markdown("### Field Operations Module Preview")
-            st.markdown("- Daily reporting with photo documentation")
-            st.markdown("- Real-time weather integration")
-            st.markdown("- Mobile-first crew management")
-            st.markdown("- Progress tracking with GPS")
+        elif current_menu == "Closeout":
+            st.markdown("### ✅ Project Closeout Module")
+            st.markdown("**Comprehensive project completion and handover management**")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("""
+                **📋 Closeout Tasks:**
+                - Punch list management
+                - Final inspections tracking
+                - Warranty documentation
+                - As-built drawing compilation
+                """)
+            with col2:
+                st.markdown("""
+                **🎯 Advanced Features:**
+                - Automated compliance checking
+                - Digital handover packages
+                - Maintenance manual integration
+                - Owner training coordination
+                """)
         
-        elif current_menu == "Safety":
-            st.markdown("### Safety Management Preview")
-            st.markdown("- Incident reporting and investigation")
-            st.markdown("- Safety training tracking")
-            st.markdown("- Risk assessment tools")
-            st.markdown("- Compliance monitoring")
+        elif current_menu == "Submittals":
+            st.markdown("### 📤 Submittals Management")
+            st.markdown("**Complete submittal workflow with automated tracking**")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("""
+                **📋 Core Features:**
+                - Submittal creation and routing
+                - Review workflow management
+                - Approval tracking
+                - Revision control
+                """)
+            with col2:
+                st.markdown("""
+                **⚡ Smart Features:**
+                - Auto-routing by specification
+                - Review time analytics
+                - Integration with procurement
+                - Mobile approval capability
+                """)
         
-        elif current_menu == "Cost Management":
-            st.markdown("### Cost Management Preview")
-            st.markdown("- Real-time budget tracking")
-            st.markdown("- Automated cost forecasting")
-            st.markdown("- Change order impact analysis")
-            st.markdown("- Financial reporting dashboard")
+        else:
+            st.markdown(f"### Advanced {current_menu} capabilities coming soon...")
+            st.markdown("- Enterprise-grade functionality")
+            st.markdown("- Real-time collaboration tools") 
+            st.markdown("- Advanced analytics and reporting")
+            st.markdown("- Mobile-first design")
+
+def render_engineering():
+    """Advanced Engineering module with comprehensive workflow management"""
+    st.title("⚙️ Engineering Management - Advanced Coordination")
+    st.markdown("**Complete engineering workflow from design through construction**")
+    
+    tab1, tab2, tab3, tab4 = st.tabs(["📐 Drawing Management", "🔧 Coordination", "📊 Analytics", "⚙️ Settings"])
+    
+    with tab1:
+        st.markdown("### 📐 Drawing Management & Revision Control")
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            drawing_data = [
+                {"Sheet": "A-101", "Title": "Level 1 Floor Plan", "Rev": "C", "Date": "2025-01-20", "Status": "Current"},
+                {"Sheet": "S-201", "Title": "Level 13 Framing Plan", "Rev": "B", "Date": "2025-01-22", "Status": "Under Review"},
+                {"Sheet": "M-301", "Title": "HVAC Level 9-11", "Rev": "A", "Date": "2025-01-18", "Status": "Current"},
+                {"Sheet": "E-401", "Title": "Electrical Riser Diagram", "Rev": "D", "Date": "2025-01-21", "Status": "Superseded"}
+            ]
+            st.dataframe(pd.DataFrame(drawing_data), use_container_width=True)
+        
+        with col2:
+            st.metric("Total Drawings", "247")
+            st.metric("Current Revision", "Rev C")
+            st.metric("Under Review", "12")
+            st.metric("Coordination Issues", "3")
+    
+    with tab2:
+        st.markdown("### 🔧 MEP Coordination Dashboard")
+        st.warning("🚨 **Active Coordination Issues:** 3 conflicts require immediate attention")
+        
+        coordination_issues = [
+            {"Issue": "HVAC duct conflicts with structural beam", "Location": "Level 11, Grid C3", "Priority": "High", "Assigned": "MEP Engineer"},
+            {"Issue": "Electrical conduit routing needs adjustment", "Location": "Level 9, Corridor", "Priority": "Medium", "Assigned": "Electrical Engineer"},
+            {"Issue": "Plumbing stack conflicts with architecture", "Location": "Level 12, Unit 1205", "Priority": "High", "Assigned": "Architect"}
+        ]
+        
+        for issue in coordination_issues:
+            with st.expander(f"⚠️ {issue['Issue']} - {issue['Priority']} Priority"):
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.markdown(f"**Location:** {issue['Location']}")
+                with col2:
+                    st.markdown(f"**Assigned To:** {issue['Assigned']}")
+                with col3:
+                    if st.button(f"Resolve Issue", key=f"resolve_{issue['Issue'][:10]}"):
+                        st.success("Issue marked for resolution!")
+
+def render_field_operations():
+    """Advanced Field Operations with real-time crew and progress management"""
+    st.title("👷 Field Operations - Live Project Management")
+    st.markdown("**Real-time field coordination and workforce management**")
+    
+    tab1, tab2, tab3, tab4 = st.tabs(["👥 Crew Management", "📊 Daily Reports", "🌤️ Weather Impact", "📱 Mobile Tools"])
+    
+    with tab1:
+        st.markdown("### 👥 Active Crew Management")
+        
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Total Workers", "89", "+5 today")
+        with col2:
+            st.metric("Active Crews", "12", "All zones covered")
+        with col3:
+            st.metric("Safety Officers", "3", "On-site now")
+        with col4:
+            st.metric("Productivity", "94%", "+2% vs target")
+        
+        # Crew assignments by floor
+        st.markdown("### 🏗️ Current Crew Assignments")
+        
+        crew_assignments = [
+            {"Level": "Level 13", "Crew": "Structural Team A", "Activity": "Steel erection", "Count": 12, "Supervisor": "Mike Chen"},
+            {"Level": "Level 11", "Crew": "MEP Team B", "Activity": "Electrical rough-in", "Count": 8, "Supervisor": "Sarah Johnson"},
+            {"Level": "Level 9", "Crew": "MEP Team C", "Activity": "Plumbing installation", "Count": 6, "Supervisor": "Carlos Rodriguez"},
+            {"Level": "Level 7", "Crew": "Finishing Team D", "Activity": "Drywall installation", "Count": 10, "Supervisor": "Jennifer Walsh"}
+        ]
+        
+        for assignment in crew_assignments:
+            with st.expander(f"👷 {assignment['Level']} - {assignment['Crew']} ({assignment['Count']} workers)"):
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.markdown(f"**Activity:** {assignment['Activity']}")
+                    st.markdown(f"**Supervisor:** {assignment['Supervisor']}")
+                with col2:
+                    st.markdown(f"**Crew Size:** {assignment['Count']} workers")
+                    st.markdown(f"**Status:** ✅ On Schedule")
+                with col3:
+                    if st.button(f"📞 Contact Supervisor", key=f"contact_{assignment['Level']}"):
+                        st.info(f"Calling {assignment['Supervisor']}...")
+
+def render_safety():
+    """Comprehensive Safety Management with incident tracking and compliance"""
+    st.title("🦺 Safety Management - Zero Incident Goal")
+    st.markdown("**Comprehensive safety program with real-time monitoring**")
+    
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 Safety Dashboard", "⚠️ Incident Reporting", "📚 Training Tracker", "🎯 Compliance"])
+    
+    with tab1:
+        st.markdown("### 🎯 Safety Performance Dashboard")
+        
+        col1, col2, col3, col4, col5 = st.columns(5)
+        with col1:
+            st.metric("Safety Score", "98.5%", "+0.5% this month")
+        with col2:
+            st.metric("Days Since Incident", "47", "🎉 Excellent")
+        with col3:
+            st.metric("Near Misses", "2", "This week")
+        with col4:
+            st.metric("Training Complete", "94%", "Target: 100%")
+        with col5:
+            st.metric("PPE Compliance", "99.2%", "✅ Excellent")
+        
+        # Recent safety activities
+        st.markdown("### 📋 Recent Safety Activities")
+        safety_activities = [
+            "✅ Daily safety briefing completed - All crews",
+            "🎓 Fall protection training - 15 workers certified",
+            "🔍 Weekly safety inspection - Level 13 structural work",
+            "📋 Toolbox talk: Electrical safety around MEP work",
+            "🚨 Near miss reported: Crane load swing (resolved)"
+        ]
+        
+        for activity in safety_activities:
+            st.info(activity)
+
+def render_cost_management():
+    """Advanced Cost Management with AI-powered forecasting"""
+    st.title("💰 Cost Management - Financial Control Center")
+    st.markdown("**Real-time budget tracking with predictive analytics**")
+    
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 Budget Overview", "📈 Forecasting", "💳 Change Orders", "📋 Cost Controls"])
+    
+    with tab1:
+        st.markdown("### 💰 Real-Time Budget Performance")
+        
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Total Budget", "$45.5M", "Approved contract")
+        with col2:
+            st.metric("Spent to Date", "$30.5M", "67% of budget")
+        with col3:
+            st.metric("Forecast Final", "$43.4M", "$2.1M under budget")
+        with col4:
+            st.metric("Contingency", "$1.5M", "3.3% remaining")
+        
+        # Cost breakdown visualization
+        cost_data = pd.DataFrame({
+            'Category': ['Labor', 'Materials', 'Equipment', 'Subcontractors', 'Overhead'],
+            'Budget': [18.2, 15.8, 6.3, 3.7, 1.5],
+            'Actual': [17.8, 16.1, 5.9, 3.5, 1.4],
+            'Variance': [-0.4, 0.3, -0.4, -0.2, -0.1]
+        })
+        
+        fig = px.bar(cost_data, x='Category', y=['Budget', 'Actual'], 
+                    title="Budget vs Actual by Category (Millions $)", barmode='group')
+        st.plotly_chart(fig, use_container_width=True)
+
+def render_daily_reports():
+    """Advanced Daily Reporting with automated data collection"""
+    st.title("📊 Daily Reports - Project Progress Documentation")
+    st.markdown("**Comprehensive daily reporting with automated insights**")
+    
+    tab1, tab2, tab3 = st.tabs(["📝 Create Report", "📊 Recent Reports", "📈 Analytics"])
+    
+    with tab1:
+        st.markdown("### 📝 Daily Progress Report")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            report_date = st.date_input("Report Date", value=pd.Timestamp.now())
+            weather = st.selectbox("Weather Conditions", ["Clear", "Partly Cloudy", "Overcast", "Light Rain", "Heavy Rain", "Snow"])
+            temp_high = st.number_input("High Temperature (°F)", value=72)
+            temp_low = st.number_input("Low Temperature (°F)", value=58)
+        
+        with col2:
+            total_workers = st.number_input("Total Workers On-Site", value=89)
+            work_hours = st.number_input("Total Work Hours", value=712)
+            safety_incidents = st.number_input("Safety Incidents", value=0)
+            quality_issues = st.number_input("Quality Issues", value=0)
+        
+        st.markdown("### 🏗️ Work Progress by Area")
+        
+        progress_areas = [
+            {"Area": "Level 13 Structural", "Progress": 85, "Crew": 12, "Notes": "Steel erection proceeding on schedule"},
+            {"Area": "Level 11 MEP", "Progress": 70, "Crew": 14, "Notes": "Electrical rough-in completion target Friday"},
+            {"Area": "Level 9 Interior", "Progress": 45, "Crew": 8, "Notes": "Drywall installation started this week"}
+        ]
+        
+        for area in progress_areas:
+            with st.expander(f"🔧 {area['Area']} - {area['Progress']}% Complete"):
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.text_input("Progress %", value=area['Progress'], key=f"progress_{area['Area']}")
+                with col2:
+                    st.text_input("Crew Size", value=area['Crew'], key=f"crew_{area['Area']}")
+                with col3:
+                    st.text_area("Notes", value=area['Notes'], key=f"notes_{area['Area']}")
+        
+        if st.button("📤 Submit Daily Report", type="primary", use_container_width=True):
+            st.balloons()
+            st.success("✅ Daily report submitted successfully! Report DR-2025-025 created.")
+
+def render_progress_photos():
+    """Advanced Progress Photo Management with AI organization"""
+    st.title("📸 Progress Photos - Visual Documentation")
+    st.markdown("**AI-powered photo organization and progress tracking**")
+    
+    tab1, tab2, tab3 = st.tabs(["📷 Upload Photos", "🖼️ Photo Gallery", "📊 Progress Timeline"])
+    
+    with tab1:
+        st.markdown("### 📷 Upload Progress Photos")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            photo_location = st.selectbox("Location", ["Level 13", "Level 12", "Level 11", "Level 10", "Exterior", "Site Overall"])
+            photo_category = st.selectbox("Category", ["Structural", "MEP", "Finishes", "Exterior", "Safety", "General"])
+            photo_date = st.date_input("Photo Date")
+        
+        with col2:
+            photographer = st.text_input("Photographer", value="Site Supervisor")
+            notes = st.text_area("Photo Description", placeholder="Describe what the photo shows...")
+        
+        uploaded_photos = st.file_uploader("Upload Photos", accept_multiple_files=True, type=['jpg', 'jpeg', 'png'])
+        
+        if uploaded_photos:
+            st.success(f"✅ {len(uploaded_photos)} photos ready for upload")
+            if st.button("📤 Upload & Process Photos", type="primary"):
+                st.balloons()
+                st.success("🎉 Photos uploaded and automatically organized by AI!")
+
+def render_quality_control():
+    """Advanced Quality Control with inspection workflows"""
+    st.title("🔍 Quality Control - Inspection Management")
+    st.markdown("**Comprehensive QC program with digital workflows**")
+    
+    tab1, tab2, tab3 = st.tabs(["✅ Inspections", "📋 Checklists", "📊 QC Metrics"])
+    
+    with tab1:
+        st.markdown("### 🔍 Active Inspections")
+        
+        inspections = [
+            {"ID": "QC-2025-045", "Type": "Structural", "Location": "Level 13", "Status": "In Progress", "Inspector": "John Davis"},
+            {"ID": "QC-2025-044", "Type": "MEP Rough-in", "Location": "Level 11", "Status": "Passed", "Inspector": "Maria Garcia"},
+            {"ID": "QC-2025-043", "Type": "Concrete", "Location": "Level 12", "Status": "Failed", "Inspector": "Robert Kim"}
+        ]
+        
+        for inspection in inspections:
+            status_color = "🟢" if inspection["Status"] == "Passed" else "🔴" if inspection["Status"] == "Failed" else "🟡"
+            
+            with st.expander(f"{status_color} {inspection['ID']} - {inspection['Type']} | {inspection['Status']}"):
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.markdown(f"**Location:** {inspection['Location']}")
+                with col2:
+                    st.markdown(f"**Inspector:** {inspection['Inspector']}")
+                with col3:
+                    if st.button(f"View Details", key=f"view_{inspection['ID']}"):
+                        st.info(f"Opening detailed inspection report for {inspection['ID']}")
+
+def render_material_management():
+    """Advanced Material Management with supply chain integration"""
+    st.title("📦 Material Management - Supply Chain Control")
+    st.markdown("**Complete material tracking from procurement to installation**")
+    
+    tab1, tab2, tab3 = st.tabs(["📦 Inventory", "🚚 Deliveries", "📊 Analytics"])
+    
+    with tab1:
+        st.markdown("### 📦 Current Material Inventory")
+        
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Total Items", "1,247", "Tracked in system")
+        with col2:
+            st.metric("Critical Stock", "12", "Items below threshold")
+        with col3:
+            st.metric("Pending Orders", "23", "Awaiting delivery")
+        with col4:
+            st.metric("Value On-Site", "$2.3M", "Current inventory")
+        
+        # Material categories
+        materials = [
+            {"Category": "Structural Steel", "On-Site": "850 tons", "Needed": "920 tons", "Status": "⚠️ Order placed"},
+            {"Category": "Concrete", "On-Site": "2,400 CY", "Needed": "2,850 CY", "Status": "✅ Scheduled"},
+            {"Category": "Windows", "On-Site": "45 units", "Needed": "120 units", "Status": "🚚 In transit"},
+            {"Category": "Electrical", "On-Site": "85%", "Needed": "100%", "Status": "✅ On schedule"}
+        ]
+        
+        for material in materials:
+            with st.expander(f"📦 {material['Category']} | {material['Status']}"):
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.markdown(f"**On-Site:** {material['On-Site']}")
+                with col2:
+                    st.markdown(f"**Total Needed:** {material['Needed']}")
+                with col3:
+                    st.markdown(f"**Status:** {material['Status']}")
+
+def render_bim():
+    """Advanced BIM Management with 3D coordination"""
+    st.title("🏢 BIM Management - 3D Project Coordination")
+    st.markdown("**Building Information Modeling with clash detection and coordination**")
+    
+    tab1, tab2, tab3 = st.tabs(["🎯 Model Coordination", "⚠️ Clash Detection", "📊 BIM Analytics"])
+    
+    with tab1:
+        st.markdown("### 🎯 3D Model Coordination")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("""
+            **Current Model Status:**
+            - Architectural: Rev C (Current)
+            - Structural: Rev B (Under Review)
+            - MEP: Rev A (Coordinating)
+            - Site: Rev A (Current)
+            """)
+        
+        with col2:
+            st.markdown("""
+            **Coordination Metrics:**
+            - Total Elements: 45,672
+            - Clash Tests Run: 247
+            - Active Clashes: 12
+            - Resolved This Week: 8
+            """)
+        
+        st.info("🔄 **Next Coordination Meeting:** Thursday 2 PM - All disciplines required")
+
+def render_analytics():
+    """Advanced Analytics with AI-powered insights"""
+    st.title("📈 Advanced Analytics - AI-Powered Project Insights")
+    st.markdown("**Comprehensive project analytics with predictive modeling**")
+    
+    tab1, tab2, tab3 = st.tabs(["📊 Executive Dashboard", "🔮 Predictive Analytics", "💡 AI Insights"])
+    
+    with tab1:
+        st.markdown("### 📊 Executive Performance Dashboard")
+        
+        # Key performance indicators
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Project Health", "94%", "+2% this month")
+        with col2:
+            st.metric("Schedule Performance", "102%", "Ahead of plan")
+        with col3:
+            st.metric("Cost Performance", "96%", "Under budget")
+        with col4:
+            st.metric("Quality Score", "97%", "Excellent")
+        
+        # Performance trends
+        performance_data = pd.DataFrame({
+            'Week': ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            'Schedule': [98, 100, 101, 102],
+            'Budget': [99, 98, 97, 96],
+            'Quality': [95, 96, 96, 97],
+            'Safety': [97, 98, 98, 99]
+        })
+        
+        fig = px.line(performance_data, x='Week', y=['Schedule', 'Budget', 'Quality', 'Safety'],
+                     title="📈 Weekly Performance Trends")
+        st.plotly_chart(fig, use_container_width=True)
+    
+    with tab2:
+        st.markdown("### 🔮 AI-Powered Predictions")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("""
+            **🎯 Completion Forecast:**
+            - Projected Completion: May 15, 2025
+            - Confidence Level: 87%
+            - Weather Risk Factor: Low
+            - Resource Availability: Good
+            """)
+        
+        with col2:
+            st.markdown("""
+            **💰 Cost Forecast:**
+            - Final Cost Prediction: $43.4M
+            - Confidence Level: 92%
+            - Potential Savings: $2.1M
+            - Risk Factors: Material prices
+            """)
 
 def main():
     """Main application entry point"""

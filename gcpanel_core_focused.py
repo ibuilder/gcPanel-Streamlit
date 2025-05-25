@@ -833,20 +833,7 @@ def render_sidebar():
         st.caption(f"**{role_info['role_name']}**")
         st.info("🏗️ Highland Tower Development")
         
-        # Streamlined User & Admin Controls
-        user_col1, user_col2 = st.columns(2)
-        
-        with user_col1:
-            if st.button("⚙️ Settings", use_container_width=True, key="user_settings"):
-                st.success("Settings panel opened")
-        
-        with user_col2:
-            if user_role == "admin":
-                if st.button("🔧 Admin", use_container_width=True, key="admin_tools"):
-                    st.success("Admin panel accessed")
-            else:
-                if st.button("👤 Profile", use_container_width=True, key="user_profile"):
-                    st.info(f"Profile: {role_info['role_name']}")
+        # Clean navigation without admin clutter
         
         # Core Tools - Most Used Daily Operations
         st.markdown("### ⚡ Core Tools")

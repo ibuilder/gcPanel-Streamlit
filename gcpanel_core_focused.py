@@ -862,7 +862,6 @@ def render_sidebar():
         core_tools = [
             ("📊 Dashboard", "Dashboard"),
             ("📝 Daily Reports", "Daily Reports"),
-            ("💲 Unit Prices", "Unit Prices"),
             ("🚛 Deliveries", "Deliveries"),
             ("🦺 Safety", "Safety")
         ]

@@ -27,8 +27,8 @@ def render_unit_prices():
     with col4:
         st.metric("Cost Accuracy", "96.4%", "+0.8% this week")
     
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "🧱 Materials", "📦 Material Management", "⚙️ Equipment", "👷 Labor", "📊 Analytics", "🔄 Integrations"
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+        "🧱 Materials", "📦 Material Management", "⚙️ Equipment", "🚛 Equipment Tracking", "👷 Labor", "📊 Analytics", "🔄 Integrations"
     ])
     
     with tab1:
@@ -41,12 +41,15 @@ def render_unit_prices():
         render_equipment_pricing()
     
     with tab4:
-        render_labor_pricing()
+        render_equipment_tracking()
     
     with tab5:
-        render_pricing_analytics()
+        render_labor_pricing()
     
     with tab6:
+        render_pricing_analytics()
+    
+    with tab7:
         render_cost_integrations()
 
 def render_materials_pricing():
@@ -454,6 +457,51 @@ def render_material_management():
     with col3:
         if st.button("🚛 Request Delivery", use_container_width=True):
             st.success("Delivery request form opened")
+
+def render_equipment_tracking():
+    """Equipment Tracking integrated with cost analysis for Highland Tower Development"""
+    st.subheader("🚛 Equipment Tracking & Cost Analysis")
+    st.markdown("**Real-time equipment location, usage, and cost tracking**")
+    
+    # Equipment Overview Dashboard
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Active Equipment", "47 units", "On-site now")
+    with col2:
+        st.metric("Daily Rental Cost", "$12,800", "Target met")
+    with col3:
+        st.metric("Utilization Rate", "87%", "+5% this week")
+    with col4:
+        st.metric("Maintenance Due", "3 units", "Scheduled")
+    
+    # Equipment tracking with cost integration
+    st.markdown("### 🏗️ Equipment Fleet Status & Costs")
+    
+    equipment_data = pd.DataFrame({
+        'Equipment': ['Tower Crane #1', 'Concrete Pump #2', 'Excavator CAT 320', 'Forklift #5', 'Boom Lift #3', 'Generator 50kW'],
+        'Location': ['Level 13', 'Level 9', 'Site Yard', 'Level 11', 'Level 7', 'Site Power'],
+        'Status': ['Active', 'Active', 'Standby', 'Active', 'Maintenance', 'Active'],
+        'Daily Cost': ['$850', '$420', '$280', '$125', '$0', '$85'],
+        'Utilization': ['95%', '78%', '45%', '92%', '0%', '100%'],
+        'Last Updated': ['2 min ago', '5 min ago', '1 hour ago', '3 min ago', '2 days ago', '1 min ago']
+    })
+    
+    st.dataframe(equipment_data, use_container_width=True)
+    
+    # Equipment actions and cost controls
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        if st.button("📍 Track Equipment", use_container_width=True):
+            st.success("GPS tracking interface opened")
+    with col2:
+        if st.button("💰 Cost Analysis", use_container_width=True):
+            st.success("Equipment cost breakdown displayed")
+    with col3:
+        if st.button("🔧 Schedule Maintenance", use_container_width=True):
+            st.success("Maintenance scheduling interface opened")
+    with col4:
+        if st.button("📊 Usage Reports", use_container_width=True):
+            st.success("Equipment utilization reports generated")
 
 def render_cost_integrations():
     """Integration with accounting systems and cost management tools"""

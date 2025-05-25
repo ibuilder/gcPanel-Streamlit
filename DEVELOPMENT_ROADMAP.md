@@ -8,15 +8,15 @@
 - [x] Integrate Material Management into Unit Prices (completed)
 - [x] Add Drawing Management to Engineering (completed)
 - [x] Move Admin to bottom of navbar (completed)
-- [ ] **Remove Daily Reports from Field Operations** (duplicate functionality)
-- [ ] **Remove Equipment Tracking from Advanced Tools** (integrate into Unit Prices)
-- [ ] **Remove old skeleton modules and placeholder messages**
+- [x] **Remove Daily Reports from Field Operations** (duplicate functionality - completed)
+- [x] **Remove Equipment Tracking from Advanced Tools** (integrated into Unit Prices - completed)
+- [x] **Remove old skeleton modules and placeholder messages** (completed)
 - [ ] **Standardize all module interfaces to use render() function**
 
 #### 2. Cost Management Enhancement
-- [ ] **Add Owner Bill functionality**
-- [ ] **Integrate AIA G702/G703 billing system** (modules exist, need integration)
-- [ ] **Connect to existing Sage accounting integration**
+- [x] **Add Owner Bill functionality** (completed)
+- [x] **Integrate AIA G702/G703 billing system** (completed)
+- [x] **Connect to existing Sage accounting integration** (completed)
 - [ ] **Remove duplicate billing references from other modules**
 
 #### 3. Navigation Streamlining

@@ -366,10 +366,11 @@ def render_sidebar():
         
         # Advanced Tools (filtered by permissions)
         advanced_available = any(check_module_access(tool) for _, tool in [
-            ("📝 RFIs", "RFIs"), ("📊 Daily Reports", "Daily Reports"),
-            ("📤 Submittals", "Submittals"), ("📨 Transmittals", "Transmittals"),
-            ("📅 Scheduling", "Scheduling"), ("🔍 Quality Control", "Quality Control"),
-            ("📦 Material Management", "Material Management"), ("🚛 Equipment Tracking", "Equipment Tracking"),
+            ("📝 RFIs", "RFIs"),
+            ("📤 Submittals", "Submittals"), 
+            ("📨 Transmittals", "Transmittals"),
+            ("📅 Scheduling", "Scheduling"), 
+            ("🔍 Quality Control", "Quality Control"),
             ("📸 Progress Photos", "Progress Photos")
         ])
         

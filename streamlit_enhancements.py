@@ -292,52 +292,160 @@ def create_interactive_charts():
     
     return fig
 
-def create_data_export_functionality(data, filename="gcpanel_export"):
-    """Advanced data export with multiple formats"""
+def create_enhanced_export_system(data, filename="highland_tower_export"):
+    """Enhanced Highland Tower Development export system with automatic downloads and fallback links"""
     
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        # Excel Export
+        # Excel Export with Auto-Download
         if st.button("📊 Export to Excel", use_container_width=True):
-            output = BytesIO()
-            with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                data.to_excel(writer, sheet_name='Construction Data', index=False)
-            
-            st.download_button(
-                label="⬇️ Download Excel File",
-                data=output.getvalue(),
-                file_name=f"{filename}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
+            try:
+                output = BytesIO()
+                with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                    data.to_excel(writer, sheet_name='Highland Tower Data', index=False)
+                
+                excel_data = output.getvalue()
+                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                excel_filename = f"{filename}_{timestamp}.xlsx"
+                
+                # Primary download button (automatic)
+                st.download_button(
+                    label="⬇️ Download Excel File",
+                    data=excel_data,
+                    file_name=excel_filename,
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    key=f"excel_download_{timestamp}"
+                )
+                
+                # Fallback download link
+                import base64
+                b64_excel = base64.b64encode(excel_data).decode()
+                excel_link = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64_excel}" download="{excel_filename}" target="_blank">📋 Alternative Excel Link</a>'
+                st.markdown(excel_link, unsafe_allow_html=True)
+                
+                st.success(f"✅ Excel file ready: {excel_filename}")
+                
+            except Exception as e:
+                st.error(f"❌ Excel export failed: {str(e)}")
     
     with col2:
-        # CSV Export
+        # CSV Export with Auto-Download
         if st.button("📄 Export to CSV", use_container_width=True):
-            csv = data.to_csv(index=False)
-            st.download_button(
-                label="⬇️ Download CSV File",
-                data=csv,
-                file_name=f"{filename}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-                mime="text/csv"
-            )
+            try:
+                csv_data = data.to_csv(index=False)
+                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                csv_filename = f"{filename}_{timestamp}.csv"
+                
+                # Primary download button (automatic)
+                st.download_button(
+                    label="⬇️ Download CSV File",
+                    data=csv_data,
+                    file_name=csv_filename,
+                    mime="text/csv",
+                    key=f"csv_download_{timestamp}"
+                )
+                
+                # Fallback download link
+                import base64
+                b64_csv = base64.b64encode(csv_data.encode()).decode()
+                csv_link = f'<a href="data:text/csv;base64,{b64_csv}" download="{csv_filename}" target="_blank">📋 Alternative CSV Link</a>'
+                st.markdown(csv_link, unsafe_allow_html=True)
+                
+                st.success(f"✅ CSV file ready: {csv_filename}")
+                
+            except Exception as e:
+                st.error(f"❌ CSV export failed: {str(e)}")
     
     with col3:
-        # JSON Export
+        # JSON Export with Auto-Download
         if st.button("🔗 Export to JSON", use_container_width=True):
-            json_data = data.to_json(orient='records', indent=2)
-            st.download_button(
-                label="⬇️ Download JSON File",
-                data=json_data,
-                file_name=f"{filename}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
-                mime="application/json"
-            )
+            try:
+                json_data = data.to_json(orient='records', indent=2)
+                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                json_filename = f"{filename}_{timestamp}.json"
+                
+                # Primary download button (automatic)
+                st.download_button(
+                    label="⬇️ Download JSON File",
+                    data=json_data,
+                    file_name=json_filename,
+                    mime="application/json",
+                    key=f"json_download_{timestamp}"
+                )
+                
+                # Fallback download link
+                import base64
+                b64_json = base64.b64encode(json_data.encode()).decode()
+                json_link = f'<a href="data:application/json;base64,{b64_json}" download="{json_filename}" target="_blank">📋 Alternative JSON Link</a>'
+                st.markdown(json_link, unsafe_allow_html=True)
+                
+                st.success(f"✅ JSON file ready: {json_filename}")
+                
+            except Exception as e:
+                st.error(f"❌ JSON export failed: {str(e)}")
     
     with col4:
-        # PDF Report (placeholder for future implementation)
+        # PDF Report with Auto-Download
         if st.button("📋 Generate PDF Report", use_container_width=True):
-            st.success("📋 PDF report generation initiated!")
-            st.info("Report will be available in the Downloads section")
+            try:
+                from reportlab.pdfgen import canvas
+                from reportlab.lib.pagesizes import letter
+                
+                pdf_buffer = BytesIO()
+                pdf_canvas = canvas.Canvas(pdf_buffer, pagesize=letter)
+                
+                # Highland Tower Development header
+                pdf_canvas.setFont("Helvetica-Bold", 16)
+                pdf_canvas.drawString(100, 750, "Highland Tower Development")
+                pdf_canvas.setFont("Helvetica", 12)
+                pdf_canvas.drawString(100, 730, f"Construction Management Report")
+                pdf_canvas.drawString(100, 710, f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+                
+                # Add data summary
+                y_position = 680
+                pdf_canvas.drawString(100, y_position, f"Total Records: {len(data)}")
+                y_position -= 20
+                
+                # Add column headers
+                if not data.empty:
+                    for i, col in enumerate(data.columns[:5]):  # First 5 columns
+                        pdf_canvas.drawString(100 + i*100, y_position, str(col))
+                    y_position -= 40
+                    
+                    # Add first 20 rows of data
+                    for idx, row in data.head(20).iterrows():
+                        for i, value in enumerate(row[:5]):
+                            pdf_canvas.drawString(100 + i*100, y_position, str(value)[:15])
+                        y_position -= 20
+                        if y_position < 100:
+                            break
+                
+                pdf_canvas.save()
+                pdf_data = pdf_buffer.getvalue()
+                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                pdf_filename = f"{filename}_report_{timestamp}.pdf"
+                
+                # Primary download button (automatic)
+                st.download_button(
+                    label="⬇️ Download PDF Report",
+                    data=pdf_data,
+                    file_name=pdf_filename,
+                    mime="application/pdf",
+                    key=f"pdf_download_{timestamp}"
+                )
+                
+                # Fallback download link
+                import base64
+                b64_pdf = base64.b64encode(pdf_data).decode()
+                pdf_link = f'<a href="data:application/pdf;base64,{b64_pdf}" download="{pdf_filename}" target="_blank">📋 Alternative PDF Link</a>'
+                st.markdown(pdf_link, unsafe_allow_html=True)
+                
+                st.success(f"✅ PDF report ready: {pdf_filename}")
+                
+            except Exception as e:
+                st.error(f"❌ PDF generation failed: {str(e)}")
+                st.info("💡 Install reportlab: pip install reportlab")
 
 def create_real_time_notifications():
     """Real-time notification system"""

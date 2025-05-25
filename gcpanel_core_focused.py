@@ -17,7 +17,7 @@ def get_user_role_permissions():
         "admin": {
             "role_name": "Administrator",
             "modules": ["Dashboard", "PreConstruction", "Engineering", "Field Operations", "Safety", 
-                       "Contracts", "Cost Management", "Unit Prices", "Daily Reports", "Progress Photos", "Quality Control",
+                       "Contracts", "Cost Management", "Unit Prices", "Deliveries", "Daily Reports", "Progress Photos", "Quality Control",
                        "Material Management", "BIM", "Analytics", "Submittals", "Transmittals", 
                        "Equipment Tracking", "AI Assistant", "Mobile Companion", "AIA Billing",
                        "Prime Contract", "Change Orders", "Closeout", "Documents", "Admin Settings"],
@@ -26,7 +26,7 @@ def get_user_role_permissions():
         "manager": {
             "role_name": "Project Manager", 
             "modules": ["Dashboard", "PreConstruction", "Engineering", "Field Operations", "Safety",
-                       "Contracts", "Cost Management", "Unit Prices", "Daily Reports", "Progress Photos", "Quality Control",
+                       "Contracts", "Cost Management", "Unit Prices", "Deliveries", "Daily Reports", "Progress Photos", "Quality Control",
                        "Material Management", "BIM", "Analytics", "Submittals", "Transmittals",
                        "AIA Billing", "Prime Contract", "Change Orders", "Closeout", "Documents"],
             "permissions": ["read_all", "write_rfis", "write_daily_reports", "write_quality", "approve_changes"]
@@ -469,6 +469,7 @@ def render_sidebar():
             ("📋 Contracts", "Contracts"),
             ("💰 Cost Management", "Cost Management"),
             ("💲 Unit Prices", "Unit Prices"),
+            ("🚛 Deliveries", "Deliveries"),
             ("🏢 BIM", "BIM"),
             ("✅ Closeout", "Closeout")
         ]
@@ -1176,6 +1177,13 @@ def render_main_content():
             module_functions["Unit Prices"] = unit_prices_render
         except ImportError:
             module_functions["Unit Prices"] = lambda: st.info("Unit Prices module loading...")
+        
+        # Deliveries module for comprehensive delivery management
+        try:
+            from modules.deliveries import render_deliveries as deliveries_render
+            module_functions["Deliveries"] = deliveries_render
+        except ImportError:
+            module_functions["Deliveries"] = lambda: st.info("Deliveries module loading...")
         
         # BIM with model viewer and clash detection
         try:

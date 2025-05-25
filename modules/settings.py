@@ -1,491 +1,302 @@
 """
-Settings module for the gcPanel Construction Management Dashboard.
-
-This module provides settings and configuration options for the application,
-including theme settings, user preferences, system configuration, and
-integration management for external services.
+Settings Module - Highland Tower Development
+Comprehensive system configuration and file distribution settings
 """
 
 import streamlit as st
 import pandas as pd
-from datetime import datetime, timedelta
-import random
-import colorsys
+from datetime import datetime
 import json
 import os
 
-# Import integration manager
-from utils.integration_manager import IntegrationManager, IntegrationType, IntegrationProvider
+def render():
+    """Render the comprehensive settings interface"""
+    st.title("⚙️ System Settings - Highland Tower Development")
+    st.markdown("**Enterprise configuration and file distribution management**")
+    
+    # Settings tabs
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "📧 Email Distribution", "📁 File Routing", "👥 User Management", "🔐 Security", "📊 Billing Setup"
+    ])
+    
+    with tab1:
+        render_email_distribution_settings()
+    
+    with tab2:
+        render_file_routing_settings()
+    
+    with tab3:
+        render_user_management_settings()
+    
+    with tab4:
+        render_security_settings()
+    
+    with tab5:
+        render_billing_setup_settings()
 
-def render_settings():
-    """Render the settings interface."""
-    st.header("Settings")
+def render_email_distribution_settings():
+    """Email distribution configuration"""
+    st.header("📧 Email Distribution Settings")
+    st.markdown("**Configure automatic file distribution for bills, reports, and documents**")
     
-    # Create settings tabs
-    tabs = st.tabs(["Appearance", "User Preferences", "Integrations", "System", "About"])
-    
-    # Appearance Tab
-    with tabs[0]:
-        render_appearance_settings()
-    
-    # User Preferences Tab
-    with tabs[1]:
-        render_user_preferences()
-        
-    # Integrations Tab
-    with tabs[2]:
-        from modules.settings_components.integrations import render_integrations
-        render_integrations()
-    
-    # System Tab
-    with tabs[3]:
-        render_system_settings()
-    
-    # About Tab
-    with tabs[4]:
-        render_about_page()
-
-def render_appearance_settings():
-    """Render appearance settings."""
-    st.subheader("Appearance Settings")
-    
-    # Theme selection
-    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-    
-    st.markdown("### Theme Options")
-    
-    # Theme color selector
-    st.write("#### Primary Color")
-    # Create a grid of color options
-    col1, col2, col3, col4, col5 = st.columns(5)
-    
-    theme_colors = {
-        "Blue": "#3e79f7",
-        "Indigo": "#5b21b6",
-        "Purple": "#8b5cf6",
-        "Pink": "#ec4899",
-        "Red": "#ef4444",
-        "Orange": "#f97316",
-        "Yellow": "#f59e0b",
-        "Green": "#10b981",
-        "Teal": "#14b8a6",
-        "Cyan": "#06b6d4"
-    }
-    
-    # Select the active theme color
-    current_color = st.session_state.get('theme_color', '#3e79f7')
-    
-    # Display color selection grid
-    color_cols = [col1, col2, col3, col4, col5]
-    
-    i = 0
-    for color_name, color_code in theme_colors.items():
-        col = color_cols[i % 5]
-        with col:
-            # Use a button with the color as background
-            is_selected = color_code == current_color
-            border_style = "2px solid white" if not is_selected else "3px solid #f59e0b"
-            
-            st.markdown(f"""
-            <div style="margin-bottom: 10px;">
-                <div style="background-color: {color_code}; width: 100%; height: 40px; 
-                           border-radius: 4px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-                           border: {border_style}" id="color-{color_name}"></div>
-                <div style="font-size: 12px; text-align: center; margin-top: 4px;">{color_name}</div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Use a hidden button to capture the click
-            if st.button(f"Select {color_name}", key=f"color_btn_{color_name}", help=f"Select {color_name} theme"):
-                st.session_state.theme_color = color_code
-                # In a real application, you would save this preference to a database
-                st.rerun()
-        
-        i += 1
-    
-    # Create custom color palettes with visualizations
-    st.write("#### Color Palettes")
-    st.write("Preview of color palettes derived from your primary color")
-    
-    # Generate complementary colors based on the primary color
-    primary_hex = st.session_state.get('theme_color', '#3e79f7')
-    r, g, b = int(primary_hex[1:3], 16)/255, int(primary_hex[3:5], 16)/255, int(primary_hex[5:7], 16)/255
-    h, s, v = colorsys.rgb_to_hsv(r, g, b)
-    
-    # Generate color variations
-    colors = []
-    
-    # Complementary color (opposite on color wheel)
-    compl_h = (h + 0.5) % 1.0
-    compl_r, compl_g, compl_b = colorsys.hsv_to_rgb(compl_h, s, v)
-    complementary = f"#{int(compl_r*255):02x}{int(compl_g*255):02x}{int(compl_b*255):02x}"
-    
-    # Analogous colors (adjacent on color wheel)
-    analog_h1 = (h + 0.1) % 1.0
-    r1, g1, b1 = colorsys.hsv_to_rgb(analog_h1, s, v)
-    analogous1 = f"#{int(r1*255):02x}{int(g1*255):02x}{int(b1*255):02x}"
-    
-    analog_h2 = (h - 0.1) % 1.0
-    r2, g2, b2 = colorsys.hsv_to_rgb(analog_h2, s, v)
-    analogous2 = f"#{int(r2*255):02x}{int(g2*255):02x}{int(b2*255):02x}"
-    
-    # Triadic colors (three equally spaced colors on wheel)
-    triad_h1 = (h + 1/3) % 1.0
-    tr1, tg1, tb1 = colorsys.hsv_to_rgb(triad_h1, s, v)
-    triadic1 = f"#{int(tr1*255):02x}{int(tg1*255):02x}{int(tb1*255):02x}"
-    
-    triad_h2 = (h + 2/3) % 1.0
-    tr2, tg2, tb2 = colorsys.hsv_to_rgb(triad_h2, s, v)
-    triadic2 = f"#{int(tr2*255):02x}{int(tg2*255):02x}{int(tb2*255):02x}"
-    
-    # Display color palettes with visualizations
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.write("##### Complementary Colors")
-        st.markdown(f"""
-        <div style="display: flex; margin-bottom: 15px;">
-            <div style="flex: 1; height: 60px; background-color: {primary_hex}; border-radius: 4px 0 0 4px;"></div>
-            <div style="flex: 1; height: 60px; background-color: {complementary}; border-radius: 0 4px 4px 0;"></div>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6c757d;">
-            <div>Primary: {primary_hex}</div>
-            <div>Complementary: {complementary}</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        st.write("##### Analogous Colors")
-        st.markdown(f"""
-        <div style="display: flex; margin-bottom: 15px;">
-            <div style="flex: 1; height: 60px; background-color: {analogous2}; border-radius: 4px 0 0 4px;"></div>
-            <div style="flex: 1; height: 60px; background-color: {primary_hex};"></div>
-            <div style="flex: 1; height: 60px; background-color: {analogous1}; border-radius: 0 4px 4px 0;"></div>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6c757d;">
-            <div>{analogous2}</div>
-            <div>{primary_hex}</div>
-            <div>{analogous1}</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.write("##### Triadic Colors")
-        st.markdown(f"""
-        <div style="display: flex; margin-bottom: 15px;">
-            <div style="flex: 1; height: 60px; background-color: {primary_hex}; border-radius: 4px 0 0 4px;"></div>
-            <div style="flex: 1; height: 60px; background-color: {triadic1};"></div>
-            <div style="flex: 1; height: 60px; background-color: {triadic2}; border-radius: 0 4px 4px 0;"></div>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6c757d;">
-            <div>{primary_hex}</div>
-            <div>{triadic1}</div>
-            <div>{triadic2}</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Shade and tint variations
-        st.write("##### Shades & Tints")
-        
-        # Generate shades and tints
-        tints = []
-        shades = []
-        
-        for i in range(5):
-            # Tints (lighter variations)
-            tint_v = min(1.0, v + (1-v) * (i+1)/5)
-            tint_r, tint_g, tint_b = colorsys.hsv_to_rgb(h, s, tint_v)
-            tint = f"#{int(tint_r*255):02x}{int(tint_g*255):02x}{int(tint_b*255):02x}"
-            tints.append(tint)
-            
-            # Shades (darker variations)
-            shade_v = max(0, v * (5-i)/5)
-            shade_r, shade_g, shade_b = colorsys.hsv_to_rgb(h, s, shade_v)
-            shade = f"#{int(shade_r*255):02x}{int(shade_g*255):02x}{int(shade_b*255):02x}"
-            shades.append(shade)
-        
-        # Display tints (light to dark)
-        tints.reverse()  # So lightest is on top
-        tint_divs = ''.join([f'<div style="height: 20px; background-color: {tint};"></div>' for tint in tints])
-        
-        # Display shades (light to dark)
-        shade_divs = ''.join([f'<div style="height: 20px; background-color: {shade};"></div>' for shade in shades])
-        
-        st.markdown(f"""
-        <div style="display: flex; margin-bottom: 15px;">
-            <div style="flex: 1; border-radius: 4px 0 0 4px; overflow: hidden;">{tint_divs}</div>
-            <div style="flex: 1; border-radius: 0 4px 4px 0; overflow: hidden;">{shade_divs}</div>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6c757d;">
-            <div>Tints</div>
-            <div>Shades</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Additional visual settings
-    st.write("#### Highland Tower Professional Theme")
-    st.info("🎨 Highland Tower Development uses a fixed professional enterprise theme with navy sidebar and clean white content areas for optimal readability and brand consistency.")
-    
-    st.markdown("""
-    **Current Theme Features:**
-    • Professional navy sidebar with Highland Tower branding
-    • Clean white content areas for optimal readability
-    • Enterprise-grade buttons and forms
-    • Consistent color scheme across all modules
-    • Mobile-responsive design for field operations
-    """)
-    
-    # Apply visual changes
-    if st.button("Refresh Interface", key="refresh_interface", type="primary"):
-        st.success("Highland Tower interface refreshed successfully!")
-            
-    st.markdown('</div>', unsafe_allow_html=True)
-
-def render_user_preferences():
-    """Render user preferences settings."""
-    st.subheader("User Preferences")
-    
-    # User profile and preferences
-    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-    
-    st.markdown("### Notification Settings")
-    
-    # Notification preferences with toggles
-    notifications = {
-        "Email Notifications": True,
-        "RFI Updates": True,
-        "Submittal Updates": True,
-        "Schedule Changes": False,
-        "Budget Alerts": True,
-        "Daily Reports": False,
-        "Safety Incidents": True,
-        "Team Messages": False
-    }
-    
-    # Display notification toggles
-    for notification, default_value in notifications.items():
-        state = st.toggle(notification, value=default_value)
-    
-    # Email notification frequency
-    st.write("#### Notification Frequency")
-    email_frequency = st.selectbox(
-        "Email Digest Frequency",
-        ["Immediately", "Daily Digest", "Weekly Digest", "None"],
-        index=1
-    )
-    
-    # Apply changes button
-    st.button("Save Notification Preferences", type="primary")
-    
-    st.markdown("<hr style='margin: 1.5rem 0; opacity: 0.15;'>", unsafe_allow_html=True)
-    
-    # Dashboard preferences
-    st.markdown("### Dashboard Preferences")
-    
-    # Default page
-    default_page = st.selectbox(
-        "Default Dashboard View",
-        ["Project Overview", "Cost Summary", "Schedule Summary", "Team Activity"],
-        index=0
-    )
-    
-    # Dashboard widgets
-    st.write("#### Dashboard Widgets")
-    st.caption("Select which widgets to display on your dashboard")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.checkbox("Project Progress", value=True)
-        st.checkbox("Budget Summary", value=True)
-        st.checkbox("Recent Activity", value=True)
-        st.checkbox("Team Members", value=False)
-    
-    with col2:
-        st.checkbox("Weather Forecast", value=True)
-        st.checkbox("Key Dates", value=True)
-        st.checkbox("Outstanding Items", value=True)
-        st.checkbox("Quality Metrics", value=False)
-    
-    # Apply changes button
-    st.button("Save Dashboard Preferences", type="primary")
-            
-    st.markdown('</div>', unsafe_allow_html=True)
-
-def render_system_settings():
-    """Render system settings."""
-    st.subheader("System Settings")
-    
-    # System configuration settings
-    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-    
-    st.markdown("### Data Management")
-    
-    # Export/Import options
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.button("Export Data", help="Export all project data to CSV/Excel")
-    
-    with col2:
-        st.button("Import Data", help="Import project data from CSV/Excel")
-    
-    # Data retention policy
-    st.write("#### Data Retention")
-    retention_policy = st.selectbox(
-        "Document Retention Period",
-        ["1 Year", "3 Years", "5 Years", "7 Years", "10 Years", "Forever"],
-        index=3
-    )
-    
-    # Backup settings
-    st.write("#### Backup Settings")
-    backup_frequency = st.selectbox(
-        "Automatic Backup Frequency",
-        ["Daily", "Weekly", "Monthly", "Never"],
-        index=1
-    )
-    
-    backup_time = st.time_input("Backup Time", value=datetime.strptime("02:00", "%H:%M").time())
-    
-    # Integration settings
-    st.markdown("<hr style='margin: 1.5rem 0; opacity: 0.15;'>", unsafe_allow_html=True)
-    st.markdown("### Integrations")
-    
-    # API settings
-    st.write("#### API Access")
-    enable_api = st.toggle("Enable API Access", value=True)
-    
-    if enable_api:
+    # Owner Bill Distribution
+    st.subheader("💰 Owner Bill Distribution")
+    with st.expander("Owner Bill Recipients", expanded=True):
         col1, col2 = st.columns(2)
+        
         with col1:
-            st.text_input("API Key", value="••••••••••••••••", disabled=True)
-        with col2:
-            st.button("Regenerate API Key")
-    
-    # Third-party integrations with color badges
-    st.write("#### Connected Services")
-    
-    integrations = [
-        {"name": "Microsoft 365", "status": "Connected", "color": "#38d39f"},
-        {"name": "Google Workspace", "status": "Not Connected", "color": "#ff5b5b"},
-        {"name": "Procore", "status": "Connected", "color": "#38d39f"},
-        {"name": "Autodesk BIM 360", "status": "Connected", "color": "#38d39f"},
-        {"name": "Sage Accounting", "status": "Not Connected", "color": "#ff5b5b"},
-        {"name": "Primavera P6", "status": "Connected", "color": "#38d39f"}
-    ]
-    
-    for integration in integrations:
-        col1, col2, col3 = st.columns([3, 1, 1])
-        with col1:
-            st.write(integration["name"])
-        with col2:
-            st.markdown(f'<span style="background-color: {integration["color"]}20; color: {integration["color"]}; padding: 3px 8px; border-radius: 12px; font-size: 12px;">{integration["status"]}</span>', unsafe_allow_html=True)
-        with col3:
-            if integration["status"] == "Connected":
-                st.button("Disconnect", key=f"disconnect_{integration['name'].lower().replace(' ', '_')}")
-            else:
-                st.button("Connect", key=f"connect_{integration['name'].lower().replace(' ', '_')}")
-    
-    # Save settings button
-    st.button("Save System Settings", type="primary")
+            st.markdown("**Primary Recipients**")
+            owner_emails = st.text_area("Owner Email Addresses", 
+                value="finance@highlandtower.com\naccounting@highlandtower.com\nproject.manager@highlandtower.com",
+                help="One email per line")
             
-    st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown("**CC Recipients**")
+            cc_emails = st.text_area("CC Email Addresses",
+                value="legal@highlandtower.com\ncontracts@highlandtower.com",
+                help="One email per line")
+        
+        with col2:
+            st.markdown("**Distribution Settings**")
+            auto_send_owner = st.checkbox("Auto-send Owner Bills", value=True)
+            include_backup = st.checkbox("Include backup documents", value=True)
+            send_confirmation = st.checkbox("Request read confirmation", value=False)
+            
+            st.markdown("**Timing**")
+            send_time = st.selectbox("Send Time", ["Immediately", "End of Business Day", "Next Morning 8 AM"])
+    
+    # G702/G703 Distribution
+    st.subheader("📄 AIA G702/G703 Distribution")
+    with st.expander("AIA Forms Distribution", expanded=True):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("**Architect Recipients**")
+            architect_emails = st.text_area("Architect Email Addresses",
+                value="billing@architectfirm.com\nproject.architect@architectfirm.com",
+                help="One email per line")
+            
+            st.markdown("**Engineer Recipients**")
+            engineer_emails = st.text_area("Engineer Email Addresses",
+                value="payments@structuralengineer.com\nproject.engineer@structuralengineer.com",
+                help="One email per line")
+        
+        with col2:
+            st.markdown("**Additional Recipients**")
+            other_g702_emails = st.text_area("Other Recipients",
+                value="admin@highlandconstruction.com\nsuperintendent@highlandconstruction.com",
+                help="One email per line")
+            
+            auto_send_g702 = st.checkbox("Auto-send G702/G703 Forms", value=True)
+            include_schedules = st.checkbox("Include all schedules", value=True)
+    
+    # RFI and Submittal Distribution
+    st.subheader("📝 RFI & Submittal Distribution")
+    with st.expander("Project Communication Distribution"):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("**RFI Distribution**")
+            rfi_emails = st.text_area("RFI Recipients",
+                value="rfis@architectfirm.com\nproject.manager@highlandtower.com\nfield.super@highlandconstruction.com",
+                help="One email per line")
+        
+        with col2:
+            st.markdown("**Submittal Distribution**")
+            submittal_emails = st.text_area("Submittal Recipients",
+                value="submittals@architectfirm.com\nreview@structuralengineer.com\nproject.manager@highlandtower.com",
+                help="One email per line")
+    
+    # Save settings
+    if st.button("💾 Save Email Settings", type="primary"):
+        st.success("✅ Email distribution settings saved successfully!")
 
-def render_about_page():
-    """Render about page with version info and help resources."""
-    st.subheader("About gcPanel")
+def render_file_routing_settings():
+    """File routing and storage configuration"""
+    st.header("📁 File Routing & Storage Settings")
+    st.markdown("**Configure where different file types are automatically stored and distributed**")
     
-    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-    
-    # App logo and version
-    col1, col2 = st.columns([1, 3])
-    
-    with col1:
-        st.markdown("""
-        <div style="background-color: #3e79f7; width: 100px; height: 100px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-            <span class="material-icons" style="font-size: 50px; color: white;">construction</span>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown("# gcPanel")
-        st.markdown("#### Construction Management Dashboard")
-        st.markdown("Version 1.0.0 - May 2025")
-    
-    # System info
-    st.markdown("### System Information")
-    
+    # Cloud Storage Settings
+    st.subheader("☁️ Cloud Storage Configuration")
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("**Platform:** Streamlit")
-        st.markdown("**Database:** PostgreSQL")
-        st.markdown("**Last Updated:** May 17, 2025")
+        st.markdown("**Primary Storage**")
+        primary_storage = st.selectbox("Primary Storage", ["Google Drive", "Dropbox", "SharePoint", "Box"])
+        folder_structure = st.text_area("Folder Structure",
+            value="Highland Tower Development/\n  01-Contracts/\n  02-Billing/\n    Owner-Bills/\n    AIA-Forms/\n  03-RFIs/\n  04-Submittals/\n  05-Daily-Reports/",
+            height=150)
     
     with col2:
-        st.markdown("**License:** Enterprise")
-        st.markdown("**Users:** 25/50")
-        st.markdown("**Storage:** 45GB/100GB")
+        st.markdown("**Backup Storage**")
+        backup_storage = st.selectbox("Backup Storage", ["AWS S3", "Azure Blob", "Local Server", "None"])
+        retention_period = st.number_input("Retention Period (years)", min_value=1, max_value=10, value=7)
+        auto_backup = st.checkbox("Automatic daily backup", value=True)
     
-    # Features and modules
-    st.markdown("### Available Modules")
+    # File Type Routing
+    st.subheader("🗂️ Automatic File Routing")
     
-    modules = [
-        {"name": "Dashboard", "status": "Active"},
-        {"name": "Project Management", "status": "Active"},
-        {"name": "Engineering", "status": "Active"},
-        {"name": "Field Operations", "status": "Active"},
-        {"name": "Safety Management", "status": "Active"},
-        {"name": "Contract Management", "status": "Active"},
-        {"name": "Cost Management", "status": "Active"},
-        {"name": "BIM Integration", "status": "Active"},
-        {"name": "Closeout", "status": "Active"},
-        {"name": "Quality Control", "status": "Available"},
-        {"name": "Resource Management", "status": "Available"},
-        {"name": "Reporting & Analytics", "status": "Available"}
-    ]
+    routing_data = pd.DataFrame([
+        {"File Type": "Owner Bills", "Primary Folder": "/02-Billing/Owner-Bills/", "Auto-Archive": "After Payment", "Notification": "✅"},
+        {"File Type": "G702 Forms", "Primary Folder": "/02-Billing/AIA-Forms/", "Auto-Archive": "Monthly", "Notification": "✅"},
+        {"File Type": "G703 Forms", "Primary Folder": "/02-Billing/AIA-Forms/", "Auto-Archive": "Monthly", "Notification": "✅"},
+        {"File Type": "RFIs", "Primary Folder": "/03-RFIs/", "Auto-Archive": "When Closed", "Notification": "✅"},
+        {"File Type": "Submittals", "Primary Folder": "/04-Submittals/", "Auto-Archive": "When Approved", "Notification": "✅"},
+        {"File Type": "Daily Reports", "Primary Folder": "/05-Daily-Reports/", "Auto-Archive": "Weekly", "Notification": "❌"},
+        {"File Type": "Safety Reports", "Primary Folder": "/06-Safety/", "Auto-Archive": "Monthly", "Notification": "✅"},
+        {"File Type": "Photos", "Primary Folder": "/07-Photos/", "Auto-Archive": "Monthly", "Notification": "❌"}
+    ])
     
-    # Create a grid of modules with color indicators
-    rows = [modules[i:i+3] for i in range(0, len(modules), 3)]
+    st.dataframe(routing_data, use_container_width=True, hide_index=True)
     
-    for row in rows:
-        cols = st.columns(3)
-        for i, module in enumerate(row):
-            with cols[i]:
-                status_color = "#38d39f" if module["status"] == "Active" else "#f59e0b"
-                st.markdown(f"""
-                <div style="padding: 10px; border: 1px solid #eef2f7; border-radius: 8px; margin-bottom: 10px;">
-                    <div style="font-weight: 500;">{module["name"]}</div>
-                    <div style="font-size: 12px; color: {status_color};">{module["status"]}</div>
-                </div>
-                """, unsafe_allow_html=True)
+    # Save routing settings
+    if st.button("💾 Save Routing Settings", type="primary"):
+        st.success("✅ File routing settings saved successfully!")
+
+def render_user_management_settings():
+    """User management and permissions"""
+    st.header("👥 User Management & Permissions")
+    st.markdown("**Manage user access and file distribution permissions**")
     
-    # Help and support
-    st.markdown("### Help & Support")
+    # User roles and permissions
+    st.subheader("🔑 User Roles & Permissions")
     
-    st.write("Need assistance with gcPanel? Contact our support team or access our help resources.")
+    user_data = pd.DataFrame([
+        {"User": "John Smith", "Role": "Project Manager", "Email": "j.smith@highlandtower.com", "Bills": "✅", "G702": "✅", "RFIs": "✅", "Admin": "✅"},
+        {"User": "Sarah Chen", "Role": "Site Superintendent", "Email": "s.chen@highlandconstruction.com", "Bills": "❌", "G702": "❌", "RFIs": "✅", "Admin": "❌"},
+        {"User": "Mike Rodriguez", "Role": "Engineer", "Email": "m.rodriguez@structuralengineer.com", "Bills": "❌", "G702": "✅", "RFIs": "✅", "Admin": "❌"},
+        {"User": "Lisa Johnson", "Role": "Architect", "Email": "l.johnson@architectfirm.com", "Bills": "❌", "G702": "✅", "RFIs": "✅", "Admin": "❌"},
+        {"User": "David Park", "Role": "Owner Rep", "Email": "d.park@highlandtower.com", "Bills": "✅", "G702": "✅", "RFIs": "❌", "Admin": "✅"}
+    ])
     
+    st.dataframe(user_data, use_container_width=True, hide_index=True)
+    
+    # Add new user
+    st.subheader("➕ Add New User")
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.button("User Guide", key="user_guide_btn")
+        new_user_name = st.text_input("Full Name")
+        new_user_email = st.text_input("Email Address")
     
     with col2:
-        st.button("Video Tutorials", key="tutorials_btn")
+        new_user_role = st.selectbox("Role", ["Project Manager", "Site Superintendent", "Engineer", "Architect", "Owner Rep", "Subcontractor"])
+        new_user_company = st.text_input("Company")
     
     with col3:
-        st.button("Contact Support", key="support_btn")
+        st.markdown("**Permissions**")
+        bills_access = st.checkbox("Bills Access")
+        g702_access = st.checkbox("G702/G703 Access")
+        rfi_access = st.checkbox("RFI Access")
+        admin_access = st.checkbox("Admin Access")
     
-    # Legal info
-    st.markdown("<hr style='margin: 1.5rem 0; opacity: 0.15;'>", unsafe_allow_html=True)
-    st.markdown("### Legal")
+    if st.button("👤 Add User", type="primary"):
+        st.success(f"✅ User {new_user_name} added successfully!")
+
+def render_security_settings():
+    """Security and access control settings"""
+    st.header("🔐 Security & Access Control")
+    st.markdown("**Configure security settings for Highland Tower Development platform**")
     
+    # Authentication settings
+    st.subheader("🛡️ Authentication Settings")
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("[Terms of Service](#)")
+        st.markdown("**Password Requirements**")
+        min_password_length = st.number_input("Minimum Password Length", min_value=8, max_value=20, value=12)
+        require_uppercase = st.checkbox("Require Uppercase Letters", value=True)
+        require_numbers = st.checkbox("Require Numbers", value=True)
+        require_symbols = st.checkbox("Require Special Characters", value=True)
+        
+        session_timeout = st.number_input("Session Timeout (hours)", min_value=1, max_value=24, value=8)
     
     with col2:
-        st.markdown("[Privacy Policy](#)")
+        st.markdown("**Two-Factor Authentication**")
+        enable_2fa = st.checkbox("Enable 2FA for all users", value=True)
+        enforce_2fa_admin = st.checkbox("Enforce 2FA for admins", value=True)
+        
+        st.markdown("**Digital Signatures**")
+        require_signatures = st.checkbox("Require digital signatures on bills", value=True)
+        signature_method = st.selectbox("Signature Method", ["DocuSign", "Adobe Sign", "Internal System"])
     
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Audit logging
+    st.subheader("📋 Audit & Logging")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Logging Settings**")
+        log_file_access = st.checkbox("Log file access", value=True)
+        log_user_actions = st.checkbox("Log user actions", value=True)
+        log_system_changes = st.checkbox("Log system changes", value=True)
+        
+    with col2:
+        st.markdown("**Retention Settings**")
+        audit_retention = st.number_input("Audit log retention (months)", min_value=12, max_value=84, value=36)
+        backup_frequency = st.selectbox("Backup frequency", ["Daily", "Weekly", "Monthly"])
+
+def render_billing_setup_settings():
+    """Billing and payment processing setup"""
+    st.header("📊 Billing & Payment Setup")
+    st.markdown("**Configure billing processes and payment systems for Highland Tower Development**")
+    
+    # Company information
+    st.subheader("🏢 Company Information")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Highland Tower Development**")
+        company_name = st.text_input("Company Name", value="Highland Tower Development LLC")
+        company_address = st.text_area("Company Address", 
+            value="1234 Construction Avenue\nNew York, NY 10001\nUnited States")
+        tax_id = st.text_input("Tax ID/EIN", value="XX-XXXXXXX")
+    
+    with col2:
+        st.markdown("**Billing Configuration**")
+        billing_cycle = st.selectbox("Billing Cycle", ["Monthly", "Bi-weekly", "Weekly"])
+        payment_terms = st.selectbox("Payment Terms", ["Net 30", "Net 15", "Due on Receipt"])
+        retention_percentage = st.number_input("Retention Percentage", min_value=0.0, max_value=10.0, value=5.0, step=0.1)
+    
+    # Digital signature settings for bills
+    st.subheader("✍️ Digital Signature Configuration")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Signature Requirements**")
+        require_pm_signature = st.checkbox("Require Project Manager signature", value=True)
+        require_owner_signature = st.checkbox("Require Owner representative signature", value=True)
+        require_contractor_signature = st.checkbox("Require Contractor signature", value=True)
+        
+    with col2:
+        st.markdown("**Signature Settings**")
+        signature_order = st.selectbox("Signature Order", 
+            ["Contractor → PM → Owner", "PM → Contractor → Owner", "Simultaneous"])
+        auto_remind = st.checkbox("Auto-remind for signatures", value=True)
+        reminder_interval = st.number_input("Reminder interval (days)", min_value=1, max_value=7, value=2)
+    
+    # AIA Forms configuration
+    st.subheader("📄 AIA Forms Configuration")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**G702 Configuration**")
+        include_retainage = st.checkbox("Include retainage calculation", value=True)
+        show_previous_apps = st.checkbox("Show previous applications", value=True)
+        auto_calculate_stored = st.checkbox("Auto-calculate stored materials", value=True)
+        
+    with col2:
+        st.markdown("**G703 Configuration**")
+        detailed_breakdown = st.checkbox("Include detailed cost breakdown", value=True)
+        show_unit_prices = st.checkbox("Show unit prices", value=True)
+        include_change_orders = st.checkbox("Include approved change orders", value=True)
+    
+    # Save all settings
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("💾 Save Security Settings", use_container_width=True):
+            st.success("✅ Security settings saved!")
+    with col2:
+        if st.button("💾 Save Billing Settings", use_container_width=True):
+            st.success("✅ Billing settings saved!")
+    with col3:
+        if st.button("🔄 Export All Settings", use_container_width=True):
+            st.success("📄 Settings exported to file!")

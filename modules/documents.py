@@ -532,6 +532,229 @@ The foundation system shall be designed to support all applied loads, including 
             </div>
             """, unsafe_allow_html=True)
 
+def render_current_set():
+    """Render Highland Tower Development current drawing set"""
+    st.header("📋 Current Drawing Set - Highland Tower Development")
+    st.markdown("**Project No. HTD-2024-001 | 15-Story Mixed-Use Development**")
+    
+    # Drawing set overview
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Total Sheets", "287")
+    col2.metric("Last Revision", "Rev 08")
+    col3.metric("Issue Date", "May 20, 2025")
+    col4.metric("Next Update", "June 3, 2025")
+    
+    # Drawing categories
+    drawing_tabs = st.tabs(["🏗️ Architectural", "⚡ Structural", "🔧 MEP", "🌐 Civil", "📋 General"])
+    
+    with drawing_tabs[0]:
+        st.subheader("Architectural Drawings")
+        arch_drawings = [
+            {"Sheet": "A-001", "Title": "Cover Sheet & Drawing Index", "Rev": "08", "Date": "2025-05-20"},
+            {"Sheet": "A-100", "Title": "Site Plan & Context", "Rev": "07", "Date": "2025-05-15"},
+            {"Sheet": "A-101", "Title": "Ground Floor Plan", "Rev": "08", "Date": "2025-05-20"},
+            {"Sheet": "A-102", "Title": "Typical Floor Plan (Levels 2-14)", "Rev": "06", "Date": "2025-05-10"},
+            {"Sheet": "A-103", "Title": "Penthouse Floor Plan", "Rev": "05", "Date": "2025-05-05"},
+            {"Sheet": "A-200", "Title": "Building Elevations - North & South", "Rev": "07", "Date": "2025-05-15"},
+            {"Sheet": "A-201", "Title": "Building Elevations - East & West", "Rev": "07", "Date": "2025-05-15"},
+            {"Sheet": "A-300", "Title": "Building Sections", "Rev": "06", "Date": "2025-05-10"},
+            {"Sheet": "A-400", "Title": "Wall Sections & Details", "Rev": "08", "Date": "2025-05-20"},
+            {"Sheet": "A-500", "Title": "Interior Details & Finishes", "Rev": "05", "Date": "2025-05-05"}
+        ]
+        
+        for drawing in arch_drawings:
+            col1, col2, col3, col4 = st.columns([2, 4, 1, 2])
+            col1.write(f"**{drawing['Sheet']}**")
+            col2.write(drawing['Title'])
+            col3.write(drawing['Rev'])
+            col4.write(drawing['Date'])
+    
+    with drawing_tabs[1]:
+        st.subheader("Structural Drawings")
+        struct_drawings = [
+            {"Sheet": "S-001", "Title": "Structural General Notes", "Rev": "06", "Date": "2025-05-18"},
+            {"Sheet": "S-100", "Title": "Foundation Plan", "Rev": "08", "Date": "2025-05-20"},
+            {"Sheet": "S-200", "Title": "Ground Floor Framing Plan", "Rev": "07", "Date": "2025-05-15"},
+            {"Sheet": "S-201", "Title": "Typical Floor Framing Plan", "Rev": "06", "Date": "2025-05-10"},
+            {"Sheet": "S-300", "Title": "Column Schedule & Details", "Rev": "08", "Date": "2025-05-20"},
+            {"Sheet": "S-400", "Title": "Connection Details", "Rev": "07", "Date": "2025-05-15"}
+        ]
+        
+        for drawing in struct_drawings:
+            col1, col2, col3, col4 = st.columns([2, 4, 1, 2])
+            col1.write(f"**{drawing['Sheet']}**")
+            col2.write(drawing['Title'])
+            col3.write(drawing['Rev'])
+            col4.write(drawing['Date'])
+
+def render_specifications():
+    """Render Highland Tower Development project specifications"""
+    st.header("📖 Project Specifications - Highland Tower Development")
+    st.markdown("**CSI MasterFormat 2018 Edition | 16 Divisions**")
+    
+    # Specifications overview
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Total Sections", "156")
+    col2.metric("Current Version", "3.2")
+    col3.metric("Last Updated", "May 18, 2025")
+    col4.metric("Completion", "94%")
+    
+    # CSI Divisions
+    spec_tabs = st.tabs(["📋 General", "🏗️ Sitework", "🧱 Concrete", "⚡ Metals", "🔧 Mechanical", "💡 Electrical"])
+    
+    with spec_tabs[0]:
+        st.subheader("Division 01 - General Requirements")
+        general_specs = [
+            {"Section": "01 1000", "Title": "Summary", "Status": "Complete", "Pages": "12"},
+            {"Section": "01 2500", "Title": "Substitution Procedures", "Status": "Complete", "Pages": "8"},
+            {"Section": "01 3300", "Title": "Submittal Procedures", "Status": "Complete", "Pages": "15"},
+            {"Section": "01 4000", "Title": "Quality Requirements", "Status": "Complete", "Pages": "22"},
+            {"Section": "01 5000", "Title": "Temporary Facilities", "Status": "Complete", "Pages": "18"},
+            {"Section": "01 7000", "Title": "Execution & Closeout", "Status": "Complete", "Pages": "25"}
+        ]
+        
+        for spec in general_specs:
+            col1, col2, col3, col4 = st.columns([2, 4, 2, 1])
+            col1.write(f"**{spec['Section']}**")
+            col2.write(spec['Title'])
+            col3.write(f"✅ {spec['Status']}")
+            col4.write(f"{spec['Pages']}p")
+    
+    with spec_tabs[1]:
+        st.subheader("Division 03 - Concrete")
+        concrete_specs = [
+            {"Section": "03 3000", "Title": "Cast-in-Place Concrete", "Status": "Complete", "Pages": "28"},
+            {"Section": "03 4000", "Title": "Precast Concrete", "Status": "Complete", "Pages": "22"},
+            {"Section": "03 5000", "Title": "Cementitious Decks", "Status": "Complete", "Pages": "15"}
+        ]
+        
+        for spec in concrete_specs:
+            col1, col2, col3, col4 = st.columns([2, 4, 2, 1])
+            col1.write(f"**{spec['Section']}**")
+            col2.write(spec['Title'])
+            col3.write(f"✅ {spec['Status']}")
+            col4.write(f"{spec['Pages']}p")
+
+def render_document_upload_with_pdf_viewer():
+    """Enhanced document upload with PDF viewing and markup capabilities"""
+    st.header("⬆️ Document Upload & PDF Viewer")
+    st.markdown("**Upload, view, and markup construction documents for Highland Tower Development**")
+    
+    # Upload section
+    st.subheader("📤 Upload New Document")
+    
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        uploaded_file = st.file_uploader(
+            "Select file to upload",
+            type=["pdf", "dwg", "xlsx", "docx", "jpg", "png"],
+            help="Supported formats: PDF, DWG, Excel, Word, Images"
+        )
+        
+        if uploaded_file:
+            # Document metadata form
+            with st.form("document_metadata"):
+                doc_title = st.text_input("Document Title", value=uploaded_file.name.split('.')[0])
+                doc_category = st.selectbox("Category", [
+                    "Architectural Drawings", "Structural Drawings", "MEP Drawings", 
+                    "Specifications", "Submittals", "RFIs", "Reports", "Photos"
+                ])
+                doc_phase = st.selectbox("Project Phase", [
+                    "Design Development", "Construction Documents", "Construction", "Closeout"
+                ])
+                doc_tags = st.text_input("Tags (comma-separated)", placeholder="foundation, concrete, level-13")
+                
+                submit_doc = st.form_submit_button("📁 Upload Document")
+                
+                if submit_doc:
+                    # Process upload
+                    st.success(f"✅ Document '{doc_title}' uploaded successfully!")
+                    st.info("📋 Document has been added to the Highland Tower project database.")
+    
+    with col2:
+        st.markdown("**📊 Upload Statistics**")
+        st.metric("Total Documents", "1,247")
+        st.metric("This Week", "23", "+8")
+        st.metric("Storage Used", "45.2 GB", "+2.1 GB")
+    
+    # PDF Viewer and Markup section
+    st.divider()
+    st.subheader("📄 PDF Viewer & Markup Tools")
+    
+    # Sample PDF documents for demonstration
+    sample_docs = [
+        "A-101 Ground Floor Plan.pdf",
+        "S-100 Foundation Plan.pdf", 
+        "M-200 HVAC Layout.pdf",
+        "Spec Section 03 3000 Concrete.pdf"
+    ]
+    
+    selected_doc = st.selectbox("Select document to view:", sample_docs)
+    
+    if selected_doc:
+        col1, col2 = st.columns([3, 1])
+        
+        with col1:
+            st.markdown(f"**Viewing: {selected_doc}**")
+            
+            # PDF viewer placeholder (would integrate with actual PDF viewer)
+            st.markdown("""
+            <div style="border: 2px solid #e1e5e9; border-radius: 8px; padding: 20px; text-align: center; background-color: #f8f9fa;">
+                <h4>📄 PDF Viewer</h4>
+                <p><strong>{}</strong></p>
+                <p>🔍 Zoom: 100% | Page 1 of 24</p>
+                <div style="margin: 20px 0;">
+                    <button style="margin: 5px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px;">🔍 Zoom In</button>
+                    <button style="margin: 5px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px;">🔍 Zoom Out</button>
+                    <button style="margin: 5px; padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px;">✏️ Markup</button>
+                    <button style="margin: 5px; padding: 8px 16px; background: #ffc107; color: black; border: none; border-radius: 4px;">💬 Comment</button>
+                </div>
+                <p style="color: #6c757d;">PDF content would display here with full markup capabilities</p>
+            </div>
+            """.format(selected_doc), unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown("**🛠️ Markup Tools**")
+            
+            # Markup tool options
+            markup_tool = st.radio("Select Tool:", [
+                "✏️ Pen", "📝 Text", "🔲 Rectangle", "🔴 Circle", "➡️ Arrow", "📌 Pin"
+            ])
+            
+            if markup_tool == "✏️ Pen":
+                pen_color = st.color_picker("Pen Color", "#FF0000")
+                pen_size = st.slider("Pen Size", 1, 10, 3)
+            elif markup_tool == "📝 Text":
+                text_content = st.text_area("Add Text", placeholder="Enter your comment...")
+                text_color = st.color_picker("Text Color", "#000000")
+            
+            st.markdown("**💾 Actions**")
+            if st.button("💾 Save Markups", use_container_width=True):
+                st.success("✅ Markups saved!")
+            if st.button("📤 Share Document", use_container_width=True):
+                st.info("📧 Document shared with project team")
+            if st.button("🖨️ Print", use_container_width=True):
+                st.info("🖨️ Sending to printer...")
+    
+    # Recent markups
+    st.divider()
+    st.subheader("📋 Recent Document Activity")
+    
+    recent_activity = [
+        {"doc": "A-101 Ground Floor Plan", "action": "Added markup", "user": "Mike Rodriguez", "time": "2 hours ago"},
+        {"doc": "S-100 Foundation Plan", "action": "Added comment", "user": "Sarah Chen", "time": "5 hours ago"},
+        {"doc": "Spec 03 3000", "action": "Approved revision", "user": "Project Manager", "time": "Yesterday"},
+        {"doc": "M-200 HVAC Layout", "action": "Uploaded new version", "user": "MEP Engineer", "time": "2 days ago"}
+    ]
+    
+    for activity in recent_activity:
+        col1, col2, col3, col4 = st.columns([3, 2, 2, 2])
+        col1.write(f"📄 {activity['doc']}")
+        col2.write(activity['action'])
+        col3.write(activity['user'])
+        col4.write(activity['time'])
+
 def render_document_upload():
     """Render document upload interface."""
     st.subheader("Upload Document")

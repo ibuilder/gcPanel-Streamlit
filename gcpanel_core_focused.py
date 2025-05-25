@@ -2547,11 +2547,12 @@ def render_daily_reports():
         st.markdown("#### 📡 Live Activity Stream")
         
         activities = [
-            {"time": "2 minutes ago", "user": "Mike Rodriguez", "action": "📸 Uploaded progress photos", "location": "Level 13-G", "type": "photo"},
-            {"time": "8 minutes ago", "user": "Sarah Chen", "action": "✅ Completed MEP inspection", "location": "Level 11", "type": "completion"},
-            {"time": "15 minutes ago", "user": "AI System", "action": "🤖 Detected quality variance", "location": "Concrete Pour #237", "type": "alert"},
-            {"time": "23 minutes ago", "user": "Jennifer Walsh", "action": "📝 Submitted daily report", "location": "Level 9", "type": "report"},
-            {"time": "35 minutes ago", "user": "Safety AI", "action": "🦺 Automated safety scan complete", "location": "Site-wide", "type": "safety"}
+            {"time": "2 hours ago", "icon": "❓", "action": "RFI: RFI #123 was answered", "user": "Project Manager", "type": "rfi"},
+            {"time": "Yesterday", "icon": "✅", "action": "Submittal: Submittal #45 was approved", "user": "Engineering Team", "type": "submittal"},
+            {"time": "2 days ago", "icon": "🏗️", "action": "Project: New milestone added", "user": "Highland Construction", "type": "project"},
+            {"time": "3 days ago", "icon": "📋", "action": "Task: Task assigned to John Smith", "user": "Site Supervisor", "type": "assignment"},
+            {"time": "4 days ago", "icon": "📄", "action": "Document: New document uploaded", "user": "Document Control", "type": "document"},
+            {"time": "5 days ago", "icon": "🦺", "action": "Safety: Safety meeting scheduled", "user": "Safety Manager", "type": "safety"}
         ]
         
         for activity in activities:

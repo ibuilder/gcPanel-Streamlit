@@ -21,24 +21,21 @@ def render():
     """, unsafe_allow_html=True)
     
     # Engineering tabs
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📋 RFIs", "📐 Drawing Management", "🏗️ Structural", "⚡ MEP Systems", "🧪 Materials Testing", "📊 Engineering Analytics"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📋 RFIs", "🏗️ Structural", "⚡ MEP Systems", "🧪 Materials Testing", "📊 Engineering Analytics"])
     
     with tab1:
         render_rfis()
     
     with tab2:
-        render_drawing_management()
-    
-    with tab3:
         render_structural()
     
-    with tab4:
+    with tab3:
         render_mep_systems()
     
-    with tab5:
+    with tab4:
         render_materials_testing()
     
-    with tab6:
+    with tab5:
         render_engineering_analytics()
 
 def render_rfis():

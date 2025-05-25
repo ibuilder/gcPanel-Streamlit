@@ -117,32 +117,49 @@ def render_sidebar():
         
         st.markdown("### 🎯 Core Management")
         core_modules = [
-            "Dashboard", "PreConstruction", "Engineering", "Field Operations",
-            "Safety", "Contracts", "Cost Management", "BIM", "Closeout"
+            ("📊 Dashboard", "Dashboard"),
+            ("🏗️ PreConstruction", "PreConstruction"), 
+            ("⚙️ Engineering", "Engineering"),
+            ("👷 Field Operations", "Field Operations"),
+            ("🦺 Safety", "Safety"),
+            ("📋 Contracts", "Contracts"),
+            ("💰 Cost Management", "Cost Management"),
+            ("🏢 BIM", "BIM"),
+            ("✅ Closeout", "Closeout")
         ]
         
-        for module in core_modules:
-            if st.button(f"📋 {module}", key=f"core_{module}", use_container_width=True):
+        for display_name, module in core_modules:
+            if st.button(display_name, key=f"core_{module}", use_container_width=True):
                 st.session_state.current_menu = module
                 st.rerun()
         
         st.markdown("### 🔧 Advanced Tools")
         advanced_tools = [
-            "RFIs", "Daily Reports", "Submittals", "Transmittals",
-            "Scheduling", "Quality Control", "Material Management",
-            "Equipment Tracking", "Progress Photos"
+            ("📝 RFIs", "RFIs"),
+            ("📊 Daily Reports", "Daily Reports"),
+            ("📤 Submittals", "Submittals"),
+            ("📨 Transmittals", "Transmittals"),
+            ("📅 Scheduling", "Scheduling"),
+            ("🔍 Quality Control", "Quality Control"),
+            ("📦 Material Management", "Material Management"),
+            ("🚛 Equipment Tracking", "Equipment Tracking"),
+            ("📸 Progress Photos", "Progress Photos")
         ]
         
-        for tool in advanced_tools:
-            if st.button(f"⚡ {tool}", key=f"tool_{tool}", use_container_width=True):
+        for display_name, tool in advanced_tools:
+            if st.button(display_name, key=f"tool_{tool}", use_container_width=True):
                 st.session_state.current_menu = tool
                 st.rerun()
         
         st.markdown("### 🤖 Intelligence")
-        ai_modules = ["Analytics", "AI Assistant", "Mobile Companion"]
+        ai_modules = [
+            ("📈 Analytics", "Analytics"),
+            ("🤖 AI Assistant", "AI Assistant"),
+            ("📱 Mobile Companion", "Mobile Companion")
+        ]
         
-        for module in ai_modules:
-            if st.button(f"🧠 {module}", key=f"ai_{module}", use_container_width=True):
+        for display_name, module in ai_modules:
+            if st.button(display_name, key=f"ai_{module}", use_container_width=True):
                 st.session_state.current_menu = module
                 st.rerun()
         

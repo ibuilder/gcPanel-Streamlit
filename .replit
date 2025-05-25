@@ -48,6 +48,10 @@ args = "gcPanel Ultimate Clean"
 task = "workflow.run"
 args = "gcPanel Clean Working"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "gcPanel Core Focused"
+
 [[workflows.workflow]]
 name = "gcPanel Sidebar"
 author = "agent"
@@ -118,6 +122,15 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "streamlit run gcpanel_working_clean.py --server.port 5000"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "gcPanel Core Focused"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "streamlit run gcpanel_core_focused.py --server.port 5000"
 waitForPort = 5000
 
 [[ports]]

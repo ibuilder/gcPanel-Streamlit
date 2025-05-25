@@ -20,92 +20,113 @@ def initialize_session_state():
         "project_name": "Highland Tower Development",
         "project_value": "$45.5M",
         "residential_units": 120,
-        "retail_units": 8
+        "retail_units": 8,
+        "theme": "dark"  # Default to dark theme
     }
     
     for key, value in defaults.items():
         if key not in st.session_state:
             st.session_state[key] = value
 
-def apply_professional_theme():
-    """Apply sophisticated enterprise styling - better than light/dark"""
-    st.markdown("""
-    <style>
-    /* Premium Enterprise Theme - Sophisticated Blue-Gray Palette */
-    .stApp {
-        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%);
-    }
+def apply_theme():
+    """Apply theme based on user selection - dark as default"""
+    theme = st.session_state.get("theme", "dark")
     
-    /* Sidebar - Deep Professional Navy */
-    .css-1d391kg, 
-    section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #334155 100%) !important;
-        border-right: 3px solid #3b82f6;
-        box-shadow: 4px 0 20px rgba(15, 23, 42, 0.3);
-    }
+    if theme == "dark":
+        st.markdown("""
+        <style>
+        .stApp {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f1f5f9;
+        }
+        
+        /* Dark Sidebar */
+        section[data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #020617 0%, #0f172a 100%) !important;
+            border-right: 2px solid #1e40af;
+        }
+        
+        section[data-testid="stSidebar"] * {
+            color: white !important;
+        }
+        
+        section[data-testid="stSidebar"] button {
+            background: rgba(30, 64, 175, 0.2) !important;
+            color: white !important;
+            border: 1px solid rgba(59, 130, 246, 0.3) !important;
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        section[data-testid="stSidebar"] button:hover {
+            background: rgba(59, 130, 246, 0.4) !important;
+            transform: translateX(5px) !important;
+        }
+        
+        /* Main content cards */
+        .metric-card {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+            border: 1px solid #475569 !important;
+        }
+        
+        .enterprise-header {
+            background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+        }
+        
+        .project-info {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border-left: 4px solid #3b82f6;
+        }
+        </style>
+        """, unsafe_allow_html=True)
     
-    /* All Sidebar Text - Crisp White */
-    section[data-testid="stSidebar"] * {
-        color: white !important;
-    }
-    
-    section[data-testid="stSidebar"] h1,
-    section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3,
-    section[data-testid="stSidebar"] h4,
-    section[data-testid="stSidebar"] h5,
-    section[data-testid="stSidebar"] h6 {
-        color: #f8fafc !important;
-        font-weight: 600 !important;
-        text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    }
-    
-    section[data-testid="stSidebar"] p,
-    section[data-testid="stSidebar"] span,
-    section[data-testid="stSidebar"] div,
-    section[data-testid="stSidebar"] strong {
-        color: #e2e8f0 !important;
-    }
-    
-    /* Navigation Buttons - Glass Morphism Effect */
-    section[data-testid="stSidebar"] button {
-        background: rgba(255, 255, 255, 0.08) !important;
-        color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-radius: 12px !important;
-        backdrop-filter: blur(10px) !important;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-        font-weight: 500 !important;
-    }
-    
-    section[data-testid="stSidebar"] button:hover {
-        background: rgba(59, 130, 246, 0.2) !important;
-        border-color: #60a5fa !important;
-        transform: translateX(8px) scale(1.02) !important;
-        box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3) !important;
-    }
-    
-    /* Input Fields - Modern Glass Design */
-    section[data-testid="stSidebar"] input {
-        background: rgba(248, 250, 252, 0.95) !important;
-        color: #1e293b !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 10px !important;
-        backdrop-filter: blur(5px) !important;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1) !important;
-    }
-    
-    section[data-testid="stSidebar"] input:focus {
-        border-color: #3b82f6 !important;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
-    }
-    
-    section[data-testid="stSidebar"] label {
-        color: #f1f5f9 !important;
-        font-weight: 600 !important;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    }
+    else:  # light theme
+        st.markdown("""
+        <style>
+        .stApp {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #1e293b;
+        }
+        
+        /* Light Sidebar */
+        section[data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%) !important;
+            border-right: 2px solid #cbd5e1;
+        }
+        
+        section[data-testid="stSidebar"] * {
+            color: #1e293b !important;
+        }
+        
+        section[data-testid="stSidebar"] button {
+            background: rgba(59, 130, 246, 0.1) !important;
+            color: #1e40af !important;
+            border: 1px solid rgba(59, 130, 246, 0.2) !important;
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        section[data-testid="stSidebar"] button:hover {
+            background: rgba(59, 130, 246, 0.2) !important;
+            transform: translateX(5px) !important;
+        }
+        
+        /* Main content cards */
+        .metric-card {
+            background: white !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+        
+        .enterprise-header {
+            background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+        }
+        
+        .project-info {
+            background: white;
+            border-left: 4px solid #3b82f6;
+        }
+        </style>
+        """, unsafe_allow_html=True)
     
     .enterprise-header {
         background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);

@@ -1768,7 +1768,7 @@ def render_main_content():
             "Cost Management": render_cost_management,
             "BIM": render_bim,
             "Analytics": render_analytics,
-            "Documents": render_documents,
+            "Documents": lambda: __import__("modules.documents").documents.render_documents(),
             "Scheduling": render_scheduling,
             "AI Assistant": render_ai_assistant,
             "Mobile Companion": render_mobile_companion,

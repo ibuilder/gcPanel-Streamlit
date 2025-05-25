@@ -377,13 +377,10 @@ def render_sidebar():
             st.markdown("### 🔧 Advanced Tools")
             advanced_tools = [
                 ("📝 RFIs", "RFIs"),
-                ("📊 Daily Reports", "Daily Reports"),
                 ("📤 Submittals", "Submittals"),
                 ("📨 Transmittals", "Transmittals"),
                 ("📅 Scheduling", "Scheduling"),
                 ("🔍 Quality Control", "Quality Control"),
-                ("📦 Material Management", "Material Management"),
-                ("🚛 Equipment Tracking", "Equipment Tracking"),
                 ("📸 Progress Photos", "Progress Photos")
             ]
             
@@ -1401,7 +1398,7 @@ def render_field_operations():
     st.title("👷 Field Operations - Live Project Management")
     st.markdown("**Real-time field coordination and workforce management**")
     
-    tab1, tab2, tab3, tab4 = st.tabs(["👥 Crew Management", "📊 Daily Reports", "🌤️ Weather Impact", "📱 Mobile Tools"])
+    tab1, tab2, tab3 = st.tabs(["👥 Crew Management", "🌤️ Weather Impact", "📱 Mobile Tools"])
     
     with tab1:
         st.markdown("### 👥 Active Crew Management")
@@ -1479,7 +1476,7 @@ def render_cost_management():
     st.title("💰 Cost Management - Financial Control Center")
     st.markdown("**Real-time budget tracking with predictive analytics**")
     
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 Budget Overview", "📈 Forecasting", "💳 Change Orders", "📋 Cost Controls"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Budget Overview", "📈 Forecasting", "💳 Change Orders", "📋 Owner Bill", "📄 AIA G702/G703"])
     
     with tab1:
         st.markdown("### 💰 Real-Time Budget Performance")
@@ -1505,6 +1502,67 @@ def render_cost_management():
         fig = px.bar(cost_data, x='Category', y=['Budget', 'Actual'], 
                     title="Budget vs Actual by Category (Millions $)", barmode='group')
         st.plotly_chart(fig, use_container_width=True)
+    
+    with tab4:
+        st.markdown("### 📋 Owner Bill Management")
+        st.markdown("**Highland Tower Development - Owner Billing Dashboard**")
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Current Bill Amount", "$2,847,500", "Application #8")
+        with col2:
+            st.metric("Total Billed to Date", "$30,247,800", "67% of contract")
+        with col3:
+            st.metric("Retention Held", "$1,512,390", "5% standard")
+            
+        # Owner billing interface
+        st.markdown("#### 💰 Create Owner Bill")
+        
+        bill_col1, bill_col2 = st.columns(2)
+        with bill_col1:
+            bill_period = st.selectbox("Billing Period", ["January 2025", "December 2024", "November 2024"])
+            bill_amount = st.number_input("Bill Amount ($)", value=2847500, step=1000)
+            retention_rate = st.number_input("Retention Rate (%)", value=5.0, step=0.1)
+            
+        with bill_col2:
+            work_completed = st.text_area("Work Completed This Period", 
+                "Level 13 structural steel erection completed\nMEP rough-in Level 9-11 progress\nExterior skin installation ongoing")
+            
+        if st.button("📤 Generate Owner Bill", type="primary"):
+            st.success("✅ Owner bill generated and ready for submission")
+            
+    with tab5:
+        st.markdown("### 📄 AIA G702/G703 Application & Certificate for Payment")
+        st.markdown("**Standard AIA billing forms for Highland Tower Development**")
+        
+        # G702/G703 interface
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            st.markdown("#### 📋 Current Application Details")
+            
+            app_data = pd.DataFrame([
+                {"Line Item": "01 - General Requirements", "Scheduled Value": "$1,820,000", "Work Complete": "$1,638,000", "% Complete": "90%"},
+                {"Line Item": "03 - Concrete", "Scheduled Value": "$8,750,000", "Work Complete": "$7,875,000", "% Complete": "90%"},
+                {"Line Item": "05 - Metals", "Scheduled Value": "$12,400,000", "Work Complete": "$8,680,000", "% Complete": "70%"},
+                {"Line Item": "07 - Thermal & Moisture", "Scheduled Value": "$3,200,000", "Work Complete": "$1,280,000", "% Complete": "40%"},
+                {"Line Item": "08 - Openings", "Scheduled Value": "$4,850,000", "Work Complete": "$1,455,000", "% Complete": "30%"}
+            ])
+            
+            st.dataframe(app_data, use_container_width=True, hide_index=True)
+            
+        with col2:
+            st.markdown("#### 🔧 Application Controls")
+            app_number = st.number_input("Application Number", value=8, min_value=1)
+            app_date = st.date_input("Application Date")
+            period_to = st.date_input("Period To")
+            
+            if st.button("📄 Generate G702", use_container_width=True):
+                st.success("G702 Application generated")
+            if st.button("📊 Generate G703", use_container_width=True):
+                st.success("G703 Schedule of Values generated")
+            if st.button("📤 Submit Application", use_container_width=True, type="primary"):
+                st.success("Payment application submitted to owner")
 
 def render_recent_reports():
     """Recent Daily Reports Management"""

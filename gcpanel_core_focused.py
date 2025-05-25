@@ -958,8 +958,7 @@ def render_sidebar():
             st.markdown("**System Management**")
             core_admin = [
                 ("👥 User Management", "User Management"),
-                ("🔐 Security Settings", "Security Settings"),
-                ("📊 System Analytics", "System Analytics")
+                ("🔐 Security Settings", "Security Settings")
             ]
             
             for display_name, admin_module in core_admin:

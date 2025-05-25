@@ -1,262 +1,538 @@
 """
-User Management Module for gcPanel Highland Tower Development
+User Management Module - Highland Tower Development
 Enterprise-grade user administration with role-based access control
 """
 
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 from datetime import datetime, timedelta
 import hashlib
-import secrets
 
 def render():
-    """Render the User Management admin module"""
+    """Render the comprehensive User Management module"""
+    st.title("👥 User Management - Highland Tower Development")
+    st.markdown("**Enterprise User Administration & Role-Based Access Control**")
     
-    st.markdown("""
-    <div class="admin-header">
-        <h1>👥 User Management</h1>
-        <p>Highland Tower Development - Team Administration</p>
-    </div>
-    """, unsafe_allow_html=True)
+    # Initialize session state for user data
+    if 'users' not in st.session_state:
+        st.session_state.users = get_sample_users()
+    if 'user_roles' not in st.session_state:
+        st.session_state.user_roles = get_user_roles()
+    if 'user_permissions' not in st.session_state:
+        st.session_state.user_permissions = get_permissions_matrix()
     
-    # User Management Tabs
-    tab1, tab2, tab3, tab4 = st.tabs(["👥 Active Users", "➕ Add User", "🔐 Roles & Permissions", "📊 User Analytics"])
+    # User management overview
+    total_users = len(st.session_state.users)
+    active_users = len([u for u in st.session_state.users if u['status'] == 'Active'])
+    pending_users = len([u for u in st.session_state.users if u['status'] == 'Pending'])
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Total Users", total_users, "Highland Tower Team")
+    with col2:
+        st.metric("Active Users", active_users, f"{active_users/total_users*100:.0f}% of total")
+    with col3:
+        st.metric("Pending Approval", pending_users, "Awaiting activation")
+    with col4:
+        st.metric("User Satisfaction", "94.2%", "+2.3% this month")
+    
+    # Main tabs
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+        "👤 User Directory", "🔐 Roles & Permissions", "➕ Add New User", "📊 User Analytics", "⚙️ User Settings", "📋 Audit Log"
+    ])
     
     with tab1:
-        st.markdown("### Current Highland Tower Team")
-        
-        # Sample user data for Highland Tower Development
-        users_data = {
-            'User ID': ['HTD-001', 'HTD-002', 'HTD-003', 'HTD-004', 'HTD-005', 'HTD-006'],
-            'Full Name': ['Jennifer Walsh, AIA', 'Sarah Chen, PE', 'Mike Rodriguez', 'David Kim', 'Lisa Wong', 'Alex Thompson'],
-            'Email': ['jennifer.walsh@highlandtower.com', 'sarah.chen@highlandtower.com', 'mike.rodriguez@highlandtower.com', 
-                     'david.kim@highlandtower.com', 'lisa.wong@highlandtower.com', 'alex.thompson@highlandtower.com'],
-            'Role': ['Project Manager', 'Structural Engineer', 'Site Supervisor', 'MEP Supervisor', 'Safety Manager', 'Cost Estimator'],
-            'Department': ['Management', 'Engineering', 'Field Operations', 'MEP', 'Safety', 'Cost Management'],
-            'Status': ['Active', 'Active', 'Active', 'Active', 'Active', 'Active'],
-            'Last Login': ['2 hours ago', '5 hours ago', '1 day ago', '3 hours ago', '1 hour ago', '4 hours ago'],
-            'Phone': ['555-0101', '555-0102', '555-0103', '555-0104', '555-0105', '555-0106']
-        }
-        
-        df_users = pd.DataFrame(users_data)
-        
-        # Search and filter
-        col1, col2, col3 = st.columns([2, 1, 1])
-        with col1:
-            search_term = st.text_input("🔍 Search users", placeholder="Name, email, or role...")
-        with col2:
-            filter_role = st.selectbox("Filter by Role", ["All Roles", "Project Manager", "Engineer", "Supervisor", "Safety Manager"])
-        with col3:
-            filter_status = st.selectbox("Filter by Status", ["All Status", "Active", "Inactive", "Pending"])
-        
-        # Apply filters
-        filtered_df = df_users.copy()
-        if search_term:
-            mask = filtered_df.apply(lambda x: x.astype(str).str.contains(search_term, case=False).any(), axis=1)
-            filtered_df = filtered_df[mask]
-        
-        # Display users table
-        st.markdown('<div class="admin-table">', unsafe_allow_html=True)
-        
-        for index, user in filtered_df.iterrows():
-            with st.expander(f"👤 {user['Full Name']} - {user['Role']}", expanded=False):
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    st.markdown(f"**User ID:** {user['User ID']}")
-                    st.markdown(f"**Email:** {user['Email']}")
-                    st.markdown(f"**Department:** {user['Department']}")
-                    st.markdown(f"**Phone:** {user['Phone']}")
-                
-                with col2:
-                    st.markdown(f"**Status:** <span class='status-badge active'>{user['Status']}</span>", unsafe_allow_html=True)
-                    st.markdown(f"**Last Login:** {user['Last Login']}")
-                    
-                    # Action buttons
-                    col_btn1, col_btn2, col_btn3 = st.columns(3)
-                    with col_btn1:
-                        if st.button("✏️ Edit", key=f"edit_{user['User ID']}"):
-                            st.info(f"Editing {user['Full Name']}")
-                    with col_btn2:
-                        if st.button("🔒 Reset Password", key=f"reset_{user['User ID']}"):
-                            st.success(f"Password reset email sent to {user['Email']}")
-                    with col_btn3:
-                        if st.button("📧 Send Message", key=f"message_{user['User ID']}"):
-                            st.info(f"Opening message composer for {user['Full Name']}")
-        
-        st.markdown('</div>', unsafe_allow_html=True)
+        render_user_directory()
     
     with tab2:
-        st.markdown("### Add New Team Member")
-        
-        with st.form("add_user_form"):
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                new_full_name = st.text_input("Full Name*", placeholder="John Smith, PE")
-                new_email = st.text_input("Email Address*", placeholder="john.smith@highlandtower.com")
-                new_phone = st.text_input("Phone Number", placeholder="555-0107")
-                new_employee_id = st.text_input("Employee ID", placeholder="HTD-007")
-            
-            with col2:
-                new_role = st.selectbox("Role*", [
-                    "Project Manager", "Assistant Project Manager", 
-                    "Structural Engineer", "MEP Engineer", "Civil Engineer",
-                    "Site Supervisor", "Assistant Supervisor", "Foreman",
-                    "Safety Manager", "Safety Coordinator",
-                    "Cost Estimator", "Scheduler", "Quality Control",
-                    "Document Controller", "Admin Assistant"
-                ])
-                new_department = st.selectbox("Department*", [
-                    "Management", "Engineering", "Field Operations", 
-                    "Safety", "Cost Management", "Quality Control", "Administration"
-                ])
-                new_access_level = st.selectbox("Access Level*", [
-                    "Full Access", "Manager Access", "Standard Access", "Limited Access", "View Only"
-                ])
-                start_date = st.date_input("Start Date", datetime.now().date())
-            
-            # Additional permissions
-            st.markdown("**Module Access Permissions:**")
-            col_perm1, col_perm2, col_perm3 = st.columns(3)
-            
-            with col_perm1:
-                dashboard_access = st.checkbox("Dashboard", value=True)
-                preconstruction_access = st.checkbox("PreConstruction", value=True)
-                engineering_access = st.checkbox("Engineering", value=True)
-            
-            with col_perm2:
-                field_ops_access = st.checkbox("Field Operations", value=True)
-                safety_access = st.checkbox("Safety", value=True)
-                cost_mgmt_access = st.checkbox("Cost Management", value=True)
-            
-            with col_perm3:
-                contracts_access = st.checkbox("Contracts", value=False)
-                bim_access = st.checkbox("BIM", value=False)
-                admin_access = st.checkbox("Administration", value=False)
-            
-            submit_new_user = st.form_submit_button("➕ Add Team Member", use_container_width=True)
-            
-            if submit_new_user:
-                if new_full_name and new_email and new_role and new_department:
-                    st.success(f"✅ {new_full_name} has been added to the Highland Tower Development team!")
-                    st.info(f"📧 Welcome email sent to {new_email} with login credentials")
-                    st.info(f"🔐 Temporary password: {''.join(secrets.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') for _ in range(8))}")
-                else:
-                    st.error("Please fill in all required fields (*)")
+        render_roles_permissions()
     
     with tab3:
-        st.markdown("### Role-Based Access Control")
-        
-        # Role definitions
-        roles_data = {
-            'Role': ['Admin', 'Project Manager', 'Engineer', 'Supervisor', 'Safety Manager', 'Standard User'],
-            'Users': [1, 2, 3, 2, 1, 8],
-            'Dashboard': ['✅', '✅', '✅', '✅', '✅', '✅'],
-            'Engineering': ['✅', '✅', '✅', '⚠️', '❌', '👁️'],
-            'Cost Management': ['✅', '✅', '⚠️', '❌', '❌', '👁️'],
-            'Administration': ['✅', '❌', '❌', '❌', '❌', '❌'],
-            'Safety Override': ['✅', '✅', '❌', '❌', '✅', '❌']
-        }
-        
-        df_roles = pd.DataFrame(roles_data)
-        st.dataframe(df_roles, use_container_width=True)
-        
-        st.markdown("""
-        **Legend:**
-        - ✅ Full Access
-        - ⚠️ Limited Access  
-        - 👁️ Read Only
-        - ❌ No Access
-        """)
-        
-        # Role management
-        st.markdown("### Create Custom Role")
-        with st.form("create_role_form"):
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                role_name = st.text_input("Role Name", placeholder="Senior Engineer")
-                role_description = st.text_area("Description", placeholder="Senior engineering role with project oversight")
-            
-            with col2:
-                st.markdown("**Permissions:**")
-                permissions = {}
-                modules = ["Dashboard", "PreConstruction", "Engineering", "Field Operations", "Safety", "Cost Management", "Contracts", "BIM", "Analytics", "Documents", "Administration"]
-                
-                for module in modules:
-                    permissions[module] = st.selectbox(f"{module}", ["No Access", "Read Only", "Limited Access", "Full Access"], key=f"perm_{module}")
-            
-            if st.form_submit_button("Create Role"):
-                st.success(f"✅ Role '{role_name}' created successfully!")
+        render_add_user()
     
     with tab4:
-        st.markdown("### User Analytics & Activity")
+        render_user_analytics()
+    
+    with tab5:
+        render_user_settings()
+    
+    with tab6:
+        render_audit_log()
+
+def render_user_directory():
+    """Complete user directory with management functions"""
+    st.subheader("👤 Highland Tower Development - User Directory")
+    
+    # Action buttons
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        if st.button("➕ Invite New User", type="primary"):
+            st.session_state.show_invite_form = True
+    with col2:
+        if st.button("📊 Export Directory"):
+            st.success("✅ User directory exported to Excel")
+    with col3:
+        if st.button("📧 Bulk Email"):
+            st.session_state.show_bulk_email = True
+    with col4:
+        if st.button("🔄 Sync Active Directory"):
+            st.info("🔄 Syncing with company Active Directory...")
+    
+    # Search and filter
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        search_query = st.text_input("🔍 Search users", placeholder="Name, email, or role...")
+    with col2:
+        role_filter = st.selectbox("Filter by Role", ["All Roles"] + [role['name'] for role in st.session_state.user_roles])
+    with col3:
+        status_filter = st.selectbox("Filter by Status", ["All", "Active", "Inactive", "Pending", "Suspended"])
+    
+    # Display users
+    users_df = pd.DataFrame(st.session_state.users)
+    
+    # Apply filters
+    if search_query:
+        mask = users_df.apply(lambda x: search_query.lower() in str(x).lower(), axis=1)
+        users_df = users_df[mask]
+    
+    if role_filter != "All Roles":
+        users_df = users_df[users_df['role'] == role_filter]
+    
+    if status_filter != "All":
+        users_df = users_df[users_df['status'] == status_filter]
+    
+    st.markdown("### User Directory")
+    
+    for idx, user in users_df.iterrows():
+        with st.expander(f"👤 {user['name']} - {user['role']} ({user['status']})"):
+            col1, col2 = st.columns([3, 1])
+            
+            with col1:
+                # Status color coding
+                status_colors = {
+                    "Active": "#28a745",
+                    "Inactive": "#6c757d",
+                    "Pending": "#ffc107",
+                    "Suspended": "#dc3545"
+                }
+                
+                status_color = status_colors.get(user['status'], "#6c757d")
+                
+                st.markdown(f"""
+                <div style="border-left: 4px solid {status_color}; padding-left: 12px; margin: 10px 0;">
+                <strong>Email:</strong> {user['email']}<br>
+                <strong>Phone:</strong> {user['phone']}<br>
+                <strong>Company:</strong> {user['company']}<br>
+                <strong>Department:</strong> {user['department']}<br>
+                <strong>Last Login:</strong> {user['last_login']}<br>
+                <strong>Access Level:</strong> {user['access_level']}<br>
+                <strong>Created:</strong> {user['created_date']}
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with col2:
+                if st.button("✏️ Edit", key=f"edit_user_{user['user_id']}"):
+                    st.session_state.edit_user_id = user['user_id']
+                    st.session_state.show_user_edit = True
+                
+                if user['status'] == 'Active':
+                    if st.button("⏸️ Suspend", key=f"suspend_user_{user['user_id']}"):
+                        # Update user status
+                        for i, u in enumerate(st.session_state.users):
+                            if u['user_id'] == user['user_id']:
+                                st.session_state.users[i]['status'] = 'Suspended'
+                                break
+                        st.warning("⏸️ User suspended")
+                        st.rerun()
+                elif user['status'] == 'Suspended':
+                    if st.button("▶️ Activate", key=f"activate_user_{user['user_id']}"):
+                        for i, u in enumerate(st.session_state.users):
+                            if u['user_id'] == user['user_id']:
+                                st.session_state.users[i]['status'] = 'Active'
+                                break
+                        st.success("▶️ User reactivated")
+                        st.rerun()
+                
+                if st.button("🔐 Reset Password", key=f"reset_pwd_{user['user_id']}"):
+                    st.success("📧 Password reset email sent")
+
+def render_roles_permissions():
+    """Role-based access control management"""
+    st.subheader("🔐 Roles & Permissions Management")
+    
+    # Role overview
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("#### 👥 User Roles")
         
-        # User activity metrics
-        col1, col2, col3, col4 = st.columns(4)
+        for role in st.session_state.user_roles:
+            user_count = len([u for u in st.session_state.users if u['role'] == role['name']])
+            
+            with st.container():
+                st.markdown(f"""
+                <div style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin: 8px 0; background: white;">
+                    <h5>{role['icon']} {role['name']}</h5>
+                    <p style="color: #666; margin: 4px 0;">{role['description']}</p>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Users: {user_count}</span>
+                        <span style="color: {role['color']}; font-weight: bold;">{role['access_level']}</span>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                if st.button(f"⚙️ Configure {role['name']}", key=f"config_{role['name']}"):
+                    st.session_state.config_role = role['name']
+                    st.session_state.show_role_config = True
+    
+    with col2:
+        st.markdown("#### 🔒 Permission Matrix")
+        
+        # Display permissions matrix
+        permissions_df = pd.DataFrame(st.session_state.user_permissions)
+        st.dataframe(permissions_df, use_container_width=True)
+        
+        if st.button("📝 Edit Permissions Matrix", use_container_width=True):
+            st.session_state.show_permissions_edit = True
+
+def render_add_user():
+    """Add new user with role assignment"""
+    st.subheader("➕ Add New User to Highland Tower Development")
+    
+    with st.form("add_user_form"):
+        col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("""
-            <div class="admin-metric">
-                <h3>17</h3>
-                <p>Total Users</p>
-            </div>
-            """, unsafe_allow_html=True)
+            full_name = st.text_input("Full Name *", placeholder="John Smith")
+            email = st.text_input("Email Address *", placeholder="john.smith@company.com")
+            phone = st.text_input("Phone Number", placeholder="(555) 123-4567")
+            company = st.selectbox("Company *", 
+                                 ["Highland Tower Development", "Highland Construction", "Elite MEP", 
+                                  "Premium Plumbing", "Steel Fabricators Inc", "Other"])
         
         with col2:
-            st.markdown("""
-            <div class="admin-metric">
-                <h3>15</h3>
-                <p>Active Today</p>
-            </div>
-            """, unsafe_allow_html=True)
+            role = st.selectbox("User Role *", [r['name'] for r in st.session_state.user_roles])
+            department = st.selectbox("Department", 
+                                    ["Construction", "Engineering", "Safety", "Quality", "Finance", "Administration"])
+            access_level = st.selectbox("Access Level", ["Full Access", "Limited Access", "View Only", "Module Specific"])
+            start_date = st.date_input("Start Date", value=datetime.now())
         
-        with col3:
-            st.markdown("""
-            <div class="admin-metric">
-                <h3>94%</h3>
-                <p>Login Rate</p>
-            </div>
-            """, unsafe_allow_html=True)
+        # Special permissions
+        st.markdown("#### 🔐 Special Permissions")
         
-        with col4:
-            st.markdown("""
-            <div class="admin-metric">
-                <h3>2.3h</h3>
-                <p>Avg Session</p>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        # Recent activity
-        st.markdown("### Recent User Activity")
-        
-        activity_data = {
-            'Time': ['10:30 AM', '10:15 AM', '09:45 AM', '09:30 AM', '09:15 AM'],
-            'User': ['Sarah Chen, PE', 'Mike Rodriguez', 'Jennifer Walsh', 'David Kim', 'Lisa Wong'],
-            'Action': ['Updated RFI-2025-045', 'Submitted Daily Report', 'Approved Change Order CO-012', 'Uploaded Safety Photos', 'Created Cost Report'],
-            'Module': ['RFIs', 'Field Operations', 'Contracts', 'Safety', 'Cost Management'],
-            'IP Address': ['192.168.1.45', '192.168.1.67', '192.168.1.23', '192.168.1.89', '192.168.1.34']
-        }
-        
-        df_activity = pd.DataFrame(activity_data)
-        st.dataframe(df_activity, use_container_width=True)
-        
-        # Export options
-        st.markdown("### Export User Data")
         col1, col2, col3 = st.columns(3)
-        
         with col1:
-            if st.button("📊 Export User List", use_container_width=True):
-                st.success("User list exported to Excel")
-        
+            admin_access = st.checkbox("System Administrator")
+            financial_access = st.checkbox("Financial Data Access")
         with col2:
-            if st.button("📈 Export Activity Report", use_container_width=True):
-                st.success("Activity report generated")
-        
+            report_access = st.checkbox("Executive Reports")
+            audit_access = st.checkbox("Audit Log Access")
         with col3:
-            if st.button("🔐 Export Access Report", use_container_width=True):
-                st.success("Access permissions report created")
+            mobile_access = st.checkbox("Mobile App Access")
+            api_access = st.checkbox("API Access")
+        
+        # Account settings
+        temporary_password = st.text_input("Temporary Password", type="password", 
+                                         help="User will be required to change on first login")
+        
+        send_welcome_email = st.checkbox("Send welcome email with login instructions", value=True)
+        require_password_change = st.checkbox("Require password change on first login", value=True)
+        
+        submitted = st.form_submit_button("👤 Create User Account", type="primary")
+        
+        if submitted and full_name and email and role:
+            # Create new user
+            new_user = {
+                'user_id': f"USR-HTD-{len(st.session_state.users) + 1:03d}",
+                'name': full_name,
+                'email': email,
+                'phone': phone,
+                'company': company,
+                'role': role,
+                'department': department,
+                'access_level': access_level,
+                'status': 'Active',
+                'last_login': 'Never',
+                'created_date': datetime.now().strftime('%Y-%m-%d'),
+                'created_by': st.session_state.get('current_user', 'System Admin'),
+                'special_permissions': {
+                    'admin_access': admin_access,
+                    'financial_access': financial_access,
+                    'report_access': report_access,
+                    'audit_access': audit_access,
+                    'mobile_access': mobile_access,
+                    'api_access': api_access
+                }
+            }
+            
+            # Add to session state
+            st.session_state.users.append(new_user)
+            
+            st.success(f"✅ User account created successfully!")
+            st.success(f"👤 User ID: {new_user['user_id']}")
+            
+            if send_welcome_email:
+                st.info("📧 Welcome email sent with login instructions")
+            
+            st.rerun()
+
+def render_user_analytics():
+    """User activity and engagement analytics"""
+    st.subheader("📊 User Analytics & Activity")
+    
+    # User activity metrics
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Daily Active Users", "18", "75% of total")
+    with col2:
+        st.metric("Avg Session Time", "42 min", "+8 min vs last week")
+    with col3:
+        st.metric("Module Usage", "87%", "High engagement")
+    with col4:
+        st.metric("Mobile Usage", "34%", "Growing trend")
+    
+    # Analytics charts
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        # User activity over time
+        activity_data = pd.DataFrame({
+            'Date': pd.date_range('2025-05-01', periods=25),
+            'Active_Users': [12, 15, 18, 16, 19, 17, 20, 18, 16, 19, 21, 17, 18, 20, 19, 17, 18, 20, 19, 18, 17, 19, 18, 20, 18],
+            'Total_Sessions': [45, 52, 61, 58, 67, 59, 72, 65, 58, 69, 75, 62, 66, 73, 68, 61, 66, 72, 69, 65, 62, 68, 66, 72, 65]
+        })
+        
+        fig = px.line(activity_data, x='Date', y=['Active_Users', 'Total_Sessions'],
+                     title="User Activity Trends")
+        st.plotly_chart(fig, use_container_width=True)
+    
+    with col2:
+        # Module usage distribution
+        module_usage = pd.DataFrame({
+            'Module': ['Dashboard', 'Field Operations', 'Cost Management', 'Quality Control', 'Safety'],
+            'Usage_Count': [245, 189, 156, 134, 112]
+        })
+        
+        fig = px.bar(module_usage, x='Module', y='Usage_Count',
+                    title="Module Usage Statistics")
+        st.plotly_chart(fig, use_container_width=True)
+
+def render_user_settings():
+    """User preference and system settings"""
+    st.subheader("⚙️ User Management Settings")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("#### 🔐 Security Settings")
+        password_policy = st.selectbox("Password Policy", 
+                                     ["Standard", "Strong", "Enterprise", "Custom"])
+        session_timeout = st.slider("Session Timeout (minutes)", 15, 480, 60)
+        two_factor_auth = st.checkbox("Require Two-Factor Authentication", value=True)
+        login_attempts = st.number_input("Max Login Attempts", min_value=3, max_value=10, value=5)
+        
+        st.markdown("#### 📧 Notification Settings")
+        welcome_emails = st.checkbox("Send welcome emails to new users", value=True)
+        password_reminders = st.checkbox("Send password expiry reminders", value=True)
+        account_alerts = st.checkbox("Send security alerts", value=True)
+    
+    with col2:
+        st.markdown("#### 👥 Default User Settings")
+        default_role = st.selectbox("Default Role for New Users", 
+                                  [r['name'] for r in st.session_state.user_roles])
+        default_access = st.selectbox("Default Access Level", 
+                                    ["View Only", "Limited Access", "Full Access"])
+        auto_approval = st.checkbox("Auto-approve new user registrations", value=False)
+        
+        st.markdown("#### 🔄 Integration Settings")
+        ad_sync = st.checkbox("Sync with Active Directory", value=False)
+        sso_enabled = st.checkbox("Enable Single Sign-On", value=False)
+        api_access_default = st.checkbox("Enable API access by default", value=False)
+    
+    if st.button("💾 Save Settings", type="primary"):
+        st.success("✅ User management settings saved successfully!")
+
+def render_audit_log():
+    """User activity audit log"""
+    st.subheader("📋 User Activity Audit Log")
+    
+    # Audit log filters
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        date_range = st.selectbox("Date Range", ["Today", "Last 7 Days", "Last 30 Days", "Custom Range"])
+    with col2:
+        action_filter = st.selectbox("Action Type", ["All Actions", "Login", "Logout", "Create", "Edit", "Delete", "View"])
+    with col3:
+        user_filter = st.selectbox("User", ["All Users"] + [u['name'] for u in st.session_state.users])
+    
+    # Sample audit log data
+    audit_data = [
+        {
+            "Timestamp": "2025-05-25 14:32:15",
+            "User": "John Smith",
+            "Action": "Login",
+            "Module": "Dashboard",
+            "IP_Address": "192.168.1.45",
+            "Details": "Successful login from Chrome browser"
+        },
+        {
+            "Timestamp": "2025-05-25 14:28:03",
+            "User": "Sarah Chen", 
+            "Action": "Create",
+            "Module": "Quality Control",
+            "IP_Address": "192.168.1.67",
+            "Details": "Created new inspection QC-HTD-20250525-001"
+        },
+        {
+            "Timestamp": "2025-05-25 14:15:22",
+            "User": "Mike Torres",
+            "Action": "Edit",
+            "Module": "Cost Management", 
+            "IP_Address": "192.168.1.23",
+            "Details": "Updated budget item COST-HTD-0045"
+        },
+        {
+            "Timestamp": "2025-05-25 13:58:41",
+            "User": "Jennifer Walsh",
+            "Action": "View",
+            "Module": "Safety",
+            "IP_Address": "192.168.1.89",
+            "Details": "Viewed safety report for Level 13"
+        }
+    ]
+    
+    audit_df = pd.DataFrame(audit_data)
+    st.dataframe(audit_df, use_container_width=True)
+    
+    # Export options
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("📊 Export to Excel"):
+            st.success("📄 Audit log exported to Excel")
+    with col2:
+        if st.button("📧 Email Report"):
+            st.success("📧 Audit report emailed to administrators")
+    with col3:
+        if st.button("🔍 Advanced Search"):
+            st.info("🔍 Opening advanced audit search...")
+
+def get_sample_users():
+    """Generate sample user data for Highland Tower Development"""
+    return [
+        {
+            'user_id': 'USR-HTD-001',
+            'name': 'John Smith',
+            'email': 'john.smith@highland-construction.com',
+            'phone': '(555) 123-4567',
+            'company': 'Highland Construction',
+            'role': 'Project Manager',
+            'department': 'Construction',
+            'access_level': 'Full Access',
+            'status': 'Active',
+            'last_login': '2025-05-25 09:15',
+            'created_date': '2025-01-15'
+        },
+        {
+            'user_id': 'USR-HTD-002',
+            'name': 'Sarah Chen',
+            'email': 'sarah.chen@elite-mep.com',
+            'phone': '(555) 234-5678',
+            'company': 'Elite MEP',
+            'role': 'MEP Coordinator',
+            'department': 'Engineering',
+            'access_level': 'Limited Access',
+            'status': 'Active',
+            'last_login': '2025-05-25 08:45',
+            'created_date': '2025-02-01'
+        },
+        {
+            'user_id': 'USR-HTD-003',
+            'name': 'Mike Torres',
+            'email': 'mike.torres@highland-construction.com',
+            'phone': '(555) 345-6789',
+            'company': 'Highland Construction',
+            'role': 'Safety Manager',
+            'department': 'Safety',
+            'access_level': 'Full Access',
+            'status': 'Active',
+            'last_login': '2025-05-24 16:30',
+            'created_date': '2025-01-20'
+        },
+        {
+            'user_id': 'USR-HTD-004',
+            'name': 'Jennifer Walsh',
+            'email': 'jennifer.walsh@highland-tower.com',
+            'phone': '(555) 456-7890',
+            'company': 'Highland Tower Development',
+            'role': 'QC Inspector',
+            'department': 'Quality',
+            'access_level': 'Limited Access',
+            'status': 'Active',
+            'last_login': '2025-05-25 11:20',
+            'created_date': '2025-02-15'
+        }
+    ]
+
+def get_user_roles():
+    """Define user roles for Highland Tower Development"""
+    return [
+        {
+            'name': 'Project Manager',
+            'icon': '👨‍💼',
+            'description': 'Full project oversight and management authority',
+            'access_level': 'Full Access',
+            'color': '#007bff'
+        },
+        {
+            'name': 'Construction Manager',
+            'icon': '🏗️',
+            'description': 'Field operations and construction coordination',
+            'access_level': 'Full Access',
+            'color': '#28a745'
+        },
+        {
+            'name': 'MEP Coordinator',
+            'icon': '⚡',
+            'description': 'Mechanical, electrical, and plumbing coordination',
+            'access_level': 'Limited Access',
+            'color': '#ffc107'
+        },
+        {
+            'name': 'Safety Manager',
+            'icon': '🦺',
+            'description': 'Safety compliance and risk management',
+            'access_level': 'Full Access',
+            'color': '#dc3545'
+        },
+        {
+            'name': 'QC Inspector',
+            'icon': '🔍',
+            'description': 'Quality control and inspection authority',
+            'access_level': 'Limited Access',
+            'color': '#6f42c1'
+        },
+        {
+            'name': 'Field Supervisor',
+            'icon': '👷',
+            'description': 'On-site supervision and daily operations',
+            'access_level': 'Limited Access',
+            'color': '#fd7e14'
+        }
+    ]
+
+def get_permissions_matrix():
+    """Define permissions matrix for roles"""
+    return [
+        {'Module': 'Dashboard', 'Project Manager': '✅', 'Construction Manager': '✅', 'MEP Coordinator': '✅', 'Safety Manager': '✅', 'QC Inspector': '✅'},
+        {'Module': 'Cost Management', 'Project Manager': '✅', 'Construction Manager': '👁️', 'MEP Coordinator': '❌', 'Safety Manager': '❌', 'QC Inspector': '❌'},
+        {'Module': 'Quality Control', 'Project Manager': '✅', 'Construction Manager': '✅', 'MEP Coordinator': '👁️', 'Safety Manager': '✅', 'QC Inspector': '✅'},
+        {'Module': 'Safety', 'Project Manager': '✅', 'Construction Manager': '✅', 'MEP Coordinator': '👁️', 'Safety Manager': '✅', 'QC Inspector': '👁️'},
+        {'Module': 'Scheduling', 'Project Manager': '✅', 'Construction Manager': '✅', 'MEP Coordinator': '✏️', 'Safety Manager': '👁️', 'QC Inspector': '👁️'},
+        {'Module': 'Documents', 'Project Manager': '✅', 'Construction Manager': '✅', 'MEP Coordinator': '✅', 'Safety Manager': '✅', 'QC Inspector': '✅'}
+    ]
 
 if __name__ == "__main__":
     render()

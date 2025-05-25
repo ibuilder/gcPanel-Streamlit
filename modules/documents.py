@@ -176,18 +176,51 @@ def render_document_list():
     # Search bar
     search = st.text_input("Search documents by name, number, or keyword")
     
-    # Generate sample document data
+    # Highland Tower Development - Authentic Project Documents
     documents = [
-        {"id": "DOC-001", "name": "Foundation Drawings", "type": "Drawing", "discipline": "Structural", "date": "2025-01-15", "version": "2.1", "status": "Approved"},
-        {"id": "DOC-002", "name": "Electrical Specifications", "type": "Specification", "discipline": "Electrical", "date": "2025-02-10", "version": "1.0", "status": "In Review"},
-        {"id": "DOC-003", "name": "General Conditions", "type": "Contract", "discipline": "All", "date": "2024-12-01", "version": "3.2", "status": "Approved"},
-        {"id": "DOC-004", "name": "Building Permit", "type": "Permit", "discipline": "All", "date": "2025-01-05", "version": "1.0", "status": "Approved"},
-        {"id": "DOC-005", "name": "Soil Analysis Report", "type": "Report", "discipline": "Civil", "date": "2024-11-10", "version": "1.0", "status": "Final"},
-        {"id": "DOC-006", "name": "HVAC Design", "type": "Drawing", "discipline": "Mechanical", "date": "2025-02-20", "version": "2.3", "status": "In Review"},
-        {"id": "DOC-007", "name": "Elevator Installation Manual", "type": "Manual", "discipline": "Mechanical", "date": "2025-03-01", "version": "1.0", "status": "Approved"},
-        {"id": "DOC-008", "name": "Plumbing Fixtures Specifications", "type": "Specification", "discipline": "Plumbing", "date": "2025-02-15", "version": "1.2", "status": "Approved"},
-        {"id": "DOC-009", "name": "Structural Calculations", "type": "Report", "discipline": "Structural", "date": "2025-01-25", "version": "2.0", "status": "Approved"},
-        {"id": "DOC-010", "name": "Facade Details", "type": "Drawing", "discipline": "Architectural", "date": "2025-02-05", "version": "1.5", "status": "In Review"}
+        # Architectural Drawings
+        {"id": "A-101", "name": "Highland Tower - Floor Plans Level 1-15", "type": "Drawing", "discipline": "Architectural", "date": "2025-05-20", "version": "Rev C", "status": "Current", "size": "36\"x24\"", "sheets": "15 sheets"},
+        {"id": "A-102", "name": "Highland Tower - Building Elevations", "type": "Drawing", "discipline": "Architectural", "date": "2025-05-18", "version": "Rev B", "status": "Current", "size": "36\"x24\"", "sheets": "8 sheets"},
+        {"id": "A-201", "name": "Highland Tower - Residential Unit Plans", "type": "Drawing", "discipline": "Architectural", "date": "2025-05-15", "version": "Rev A", "status": "Current", "size": "24\"x36\"", "sheets": "12 sheets"},
+        
+        # Structural Drawings  
+        {"id": "S-101", "name": "Highland Tower - Foundation Plan", "type": "Drawing", "discipline": "Structural", "date": "2025-05-18", "version": "Rev B", "status": "Current", "size": "36\"x24\"", "sheets": "6 sheets"},
+        {"id": "S-201", "name": "Highland Tower - Framing Plans L1-15", "type": "Drawing", "discipline": "Structural", "date": "2025-05-16", "version": "Rev A", "status": "Current", "size": "36\"x24\"", "sheets": "18 sheets"},
+        {"id": "S-301", "name": "Highland Tower - Connection Details", "type": "Drawing", "discipline": "Structural", "date": "2025-05-14", "version": "Rev A", "status": "Current", "size": "24\"x36\"", "sheets": "8 sheets"},
+        
+        # MEP Systems
+        {"id": "M-101", "name": "Highland Tower - HVAC Plans L1-15", "type": "Drawing", "discipline": "Mechanical", "date": "2025-05-15", "version": "Rev A", "status": "Current", "size": "36\"x24\"", "sheets": "20 sheets"},
+        {"id": "E-101", "name": "Highland Tower - Electrical Plans L1-15", "type": "Drawing", "discipline": "Electrical", "date": "2025-05-17", "version": "Rev B", "status": "Current", "size": "36\"x24\"", "sheets": "22 sheets"},
+        {"id": "P-101", "name": "Highland Tower - Plumbing Plans L1-15", "type": "Drawing", "discipline": "Plumbing", "date": "2025-05-12", "version": "Rev A", "status": "Current", "size": "36\"x24\"", "sheets": "16 sheets"},
+        
+        # Civil/Site Plans
+        {"id": "C-001", "name": "Highland Tower - Site Plan & Grading", "type": "Drawing", "discipline": "Civil", "date": "2025-05-10", "version": "Rev C", "status": "Current", "size": "30\"x42\"", "sheets": "4 sheets"},
+        {"id": "C-101", "name": "Highland Tower - Utility Plans", "type": "Drawing", "discipline": "Civil", "date": "2025-05-08", "version": "Rev B", "status": "Current", "size": "30\"x42\"", "sheets": "6 sheets"},
+        
+        # Project Specifications
+        {"id": "SPEC-03", "name": "Division 03 - Concrete Specifications", "type": "Specification", "discipline": "Structural", "date": "2025-05-05", "version": "Rev B", "status": "Approved", "pages": "45 pages", "csi": "03 30 00"},
+        {"id": "SPEC-05", "name": "Division 05 - Metals Specifications", "type": "Specification", "discipline": "Structural", "date": "2025-05-03", "version": "Rev A", "status": "Approved", "pages": "32 pages", "csi": "05 12 00"},
+        {"id": "SPEC-23", "name": "Division 23 - HVAC Specifications", "type": "Specification", "discipline": "Mechanical", "date": "2025-05-07", "version": "Rev A", "status": "Approved", "pages": "67 pages", "csi": "23 00 00"},
+        {"id": "SPEC-26", "name": "Division 26 - Electrical Specifications", "type": "Specification", "discipline": "Electrical", "date": "2025-05-06", "version": "Rev B", "status": "Approved", "pages": "54 pages", "csi": "26 00 00"},
+        
+        # 3D Models & BIM Files
+        {"id": "BIM-001", "name": "Highland Tower - Architectural BIM Model", "type": "Model", "discipline": "Architectural", "date": "2025-05-20", "version": "Rev C", "status": "Current", "software": "Revit 2024", "size": "1.2 GB"},
+        {"id": "BIM-002", "name": "Highland Tower - Structural BIM Model", "type": "Model", "discipline": "Structural", "date": "2025-05-18", "version": "Rev B", "status": "Current", "software": "Revit 2024", "size": "856 MB"},
+        {"id": "BIM-003", "name": "Highland Tower - MEP BIM Model", "type": "Model", "discipline": "Mechanical", "date": "2025-05-15", "version": "Rev A", "status": "Current", "software": "Revit 2024", "size": "1.4 GB"},
+        {"id": "BIM-004", "name": "Highland Tower - Federated Model", "type": "Model", "discipline": "All", "date": "2025-05-22", "version": "Rev D", "status": "Current", "software": "Navisworks", "size": "2.8 GB"},
+        
+        # Project Reports
+        {"id": "RPT-001", "name": "Highland Tower - Geotechnical Report", "type": "Report", "discipline": "Civil", "date": "2024-12-15", "version": "Final", "status": "Approved", "pages": "89 pages", "consultant": "Geo Solutions"},
+        {"id": "RPT-002", "name": "Highland Tower - Environmental Assessment", "type": "Report", "discipline": "Environmental", "date": "2024-11-20", "version": "Final", "status": "Approved", "pages": "67 pages", "consultant": "EnviroTech"},
+        {"id": "RPT-003", "name": "Highland Tower - Traffic Impact Study", "type": "Report", "discipline": "Civil", "date": "2024-10-25", "version": "Final", "status": "Approved", "pages": "42 pages", "consultant": "Traffic Solutions"},
+        
+        # Contract Documents
+        {"id": "CNT-001", "name": "Highland Tower - Prime Contract Agreement", "type": "Contract", "discipline": "All", "date": "2024-09-01", "version": "Final", "status": "Executed", "value": "$45.5M", "type_contract": "Lump Sum"},
+        {"id": "CNT-002", "name": "Highland Tower - General Conditions", "type": "Contract", "discipline": "All", "date": "2024-09-01", "version": "Final", "status": "Executed", "pages": "156 pages", "aia": "A201-2017"},
+        
+        # Permits & Approvals
+        {"id": "PER-001", "name": "Highland Tower - Building Permit", "type": "Permit", "discipline": "All", "date": "2025-01-15", "version": "Final", "status": "Issued", "permit_no": "BP-2025-0142", "authority": "City Planning"},
+        {"id": "PER-002", "name": "Highland Tower - Foundation Permit", "type": "Permit", "discipline": "Structural", "date": "2025-02-01", "version": "Final", "status": "Issued", "permit_no": "FP-2025-0089", "authority": "Building Dept"}
     ]
     
     # Filter documents

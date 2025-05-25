@@ -301,74 +301,10 @@ def render_sidebar():
         role_info = role_permissions.get(user_role, role_permissions["user"])
         username = st.session_state.get('username', 'Guest')
         
-        st.markdown(f"""
-        <div style="
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(51, 65, 85, 0.9) 100%);
-            border: 2px solid rgba(59, 130, 246, 0.3);
-            border-radius: 20px;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.1);
-            backdrop-filter: blur(15px);
-            position: relative;
-            overflow: hidden;
-        ">
-            <div style="
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 3px;
-                background: linear-gradient(90deg, #3b82f6, #60a5fa, #93c5fd);
-            "></div>
-            
-            <div style="text-align: center; margin-bottom: 1rem;">
-                <div style="
-                    width: 60px;
-                    height: 60px;
-                    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-                    border-radius: 50%;
-                    margin: 0 auto 1rem auto;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1.5rem;
-                    color: white;
-                    font-weight: bold;
-                    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-                ">{username[0].upper() if username else 'G'}</div>
-                
-                <h4 style="
-                    color: #f1f5f9;
-                    margin: 0;
-                    font-size: 1.1rem;
-                    font-weight: 700;
-                ">{username}</h4>
-                
-                <p style="
-                    color: #60a5fa;
-                    margin: 0.5rem 0;
-                    font-size: 0.9rem;
-                    font-weight: 600;
-                ">{role_info['role_name']}</p>
-                
-                <div style="
-                    background: rgba(59, 130, 246, 0.2);
-                    border: 1px solid rgba(59, 130, 246, 0.4);
-                    border-radius: 12px;
-                    padding: 0.5rem;
-                    margin-top: 1rem;
-                ">
-                    <p style="
-                        color: #93c5fd;
-                        margin: 0;
-                        font-size: 0.8rem;
-                        font-weight: 500;
-                    ">🏗️ Highland Tower Development</p>
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        # Clean Profile Section - No HTML
+        st.markdown(f"### 👤 {username}")
+        st.caption(f"**{role_info['role_name']}**")
+        st.info("🏗️ Highland Tower Development")
         
         # Enhanced User Actions with Professional Styling
         st.markdown("### 👤 User Actions")

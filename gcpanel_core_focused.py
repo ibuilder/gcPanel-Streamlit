@@ -458,25 +458,38 @@ def render_sidebar():
                 st.success("✅ Successfully logged out. Redirecting to login...")
                 st.rerun()
         
-        # Core Management Modules (filtered by permissions)
-        st.markdown("### 🎯 Core Management")
-        core_modules = [
+        # Core Tools - Most Used Daily Operations
+        st.markdown("### ⚡ Core Tools")
+        core_tools = [
             ("📊 Dashboard", "Dashboard"),
+            ("📊 Daily Reports", "Daily Reports"),
+            ("💲 Unit Prices", "Unit Prices"),
+            ("🚛 Deliveries", "Deliveries"),
+            ("🦺 Safety", "Safety"),
+            ("📦 Material Management", "Material Management")
+        ]
+        
+        for display_name, module in core_tools:
+            if check_module_access(module):
+                if st.button(display_name, key=f"core_tool_{module}", use_container_width=True):
+                    st.session_state.current_menu = module
+                    st.rerun()
+        
+        # Management Modules - Project Level Operations
+        st.markdown("### 🎯 Project Management")
+        management_modules = [
             ("🏗️ PreConstruction", "PreConstruction"), 
             ("⚙️ Engineering", "Engineering"),
             ("👷 Field Operations", "Field Operations"),
-            ("🦺 Safety", "Safety"),
             ("📋 Contracts", "Contracts"),
             ("💰 Cost Management", "Cost Management"),
-            ("💲 Unit Prices", "Unit Prices"),
-            ("🚛 Deliveries", "Deliveries"),
             ("🏢 BIM", "BIM"),
             ("✅ Closeout", "Closeout")
         ]
         
-        for display_name, module in core_modules:
+        for display_name, module in management_modules:
             if check_module_access(module):
-                if st.button(display_name, key=f"core_{module}", use_container_width=True):
+                if st.button(display_name, key=f"mgmt_{module}", use_container_width=True):
                     st.session_state.current_menu = module
                     st.rerun()
         

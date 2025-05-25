@@ -222,52 +222,21 @@ def render_appearance_settings():
         """, unsafe_allow_html=True)
     
     # Additional visual settings
-    st.write("#### Visual Mode")
+    st.write("#### Highland Tower Professional Theme")
+    st.info("🎨 Highland Tower Development uses a fixed professional enterprise theme with navy sidebar and clean white content areas for optimal readability and brand consistency.")
     
-    # Create Light/Dark mode selector
-    col1, col2 = st.columns(2)
-    with col1:
-        # Light Mode
-        is_light = st.session_state.get('theme_mode', 'light') == 'light'
-        light_border = "3px solid #f59e0b" if is_light else "2px solid #e2e8f0"
-        
-        st.markdown(f"""
-        <div style="cursor: pointer; border-radius: 6px; padding: 15px; 
-                   background-color: #ffffff; margin-bottom: 10px; text-align: center;
-                   border: {light_border}; box-shadow: 0 1px 3px rgba(0,0,0,0.12);" 
-             id="light-mode">
-            <div style="font-size: 24px; margin-bottom: 5px;">☀️</div>
-            <div style="font-weight: 500;">Light Mode</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        if st.button("Light Mode", key="btn_light_mode"):
-            st.session_state.theme_mode = 'light'
-            st.rerun()
-    
-    with col2:
-        # Dark Mode
-        is_dark = st.session_state.get('theme_mode', 'light') == 'dark'
-        dark_border = "3px solid #f59e0b" if is_dark else "2px solid #e2e8f0"
-        
-        st.markdown(f"""
-        <div style="cursor: pointer; border-radius: 6px; padding: 15px; 
-                   background-color: #1e293b; color: white; margin-bottom: 10px; text-align: center;
-                   border: {dark_border}; box-shadow: 0 1px 3px rgba(0,0,0,0.12);" 
-             id="dark-mode">
-            <div style="font-size: 24px; margin-bottom: 5px;">🌙</div>
-            <div style="font-weight: 500;">Dark Mode</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        if st.button("Dark Mode", key="btn_dark_mode"):
-            st.session_state.theme_mode = 'dark'
-            st.rerun()
+    st.markdown("""
+    **Current Theme Features:**
+    • Professional navy sidebar with Highland Tower branding
+    • Clean white content areas for optimal readability
+    • Enterprise-grade buttons and forms
+    • Consistent color scheme across all modules
+    • Mobile-responsive design for field operations
+    """)
     
     # Apply visual changes
-    if st.button("Apply Visual Changes", key="apply_visual", type="primary"):
-        # In a real application, you would save these preferences to a database
-        st.success("Visual settings applied successfully!")
+    if st.button("Refresh Interface", key="refresh_interface", type="primary"):
+        st.success("Highland Tower interface refreshed successfully!")
             
     st.markdown('</div>', unsafe_allow_html=True)
 

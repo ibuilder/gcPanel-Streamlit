@@ -2690,35 +2690,206 @@ def render_material_management():
                     st.markdown(f"**Status:** {material['Status']}")
 
 def render_bim():
-    """Advanced BIM Management with 3D coordination"""
-    st.title("🏢 BIM Management - 3D Project Coordination")
-    st.markdown("**Building Information Modeling with clash detection and coordination**")
+    """Advanced BIM Management with 3D coordination for Highland Tower Development"""
+    st.title("🏢 BIM Management - Highland Tower Development")
+    st.markdown("**Building Information Modeling with clash detection and IFC coordination for $45.5M project**")
     
-    tab1, tab2, tab3 = st.tabs(["🎯 Model Coordination", "⚠️ Clash Detection", "📊 BIM Analytics"])
+    # BIM action buttons
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        if st.button("📤 Upload IFC Model", type="primary"):
+            st.session_state.show_ifc_upload = True
+    with col2:
+        if st.button("🔍 Run Clash Detection"):
+            st.session_state.show_clash_detection = True
+    with col3:
+        if st.button("📊 Model Analytics"):
+            st.session_state.show_model_analytics = True
+    with col4:
+        if st.button("📋 Export Report"):
+            st.success("📄 BIM coordination report exported")
+    
+    # IFC Upload form
+    if st.session_state.get("show_ifc_upload", False):
+        with st.form("ifc_upload_form"):
+            st.subheader("📤 Upload IFC Model")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                uploaded_file = st.file_uploader("Choose IFC File", type=['ifc'], help="Industry Foundation Classes format only")
+                model_name = st.text_input("Model Name", placeholder="Highland Tower - Architectural Rev D")
+                discipline = st.selectbox("Discipline", ["Architectural", "Structural", "MEP", "Civil", "Landscape"])
+                
+            with col2:
+                model_version = st.text_input("Model Version", placeholder="Rev D.1")
+                model_level = st.selectbox("Model Level", ["LOD 200", "LOD 300", "LOD 350", "LOD 400", "LOD 500"])
+                coordinated_by = st.text_input("Coordinated By", placeholder="Sarah Chen, BIM Manager")
+            
+            notes = st.text_area("Model Notes", placeholder="Latest coordination updates for Highland Tower Level 13-15 modifications")
+            
+            if st.form_submit_button("🔄 Process IFC Model", type="primary"):
+                if uploaded_file:
+                    st.success(f"✅ IFC model '{model_name}' uploaded and processed successfully!")
+                    st.info(f"📊 Model contains {45672:,} elements across {1247} families")
+                    st.session_state.show_ifc_upload = False
+                    st.rerun()
+                else:
+                    st.error("Please select an IFC file to upload")
+    
+    tab1, tab2, tab3, tab4 = st.tabs(["📋 IFC Model Library", "🎯 3D Coordination", "⚠️ Clash Detection", "📊 BIM Analytics"])
     
     with tab1:
+        st.markdown("### 📋 Highland Tower Development - IFC Model Library")
+        
+        # Current IFC models
+        ifc_models_data = pd.DataFrame([
+            {
+                "Model Name": "Highland Tower - Architectural",
+                "Version": "Rev D.1",
+                "Discipline": "Architectural", 
+                "File Size": "487 MB",
+                "Elements": "47,582",
+                "Status": "Current",
+                "Last Updated": "2025-05-23",
+                "Coordinator": "Sarah Chen"
+            },
+            {
+                "Model Name": "Highland Tower - Structural", 
+                "Version": "Rev C.3",
+                "Discipline": "Structural",
+                "File Size": "298 MB", 
+                "Elements": "28,947",
+                "Status": "Under Review",
+                "Last Updated": "2025-05-20",
+                "Coordinator": "Michael Torres"
+            },
+            {
+                "Model Name": "Highland Tower - MEP",
+                "Version": "Rev B.2", 
+                "Discipline": "MEP",
+                "File Size": "652 MB",
+                "Elements": "89,234",
+                "Status": "Coordinating", 
+                "Last Updated": "2025-05-18",
+                "Coordinator": "Jennifer Walsh"
+            }
+        ])
+        
+        st.dataframe(ifc_models_data, use_container_width=True, hide_index=True)
+        
+        # IFC Model metrics
+        st.subheader("📊 IFC Model Metrics")
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Total Elements", "165,763", "All disciplines")
+        with col2:
+            st.metric("Model Size", "1.4 GB", "Combined IFC")
+        with col3:
+            st.metric("Coordination Level", "LOD 350", "Design Development")
+        with col4:
+            st.metric("Last Coordination", "2 days ago", "All current")
+    
+    with tab2:
         st.markdown("### 🎯 3D Model Coordination")
         
         col1, col2 = st.columns(2)
         with col1:
             st.markdown("""
-            **Current Model Status:**
-            - Architectural: Rev C (Current)
-            - Structural: Rev B (Under Review)
-            - MEP: Rev A (Coordinating)
-            - Site: Rev A (Current)
+            **🏗️ Highland Tower Model Status:**
+            • **Architectural:** Rev D.1 (Current)
+            • **Structural:** Rev C.3 (Under Review) 
+            • **MEP:** Rev B.2 (Coordinating)
+            • **Site/Civil:** Rev A.1 (Current)
+            • **Landscape:** Rev A.0 (Draft)
             """)
         
         with col2:
             st.markdown("""
-            **Coordination Metrics:**
-            - Total Elements: 45,672
-            - Clash Tests Run: 247
-            - Active Clashes: 12
-            - Resolved This Week: 8
+            **📊 Coordination Metrics:**
+            • **Total IFC Elements:** 165,763
+            • **Clash Tests Run:** 347 this week
+            • **Active Clashes:** 18 (down from 45)
+            • **Critical Issues:** 3 requiring attention
+            • **Resolved This Week:** 27 clashes
             """)
         
-        st.info("🔄 **Next Coordination Meeting:** Thursday 2 PM - All disciplines required")
+        st.success("🔄 **Next BIM Coordination Meeting:** Thursday 2:00 PM - All discipline coordinators required")
+        st.info("📋 **Focus Areas:** Level 13-15 MEP routing, structural connections, curtain wall integration")
+    
+    with tab3:
+        st.markdown("### ⚠️ IFC Clash Detection Results")
+        
+        # Clash detection metrics
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Active Clashes", "18", "-27 resolved")
+        with col2:
+            st.metric("Critical Clashes", "3", "Immediate attention")
+        with col3:
+            st.metric("Hard Clashes", "12", "Physical conflicts")
+        with col4:
+            st.metric("Soft Clashes", "6", "Clearance issues")
+        
+        # Current clash issues
+        st.subheader("🚨 Priority Clash Issues")
+        clash_data = pd.DataFrame([
+            {
+                "Clash ID": "CLH-HTD-047",
+                "Type": "Hard Clash",
+                "Location": "Level 13 - Grid E4",
+                "Discipline 1": "MEP - HVAC Duct", 
+                "Discipline 2": "Structural - Steel Beam",
+                "Priority": "Critical",
+                "Status": "Open",
+                "Assigned To": "Jennifer Walsh / Michael Torres"
+            },
+            {
+                "Clash ID": "CLH-HTD-046", 
+                "Type": "Soft Clash",
+                "Location": "Level 12 - Corridor",
+                "Discipline 1": "Electrical - Conduit",
+                "Discipline 2": "Plumbing - Domestic Water",
+                "Priority": "High", 
+                "Status": "Under Review",
+                "Assigned To": "Jennifer Walsh"
+            },
+            {
+                "Clash ID": "CLH-HTD-045",
+                "Type": "Hard Clash", 
+                "Location": "Level 14 - Mechanical Room",
+                "Discipline 1": "HVAC - Equipment",
+                "Discipline 2": "Structural - Column",
+                "Priority": "Critical",
+                "Status": "Resolution Proposed",
+                "Assigned To": "Michael Torres"
+            }
+        ])
+        
+        st.dataframe(clash_data, use_container_width=True, hide_index=True)
+    
+    with tab4:
+        st.markdown("### 📊 BIM Analytics - Highland Tower Development")
+        
+        # Model complexity analysis
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("#### 📈 Model Element Distribution")
+            element_data = pd.DataFrame({
+                'Discipline': ['Architectural', 'Structural', 'MEP', 'Civil'],
+                'Elements': [47582, 28947, 89234, 5847],
+                'Percentage': [28.7, 17.5, 53.8, 3.5]
+            })
+            st.dataframe(element_data, use_container_width=True, hide_index=True)
+            
+        with col2:
+            st.markdown("#### 🎯 Coordination Progress")
+            progress_data = pd.DataFrame({
+                'Phase': ['Design Development', 'Coordination', 'Documentation', 'Construction'],
+                'Architectural': [100, 95, 85, 0],
+                'Structural': [100, 87, 78, 0], 
+                'MEP': [95, 82, 65, 0]
+            })
+            st.dataframe(progress_data, use_container_width=True, hide_index=True)
 
 def render_analytics():
     """Advanced Analytics with AI-powered insights"""

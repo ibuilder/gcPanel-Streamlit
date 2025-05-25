@@ -265,10 +265,237 @@ def apply_highland_tower_styling():
         color: #1e40af !important;
     }
 
-    /* Responsive Design */
+    /* COMPREHENSIVE MOBILE RESPONSIVE DESIGN */
     @media (max-width: 768px) {
+        /* Mobile Container Adjustments */
         .main .block-container {
             padding: 1rem !important;
+            max-width: 100% !important;
+        }
+        
+        /* Mobile Header Styling */
+        .enterprise-header, .highland-header {
+            padding: 1.5rem 1rem !important;
+            margin-bottom: 1rem !important;
+            border-radius: 12px !important;
+        }
+        
+        .enterprise-header h1, .highland-header h1 {
+            font-size: 1.75rem !important;
+            line-height: 1.2 !important;
+        }
+        
+        .enterprise-header p, .highland-header p {
+            font-size: 1rem !important;
+            line-height: 1.4 !important;
+        }
+        
+        /* Mobile Sidebar Adjustments */
+        section[data-testid="stSidebar"] .block-container {
+            padding: 1rem !important;
+        }
+        
+        /* Mobile Button Styling - Touch Friendly */
+        .stButton > button {
+            min-height: 48px !important;
+            font-size: 16px !important;
+            padding: 12px 20px !important;
+            margin: 8px 0 !important;
+            border-radius: 8px !important;
+            width: 100% !important;
+        }
+        
+        section[data-testid="stSidebar"] .stButton > button {
+            min-height: 44px !important;
+            padding: 12px 16px !important;
+            font-size: 15px !important;
+            margin-bottom: 8px !important;
+        }
+        
+        /* Mobile Form Elements - Touch Optimized */
+        .stTextInput > div > div > input,
+        .stTextArea > div > div > textarea,
+        .stSelectbox > div > div > select,
+        .stNumberInput > div > div > input {
+            min-height: 48px !important;
+            font-size: 16px !important;
+            padding: 12px !important;
+            border-radius: 8px !important;
+        }
+        
+        /* Mobile Metrics Cards */
+        .stMetric {
+            padding: 1rem !important;
+            margin-bottom: 1rem !important;
+            border-radius: 8px !important;
+        }
+        
+        .stMetric [data-testid="metric-container"] > div:first-child {
+            font-size: 0.75rem !important;
+        }
+        
+        .stMetric [data-testid="metric-container"] > div:nth-child(2) {
+            font-size: 1.5rem !important;
+        }
+        
+        /* Mobile Cards */
+        .dashboard-card, .admin-card, .enterprise-card, .highland-card {
+            padding: 1rem !important;
+            margin-bottom: 1rem !important;
+            border-radius: 8px !important;
+        }
+        
+        /* Mobile Tables */
+        .stDataFrame {
+            border-radius: 8px !important;
+            font-size: 14px !important;
+        }
+        
+        .stDataFrame th {
+            padding: 0.75rem 0.5rem !important;
+            font-size: 0.7rem !important;
+        }
+        
+        .stDataFrame td {
+            padding: 0.75rem 0.5rem !important;
+            font-size: 0.8rem !important;
+        }
+        
+        /* Mobile Tabs */
+        .stTabs [data-baseweb="tab-list"] {
+            padding: 0.25rem !important;
+            overflow-x: auto !important;
+            white-space: nowrap !important;
+        }
+        
+        .stTabs [data-baseweb="tab"] {
+            padding: 0.75rem 1rem !important;
+            font-size: 14px !important;
+            min-width: 120px !important;
+            flex-shrink: 0 !important;
+        }
+        
+        .stTabs [data-baseweb="tab-panel"] {
+            padding: 1rem !important;
+        }
+        
+        /* Mobile Alerts */
+        .stSuccess, .stWarning, .stError, .stInfo {
+            padding: 0.75rem !important;
+            margin: 0.75rem 0 !important;
+            border-radius: 6px !important;
+            font-size: 14px !important;
+        }
+        
+        /* Mobile Project Info */
+        .project-info {
+            padding: 1rem !important;
+            margin-bottom: 1rem !important;
+            border-radius: 8px !important;
+        }
+        
+        .project-info h3 {
+            font-size: 1.25rem !important;
+            margin-bottom: 0.75rem !important;
+        }
+        
+        .project-info p {
+            font-size: 0.9rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        /* Mobile Column Adjustments */
+        .stColumns > div {
+            padding: 0 0.25rem !important;
+        }
+        
+        /* Mobile Expanders */
+        .streamlit-expanderHeader {
+            padding: 0.75rem 1rem !important;
+            font-size: 14px !important;
+        }
+        
+        .streamlit-expanderContent {
+            padding: 1rem !important;
+        }
+        
+        /* Mobile Charts */
+        .stPlotlyChart {
+            height: 300px !important;
+        }
+        
+        /* Mobile Typography */
+        h1 {
+            font-size: 1.75rem !important;
+            line-height: 1.2 !important;
+        }
+        
+        h2 {
+            font-size: 1.5rem !important;
+            line-height: 1.3 !important;
+        }
+        
+        h3 {
+            font-size: 1.25rem !important;
+            line-height: 1.3 !important;
+        }
+        
+        /* Mobile Navigation Improvements */
+        section[data-testid="stSidebar"] h1,
+        section[data-testid="stSidebar"] h2,
+        section[data-testid="stSidebar"] h3 {
+            font-size: 1.1rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        /* Mobile Specific Highland Tower Branding */
+        .highland-header h1 {
+            font-size: 1.5rem !important;
+            text-align: center !important;
+        }
+        
+        .highland-header p {
+            text-align: center !important;
+            font-size: 0.9rem !important;
+        }
+        
+        /* Touch-friendly spacing */
+        .stMarkdown {
+            margin-bottom: 0.75rem !important;
+        }
+        
+        /* Mobile-optimized shadows */
+        .highland-card:hover,
+        .dashboard-card:hover,
+        .admin-card:hover,
+        .enterprise-card:hover {
+            transform: none !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+        }
+    }
+    
+    /* Tablet Responsive Design (768px - 1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .main .block-container {
+            padding: 1.5rem 2rem !important;
+            max-width: 1200px !important;
+        }
+        
+        .enterprise-header, .highland-header {
+            padding: 2rem !important;
+        }
+        
+        .stButton > button {
+            min-height: 44px !important;
+            font-size: 15px !important;
+        }
+        
+        .stMetric {
+            padding: 1.25rem !important;
+        }
+        
+        .highland-card, .dashboard-card, .admin-card, .enterprise-card {
+            padding: 1.25rem !important;
         }
     }
     </style>

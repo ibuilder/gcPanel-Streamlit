@@ -1,0 +1,311 @@
+/* Unified Theme System for Highland Tower Development gcPanel */
+
+/* ==================== LIGHT THEME (DEFAULT) ==================== */
+:root {
+    /* Highland Tower Brand Colors */
+    --ht-primary: #2563eb;
+    --ht-secondary: #1e40af;
+    --ht-accent: #3b82f6;
+    --ht-gold: #f59e0b;
+    
+    /* Light Theme Colors */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8fafc;
+    --bg-tertiary: #f1f5f9;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --border-color: #e2e8f0;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    
+    /* Sidebar Colors */
+    --sidebar-bg: #1e293b;
+    --sidebar-text: #f1f5f9;
+    --sidebar-hover: rgba(59, 130, 246, 0.1);
+    --sidebar-active: #3b82f6;
+    
+    /* Interactive Elements */
+    --button-primary: var(--ht-primary);
+    --button-hover: var(--ht-secondary);
+    --button-text: #ffffff;
+    
+    /* Status Colors */
+    --success: #059669;
+    --warning: #d97706;
+    --error: #dc2626;
+    --info: var(--ht-accent);
+}
+
+/* ==================== DARK THEME ==================== */
+[data-theme="dark"] {
+    /* Dark Theme Colors */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --border-color: #475569;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    
+    /* Sidebar Dark Colors */
+    --sidebar-bg: #0f172a;
+    --sidebar-text: #f1f5f9;
+    --sidebar-hover: rgba(59, 130, 246, 0.2);
+    --sidebar-active: #3b82f6;
+    
+    /* Interactive Elements Dark */
+    --button-primary: var(--ht-accent);
+    --button-hover: #2563eb;
+    --button-text: #ffffff;
+}
+
+/* ==================== GLOBAL APPLICATION STYLES ==================== */
+
+/* Main application container */
+.stApp {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+/* Main content area */
+.main .block-container {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    padding: 1rem 2rem !important;
+}
+
+/* ==================== SIDEBAR STYLING ==================== */
+
+/* Sidebar container */
+section[data-testid="stSidebar"] {
+    background-color: var(--sidebar-bg) !important;
+    border-right: 1px solid var(--border-color) !important;
+}
+
+section[data-testid="stSidebar"] > div {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Sidebar content */
+section[data-testid="stSidebar"] .block-container {
+    background-color: var(--sidebar-bg) !important;
+    padding: 1rem !important;
+}
+
+/* Sidebar text elements */
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3,
+section[data-testid="stSidebar"] h4,
+section[data-testid="stSidebar"] h5,
+section[data-testid="stSidebar"] h6,
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] .stMarkdown,
+section[data-testid="stSidebar"] .stText {
+    color: var(--sidebar-text) !important;
+}
+
+/* Sidebar buttons */
+section[data-testid="stSidebar"] .stButton > button {
+    background-color: transparent !important;
+    color: var(--sidebar-text) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 6px !important;
+    padding: 0.5rem 0.75rem !important;
+    margin-bottom: 0.25rem !important;
+    width: 100% !important;
+    text-align: left !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+}
+
+section[data-testid="stSidebar"] .stButton > button:hover {
+    background-color: var(--sidebar-hover) !important;
+    border-color: var(--sidebar-active) !important;
+    color: #ffffff !important;
+    transform: translateX(2px) !important;
+}
+
+/* Theme toggle button special styling */
+section[data-testid="stSidebar"] .stButton > button[aria-label*="theme"] {
+    background-color: var(--ht-accent) !important;
+    border-color: var(--ht-accent) !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+section[data-testid="stSidebar"] .stButton > button[aria-label*="theme"]:hover {
+    background-color: var(--button-hover) !important;
+    transform: scale(1.02) !important;
+}
+
+/* ==================== CONTENT AREA STYLING ==================== */
+
+/* Cards and containers */
+.dashboard-card,
+.admin-card {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    padding: 1.5rem !important;
+    margin-bottom: 1rem !important;
+    box-shadow: 0 2px 4px var(--shadow-color) !important;
+    transition: all 0.2s ease !important;
+}
+
+.dashboard-card:hover,
+.admin-card:hover {
+    box-shadow: 0 4px 8px var(--shadow-color) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Headers */
+.enterprise-header,
+.admin-header {
+    background: linear-gradient(135deg, var(--ht-primary) 0%, var(--ht-accent) 100%) !important;
+    color: white !important;
+    padding: 2rem !important;
+    border-radius: 8px !important;
+    margin-bottom: 2rem !important;
+    box-shadow: 0 4px 6px var(--shadow-color) !important;
+}
+
+/* Project info */
+.project-info {
+    background: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--bg-tertiary) 100%) !important;
+    border-left: 4px solid var(--ht-accent) !important;
+    padding: 1.5rem !important;
+    border-radius: 8px !important;
+    margin-bottom: 1rem !important;
+    color: var(--sidebar-text) !important;
+}
+
+/* ==================== BUTTONS AND INTERACTIVE ELEMENTS ==================== */
+
+/* Primary buttons */
+.stButton > button:not([data-testid="stSidebar"] *) {
+    background-color: var(--button-primary) !important;
+    color: var(--button-text) !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 0.5rem 1rem !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+}
+
+.stButton > button:not([data-testid="stSidebar"] *):hover {
+    background-color: var(--button-hover) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px var(--shadow-color) !important;
+}
+
+/* ==================== DATA DISPLAYS ==================== */
+
+/* Tables */
+.stDataFrame,
+.stTable {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+}
+
+/* Metrics */
+.stMetric {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    padding: 1rem !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+/* ==================== EXPANDERS AND TABS ==================== */
+
+/* Expanders */
+.streamlit-expanderHeader {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 6px !important;
+}
+
+.streamlit-expanderContent {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0 0 6px 6px !important;
+}
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+    background-color: var(--bg-primary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.stTabs [data-baseweb="tab"] {
+    color: var(--text-secondary) !important;
+    background-color: transparent !important;
+}
+
+.stTabs [aria-selected="true"] {
+    color: var(--ht-primary) !important;
+    border-bottom-color: var(--ht-primary) !important;
+}
+
+/* ==================== FORMS AND INPUTS ==================== */
+
+/* Input fields */
+.stTextInput input,
+.stTextArea textarea,
+.stSelectbox select,
+.stNumberInput input {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 6px !important;
+}
+
+/* ==================== STATUS INDICATORS ==================== */
+
+/* Status badges */
+.status-badge.active {
+    background-color: var(--success) !important;
+    color: white !important;
+}
+
+.status-badge.warning {
+    background-color: var(--warning) !important;
+    color: white !important;
+}
+
+.status-badge.error {
+    background-color: var(--error) !important;
+    color: white !important;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+@media (max-width: 768px) {
+    .main .block-container {
+        padding: 0.5rem 1rem !important;
+    }
+    
+    .dashboard-card,
+    .admin-card {
+        padding: 1rem !important;
+    }
+    
+    .enterprise-header,
+    .admin-header {
+        padding: 1rem !important;
+    }
+}
+
+/* ==================== SMOOTH TRANSITIONS ==================== */
+
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+}

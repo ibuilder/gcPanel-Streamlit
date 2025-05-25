@@ -47,35 +47,128 @@ def apply_theme():
     }
     
     section[data-testid="stSidebar"] button {
-        background: linear-gradient(135deg, #0ea5e9, #38bdf8) !important;
+        background: linear-gradient(135deg, #1e40af, #3b82f6, #60a5fa) !important;
         color: white !important;
-        border: 1px solid #0284c7 !important;
-        border-radius: 8px !important;
-        transition: all 0.3s ease !important;
-        font-weight: 500 !important;
-        box-shadow: 0 2px 4px rgba(14, 165, 233, 0.3) !important;
+        border: none !important;
+        border-radius: 12px !important;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        padding: 12px 16px !important;
+        margin: 6px 0 !important;
+        box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3) !important;
+        text-align: left !important;
     }
     
     section[data-testid="stSidebar"] button:hover {
-        background: linear-gradient(135deg, #0284c7, #0ea5e9) !important;
-        transform: translateX(5px) scale(1.02) !important;
-        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4) !important;
+        background: linear-gradient(135deg, #3b82f6, #60a5fa, #93c5fd) !important;
+        transform: translateY(-2px) translateX(6px) !important;
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5) !important;
+        border-left: 4px solid #fbbf24 !important;
+    }
+    
+    /* Navigation Section Headers */
+    section[data-testid="stSidebar"] h3 {
+        color: #fbbf24 !important;
+        font-weight: 700 !important;
+        font-size: 16px !important;
+        margin: 1.5rem 0 0.8rem 0 !important;
+        padding-bottom: 0.5rem !important;
+        border-bottom: 2px solid #fbbf24 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
     }
     
     .metric-card {
         background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
         border: 1px solid #475569 !important;
-        padding: 1.5rem;
-        border-radius: 10px;
-        margin-bottom: 1rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        padding: 2rem !important;
+        border-radius: 16px !important;
+        margin-bottom: 1.5rem !important;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.4) !important;
         color: #f1f5f9 !important;
+        transition: all 0.3s ease !important;
     }
     
-    /* Enhanced dark theme support for BIM and other modules */
-    .stSelectbox > div > div {
-        background-color: rgba(30, 41, 59, 0.8) !important;
+    .metric-card:hover {
+        transform: translateY(-4px) !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+        border-color: #3b82f6 !important;
+    }
+    
+    /* Enhanced Main Content Buttons */
+    .stButton > button {
+        background: linear-gradient(135deg, #1e40af, #3b82f6) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        font-weight: 600 !important;
+        padding: 14px 28px !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
+        font-size: 15px !important;
+    }
+    
+    .stButton > button:hover {
+        background: linear-gradient(135deg, #3b82f6, #60a5fa) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4) !important;
+    }
+    
+    /* Project Info Enhanced Styling */
+    .project-info {
+        background: linear-gradient(135deg, #1e40af, #3b82f6, #60a5fa) !important;
+        padding: 2rem !important;
+        border-radius: 16px !important;
+        margin: 1.5rem 0 !important;
+        border: 2px solid #93c5fd !important;
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4) !important;
+    }
+    
+    /* Enhanced Form Elements */
+    .stSelectbox > div > div, .stTextInput input, .stTextArea textarea {
+        background: rgba(30, 41, 59, 0.9) !important;
+        border: 2px solid #475569 !important;
+        border-radius: 12px !important;
         color: #f1f5f9 !important;
+        transition: all 0.3s ease !important;
+        padding: 12px !important;
+    }
+    
+    .stSelectbox > div > div:focus, .stTextInput input:focus, .stTextArea textarea:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+    }
+    
+    /* Enhanced Tables and Data Frames */
+    .stDataFrame {
+        border-radius: 16px !important;
+        overflow: hidden !important;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+        border: 1px solid #475569 !important;
+    }
+    
+    /* Status Indicators */
+    .status-active {
+        color: #10b981 !important;
+        font-weight: 700 !important;
+        text-shadow: 0 0 10px rgba(16, 185, 129, 0.3) !important;
+    }
+    
+    /* Loading Animation */
+    .loading-spinner {
+        border: 4px solid #1e293b !important;
+        border-top: 4px solid #3b82f6 !important;
+        border-radius: 50% !important;
+        width: 40px !important;
+        height: 40px !important;
+        animation: spin 1s linear infinite !important;
+        margin: 20px auto !important;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
     
     .stTextInput > div > div > input {

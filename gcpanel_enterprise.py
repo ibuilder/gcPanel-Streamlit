@@ -524,86 +524,117 @@ def apply_enterprise_theme():
 
 # Enhanced Login with Emotional Intelligence & About Section
 def render_login():
-    # Emotional Welcome Banner
+    # Clean Professional Header
     st.markdown("""
-    <div class="enterprise-card" style="background: linear-gradient(135deg, #4A90E2 0%, #5BA0F2 100%); color: white; text-align: center; margin-bottom: 2rem;">
-        <h1 style="margin: 0; color: white; font-size: 2.5rem;">🏗️ Welcome to gcPanel</h1>
-        <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; opacity: 0.9;">
-            You're about to manage something extraordinary
+    <div style="text-align: center; padding: 3rem 0 2rem 0;">
+        <h1 style="color: #1e40af; font-size: 3rem; font-weight: 800; margin: 0; letter-spacing: -0.02em;">
+            🏗️ gcPanel
+        </h1>
+        <p style="color: #64748b; font-size: 1.2rem; margin: 0.5rem 0 0 0; font-weight: 500;">
+            Enterprise Construction Management Platform
+        </p>
+        <p style="color: #94a3b8; font-size: 1rem; margin: 0.25rem 0 0 0;">
+            Highland Tower Development • $45.5M Mixed-Use Project
         </p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Project Overview
-    st.markdown("""
-    <div class="enterprise-card" style="background: linear-gradient(135deg, #28A745 0%, #34CE57 100%); color: white; text-align: center;">
-        <h3 style="margin: 0; color: white;">Highland Tower Development</h3>
-        <p style="margin: 0.5rem 0 0 0; opacity: 0.9; line-height: 1.6;">
-            Managing a $45.5M project with 120 residential units and 8 retail spaces. 
-            <strong>gcPanel makes complex construction management simple.</strong>
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+    # Centered Login Section
+    col1, col2, col3 = st.columns([1, 2, 1])
     
-    # Main login area with tabs
-    tabs = st.tabs(["🔐 Login", "📖 About gcPanel", "🎯 Why You'll Succeed"])
-    
-    with tabs[0]:
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
+        # Professional Login Card
+        st.markdown("""
+        <div class="enterprise-card" style="text-align: center; padding: 3rem; margin: 2rem 0;">
+            <h2 style="color: #1e40af; margin-bottom: 1rem;">Access Your Project Dashboard</h2>
+            <p style="color: #64748b; margin-bottom: 2rem;">
+                Manage 120 residential units + 8 retail spaces with enterprise-grade tools
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Streamlined Login Form
+        with st.form("login_form", clear_on_submit=False):
+            username = st.text_input("👤 Username", placeholder="Enter your username", help="Use any username to access the platform")
+            password = st.text_input("🔒 Password", type="password", placeholder="Enter your password", help="Use any password to login")
+            
+            col_a, col_b = st.columns(2)
+            with col_a:
+                login_submitted = st.form_submit_button("🚀 Login", use_container_width=True, type="primary")
+            with col_b:
+                demo_submitted = st.form_submit_button("👀 Demo Access", use_container_width=True)
+            
+            # Handle form submissions
+            if login_submitted:
+                if username and password:
+                    st.session_state.authenticated = True
+                    st.session_state.username = username
+                    st.session_state.user_role = "admin" if username.lower() == "admin" else "user"
+                    st.balloons()
+                    st.success(f"Welcome, {username}! Access granted to Highland Tower project dashboard.")
+                    st.rerun()
+                else:
+                    st.error("Please enter both username and password")
+            
+            if demo_submitted:
+                st.session_state.authenticated = True
+                st.session_state.username = "Demo User"
+                st.session_state.user_role = "user"
+                st.success("Demo access granted! Exploring gcPanel construction management features.")
+                st.rerun()
+        
+        # Project Overview Section
+        st.markdown("---")
+        st.markdown("""
+        <div style="text-align: center; padding: 2rem 0;">
+            <h3 style="color: #374151; margin-bottom: 1.5rem;">Highland Tower Development Overview</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Key Project Stats
+        col1, col2, col3 = st.columns(3)
+        with col1:
             st.markdown("""
-            <div class="enterprise-card" style="text-align: center;">
-                <h2 style="color: #4A90E2;">Ready to Build Excellence?</h2>
-                <p style="color: #6C757D;">Your construction command center awaits</p>
+            <div style="text-align: center; padding: 1rem; background: #f8fafc; border-radius: 12px; margin-bottom: 1rem;">
+                <div style="font-size: 2rem; color: #1e40af;">$45.5M</div>
+                <div style="color: #64748b; font-weight: 500;">Total Project Value</div>
             </div>
             """, unsafe_allow_html=True)
-            
-            # Emotional support messaging
-            time_of_day = datetime.now().hour
-            if time_of_day < 12:
-                greeting = "Good morning! Ready to make progress on Highland Tower?"
-            elif time_of_day < 17:
-                greeting = "Good afternoon! Let's see how your project is advancing!"
-            else:
-                greeting = "Good evening! Time to review today's achievements!"
-            
-            st.info(f"💪 {greeting}")
-            
-            # Login form with Enter key support
-            with st.form("login_form"):
-                username = st.text_input("👤 Username", placeholder="Enter your username")
-                password = st.text_input("🔒 Password", type="password", placeholder="Enter your password")
-                
-                # Encouraging messages
-                if username and not password:
-                    st.success("Great! Now enter your password to access your project dashboard.")
-                elif username and password:
-                    st.success("Perfect! Ready to log in and continue building excellence!")
-                
-                col_a, col_b = st.columns(2)
-                with col_a:
-                    login_submitted = st.form_submit_button("🚀 Begin Building", use_container_width=True)
-                with col_b:
-                    demo_submitted = st.form_submit_button("👀 Try Demo", use_container_width=True)
-                
-                # Handle form submissions
-                if login_submitted:
-                    if username and password:
-                        st.session_state.authenticated = True
-                        st.session_state.username = username
-                        st.session_state.user_role = "admin" if username.lower() == "admin" else "user"
-                        st.balloons()
-                        st.success(f"Welcome back, {username}! Highland Tower is in excellent hands. Let's continue building something amazing together!")
-                        st.rerun()
-                    else:
-                        st.error("Please enter both username and password to access your project")
-                
-                if demo_submitted:
-                    st.session_state.authenticated = True
-                    st.session_state.username = "Demo User"
-                    st.session_state.user_role = "user"
-                    st.success("Welcome to the Demo! Explore how gcPanel transforms construction management.")
-                    st.rerun()
+        
+        with col2:
+            st.markdown("""
+            <div style="text-align: center; padding: 1rem; background: #f8fafc; border-radius: 12px; margin-bottom: 1rem;">
+                <div style="font-size: 2rem; color: #059669;">128</div>
+                <div style="color: #64748b; font-weight: 500;">Total Units</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            st.markdown("""
+            <div style="text-align: center; padding: 1rem; background: #f8fafc; border-radius: 12px; margin-bottom: 1rem;">
+                <div style="font-size: 2rem; color: #dc2626;">15</div>
+                <div style="color: #64748b; font-weight: 500;">Floors</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Platform Features
+        st.markdown("""
+        <div style="background: #f1f5f9; padding: 2rem; border-radius: 16px; margin: 2rem 0;">
+            <h4 style="color: #1e40af; text-align: center; margin-bottom: 1.5rem;">
+                Complete Construction Management Platform
+            </h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div>• Real-time project dashboard</div>
+                <div>• Advanced BIM integration</div>
+                <div>• Contract & cost management</div>
+                <div>• Safety compliance tracking</div>
+                <div>• Quality control systems</div>
+                <div>• AI-powered analytics</div>
+            </div>
+            <p style="text-align: center; color: #64748b; margin: 1rem 0 0 0;">
+                Ready to transform your construction management experience?
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
     
     with tabs[1]:

@@ -881,6 +881,27 @@ def render_sidebar():
                         st.session_state.current_menu = tool
                         st.rerun()
         
+        # Resource Management (filtered by permissions)
+        resource_available = any(check_module_access(module) for _, module in [
+            ("📁 Documents", "Documents"), ("📦 Material Management", "Material Management"),
+            ("🚜 Equipment Tracking", "Equipment Tracking"), ("📋 Punch Lists", "Punch Lists")
+        ])
+        
+        if resource_available:
+            st.markdown("### 📦 Resource Management")
+            resource_modules = [
+                ("📁 Documents", "Documents"),
+                ("📦 Material Management", "Material Management"),
+                ("🚜 Equipment Tracking", "Equipment Tracking"),
+                ("📋 Punch Lists", "Punch Lists")
+            ]
+            
+            for display_name, module in resource_modules:
+                if check_module_access(module):
+                    if st.button(display_name, key=f"resource_{module}", use_container_width=True):
+                        st.session_state.current_menu = module
+                        st.rerun()
+
         # Intelligence & Analytics (filtered by permissions)
         ai_available = any(check_module_access(module) for _, module in [
             ("📈 Analytics", "Analytics"), ("🤖 AI Assistant", "AI Assistant"),

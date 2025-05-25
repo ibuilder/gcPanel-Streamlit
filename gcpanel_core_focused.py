@@ -740,15 +740,25 @@ def render_main_content():
         
         # Safety with incident tracking and compliance
         try:
-            from modules.safety import render
-            module_functions["Safety"] = render
+            import modules.safety as safety_module
+            if hasattr(safety_module, 'render'):
+                module_functions["Safety"] = safety_module.render
+            elif hasattr(safety_module, 'render_safety'):
+                module_functions["Safety"] = safety_module.render_safety
+            else:
+                module_functions["Safety"] = render_safety
         except ImportError:
             module_functions["Safety"] = render_safety
         
         # Contracts with prime contracts and change orders
         try:
-            from modules.contracts import render
-            module_functions["Contracts"] = render
+            import modules.contracts as contracts_module
+            if hasattr(contracts_module, 'render'):
+                module_functions["Contracts"] = contracts_module.render
+            elif hasattr(contracts_module, 'render_contracts'):
+                module_functions["Contracts"] = contracts_module.render_contracts
+            else:
+                module_functions["Contracts"] = render_contracts
         except ImportError:
             module_functions["Contracts"] = render_contracts
         

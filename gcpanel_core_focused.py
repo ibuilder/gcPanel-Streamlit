@@ -1170,6 +1170,13 @@ def render_main_content():
             module_functions["Cost Management"] = render_cost_management
             module_functions["AIA G702/G703 Billing"] = render_aia_billing
         
+        # Unit Prices module for advanced cost intelligence
+        try:
+            from modules.unit_prices import render_unit_prices as unit_prices_render
+            module_functions["Unit Prices"] = unit_prices_render
+        except ImportError:
+            module_functions["Unit Prices"] = lambda: st.info("Unit Prices module loading...")
+        
         # BIM with model viewer and clash detection
         try:
             from modules.bim import render_bim as bim_render
@@ -1587,7 +1594,7 @@ def render_recent_reports():
 def render_daily_reports():
     """🚀 Next-Generation Daily Reports - Beyond Procore & Autodesk Construction Cloud"""
     st.title("📊 Highland Tower Daily Reports")
-    st.markdown("**🎯 Advanced AI-Powered Field Reporting System - Better than Procore & Autodesk**")
+    st.markdown("**🎯 Advanced AI-Powered Field Reporting System**")
     
     # Real-time project status bar
     st.markdown("""
@@ -1607,7 +1614,7 @@ def render_daily_reports():
     
     with tab1:
         st.markdown("### 🚀 Intelligent Daily Report Creation")
-        st.markdown("**Features that beat Procore:** Auto-populated data, AI suggestions, predictive analysis")
+        st.markdown("**Advanced Features:** Auto-populated data, AI suggestions, predictive analysis")
         
         # Auto-populated environmental data
         col1, col2, col3 = st.columns(3)
@@ -1651,7 +1658,7 @@ def render_daily_reports():
                      delta=f"{-2.3}% vs planned", delta_color="normal")
         
         st.markdown("### 🏗️ Advanced Work Progress Tracking")
-        st.markdown("**Superior to Autodesk:** Real-time progress with photo verification and GPS tracking")
+        st.markdown("**Enterprise Capabilities:** Real-time progress with photo verification and GPS tracking")
         
         # Enhanced progress tracking with Highland Tower specific areas
         progress_areas = [

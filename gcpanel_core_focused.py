@@ -828,28 +828,28 @@ def render_main_content():
         
     except Exception as e:
         st.error(f"Error loading sophisticated modules: {str(e)}")
-        # Fallback to basic functions - these are defined below
+        # Fallback to basic functions - only use what's actually defined
         module_functions = {
             "Dashboard": render_dashboard,
             "PreConstruction": render_preconstruction,
             "Engineering": render_engineering,
             "Field Operations": render_field_operations,
-            "Safety": lambda: render_safety(),
-            "Contracts": lambda: render_contracts(),
+            "Safety": render_safety,
+            "Contracts": render_contracts,
             "Cost Management": render_cost_management,
-            "BIM": lambda: render_bim(),
+            "BIM": render_bim,
             "Analytics": render_analytics,
             "Documents": render_documents,
-            "Scheduling": lambda: render_scheduling(),
-            "AI Assistant": lambda: render_ai_assistant(),
-            "Mobile Companion": lambda: render_mobile_companion(),
-            "Prime Contract": lambda: render_prime_contract(),
-            "Change Orders": lambda: render_change_orders(),
-            "AIA G702/G703 Billing": lambda: render_aia_billing(),
-            "Recent Reports": lambda: render_recent_reports(),
-            "Daily Reports": lambda: render_daily_reports(),
-            "Quality Control": lambda: render_quality_control(),
-            "Material Management": lambda: render_material_management(),
+            "Scheduling": render_scheduling,
+            "AI Assistant": render_ai_assistant,
+            "Mobile Companion": render_mobile_companion,
+            "Prime Contract": render_prime_contract,
+            "Change Orders": render_change_orders,
+            "AIA G702/G703 Billing": render_aia_billing,
+            "Recent Reports": render_recent_reports,
+            "Daily Reports": render_daily_reports,
+            "Quality Control": render_quality_control,
+            "Material Management": render_material_management,
         }
     
     if current_menu in module_functions:

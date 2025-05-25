@@ -569,36 +569,42 @@ def render_login():
             
             st.info(f"💪 {greeting}")
             
-            username = st.text_input("👤 Username", placeholder="Enter your username")
-            password = st.text_input("🔒 Password", type="password", placeholder="Enter your password")
-            
-            # Encouraging messages
-            if username and not password:
-                st.success("Great! Now enter your password to access your project dashboard.")
-            elif username and password:
-                st.success("Perfect! Ready to log in and continue building excellence!")
-            
-            col_a, col_b = st.columns(2)
-            with col_a:
-                if st.button("🚀 Begin Building", use_container_width=True):
+            # Login form with Enter key support
+            with st.form("login_form"):
+                username = st.text_input("👤 Username", placeholder="Enter your username")
+                password = st.text_input("🔒 Password", type="password", placeholder="Enter your password")
+                
+                # Encouraging messages
+                if username and not password:
+                    st.success("Great! Now enter your password to access your project dashboard.")
+                elif username and password:
+                    st.success("Perfect! Ready to log in and continue building excellence!")
+                
+                col_a, col_b = st.columns(2)
+                with col_a:
+                    login_submitted = st.form_submit_button("🚀 Begin Building", use_container_width=True)
+                with col_b:
+                    demo_submitted = st.form_submit_button("👀 Try Demo", use_container_width=True)
+                
+                # Handle form submissions
+                if login_submitted:
                     if username and password:
                         st.session_state.authenticated = True
                         st.session_state.username = username
                         st.session_state.user_role = "admin" if username.lower() == "admin" else "user"
-                        # Welcome message with emotional support
                         st.balloons()
                         st.success(f"Welcome back, {username}! Highland Tower is in excellent hands. Let's continue building something amazing together!")
                         st.rerun()
                     else:
                         st.error("Please enter both username and password to access your project")
-            
-            with col_b:
-                if st.button("👀 Try Demo", use_container_width=True):
+                
+                if demo_submitted:
                     st.session_state.authenticated = True
                     st.session_state.username = "Demo User"
                     st.session_state.user_role = "user"
                     st.success("Welcome to the Demo! Explore how gcPanel transforms construction management.")
                     st.rerun()
+
     
     with tabs[1]:
         st.markdown("""
@@ -1532,7 +1538,155 @@ def render_bim():
 # Additional modules with similar structure
 def render_contracts():
     st.title("📋 Contract Management")
-    st.info("Contract management features - subcontractor agreements, change orders, payment applications")
+    st.info("Comprehensive contract tracking, change orders, and vendor management")
+    
+    # Create tabs for different contract functions
+    tab1, tab2, tab3, tab4 = st.tabs(["📄 Active Contracts", "🔄 Change Orders", "📊 Contract Analytics", "👥 Vendor Management"])
+    
+    with tab1:
+        st.subheader("Active Contracts - Highland Tower Development")
+        
+        # Contract overview metrics
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Total Contract Value", "$45.5M", "Original budget")
+        with col2:
+            st.metric("Active Contracts", "23", "Currently in progress")
+        with col3:
+            st.metric("Pending Approvals", "3", "Awaiting signatures")
+        with col4:
+            st.metric("Contract Compliance", "98%", "+2% this month")
+        
+        st.markdown("---")
+        
+        # Major contracts list
+        st.subheader("Major Trade Contracts")
+        
+        contracts_data = [
+            {"Trade": "General Contractor", "Contractor": "Highland Construction LLC", "Value": "$15.2M", "Status": "Active", "Progress": "42%"},
+            {"Trade": "Structural Steel", "Contractor": "Steel Works Inc", "Value": "$3.8M", "Status": "Active", "Progress": "65%"},
+            {"Trade": "MEP Systems", "Contractor": "Metro Engineering", "Value": "$8.1M", "Status": "Active", "Progress": "35%"},
+            {"Trade": "Concrete", "Contractor": "Foundation Pro", "Value": "$4.2M", "Status": "Active", "Progress": "78%"},
+            {"Trade": "Glazing & Windows", "Contractor": "Crystal View", "Value": "$2.9M", "Status": "Pending", "Progress": "0%"},
+            {"Trade": "Roofing", "Contractor": "Weather Shield", "Value": "$1.8M", "Status": "Active", "Progress": "15%"}
+        ]
+        
+        for contract in contracts_data:
+            with st.expander(f"{contract['Trade']} - {contract['Contractor']} ({contract['Value']})"):
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.write(f"**Contract Value:** {contract['Value']}")
+                    st.write(f"**Status:** {contract['Status']}")
+                    st.write(f"**Progress:** {contract['Progress']}")
+                with col2:
+                    st.write("**Key Deliverables:**")
+                    if contract['Trade'] == "General Contractor":
+                        st.write("• Site management and coordination")
+                        st.write("• Quality control and safety oversight")
+                        st.write("• Schedule management")
+                    elif contract['Trade'] == "Structural Steel":
+                        st.write("• Steel fabrication and erection")
+                        st.write("• Connection details and welding")
+                        st.write("• Load testing and certification")
+                    elif contract['Trade'] == "MEP Systems":
+                        st.write("• HVAC system installation")
+                        st.write("• Electrical and plumbing systems")
+                        st.write("• Fire safety and security systems")
+    
+    with tab2:
+        st.subheader("Change Orders")
+        
+        # Change order metrics
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Total Change Orders", "12", "+2 this week")
+        with col2:
+            st.metric("Value Impact", "+$127K", "2.8% of original budget")
+        with col3:
+            st.metric("Pending Approval", "3", "Awaiting owner approval")
+        
+        st.markdown("---")
+        
+        # Recent change orders
+        st.subheader("Recent Change Orders")
+        
+        change_orders = [
+            {"ID": "CO-007", "Description": "Additional roof garden infrastructure", "Value": "+$45K", "Status": "Approved", "Date": "2025-05-20"},
+            {"ID": "CO-008", "Description": "Upgrade lobby finishes to premium materials", "Value": "+$32K", "Status": "Pending", "Date": "2025-05-18"},
+            {"ID": "CO-009", "Description": "Additional electrical outlets in units", "Value": "+$18K", "Status": "Under Review", "Date": "2025-05-15"},
+            {"ID": "CO-010", "Description": "Structural modification for MEP routing", "Value": "+$28K", "Status": "Approved", "Date": "2025-05-12"}
+        ]
+        
+        for co in change_orders:
+            with st.expander(f"{co['ID']}: {co['Description']} ({co['Value']})"):
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.write(f"**Value:** {co['Value']}")
+                    st.write(f"**Status:** {co['Status']}")
+                    st.write(f"**Date Submitted:** {co['Date']}")
+                with col2:
+                    if co['Status'] == "Pending":
+                        if st.button(f"Approve {co['ID']}", key=f"approve_{co['ID']}"):
+                            st.success(f"Change Order {co['ID']} approved!")
+                        if st.button(f"Reject {co['ID']}", key=f"reject_{co['ID']}"):
+                            st.error(f"Change Order {co['ID']} rejected!")
+    
+    with tab3:
+        st.subheader("Contract Analytics")
+        
+        # Budget vs actual spending
+        col1, col2 = st.columns(2)
+        with col1:
+            st.subheader("Budget Performance by Trade")
+            st.write("• General Contractor: 42% complete, on budget")
+            st.write("• Structural Steel: 65% complete, 2% under budget")
+            st.write("• MEP Systems: 35% complete, on budget")
+            st.write("• Concrete: 78% complete, 3% over budget")
+            st.write("• Glazing: 0% complete, not started")
+            st.write("• Roofing: 15% complete, on budget")
+        
+        with col2:
+            st.subheader("Contract Risk Assessment")
+            st.write("🟢 **Low Risk:** Structural Steel, Roofing")
+            st.write("🟡 **Medium Risk:** General Contractor, MEP")
+            st.write("🔴 **High Risk:** Concrete (over budget)")
+            st.write("⚪ **Not Started:** Glazing & Windows")
+    
+    with tab4:
+        st.subheader("Vendor Management")
+        
+        # Vendor performance
+        st.subheader("Vendor Performance Ratings")
+        
+        vendors = [
+            {"Name": "Highland Construction LLC", "Rating": "⭐⭐⭐⭐⭐", "Performance": "Excellent", "On_Time": "95%"},
+            {"Name": "Steel Works Inc", "Rating": "⭐⭐⭐⭐⭐", "Performance": "Excellent", "On_Time": "98%"},
+            {"Name": "Metro Engineering", "Rating": "⭐⭐⭐⭐", "Performance": "Good", "On_Time": "87%"},
+            {"Name": "Foundation Pro", "Rating": "⭐⭐⭐", "Performance": "Fair", "On_Time": "78%"},
+            {"Name": "Crystal View", "Rating": "⭐⭐⭐⭐", "Performance": "Good", "On_Time": "92%"},
+            {"Name": "Weather Shield", "Rating": "⭐⭐⭐⭐⭐", "Performance": "Excellent", "On_Time": "96%"}
+        ]
+        
+        for vendor in vendors:
+            with st.expander(f"{vendor['Name']} - {vendor['Rating']}"):
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.write(f"**Overall Performance:** {vendor['Performance']}")
+                    st.write(f"**On-Time Delivery:** {vendor['On_Time']}")
+                with col2:
+                    st.write("**Key Strengths:**")
+                    if vendor['Performance'] == "Excellent":
+                        st.write("• Consistent quality delivery")
+                        st.write("• Proactive communication")
+                        st.write("• Strong safety record")
+                    elif vendor['Performance'] == "Good":
+                        st.write("• Reliable performance")
+                        st.write("• Good quality standards")
+                        st.write("• Room for improvement")
+                    else:
+                        st.write("• Needs performance improvement")
+                        st.write("• Additional oversight required")
+                        st.write("• Action plan in place")
 
 def render_closeout():
     st.title("✅ Project Closeout")

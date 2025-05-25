@@ -1345,7 +1345,7 @@ def render_dashboard():
     ]
     
     # Create styled activity cards
-    for activity in activities:
+    for idx, activity in enumerate(activities):
         # Color coding for different priorities
         if activity["priority"] == "HIGH":
             border_color = "#dc3545"
@@ -1386,8 +1386,8 @@ def render_dashboard():
             </div>
             """, unsafe_allow_html=True)
             
-            # Make activity clickable
-            if st.button(f"View {activity['type']}", key=f"activity_{activity['link']}", help=f"Go to {activity['link']} module"):
+            # Make activity clickable with unique key
+            if st.button(f"View {activity['type']}", key=f"activity_{idx}_{activity['link']}", help=f"Go to {activity['link']} module"):
                 st.session_state.current_menu = activity['link']
                 st.rerun()
     

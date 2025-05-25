@@ -3055,13 +3055,7 @@ def render_analytics():
 
 def main():
     """Main application entry point"""
-    st.set_page_config(
-        page_title="gcPanel - Better than Procore",
-        page_icon="🏗️",
-        layout="wide",
-        initial_sidebar_state="expanded"
-    )
-    
+    # Page config is now handled in app.py entry point
     initialize_session_state()
     apply_highland_tower_styling()
     

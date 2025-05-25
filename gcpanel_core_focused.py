@@ -265,9 +265,9 @@ def apply_highland_tower_styling():
         color: #1e40af !important;
     }
 
-    /* COMPREHENSIVE MOBILE RESPONSIVE DESIGN */
+    /* UNIFIED MOBILE-DESKTOP RESPONSIVE DESIGN */
     @media (max-width: 768px) {
-        /* Mobile Container Adjustments */
+        /* Consistent Container for Mobile */
         .main .block-container {
             padding: 1rem !important;
             max-width: 100% !important;
@@ -295,21 +295,48 @@ def apply_highland_tower_styling():
             padding: 1rem !important;
         }
         
-        /* Mobile Button Styling - Touch Friendly */
+        /* Unified Button Styling - Same as Desktop */
         .stButton > button {
-            min-height: 48px !important;
-            font-size: 16px !important;
-            padding: 12px 20px !important;
-            margin: 8px 0 !important;
-            border-radius: 8px !important;
+            background: linear-gradient(135deg, #1e40af, #3b82f6) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 12px !important;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            padding: 12px 16px !important;
+            margin: 6px 0 !important;
+            box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3) !important;
+            min-height: 44px !important;
             width: 100% !important;
         }
         
+        .stButton > button:hover {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa, #93c5fd) !important;
+            transform: translateY(-2px) translateX(6px) !important;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5) !important;
+            border-left: 4px solid #fbbf24 !important;
+        }
+        
         section[data-testid="stSidebar"] .stButton > button {
-            min-height: 44px !important;
+            background: linear-gradient(135deg, #1e40af, #3b82f6, #60a5fa) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 12px !important;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
             padding: 12px 16px !important;
-            font-size: 15px !important;
-            margin-bottom: 8px !important;
+            margin: 6px 0 !important;
+            box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3) !important;
+            text-align: left !important;
+        }
+        
+        section[data-testid="stSidebar"] .stButton > button:hover {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa, #93c5fd) !important;
+            transform: translateY(-2px) translateX(6px) !important;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5) !important;
+            border-left: 4px solid #fbbf24 !important;
         }
         
         /* Mobile Form Elements - Touch Optimized */

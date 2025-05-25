@@ -1778,6 +1778,11 @@ def render_main_content():
             "Daily Reports": render_daily_reports,
             "Quality Control": render_quality_control,
             "Material Management": render_material_management,
+            "RFIs": render_rfis,
+            "Performance Snapshot": lambda: __import__("modules.performance_snapshot").performance_snapshot.render(),
+            "Subcontractor Management": lambda: __import__("modules.subcontractor_management").subcontractor_management.render(),
+            "Inspections": lambda: __import__("modules.inspections").inspections.render(),
+            "Issues & Risks": lambda: __import__("modules.issues_risks").issues_risks.render(),
         }
     
     if current_menu in module_functions:

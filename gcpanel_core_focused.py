@@ -11,6 +11,269 @@ from datetime import datetime, timedelta
 import plotly.express as px
 import plotly.graph_objects as go
 
+def apply_highland_tower_styling():
+    """Apply professional Highland Tower Development enterprise styling"""
+    st.markdown("""
+    <style>
+    /* Highland Tower Enterprise Styling */
+    :root {
+        --highland-primary: #1e40af;
+        --highland-secondary: #3b82f6;
+        --highland-accent: #f59e0b;
+        --highland-success: #059669;
+        --highland-warning: #d97706;
+        --highland-error: #dc2626;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Main App Styling */
+    .stApp {
+        background-color: var(--gray-50) !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    }
+
+    /* Container Styling */
+    .main .block-container {
+        max-width: 1400px !important;
+        padding: 2rem 3rem !important;
+        background-color: transparent !important;
+    }
+
+    /* Professional Header */
+    .enterprise-header {
+        background: linear-gradient(135deg, var(--highland-primary) 0%, var(--highland-secondary) 100%) !important;
+        color: white !important;
+        padding: 2.5rem 3rem !important;
+        border-radius: 16px !important;
+        margin-bottom: 2rem !important;
+        box-shadow: var(--shadow-lg) !important;
+    }
+
+    .enterprise-header h1 {
+        margin: 0 !important;
+        font-size: 2.25rem !important;
+        font-weight: 700 !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .enterprise-header p {
+        margin: 0.75rem 0 0 0 !important;
+        opacity: 0.95 !important;
+        font-size: 1.125rem !important;
+        font-weight: 500 !important;
+    }
+
+    /* Professional Sidebar */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, var(--gray-800) 0%, var(--gray-900) 100%) !important;
+        border-right: 1px solid var(--gray-700) !important;
+        box-shadow: var(--shadow-lg) !important;
+    }
+
+    section[data-testid="stSidebar"] > div {
+        background-color: transparent !important;
+    }
+
+    section[data-testid="stSidebar"] .block-container {
+        padding: 1.5rem !important;
+    }
+
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3,
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] .stMarkdown {
+        color: #f3f4f6 !important;
+        font-weight: 600 !important;
+    }
+
+    /* Enterprise Buttons */
+    .stButton > button {
+        background: linear-gradient(135deg, var(--highland-primary) 0%, var(--highland-secondary) 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 0.75rem 1.5rem !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+        box-shadow: var(--shadow-sm) !important;
+    }
+
+    .stButton > button:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: var(--shadow-md) !important;
+    }
+
+    /* Sidebar Buttons */
+    section[data-testid="stSidebar"] .stButton > button {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        color: #f3f4f6 !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        width: 100% !important;
+        text-align: left !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    section[data-testid="stSidebar"] .stButton > button:hover {
+        background-color: var(--highland-secondary) !important;
+        border-color: var(--highland-secondary) !important;
+        transform: translateX(4px) !important;
+    }
+
+    /* Professional Cards */
+    .dashboard-card, .admin-card, .enterprise-card {
+        background: white !important;
+        border: 1px solid var(--gray-200) !important;
+        border-radius: 12px !important;
+        padding: 1.5rem !important;
+        margin-bottom: 1.5rem !important;
+        box-shadow: var(--shadow-sm) !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .dashboard-card:hover, .admin-card:hover, .enterprise-card:hover {
+        box-shadow: var(--shadow-md) !important;
+        transform: translateY(-2px) !important;
+    }
+
+    /* Professional Metrics */
+    .stMetric {
+        background: white !important;
+        border: 1px solid var(--gray-200) !important;
+        border-radius: 12px !important;
+        padding: 1.5rem !important;
+        box-shadow: var(--shadow-sm) !important;
+    }
+
+    .stMetric [data-testid="metric-container"] > div:first-child {
+        color: var(--gray-600) !important;
+        font-size: 0.875rem !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+    }
+
+    .stMetric [data-testid="metric-container"] > div:nth-child(2) {
+        color: var(--highland-primary) !important;
+        font-size: 2rem !important;
+        font-weight: 700 !important;
+    }
+
+    /* Professional Tables */
+    .stDataFrame {
+        border: 1px solid var(--gray-200) !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        box-shadow: var(--shadow-sm) !important;
+    }
+
+    .stDataFrame th {
+        background-color: var(--gray-50) !important;
+        color: var(--gray-700) !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        font-size: 0.75rem !important;
+    }
+
+    .stDataFrame tr:hover {
+        background-color: var(--gray-50) !important;
+    }
+
+    /* Professional Forms */
+    .stTextInput > div > div > input,
+    .stTextArea > div > div > textarea,
+    .stSelectbox > div > div > select {
+        border: 1px solid var(--gray-300) !important;
+        border-radius: 8px !important;
+        padding: 0.75rem !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .stTextInput > div > div > input:focus,
+    .stTextArea > div > div > textarea:focus,
+    .stSelectbox > div > div > select:focus {
+        border-color: var(--highland-secondary) !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+    }
+
+    /* Professional Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        background-color: white !important;
+        border: 1px solid var(--gray-200) !important;
+        border-radius: 12px 12px 0 0 !important;
+        padding: 0.5rem !important;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        background-color: transparent !important;
+        color: var(--gray-600) !important;
+        border-radius: 8px !important;
+        font-weight: 500 !important;
+        padding: 0.75rem 1.5rem !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .stTabs [aria-selected="true"] {
+        background-color: var(--highland-primary) !important;
+        color: white !important;
+        box-shadow: var(--shadow-sm) !important;
+    }
+
+    .stTabs [data-baseweb="tab-panel"] {
+        background-color: white !important;
+        border: 1px solid var(--gray-200) !important;
+        border-top: none !important;
+        border-radius: 0 0 12px 12px !important;
+        padding: 2rem !important;
+    }
+
+    /* Professional Alerts */
+    .stSuccess {
+        background-color: #d1fae5 !important;
+        border: 1px solid #a7f3d0 !important;
+        border-radius: 8px !important;
+        color: #047857 !important;
+    }
+
+    .stWarning {
+        background-color: #fef3c7 !important;
+        border: 1px solid #fde68a !important;
+        border-radius: 8px !important;
+        color: #92400e !important;
+    }
+
+    .stError {
+        background-color: #fee2e2 !important;
+        border: 1px solid #fecaca !important;
+        border-radius: 8px !important;
+        color: #991b1b !important;
+    }
+
+    .stInfo {
+        background-color: #dbeafe !important;
+        border: 1px solid #bfdbfe !important;
+        border-radius: 8px !important;
+        color: #1e40af !important;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .main .block-container {
+            padding: 1rem !important;
+        }
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 def get_user_role_permissions():
     """Define role-based module access permissions for Highland Tower Development"""
     return {
@@ -2243,7 +2506,7 @@ def main():
     )
     
     initialize_session_state()
-    apply_theme()
+    apply_highland_tower_styling()
     
     if not st.session_state.authenticated:
         render_login()

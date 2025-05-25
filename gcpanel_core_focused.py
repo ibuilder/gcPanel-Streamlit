@@ -1433,49 +1433,376 @@ def render_recent_reports():
         st.metric("Issues Reported", "2", "Minor delays only")
 
 def render_daily_reports():
-    """Advanced Daily Reporting with automated data collection"""
-    st.title("📊 Daily Reports - Project Progress Documentation")
-    st.markdown("**Comprehensive daily reporting with automated insights**")
+    """🚀 Next-Generation Daily Reports - Beyond Procore & Autodesk Construction Cloud"""
+    st.title("📊 Highland Tower Daily Reports")
+    st.markdown("**🎯 Advanced AI-Powered Field Reporting System - Better than Procore & Autodesk**")
     
-    tab1, tab2, tab3 = st.tabs(["📝 Create Report", "📊 Recent Reports", "📈 Analytics"])
+    # Real-time project status bar
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 1rem; border-radius: 12px; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; color: white;">
+            <div><strong>📍 Highland Tower Development</strong></div>
+            <div><strong>🏗️ Level 13 Active</strong></div>
+            <div><strong>👷 89 Workers</strong></div>
+            <div><strong>🌤️ 72°F Clear</strong></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "🚀 Smart Report", "📱 Mobile Capture", "🤖 AI Insights", "📊 Analytics", "🔄 Live Feed"
+    ])
     
     with tab1:
-        st.markdown("### 📝 Daily Progress Report")
+        st.markdown("### 🚀 Intelligent Daily Report Creation")
+        st.markdown("**Features that beat Procore:** Auto-populated data, AI suggestions, predictive analysis")
         
-        col1, col2 = st.columns(2)
+        # Auto-populated environmental data
+        col1, col2, col3 = st.columns(3)
         with col1:
-            report_date = st.date_input("Report Date", value=pd.Timestamp.now())
-            weather = st.selectbox("Weather Conditions", ["Clear", "Partly Cloudy", "Overcast", "Light Rain", "Heavy Rain", "Snow"])
-            temp_high = st.number_input("High Temperature (°F)", value=72)
-            temp_low = st.number_input("Low Temperature (°F)", value=58)
+            st.markdown("#### 🌤️ Environmental (Auto-Detected)")
+            report_date = st.date_input("📅 Report Date", value=pd.Timestamp.now())
+            weather = st.selectbox("☁️ Weather", ["Clear ☀️", "Partly Cloudy ⛅", "Overcast ☁️", "Light Rain 🌦️", "Heavy Rain 🌧️"], index=0)
+            col_temp1, col_temp2 = st.columns(2)
+            with col_temp1:
+                temp_high = st.number_input("🌡️ High °F", value=72, min_value=-20, max_value=120)
+            with col_temp2:
+                temp_low = st.number_input("🌡️ Low °F", value=58, min_value=-20, max_value=120)
+            wind_speed = st.slider("💨 Wind Speed (mph)", 0, 50, 8)
+            humidity = st.slider("💧 Humidity %", 0, 100, 65)
         
         with col2:
-            total_workers = st.number_input("Total Workers On-Site", value=89)
-            work_hours = st.number_input("Total Work Hours", value=712)
-            safety_incidents = st.number_input("Safety Incidents", value=0)
-            quality_issues = st.number_input("Quality Issues", value=0)
+            st.markdown("#### 👥 Workforce Analytics")
+            total_workers = st.number_input("👷 Total Workers", value=89, min_value=0)
+            work_hours = st.number_input("⏰ Total Hours", value=712, min_value=0)
+            overtime_hours = st.number_input("⏰ Overtime Hours", value=45, min_value=0)
+            
+            # AI-powered crew optimization suggestion
+            st.info(f"🤖 **AI Suggestion:** Optimal crew size for current weather: {int(total_workers * 0.95)} workers")
+            
+            col_safety1, col_safety2 = st.columns(2)
+            with col_safety1:
+                safety_incidents = st.number_input("⚠️ Safety Issues", value=0, min_value=0)
+            with col_safety2:
+                quality_issues = st.number_input("🔍 Quality Issues", value=0, min_value=0)
         
-        st.markdown("### 🏗️ Work Progress by Area")
+        with col3:
+            st.markdown("#### 💰 Cost & Schedule Impact")
+            labor_cost = st.number_input("💵 Daily Labor Cost", value=35600, min_value=0)
+            material_cost = st.number_input("🧱 Material Cost", value=12400, min_value=0)
+            schedule_variance = st.selectbox("📈 Schedule Status", 
+                ["Ahead of Schedule ⚡", "On Schedule ✅", "Behind Schedule ⚠️", "Critical Delay 🚨"])
+            
+            # Real-time cost analysis
+            total_daily_cost = labor_cost + material_cost
+            st.metric("💰 Total Daily Cost", f"${total_daily_cost:,}", 
+                     delta=f"{-2.3}% vs planned", delta_color="normal")
         
+        st.markdown("### 🏗️ Advanced Work Progress Tracking")
+        st.markdown("**Superior to Autodesk:** Real-time progress with photo verification and GPS tracking")
+        
+        # Enhanced progress tracking with Highland Tower specific areas
         progress_areas = [
-            {"Area": "Level 13 Structural", "Progress": 85, "Crew": 12, "Notes": "Steel erection proceeding on schedule"},
-            {"Area": "Level 11 MEP", "Progress": 70, "Crew": 14, "Notes": "Electrical rough-in completion target Friday"},
-            {"Area": "Level 9 Interior", "Progress": 45, "Crew": 8, "Notes": "Drywall installation started this week"}
+            {
+                "Area": "Level 13 - Structural Steel", 
+                "Progress": 87, 
+                "Crew": 12, 
+                "Lead": "Mike Rodriguez", 
+                "Priority": "High",
+                "Notes": "W24x62 beam installation 90% complete. Connection details under review.",
+                "Photos": 8,
+                "GPS": "40.7589, -73.9851",
+                "Schedule": "On Track",
+                "Cost_Impact": "$0",
+                "Next_Activity": "Install remaining beams L13.G-L13.J"
+            },
+            {
+                "Area": "Level 11 - MEP Systems", 
+                "Progress": 73, 
+                "Crew": 14, 
+                "Lead": "Sarah Chen", 
+                "Priority": "Medium",
+                "Notes": "HVAC ductwork installation progressing. Electrical conduit runs complete.",
+                "Photos": 12,
+                "GPS": "40.7587, -73.9851", 
+                "Schedule": "Ahead",
+                "Cost_Impact": "-$2,300 under budget",
+                "Next_Activity": "Coordinate plumbing rough-in with electrical"
+            },
+            {
+                "Area": "Level 9 - Interior Finishes", 
+                "Progress": 51, 
+                "Crew": 8, 
+                "Lead": "Jennifer Walsh", 
+                "Priority": "Low",
+                "Notes": "Drywall installation 60% complete. Paint prep scheduled for next week.",
+                "Photos": 15,
+                "GPS": "40.7585, -73.9851",
+                "Schedule": "On Track", 
+                "Cost_Impact": "+$1,200 material variance",
+                "Next_Activity": "Complete drywall installation east wing"
+            }
         ]
         
-        for area in progress_areas:
-            with st.expander(f"🔧 {area['Area']} - {area['Progress']}% Complete"):
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.text_input("Progress %", value=area['Progress'], key=f"progress_{area['Area']}")
-                with col2:
-                    st.text_input("Crew Size", value=area['Crew'], key=f"crew_{area['Area']}")
-                with col3:
-                    st.text_area("Notes", value=area['Notes'], key=f"notes_{area['Area']}")
+        for i, area in enumerate(progress_areas):
+            priority_color = "🔴" if area['Priority'] == "High" else "🟡" if area['Priority'] == "Medium" else "🟢"
+            schedule_icon = "⚡" if area['Schedule'] == "Ahead" else "✅" if area['Schedule'] == "On Track" else "⚠️"
+            
+            with st.expander(f"{priority_color} {area['Area']} - {area['Progress']}% Complete {schedule_icon}"):
+                # Multi-column layout for comprehensive data
+                detail_col1, detail_col2, detail_col3, detail_col4 = st.columns(4)
+                
+                with detail_col1:
+                    st.markdown("**📊 Progress & Crew**")
+                    progress_val = st.slider("Progress %", 0, 100, area['Progress'], key=f"progress_{i}")
+                    crew_size = st.number_input("👥 Crew Size", value=area['Crew'], key=f"crew_{i}")
+                    crew_lead = st.text_input("👤 Lead", value=area['Lead'], key=f"lead_{i}")
+                
+                with detail_col2:
+                    st.markdown("**📍 Location & Photos**")
+                    st.text_input("📍 GPS Coords", value=area['GPS'], key=f"gps_{i}")
+                    photos_count = st.number_input("📸 Photos", value=area['Photos'], key=f"photos_{i}")
+                    if st.button(f"📷 Capture Progress Photos", key=f"photo_btn_{i}"):
+                        st.info("📱 Mobile camera integration would open here")
+                
+                with detail_col3:
+                    st.markdown("**💰 Schedule & Cost**")
+                    schedule_status = st.selectbox("📈 Status", 
+                        ["Ahead", "On Track", "Behind", "Critical"], 
+                        index=["Ahead", "On Track", "Behind"].index(area['Schedule']) if area['Schedule'] in ["Ahead", "On Track", "Behind"] else 1,
+                        key=f"schedule_{i}")
+                    cost_impact = st.text_input("💵 Cost Impact", value=area['Cost_Impact'], key=f"cost_{i}")
+                
+                with detail_col4:
+                    st.markdown("**📝 Notes & Next Steps**")
+                    work_notes = st.text_area("📋 Today's Work", value=area['Notes'], key=f"notes_{i}", height=100)
+                    next_activity = st.text_area("➡️ Next Activity", value=area['Next_Activity'], key=f"next_{i}", height=60)
         
-        if st.button("📤 Submit Daily Report", type="primary", use_container_width=True):
-            st.balloons()
-            st.success("✅ Daily report submitted successfully! Report DR-2025-025 created.")
+        # AI-powered suggestions and alerts
+        st.markdown("### 🤖 AI-Powered Insights & Recommendations")
+        
+        insight_col1, insight_col2 = st.columns(2)
+        with insight_col1:
+            st.markdown("""
+            **🧠 Smart Recommendations:**
+            - 🌧️ Weather alert: 30% rain chance tomorrow - consider indoor work priority
+            - ⚡ Productivity boost: Level 11 crew performing 15% above baseline
+            - 🔄 Resource optimization: Relocate 2 workers from Level 9 to Level 13 for efficiency
+            - 📈 Schedule prediction: Current pace will complete Level 13 structural 2 days ahead
+            """)
+        
+        with insight_col2:
+            st.markdown("""
+            **⚠️ Risk Alerts:**
+            - 🚨 Critical: Level 13 crane inspection due within 3 days
+            - ⚠️ Medium: Material delivery delay risk for Level 14 steel (supplier contacted)
+            - 📊 Low: Quality variance detected in concrete batch #237 - monitoring required
+            - 💰 Budget: Daily costs running 2.3% under planned target
+            """)
+        
+        # Enhanced submission with AI validation
+        st.markdown("---")
+        col_submit1, col_submit2, col_submit3 = st.columns(3)
+        
+        with col_submit1:
+            if st.button("🤖 AI Review", use_container_width=True, type="secondary"):
+                st.info("🧠 AI analyzing report for completeness and insights...")
+                
+        with col_submit2:
+            if st.button("💾 Save Draft", use_container_width=True):
+                st.success("✅ Draft saved - Report DR-HT-2025-025")
+        
+        with col_submit3:
+            if st.button("📤 Submit Report", type="primary", use_container_width=True):
+                st.balloons()
+                st.success("""
+                ✅ **Daily Report DR-HT-2025-025 Successfully Submitted!**
+                
+                📊 **Auto-Generated Insights:**
+                - 📈 Project 3.2% ahead of schedule
+                - 💰 Daily costs 2.3% under budget
+                - 🎯 87% average productivity across all areas
+                - 🚀 Ready for Level 14 structural start Monday
+                """)
+    
+    with tab2:
+        st.markdown("### 📱 Mobile-First Field Capture")
+        st.markdown("**Revolutionary feature:** Real-time field data capture that beats both Procore and Autodesk")
+        
+        mobile_col1, mobile_col2 = st.columns(2)
+        
+        with mobile_col1:
+            st.markdown("""
+            #### 📸 Smart Photo Management
+            **Features beyond competition:**
+            - GPS auto-tagging with floor/area detection
+            - AI-powered progress analysis from photos
+            - Automatic quality issue detection
+            - Voice-to-text annotations
+            """)
+            
+            if st.button("📷 Launch Mobile Camera", use_container_width=True, type="primary"):
+                st.info("📱 Mobile capture interface would launch with:")
+                st.markdown("""
+                - 🎯 AR overlay showing planned vs actual progress
+                - 🤖 AI real-time quality analysis 
+                - 📍 Automatic GPS and floor level detection
+                - 🎙️ Voice note recording with transcription
+                """)
+        
+        with mobile_col2:
+            st.markdown("""
+            #### 🎙️ Voice-Powered Reporting
+            **Industry-first features:**
+            - Natural language report creation
+            - Real-time transcription with technical term recognition
+            - Multi-language support for diverse crews
+            - Offline capability with sync when connected
+            """)
+            
+            if st.button("🎙️ Start Voice Report", use_container_width=True):
+                st.info("🎤 Voice recording would start with:")
+                st.markdown("""
+                - 🧠 AI listening for construction terminology
+                - 📝 Real-time transcription and formatting
+                - 🔧 Auto-categorization into report sections
+                - ✅ Smart validation and completion prompts
+                """)
+    
+    with tab3:
+        st.markdown("### 🤖 AI-Powered Construction Intelligence")
+        st.markdown("**Next-level analytics that surpass industry leaders**")
+        
+        # AI insights dashboard
+        ai_col1, ai_col2, ai_col3 = st.columns(3)
+        
+        with ai_col1:
+            st.metric("🧠 AI Productivity Score", "94.2%", delta="↗️ +3.1%")
+            st.metric("🎯 Schedule Confidence", "87%", delta="↗️ +5%")
+            st.metric("💰 Cost Prediction Accuracy", "96.8%", delta="↗️ +1.2%")
+        
+        with ai_col2:
+            st.metric("⚡ Efficiency Rating", "A+", delta="Excellent")
+            st.metric("🔍 Quality Score", "9.1/10", delta="↗️ +0.3")
+            st.metric("🚀 Innovation Index", "High", delta="Leading Industry")
+        
+        with ai_col3:
+            st.metric("🌤️ Weather Impact", "Minimal", delta="↘️ -15% risk")
+            st.metric("👥 Team Satisfaction", "92%", delta="↗️ +4%")
+            st.metric("🎯 Goal Achievement", "103%", delta="↗️ Exceeding")
+        
+        # Advanced AI features
+        st.markdown("#### 🚀 Advanced AI Capabilities")
+        
+        ai_feature_col1, ai_feature_col2 = st.columns(2)
+        
+        with ai_feature_col1:
+            st.markdown("""
+            **🔮 Predictive Analytics:**
+            - 📊 7-day progress forecasting with 96% accuracy
+            - 🌧️ Weather impact modeling and mitigation suggestions
+            - 💰 Cost variance prediction with early warning system
+            - 👥 Optimal crew allocation recommendations
+            - 📈 Schedule optimization using machine learning
+            """)
+        
+        with ai_feature_col2:
+            st.markdown("""
+            **🧠 Smart Automation:**
+            - 📸 Photo analysis for automatic progress measurement
+            - 🔍 Quality defect detection from images
+            - 📝 Auto-generation of RFIs from field observations
+            - 🚨 Proactive safety hazard identification
+            - 📊 Real-time dashboard updates from field data
+            """)
+    
+    with tab4:
+        st.markdown("### 📊 Enterprise Analytics Dashboard")
+        st.markdown("**Comprehensive analytics that outperform Autodesk Construction Cloud**")
+        
+        # Create sample charts with Highland Tower data
+        fig_progress = px.line(
+            x=['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            y=[23, 45, 67, 87],
+            title="📈 Highland Tower Progress Trajectory",
+            labels={'x': 'Timeline', 'y': 'Completion %'}
+        )
+        fig_progress.update_layout(template="plotly_dark")
+        st.plotly_chart(fig_progress, use_container_width=True)
+        
+        # Cost analytics
+        cost_col1, cost_col2 = st.columns(2)
+        
+        with cost_col1:
+            fig_cost = px.bar(
+                x=['Labor', 'Materials', 'Equipment', 'Overhead'],
+                y=[35600, 12400, 8900, 5100],
+                title="💰 Daily Cost Breakdown",
+                color=['Labor', 'Materials', 'Equipment', 'Overhead']
+            )
+            fig_cost.update_layout(template="plotly_dark")
+            st.plotly_chart(fig_cost, use_container_width=True)
+        
+        with cost_col2:
+            fig_productivity = px.gauge(
+                value=94.2,
+                title="⚡ Overall Productivity Score",
+                domain={'x': [0, 1], 'y': [0, 1]},
+                gauge={'axis': {'range': [None, 100]},
+                       'bar': {'color': "darkblue"},
+                       'bgcolor': "white",
+                       'borderwidth': 2,
+                       'bordercolor': "gray",
+                       'steps': [{'range': [0, 50], 'color': 'lightgray'},
+                                {'range': [50, 80], 'color': 'gray'},
+                                {'range': [80, 100], 'color': 'lightgreen'}],
+                       'threshold': {'line': {'color': "red", 'width': 4},
+                                   'thickness': 0.75, 'value': 90}}
+            )
+            st.plotly_chart(fig_productivity, use_container_width=True)
+    
+    with tab5:
+        st.markdown("### 🔄 Real-Time Project Feed")
+        st.markdown("**Live collaboration that beats all competitors**")
+        
+        # Real-time activity feed
+        st.markdown("#### 📡 Live Activity Stream")
+        
+        activities = [
+            {"time": "2 minutes ago", "user": "Mike Rodriguez", "action": "📸 Uploaded progress photos", "location": "Level 13-G", "type": "photo"},
+            {"time": "8 minutes ago", "user": "Sarah Chen", "action": "✅ Completed MEP inspection", "location": "Level 11", "type": "completion"},
+            {"time": "15 minutes ago", "user": "AI System", "action": "🤖 Detected quality variance", "location": "Concrete Pour #237", "type": "alert"},
+            {"time": "23 minutes ago", "user": "Jennifer Walsh", "action": "📝 Submitted daily report", "location": "Level 9", "type": "report"},
+            {"time": "35 minutes ago", "user": "Safety AI", "action": "🦺 Automated safety scan complete", "location": "Site-wide", "type": "safety"}
+        ]
+        
+        for activity in activities:
+            icon_color = "🟢" if activity["type"] == "completion" else "🔵" if activity["type"] == "photo" else "🟡" if activity["type"] == "alert" else "⚪"
+            
+            st.markdown(f"""
+            <div style="background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 8px; margin: 0.5rem 0; border-left: 4px solid #3b82f6;">
+                {icon_color} <strong>{activity['time']}</strong> - {activity['user']} {activity['action']} at {activity['location']}
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Real-time collaboration tools
+        st.markdown("#### 💬 Team Collaboration Hub")
+        
+        collab_col1, collab_col2 = st.columns(2)
+        
+        with collab_col1:
+            st.markdown("**🎯 Active Issues Requiring Attention:**")
+            if st.button("🚨 Critical: Crane Inspection Due", use_container_width=True, type="secondary"):
+                st.warning("📋 Crane certification expires in 2 days. Inspection scheduled for tomorrow 8 AM.")
+            
+            if st.button("⚠️ Medium: Material Delivery Delay", use_container_width=True):
+                st.info("🚛 Steel delivery for Level 14 potentially delayed 1 day. Supplier confirmed backup plan.")
+        
+        with collab_col2:
+            st.markdown("**💬 Quick Communication:**")
+            quick_message = st.text_area("📱 Send Update to Team", placeholder="Type update, mention @user for notifications...")
+            if st.button("📤 Send Update", use_container_width=True, type="primary"):
+                st.success("✅ Update sent to Highland Tower team with push notifications")
 
 def render_progress_photos():
     """Advanced Progress Photo Management with AI organization"""

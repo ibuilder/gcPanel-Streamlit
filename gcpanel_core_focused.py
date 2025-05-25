@@ -741,32 +741,27 @@ def render_main_content():
                 """)
         
         elif current_menu == "Submittals":
-            st.markdown("### 📤 Submittals Management")
-            st.markdown("**Complete submittal workflow with automated tracking**")
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown("""
-                **📋 Core Features:**
-                - Submittal creation and routing
-                - Review workflow management
-                - Approval tracking
-                - Revision control
-                """)
-            with col2:
-                st.markdown("""
-                **⚡ Smart Features:**
-                - Auto-routing by specification
-                - Review time analytics
-                - Integration with procurement
-                - Mobile approval capability
-                """)
+            render_submittals()
+        
+        elif current_menu == "Transmittals":
+            render_transmittals()
+        
+        elif current_menu == "Equipment Tracking":
+            render_equipment_tracking()
+        
+        elif current_menu == "AI Assistant":
+            render_ai_assistant()
+        
+        elif current_menu == "Mobile Companion":
+            render_mobile_companion()
         
         else:
-            st.markdown(f"### Advanced {current_menu} capabilities coming soon...")
-            st.markdown("- Enterprise-grade functionality")
+            st.markdown(f"### {current_menu} - Advanced Module")
+            st.info(f"The {current_menu} module is being developed with enterprise-grade features designed to outperform Procore.")
             st.markdown("- Real-time collaboration tools") 
             st.markdown("- Advanced analytics and reporting")
             st.markdown("- Mobile-first design")
+            st.markdown("- AI-powered automation")
 
 def render_engineering():
     """Advanced Engineering module with comprehensive workflow management"""
@@ -1170,6 +1165,168 @@ def main():
         render_header()
         render_sidebar()
         render_main_content()
+
+def render_submittals():
+    """Advanced Submittals Management with automated workflow"""
+    st.title("📤 Submittals Management - Complete Workflow")
+    st.markdown("**Automated submittal tracking from creation to approval**")
+    
+    tab1, tab2, tab3 = st.tabs(["📋 Active Submittals", "✅ Create New", "📊 Performance"])
+    
+    with tab1:
+        st.markdown("### 📋 Active Submittals Register")
+        
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Total Submittals", "47", "+8 this week")
+        with col2:
+            st.metric("Pending Review", "12", "Avg 5.2 days")
+        with col3:
+            st.metric("Approved", "28", "Ready for procurement")
+        with col4:
+            st.metric("Revision Required", "7", "Needs attention")
+        
+        submittals = [
+            {"ID": "SUB-2025-034", "Item": "Structural Steel Connections", "Spec": "05120", "Status": "🟡 Under Review", "Days": 3, "Reviewer": "Structural Engineer"},
+            {"ID": "SUB-2025-033", "Item": "HVAC Equipment Schedule", "Spec": "23000", "Status": "🟢 Approved", "Days": 8, "Reviewer": "MEP Engineer"},
+            {"ID": "SUB-2025-032", "Item": "Curtain Wall System", "Spec": "08400", "Status": "🔴 Revision Required", "Days": 12, "Reviewer": "Architect"}
+        ]
+        
+        for submittal in submittals:
+            with st.expander(f"{submittal['Status']} {submittal['ID']} - {submittal['Item']}"):
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.markdown(f"**Spec Section:** {submittal['Spec']}")
+                    st.markdown(f"**Reviewer:** {submittal['Reviewer']}")
+                with col2:
+                    st.markdown(f"**Days in Review:** {submittal['Days']}")
+                    st.markdown(f"**Status:** {submittal['Status']}")
+                with col3:
+                    if st.button(f"📋 Review", key=f"review_{submittal['ID']}"):
+                        st.success(f"Opening review interface for {submittal['ID']}")
+    
+    with tab2:
+        st.markdown("### ✅ Create New Submittal")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            sub_title = st.text_input("Submittal Title*", placeholder="Descriptive title for submittal")
+            sub_spec = st.selectbox("Specification Section", ["03300 - Concrete", "05120 - Structural Steel", "08400 - Curtain Wall", "23000 - HVAC"])
+        with col2:
+            sub_reviewer = st.selectbox("Primary Reviewer", ["Architect", "Structural Engineer", "MEP Engineer"])
+            sub_priority = st.selectbox("Priority", ["Standard", "Rush", "Critical"])
+        
+        if st.button("📤 Submit for Review", type="primary", use_container_width=True):
+            if sub_title:
+                st.balloons()
+                st.success("✅ Submittal SUB-2025-035 created and routed for review!")
+
+def render_transmittals():
+    """Advanced Transmittals Management for document distribution"""
+    st.title("📨 Transmittals - Document Distribution")
+    st.markdown("**Professional document transmittal and tracking system**")
+    
+    tab1, tab2 = st.tabs(["📨 Active Transmittals", "✅ Create New"])
+    
+    with tab1:
+        transmittals = [
+            {"ID": "TRA-2025-012", "Subject": "Updated Structural Drawings Rev C", "To": "All Trades", "Date": "2025-01-22", "Status": "🟢 Distributed"},
+            {"ID": "TRA-2025-011", "Subject": "MEP Coordination Meeting Minutes", "To": "MEP Contractors", "Date": "2025-01-20", "Status": "🟡 Pending"}
+        ]
+        
+        for transmittal in transmittals:
+            with st.expander(f"{transmittal['Status']} {transmittal['ID']} - {transmittal['Subject']}"):
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.markdown(f"**To:** {transmittal['To']}")
+                with col2:
+                    st.markdown(f"**Date:** {transmittal['Date']}")
+                with col3:
+                    if st.button(f"📧 Resend", key=f"resend_{transmittal['ID']}"):
+                        st.success(f"Resending {transmittal['ID']}")
+
+def render_equipment_tracking():
+    """Advanced Equipment Tracking with GPS and maintenance"""
+    st.title("🚛 Equipment Tracking - Asset Management")
+    st.markdown("**Real-time equipment location and maintenance tracking**")
+    
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Total Equipment", "23", "On-site assets")
+    with col2:
+        st.metric("Currently Active", "19", "82% utilization")
+    with col3:
+        st.metric("In Maintenance", "2", "Scheduled service")
+    with col4:
+        st.metric("Available", "2", "Ready for assignment")
+    
+    equipment = [
+        {"Asset": "Tower Crane TC-01", "Location": "Level 13", "Status": "🟢 Active", "Operator": "Mike Chen"},
+        {"Asset": "Concrete Pump CP-02", "Location": "Level 12", "Status": "🟢 Active", "Operator": "Sarah Johnson"},
+        {"Asset": "Material Hoist MH-01", "Location": "Exterior", "Status": "🔴 Maintenance", "Operator": "N/A"}
+    ]
+    
+    for item in equipment:
+        with st.expander(f"{item['Status']} {item['Asset']} - {item['Location']}"):
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.markdown(f"**Location:** {item['Location']}")
+            with col2:
+                st.markdown(f"**Operator:** {item['Operator']}")
+            with col3:
+                if st.button(f"📍 Track", key=f"track_{item['Asset']}"):
+                    st.info(f"Opening GPS tracking for {item['Asset']}")
+
+def render_ai_assistant():
+    """AI-Powered Construction Assistant"""
+    st.title("🤖 AI Assistant - Intelligent Project Support")
+    st.markdown("**AI-powered assistance for construction management tasks**")
+    
+    st.chat_message("assistant").write("Hello! I'm your AI construction assistant. I can help with project analysis, scheduling optimization, cost forecasting, and risk assessment.")
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("📊 Analyze Schedule", use_container_width=True):
+            st.success("Your project is 5 days ahead of schedule. Level 13 steel erection is on critical path.")
+    with col2:
+        if st.button("💰 Cost Analysis", use_container_width=True):
+            st.success("You're 4.6% under budget ($2.1M savings). Forecast completion at $43.4M.")
+    with col3:
+        if st.button("🦺 Safety Review", use_container_width=True):
+            st.success("Safety performance excellent at 98.5%. Recommend crane safety briefings.")
+
+def render_mobile_companion():
+    """Mobile Companion for field operations"""
+    st.title("📱 Mobile Companion - Field Operations")
+    st.markdown("**Mobile-optimized tools for on-site project management**")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("""
+        **Today's Focus:**
+        - Level 13 steel erection
+        - MEP coordination meeting at 2 PM
+        - Safety inspection at 4 PM
+        """)
+    
+    with col2:
+        st.markdown("""
+        **Quick Stats:**
+        - 89 workers on-site
+        - 98.5% safety score
+        - 3 active RFIs
+        """)
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("📝 Quick RFI", use_container_width=True):
+            st.info("Mobile RFI form optimized for field input")
+    with col2:
+        if st.button("📸 Photo Upload", use_container_width=True):
+            st.info("Camera integration for instant progress photos")
+    with col3:
+        if st.button("🚨 Safety Report", use_container_width=True):
+            st.info("Emergency safety incident reporting")
 
 if __name__ == "__main__":
     main()

@@ -109,7 +109,7 @@ def render_quick_actions():
         if create_responsive_card(
             icon="🔍",
             title="QA Check",
-            action="Quality assurance inspection form",
+            description="Quality assurance inspection form",
             button_text="QA Check",
             button_key="qa_check_btn"
         ):

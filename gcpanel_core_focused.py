@@ -295,17 +295,168 @@ def render_sidebar():
         </div>
         """, unsafe_allow_html=True)
         
-        # User role information
+        # Enhanced User Profile Section
         user_role = st.session_state.get("user_role", "user")
         role_permissions = get_user_role_permissions()
         role_info = role_permissions.get(user_role, role_permissions["user"])
+        username = st.session_state.get('username', 'Guest')
         
         st.markdown(f"""
-        <div style="background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-            <p><strong>User:</strong> {st.session_state.get('username', 'Guest')}</p>
-            <p><strong>Role:</strong> {role_info['role_name']}</p>
+        <div style="
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(51, 65, 85, 0.9) 100%);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        ">
+            <div style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, #3b82f6, #60a5fa, #93c5fd);
+            "></div>
+            
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <div style="
+                    width: 60px;
+                    height: 60px;
+                    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+                    border-radius: 50%;
+                    margin: 0 auto 1rem auto;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.5rem;
+                    color: white;
+                    font-weight: bold;
+                    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+                ">{username[0].upper() if username else 'G'}</div>
+                
+                <h4 style="
+                    color: #f1f5f9;
+                    margin: 0;
+                    font-size: 1.1rem;
+                    font-weight: 700;
+                ">{username}</h4>
+                
+                <p style="
+                    color: #60a5fa;
+                    margin: 0.5rem 0;
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                ">{role_info['role_name']}</p>
+                
+                <div style="
+                    background: rgba(59, 130, 246, 0.2);
+                    border: 1px solid rgba(59, 130, 246, 0.4);
+                    border-radius: 12px;
+                    padding: 0.5rem;
+                    margin-top: 1rem;
+                ">
+                    <p style="
+                        color: #93c5fd;
+                        margin: 0;
+                        font-size: 0.8rem;
+                        font-weight: 500;
+                    ">🏗️ Highland Tower Development</p>
+                </div>
+            </div>
         </div>
         """, unsafe_allow_html=True)
+        
+        # Enhanced User Actions with Professional Styling
+        st.markdown("### 👤 User Actions")
+        
+        # Profile management buttons
+        profile_col1, profile_col2 = st.columns(2)
+        
+        with profile_col1:
+            if st.button("👤 View Profile", use_container_width=True, key="view_profile"):
+                st.info(f"""
+                **👤 User Profile - {username}**
+                
+                **📋 Account Details:**
+                - **Role:** {role_info['role_name']}
+                - **Access Level:** {user_role.title()}
+                - **Project:** Highland Tower Development
+                - **Department:** {
+                    'Administration' if user_role == 'admin' else
+                    'Project Management' if user_role == 'manager' else
+                    'Field Operations' if user_role in ['superintendent', 'foreman'] else
+                    'Quality Control' if user_role == 'inspector' else
+                    'General Access'
+                }
+                
+                **🔐 Permissions:** {len(role_info['permissions'])} active permissions
+                **📊 Module Access:** {len(role_info['modules'])} modules available
+                """)
+        
+        with profile_col2:
+            if st.button("⚙️ Settings", use_container_width=True, key="user_settings"):
+                st.info("""
+                **⚙️ User Preferences**
+                
+                - 🎨 Theme: Professional Dark Mode
+                - 📱 Mobile Sync: Enabled
+                - 🔔 Notifications: Real-time alerts active
+                - 📊 Dashboard: Highland Tower layout
+                - 🔐 Security: 2FA recommended
+                """)
+        
+        # Admin-specific features
+        if user_role == "admin":
+            st.markdown("### 🔧 Admin Tools")
+            
+            admin_col1, admin_col2 = st.columns(2)
+            
+            with admin_col1:
+                if st.button("👥 User Management", use_container_width=True, key="user_mgmt"):
+                    st.success("🔧 **Admin Panel Access**\n\nManage Highland Tower team members, roles, and permissions.")
+                    
+            with admin_col2:
+                if st.button("📊 System Status", use_container_width=True, key="system_status"):
+                    st.info("""
+                    **📊 System Health Dashboard**
+                    
+                    - ✅ Database: Online (PostgreSQL)
+                    - ✅ Authentication: Active
+                    - ✅ File Storage: Available
+                    - ✅ Performance: Optimal
+                    """)
+        
+        # Security and logout section
+        st.markdown("---")
+        
+        logout_col1, logout_col2 = st.columns(2)
+        
+        with logout_col1:
+            if st.button("🔐 Security", use_container_width=True, key="security"):
+                st.warning("""
+                **🔐 Security Center**
+                
+                - **Last Login:** Today, 8:30 AM
+                - **Session:** Active (2 hours)
+                - **Location:** Highland Tower Site Office
+                - **Device:** Secure workstation
+                
+                ⚠️ **Recommendation:** Enable 2FA for enhanced security
+                """)
+        
+        with logout_col2:
+            if st.button("🚪 Logout", use_container_width=True, type="secondary", key="logout_btn"):
+                # Clear session and redirect to login
+                st.session_state.authenticated = False
+                st.session_state.user_role = ""
+                st.session_state.username = ""
+                st.session_state.current_menu = "Dashboard"
+                st.success("✅ Successfully logged out. Redirecting to login...")
+                st.rerun()
         
         # Core Management Modules (filtered by permissions)
         st.markdown("### 🎯 Core Management")

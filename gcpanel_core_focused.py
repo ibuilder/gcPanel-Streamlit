@@ -870,12 +870,15 @@ def render_sidebar():
         
         # Advanced Tools (filtered by permissions)
         advanced_available = any(check_module_access(tool) for _, tool in [
-            ("📝 RFIs", "RFIs"),
+            ("❓ RFIs", "RFIs"),
             ("📤 Submittals", "Submittals"), 
             ("📨 Transmittals", "Transmittals"),
             ("📅 Scheduling", "Scheduling"), 
             ("🔍 Quality Control", "Quality Control"),
-            ("📸 Progress Photos", "Progress Photos")
+            ("📸 Progress Photos", "Progress Photos"),
+            ("👥 Subcontractor Management", "Subcontractor Management"),
+            ("📊 Inspections", "Inspections"),
+            ("⚠️ Issues & Risks", "Issues & Risks")
         ])
         
         if advanced_available:
@@ -886,7 +889,10 @@ def render_sidebar():
                 ("📨 Transmittals", "Transmittals"),
                 ("📅 Scheduling", "Scheduling"),
                 ("🔍 Quality Control", "Quality Control"),
-                ("📸 Progress Photos", "Progress Photos")
+                ("📸 Progress Photos", "Progress Photos"),
+                ("👥 Subcontractor Management", "Subcontractor Management"),
+                ("📊 Inspections", "Inspections"),
+                ("⚠️ Issues & Risks", "Issues & Risks")
             ]
             
             for display_name, tool in advanced_tools:

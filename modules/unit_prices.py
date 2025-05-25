@@ -15,38 +15,29 @@ def render_unit_prices():
     st.title("💰 Unit Prices - Cost Intelligence Center")
     st.markdown("**Comprehensive pricing analytics for Highland Tower Development**")
     
-    # Real-time cost overview dashboard
-    st.markdown("""
-    <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 1.5rem; border-radius: 16px; margin-bottom: 2rem;">
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; color: white; text-align: center;">
-            <div>
-                <h3 style="margin: 0; font-size: 1.8rem;">$48,200</h3>
-                <p style="margin: 0.5rem 0; opacity: 0.9;">Daily Material Costs</p>
-            </div>
-            <div>
-                <h3 style="margin: 0; font-size: 1.8rem;">$35,600</h3>
-                <p style="margin: 0.5rem 0; opacity: 0.9;">Daily Labor Costs</p>
-            </div>
-            <div>
-                <h3 style="margin: 0; font-size: 1.8rem;">$12,800</h3>
-                <p style="margin: 0.5rem 0; opacity: 0.9;">Equipment Rental</p>
-            </div>
-            <div>
-                <h3 style="margin: 0; font-size: 1.8rem;">96.4%</h3>
-                <p style="margin: 0.5rem 0; opacity: 0.9;">Cost Accuracy</p>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    # Real-time cost overview dashboard using native Streamlit components
+    col1, col2, col3, col4 = st.columns(4)
     
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
-        "🧱 Materials", "⚙️ Equipment", "👷 Labor", "📊 Analytics", "🔄 Integrations"
+    with col1:
+        st.metric("Daily Material Costs", "$48,200", "+2.1% vs budget")
+    with col2:
+        st.metric("Daily Labor Costs", "$35,600", "-1.5% vs budget")
+    with col3:
+        st.metric("Equipment Rental", "$12,800", "On target")
+    with col4:
+        st.metric("Cost Accuracy", "96.4%", "+0.8% this week")
+    
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+        "🧱 Materials", "📦 Material Management", "⚙️ Equipment", "👷 Labor", "📊 Analytics", "🔄 Integrations"
     ])
     
     with tab1:
         render_materials_pricing()
     
     with tab2:
+        render_material_management()
+    
+    with tab3:
         render_equipment_pricing()
     
     with tab3:

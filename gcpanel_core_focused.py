@@ -337,8 +337,7 @@ def render_sidebar():
             ("📊 Daily Reports", "Daily Reports"),
             ("💲 Unit Prices", "Unit Prices"),
             ("🚛 Deliveries", "Deliveries"),
-            ("🦺 Safety", "Safety"),
-            ("📦 Material Management", "Material Management")
+            ("🦺 Safety", "Safety")
         ]
         
         for display_name, module in core_tools:
@@ -1629,7 +1628,7 @@ def render_daily_reports():
                 with detail_col4:
                     st.markdown("**📝 Notes & Next Steps**")
                     work_notes = st.text_area("📋 Today's Work", value=area['Notes'], key=f"notes_{i}", height=100)
-                    next_activity = st.text_area("➡️ Next Activity", value=area['Next_Activity'], key=f"next_{i}", height=60)
+                    next_activity = st.text_area("➡️ Next Activity", value=area['Next_Activity'], key=f"next_{i}", height=80)
         
         # AI-powered suggestions and alerts
         st.markdown("### 🤖 AI-Powered Insights & Recommendations")

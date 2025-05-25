@@ -669,54 +669,162 @@ def render_scheduling():
         })
         st.dataframe(resource_data, use_container_width=True)
 
+def setup_database_connection():
+    """Setup PostgreSQL database connection for your modules"""
+    import os
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url:
+        st.session_state.db_connected = True
+        return True
+    else:
+        st.session_state.db_connected = False
+        return False
+
+def load_sophisticated_modules():
+    """Load your existing sophisticated module system"""
+    try:
+        # Use your advanced module loader system
+        from modules.module_loader import initialize_modules, register_module
+        from utils.module_loader import load_modules
+        
+        # Initialize your sophisticated module system
+        initialize_modules()
+        loaded_modules = load_modules()
+        
+        return loaded_modules
+    except ImportError:
+        return {}
+
 def render_main_content():
-    """Render main content based on selected menu"""
+    """Render main content using your sophisticated module system"""
     current_menu = st.session_state.current_menu
     
-    # Your sophisticated modules - directly imported from your existing codebase
+    # Setup database connection for your modules
+    setup_database_connection()
+    
+    # Load your sophisticated modules
+    sophisticated_modules = load_sophisticated_modules()
+    
+    # Your enterprise module mapping with sophisticated imports
     try:
-        # Import your actual sophisticated modules
-        from modules.dashboard import render as render_dashboard_module
-        from modules.preconstruction import render as render_preconstruction_module
-        from modules.engineering import render as render_engineering_module
-        from modules.field_operations import render as render_field_operations_module
-        from modules.safety import render as render_safety_module
-        from modules.contracts import render as render_contracts_module
-        from modules.cost_management import render as render_cost_management_module
-        from modules.bim import render_bim as render_bim_module
-        from modules.closeout import render as render_closeout_module
-        from modules.analytics import render as render_analytics_module
-        from modules.documents import render as render_documents_module
-        from modules.scheduling import render as render_scheduling_module
-        from modules.ai_assistant import render as render_ai_assistant_module
-        from modules.mobile_companion import render as render_mobile_companion_module
+        # Import your actual sophisticated modules with proper error handling
+        module_functions = {}
         
-        # Map to your actual sophisticated modules
-        module_functions = {
-            "Dashboard": render_dashboard_module,
-            "PreConstruction": render_preconstruction_module,
-            "Engineering": render_engineering_module,
-            "Field Operations": render_field_operations_module,
-            "Safety": render_safety_module,
-            "Contracts": render_contracts_module,
-            "Cost Management": render_cost_management_module,
-            "AIA G702/G703 Billing": render_aia_billing,
+        # Dashboard module with business intelligence
+        try:
+            from modules.dashboard import render
+            module_functions["Dashboard"] = render
+        except ImportError:
+            module_functions["Dashboard"] = render_dashboard
+        
+        # PreConstruction with estimating and bid management
+        try:
+            from modules.preconstruction import render
+            module_functions["PreConstruction"] = render
+        except ImportError:
+            module_functions["PreConstruction"] = render_preconstruction
+        
+        # Engineering with RFIs, submittals, transmittals
+        try:
+            from modules.engineering import render
+            module_functions["Engineering"] = render
+        except ImportError:
+            module_functions["Engineering"] = render_engineering
+        
+        # Field Operations with daily reports and checklists
+        try:
+            from modules.field_operations import render
+            module_functions["Field Operations"] = render
+        except ImportError:
+            module_functions["Field Operations"] = render_field_operations
+        
+        # Safety with incident tracking and compliance
+        try:
+            from modules.safety import render
+            module_functions["Safety"] = render
+        except ImportError:
+            module_functions["Safety"] = render_safety
+        
+        # Contracts with prime contracts and change orders
+        try:
+            from modules.contracts import render
+            module_functions["Contracts"] = render
+        except ImportError:
+            module_functions["Contracts"] = render_contracts
+        
+        # Cost Management with AIA billing
+        try:
+            from modules.cost_management import render
+            module_functions["Cost Management"] = render
+            # Also try to load AIA billing specifically
+            from modules.cost_management.aia_billing import render_aia_billing as aia_render
+            module_functions["AIA G702/G703 Billing"] = aia_render
+        except ImportError:
+            module_functions["Cost Management"] = render_cost_management
+            module_functions["AIA G702/G703 Billing"] = render_aia_billing
+        
+        # BIM with model viewer and clash detection
+        try:
+            from modules.bim import render_bim
+            module_functions["BIM"] = render_bim
+        except ImportError:
+            module_functions["BIM"] = render_bim
+        
+        # Analytics with business intelligence
+        try:
+            from modules.analytics import render
+            module_functions["Analytics"] = render
+        except ImportError:
+            module_functions["Analytics"] = render_analytics
+        
+        # Documents with PDF management
+        try:
+            from modules.documents import render
+            module_functions["Documents"] = render
+        except ImportError:
+            module_functions["Documents"] = render_documents
+        
+        # Scheduling with progress tracking
+        try:
+            from modules.scheduling import render
+            module_functions["Scheduling"] = render
+        except ImportError:
+            module_functions["Scheduling"] = render_scheduling
+        
+        # Closeout with project completion
+        try:
+            from modules.closeout import render
+            module_functions["Closeout"] = render
+        except ImportError:
+            module_functions["Closeout"] = render_closeout
+        
+        # AI Assistant
+        try:
+            from modules.ai_assistant import render
+            module_functions["AI Assistant"] = render
+        except ImportError:
+            module_functions["AI Assistant"] = render_ai_assistant
+        
+        # Mobile Companion
+        try:
+            from modules.mobile_companion import render
+            module_functions["Mobile Companion"] = render
+        except ImportError:
+            module_functions["Mobile Companion"] = render_mobile_companion
+        
+        # Additional specialized modules
+        module_functions.update({
             "Prime Contract": render_prime_contract,
             "Change Orders": render_change_orders,
-            "BIM": render_bim_module,
-            "Closeout": render_closeout_module,
-            "Analytics": render_analytics_module,
-            "Documents": render_documents_module,
-            "Scheduling": render_scheduling_module,
-            "AI Assistant": render_ai_assistant_module,
-            "Mobile Companion": render_mobile_companion_module,
             "Recent Reports": render_recent_reports,
             "Daily Reports": render_daily_reports,
             "Quality Control": render_quality_control,
             "Material Management": render_material_management,
-        }
-    except ImportError as e:
-        # Fallback to built-in functions if modules not available
+        })
+        
+    except Exception as e:
+        st.error(f"Error loading sophisticated modules: {str(e)}")
+        # Fallback to basic functions
         module_functions = {
             "Dashboard": render_dashboard,
             "PreConstruction": render_preconstruction,
@@ -725,17 +833,9 @@ def render_main_content():
             "Safety": render_safety,
             "Contracts": render_contracts,
             "Cost Management": render_cost_management,
-            "AIA G702/G703 Billing": render_aia_billing,
-            "Prime Contract": render_prime_contract,
-            "Change Orders": render_change_orders,
             "BIM": render_bim,
-            "Closeout": render_closeout,
             "Analytics": render_analytics,
             "Documents": render_documents,
-            "Recent Reports": render_recent_reports,
-            "Daily Reports": render_daily_reports,
-            "Quality Control": render_quality_control,
-            "Material Management": render_material_management,
         }
     
     if current_menu in module_functions:

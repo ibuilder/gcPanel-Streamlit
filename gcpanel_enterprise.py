@@ -542,6 +542,7 @@ def render_login():
     # Centered Login Section
     col1, col2, col3 = st.columns([1, 2, 1])
     
+    with col2:
         # Professional Login Card
         st.markdown("""
         <div class="enterprise-card" style="text-align: center; padding: 3rem; margin: 2rem 0;">
@@ -635,15 +636,6 @@ def render_login():
             </p>
         </div>
         """, unsafe_allow_html=True)
-
-    
-    with tabs[1]:
-        st.markdown("""
-        <div class="enterprise-card">
-            <h2 style="color: #4A90E2;">🏗️ About gcPanel Enterprise Construction Platform</h2>
-            <p><strong>Professional Construction Management:</strong> gcPanel is the industry-leading platform that transforms complex construction projects into manageable, organized workflows.</p>
-            
-            <h3 style="color: #4A90E2;">🎯 Highland Tower Development Project</h3>
             <ul>
                 <li><strong>Investment:</strong> $45.5 Million</li>
                 <li><strong>Residential Units:</strong> 120 modern apartments</li>

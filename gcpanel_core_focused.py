@@ -929,33 +929,26 @@ def render_sidebar():
                         st.session_state.current_menu = module
                         st.rerun()
 
-        # Intelligence & Analytics (filtered by permissions)
-        ai_available = any(check_module_access(module) for _, module in [
-            ("📈 Analytics", "Analytics"), ("🤖 AI Assistant", "AI Assistant"),
-            ("📱 Mobile Companion", "Mobile Companion")
+        # Analytics & Intelligence (consolidated)
+        analytics_available = any(check_module_access(module) for _, module in [
+            ("📈 Analytics", "Analytics"), ("🤖 AI Assistant", "AI Assistant")
         ])
         
-        if ai_available:
-            st.markdown("### 🤖 Intelligence")
-            ai_modules = [
+        if analytics_available:
+            st.markdown("### 📊 Analytics & AI")
+            analytics_modules = [
                 ("📈 Analytics", "Analytics"),
-                ("🤖 AI Assistant", "AI Assistant"),
-                ("📱 Mobile Companion", "Mobile Companion")
+                ("🤖 AI Assistant", "AI Assistant")
             ]
             
-            for display_name, module in ai_modules:
+            for display_name, module in analytics_modules:
                 if check_module_access(module):
-                    if st.button(display_name, key=f"ai_{module}", use_container_width=True):
+                    if st.button(display_name, key=f"analytics_{module}", use_container_width=True):
                         st.session_state.current_menu = module
                         st.rerun()
         
-        # Theme toggle and logout
+        # User section and logout
         st.markdown("---")
-        current_theme = "🌙 Dark Mode" if st.session_state.theme == "light" else "☀️ Light Mode"
-        if st.button(current_theme, use_container_width=True):
-            st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
-            apply_theme()
-            st.rerun()
         
         # Administration (admin only) - Professional & Organized
         if user_role == "admin":

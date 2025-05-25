@@ -34,14 +34,22 @@ def render_documents():
     st.header("Document Management")
     
     # Create tabs for different document views
-    tabs = st.tabs(["All Documents", "Smart Search", "Recent", "Favorites", "Collaboration", "Upload"])
+    tabs = st.tabs(["📋 Current Set", "📖 Specifications", "📁 All Documents", "🔍 Smart Search", "⬆️ Upload"])
+    
+    # Current Set tab
+    with tabs[0]:
+        render_current_set()
+    
+    # Specifications tab
+    with tabs[1]:
+        render_specifications()
     
     # All Documents tab
-    with tabs[0]:
+    with tabs[2]:
         render_document_list()
     
     # Smart Search tab - AI-powered search with NLP
-    with tabs[1]:
+    with tabs[3]:
         st.subheader("Smart Document Search")
         
         # Search input

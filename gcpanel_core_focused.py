@@ -910,16 +910,15 @@ def render_sidebar():
         
         # Resource Management (filtered by permissions)
         resource_available = any(check_module_access(module) for _, module in [
-            ("📁 Documents", "Documents"), ("📦 Material Management", "Material Management"),
-            ("🚜 Equipment Tracking", "Equipment Tracking"), ("📋 Punch Lists", "Punch Lists")
+            ("📁 Documents", "Documents"), ("💰 Unit Prices", "Unit Prices"),
+            ("📋 Punch Lists", "Punch Lists")
         ])
         
         if resource_available:
             st.markdown("### 📦 Resource Management")
             resource_modules = [
                 ("📁 Documents", "Documents"),
-                ("📦 Material Management", "Material Management"),
-                ("🚜 Equipment Tracking", "Equipment Tracking"),
+                ("💰 Unit Prices", "Unit Prices"),
                 ("📋 Punch Lists", "Punch Lists")
             ]
             

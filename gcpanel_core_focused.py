@@ -824,7 +824,7 @@ def render_sidebar():
         st.markdown("### ⚡ Core Tools")
         core_tools = [
             ("📊 Dashboard", "Dashboard"),
-            ("📊 Daily Reports", "Daily Reports"),
+            ("📝 Daily Reports", "Daily Reports"),
             ("💲 Unit Prices", "Unit Prices"),
             ("🚛 Deliveries", "Deliveries"),
             ("🦺 Safety", "Safety")
@@ -867,7 +867,7 @@ def render_sidebar():
         if advanced_available:
             st.markdown("### 🔧 Advanced Tools")
             advanced_tools = [
-                ("📝 RFIs", "RFIs"),
+                ("❓ RFIs", "RFIs"),
                 ("📤 Submittals", "Submittals"),
                 ("📨 Transmittals", "Transmittals"),
                 ("📅 Scheduling", "Scheduling"),

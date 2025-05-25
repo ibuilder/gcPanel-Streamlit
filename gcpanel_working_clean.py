@@ -35,6 +35,46 @@ def apply_professional_theme():
         background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     }
     
+    .css-1d391kg {
+        background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+    }
+    
+    .css-1d391kg .css-1v0mbdj {
+        background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+    }
+    
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+        border-right: 2px solid #3b82f6;
+    }
+    
+    section[data-testid="stSidebar"] .css-1v0mbdj {
+        color: white !important;
+    }
+    
+    section[data-testid="stSidebar"] h3 {
+        color: #fbbf24 !important;
+        font-weight: 600 !important;
+    }
+    
+    section[data-testid="stSidebar"] p {
+        color: #e2e8f0 !important;
+    }
+    
+    section[data-testid="stSidebar"] button {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 8px !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    section[data-testid="stSidebar"] button:hover {
+        background: rgba(255, 255, 255, 0.2) !important;
+        border-color: #fbbf24 !important;
+        transform: translateX(5px) !important;
+    }
+    
     .enterprise-header {
         background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
         color: white;

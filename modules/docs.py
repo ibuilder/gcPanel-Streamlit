@@ -1,283 +1,722 @@
 """
-Highland Tower Development - Documentation Module
-Public documentation accessible without login
+Documentation Module for Highland Tower Development
+Comprehensive Quick Start guide and feature documentation
 """
 
 import streamlit as st
+import pandas as pd
+from datetime import datetime
 
 def render():
-    """Render the documentation module"""
+    """Render comprehensive documentation system"""
     
     st.markdown("""
     <div style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); 
                 padding: 2rem; border-radius: 15px; margin-bottom: 2rem; text-align: center;">
         <h1 style="color: white; margin: 0; font-size: 2.5rem; font-weight: 700;">
-            📚 Highland Tower Development
+            📚 Highland Tower Development - Quick Start Guide
         </h1>
         <p style="color: #e8f4fd; margin: 1rem 0 0 0; font-size: 1.2rem;">
-            Construction Management Platform Documentation
+            Complete construction management platform documentation
         </p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Navigation tabs for documentation
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
-        "🏗️ Project Overview", "📖 User Guide", "🔧 Features", "❓ FAQ", "📞 Support"
+    # Navigation tabs
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+        "🚀 Quick Start", "⭐ Core Features", "📊 Panels", "📈 Charts", "🔧 API Reference", "📖 Examples"
     ])
     
     with tab1:
-        render_project_overview()
+        render_quick_start()
     
     with tab2:
-        render_user_guide()
+        render_core_features()
     
     with tab3:
-        render_features_guide()
+        render_panels_overview()
     
     with tab4:
-        render_faq()
+        render_charts_guide()
     
     with tab5:
-        render_support()
-
-def render_project_overview():
-    """Render Highland Tower project overview"""
+        render_api_reference()
     
-    st.markdown("## 🏗️ Highland Tower Development Project")
+    with tab6:
+        render_examples()
+
+def render_quick_start():
+    """Complete Quick Start guide"""
+    st.markdown("# 🚀 Quick Start Guide")
+    st.markdown("**Get up and running with Highland Tower Development in minutes**")
     
     col1, col2 = st.columns([2, 1])
     
     with col1:
         st.markdown("""
-        ### Project Details
+        ## 📋 Getting Started Checklist
         
-        **Highland Tower Development** is a $45.5M mixed-use construction project featuring:
+        ### Step 1: Login & Authentication
+        ✅ **Login with your credentials:**
+        - Username: `admin` Password: `Highland2025!` (Administrator)
+        - Username: `pmgr_johnson` Password: `ProjectMgr2025!` (Project Manager)
+        - Username: `super_chen` Password: `Superintendent2025!` (Superintendent)
         
-        - **120 Residential Units** across 15 floors above ground
-        - **8 Retail Spaces** at street level
-        - **2 Below-ground levels** for parking and utilities
-        - **168,500 total square feet** of construction
-        - **24-month construction timeline**
+        ### Step 2: Navigate the Platform
+        ✅ **Explore main sections:**
+        - **Dashboard** - Project overview and real-time metrics
+        - **Core Tools** - Daily operations (Reports, Photos, Safety)
+        - **Advanced Tools** - Professional modules (RFIs, Documents, Subcontractors)
+        - **Analytics & AI** - Performance insights and AI assistance
         
-        ### Project Status
-        - ✅ **67.3% Complete** - ahead of schedule
-        - 💰 **$2.1M Under Budget** - exceptional cost management
-        - 🦺 **98.5% OSHA Compliance** - industry-leading safety
-        - 📋 **23 Active RFIs** - managed through our system
+        ### Step 3: Key Daily Operations
+        ✅ **Essential workflows:**
+        1. Create daily reports in **Daily Reports** module
+        2. Upload progress photos in **Progress Photos**
+        3. Submit RFIs in **RFIs** module
+        4. Track safety incidents in **Safety** module
+        5. Monitor costs in **Cost Management**
+        
+        ### Step 4: Document Management
+        ✅ **Manage project documents:**
+        - Upload drawings, specifications, contracts
+        - Search and filter documents by category
+        - Version control and approval workflows
+        - Share documents with team members
         """)
     
     with col2:
-        st.markdown("""
-        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; border-left: 4px solid #1e3c72;">
-            <h4 style="color: #1e3c72; margin-top: 0;">Key Metrics</h4>
-            <p><strong>Project Value:</strong> $45.5M</p>
-            <p><strong>Completion:</strong> 67.3%</p>
-            <p><strong>Schedule:</strong> 5 days ahead</p>
-            <p><strong>Budget:</strong> $2.1M under</p>
-            <p><strong>Safety Score:</strong> 98.5%</p>
-            <p><strong>Quality Score:</strong> 96.2%</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown("### 🎯 Project Overview")
+        st.info("""
+        **Highland Tower Development**
+        📍 $45.5M Mixed-Use Project
+        🏢 120 Residential + 8 Retail Units
+        📅 67.3% Complete (5 days ahead)
+        💰 $2.1M Under Budget
+        ⚡ 98.5% OSHA Compliance
+        """)
+        
+        st.markdown("### 📞 Support")
+        st.success("""
+        **Need Help?**
+        📧 support@highlandtower.com
+        📱 +1-555-HIGHLAND
+        🌐 docs.highlandtower.com
+        """)
+        
+        st.markdown("### 🎬 Video Tutorials")
+        if st.button("▶️ Watch Getting Started", use_container_width=True):
+            st.info("Opening video tutorial...")
+        
+        if st.button("▶️ RFI Management Demo", use_container_width=True):
+            st.info("Opening RFI tutorial...")
 
-def render_user_guide():
-    """Render user guide and getting started information"""
-    
-    st.markdown("## 📖 User Guide - Getting Started")
-    
-    st.markdown("### 🔐 Accessing the System")
-    
-    st.info("""
-    **Login Required**: The Highland Tower Construction Management Platform requires authentication. 
-    Contact your project manager for login credentials.
-    """)
-    
-    st.markdown("### 🎯 Module Overview")
-    
-    modules_info = [
-        {
-            "category": "⚡ Core Tools",
-            "modules": [
-                ("📊 Dashboard", "Real-time project overview and key metrics"),
-                ("📝 Daily Reports", "Submit and review daily field reports"),
-                ("🚛 Deliveries", "Track material deliveries and shipments"),
-                ("🦺 Safety", "Safety incident tracking and compliance")
-            ]
-        },
-        {
-            "category": "🎯 Project Management", 
-            "modules": [
-                ("🏗️ PreConstruction", "Planning, estimating, and design coordination"),
-                ("⚙️ Engineering", "RFIs, technical documents, specifications"),
-                ("👷 Field Operations", "Crew management and field coordination"),
-                ("📋 Contracts", "Contract administration and change orders"),
-                ("💰 Cost Management", "AIA billing, budget tracking, financials"),
-                ("🏢 BIM", "3D model coordination and clash detection"),
-                ("✅ Closeout", "Project completion and handover processes")
-            ]
-        },
-        {
-            "category": "🔧 Advanced Tools",
-            "modules": [
-                ("❓ RFIs", "Request for Information management"),
-                ("📤 Submittals", "Submittal review and approval workflow"),
-                ("📅 Scheduling", "Project timeline and milestone tracking"),
-                ("🔍 Quality Control", "Inspection workflows and compliance"),
-                ("📸 Progress Photos", "Site documentation with GPS tagging")
-            ]
-        }
-    ]
-    
-    for category_info in modules_info:
-        st.markdown(f"#### {category_info['category']}")
-        for module_name, description in category_info['modules']:
-            st.markdown(f"**{module_name}**: {description}")
-        st.markdown("---")
-
-def render_features_guide():
-    """Render detailed features guide"""
-    
-    st.markdown("## 🔧 Platform Features")
+def render_core_features():
+    """Core Features documentation"""
+    st.markdown("# ⭐ Core Features")
+    st.markdown("**Comprehensive overview of Highland Tower Development capabilities**")
     
     # Feature categories
-    feature_sections = [
-        {
-            "title": "📊 Real-Time Analytics",
-            "features": [
-                "Live project dashboard with KPIs",
-                "Cost variance tracking and forecasting", 
-                "Schedule performance monitoring",
-                "Safety compliance metrics",
-                "Quality control analytics"
-            ]
-        },
-        {
-            "title": "📱 Mobile-Optimized",
-            "features": [
-                "Responsive design for field use",
-                "GPS-enabled photo documentation",
-                "Offline data entry capabilities",
-                "Voice-to-text report submission",
-                "Real-time synchronization"
-            ]
-        },
-        {
-            "title": "🔐 Security & Compliance",
-            "features": [
-                "Role-based access control",
-                "Digital signature capabilities",
-                "Audit trail for all actions",
-                "OSHA compliance tracking",
-                "Document version control"
-            ]
-        },
-        {
-            "title": "🤖 AI-Powered Features",
-            "features": [
-                "Smart tooltip guidance system",
-                "Predictive cost analytics",
-                "Automated quality checks",
-                "Intelligent document search",
-                "Performance snapshot generation"
-            ]
-        }
-    ]
+    feature_tabs = st.tabs(["🏗️ Construction", "📋 Management", "📊 Analytics", "🔒 Security"])
     
-    for section in feature_sections:
-        with st.expander(section["title"], expanded=True):
-            for feature in section["features"]:
-                st.markdown(f"• {feature}")
-
-def render_faq():
-    """Render frequently asked questions"""
+    with feature_tabs[0]:
+        st.markdown("## 🏗️ Construction Features")
+        
+        features_construction = [
+            {
+                "feature": "RFI Management",
+                "description": "Professional Request for Information system with workflow automation",
+                "capabilities": ["Create/Edit/Respond to RFIs", "Priority management", "Cost/schedule impact tracking", "File attachments"],
+                "module": "RFIs"
+            },
+            {
+                "feature": "Daily Reports", 
+                "description": "Smart daily reporting with AI suggestions and mobile capture",
+                "capabilities": ["Weather integration", "Crew management", "Safety incident tracking", "Progress photos"],
+                "module": "Daily Reports"
+            },
+            {
+                "feature": "Quality Control",
+                "description": "Comprehensive inspection management and deficiency tracking", 
+                "capabilities": ["Digital checklists", "Photo documentation", "Corrective actions", "Compliance tracking"],
+                "module": "Quality Control"
+            },
+            {
+                "feature": "Subcontractor Management",
+                "description": "Complete sub-trade coordination and performance tracking",
+                "capabilities": ["Performance ratings", "Insurance tracking", "Payment management", "Prequalification"],
+                "module": "Subcontractor Management"
+            }
+        ]
+        
+        for feature in features_construction:
+            with st.expander(f"🔧 {feature['feature']} - {feature['module']}"):
+                st.markdown(f"**{feature['description']}**")
+                st.markdown("**Key Capabilities:**")
+                for cap in feature['capabilities']:
+                    st.markdown(f"• {cap}")
+                
+                if st.button(f"Open {feature['feature']}", key=f"open_{feature['module']}"):
+                    st.session_state.current_menu = feature['module']
+                    st.rerun()
     
-    st.markdown("## ❓ Frequently Asked Questions")
+    with feature_tabs[1]:
+        st.markdown("## 📋 Management Features")
+        
+        management_features = [
+            {
+                "feature": "Document Management",
+                "description": "Enterprise document control with version management and search",
+                "benefits": ["Centralized storage", "Version control", "Advanced search", "Access control"]
+            },
+            {
+                "feature": "Cost Management", 
+                "description": "Real-time budget tracking and financial analytics",
+                "benefits": ["Budget vs actual", "Variance analysis", "Forecasting", "Payment tracking"]
+            },
+            {
+                "feature": "Scheduling",
+                "description": "Critical path analysis and resource planning",
+                "benefits": ["Gantt charts", "Critical path", "Resource optimization", "Progress tracking"]
+            },
+            {
+                "feature": "Issues & Risks",
+                "description": "Proactive risk management and issue resolution",
+                "benefits": ["Risk assessment", "Mitigation planning", "Issue tracking", "Lessons learned"]
+            }
+        ]
+        
+        for feature in management_features:
+            st.markdown(f"### 📌 {feature['feature']}")
+            st.markdown(feature['description'])
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("**Key Benefits:**")
+                for benefit in feature['benefits']:
+                    st.markdown(f"✅ {benefit}")
     
-    faqs = [
-        {
-            "question": "How do I get access to the Highland Tower platform?",
-            "answer": "Contact your project manager or Highland Tower Development administration team for login credentials. Access is restricted to authorized project personnel only."
-        },
-        {
-            "question": "Can I use this system on my mobile device?",
-            "answer": "Yes! The platform is fully optimized for mobile use. Field personnel can submit reports, take progress photos, and access project information from any mobile device."
-        },
-        {
-            "question": "How do I submit daily reports?",
-            "answer": "Navigate to the Daily Reports module from the Core Tools section. Fill out the required fields including weather, crew count, work performed, and any safety notes."
-        },
-        {
-            "question": "What is an RFI and how do I submit one?",
-            "answer": "RFI stands for Request for Information. Use the Engineering module to submit RFIs when you need clarification on drawings, specifications, or construction details."
-        },
-        {
-            "question": "How does digital signature work for owner bills?",
-            "answer": "Authorized personnel can digitally sign AIA G702/G703 owner bills through the Cost Management module. Digital signatures are legally binding and secure."
-        },
-        {
-            "question": "Can I access the system offline?",
-            "answer": "Limited offline functionality is available for mobile users. Data will synchronize when connection is restored."
-        }
-    ]
-    
-    for faq in faqs:
-        with st.expander(faq["question"]):
-            st.write(faq["answer"])
-
-def render_support():
-    """Render support and contact information"""
-    
-    st.markdown("## 📞 Support & Contact Information")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
+    with feature_tabs[2]:
+        st.markdown("## 📊 Analytics Features")
+        
         st.markdown("""
-        ### 🏗️ Highland Tower Development Team
+        ### Performance Analytics
+        - **Real-time dashboards** with KPI tracking
+        - **Predictive analytics** for cost and schedule
+        - **Custom reports** and data visualization
+        - **Mobile-responsive** charts and metrics
         
-        **Project Manager**
-        - Phone: (555) 123-4567
-        - Email: pm@highlandtower.dev
-        
-        **Site Superintendent** 
-        - Phone: (555) 123-4568
-        - Email: super@highlandtower.dev
-        
-        **Safety Manager**
-        - Phone: (555) 123-4569
-        - Email: safety@highlandtower.dev
+        ### AI-Powered Insights
+        - **Smart recommendations** for crew optimization
+        - **Risk prediction** based on historical data
+        - **Automated reporting** with natural language generation
+        - **Photo analysis** for progress tracking
         """)
     
-    with col2:
+    with feature_tabs[3]:
+        st.markdown("## 🔒 Security Features")
+        
         st.markdown("""
-        ### 💻 Technical Support
+        ### Authentication & Authorization
+        - **JWT-based security** with session management
+        - **Role-based access control** (Admin, Manager, Superintendent, etc.)
+        - **Permission-based modules** with granular access
+        - **Session timeout** and security monitoring
         
-        **IT Help Desk**
-        - Phone: (555) 123-4570
-        - Email: support@highlandtower.dev
-        - Hours: Monday-Friday, 7 AM - 6 PM
+        ### Data Protection
+        - **PostgreSQL database** with enterprise-grade security
+        - **Audit logging** for all system changes
+        - **Data encryption** in transit and at rest
+        - **Backup and recovery** systems
+        """)
+
+def render_panels_overview():
+    """Panels and Dashboard Overview"""
+    st.markdown("# 📊 Panels & Dashboards")
+    st.markdown("**Interactive dashboards and data visualization panels**")
+    
+    panel_tabs = st.tabs(["📈 Main Dashboard", "🔧 Module Panels", "📱 Mobile Panels", "⚙️ Custom Panels"])
+    
+    with panel_tabs[0]:
+        st.markdown("## 📈 Main Dashboard Components")
         
-        **Emergency After Hours**
-        - Phone: (555) 123-HELP
-        - Available 24/7 for critical issues
+        dashboard_panels = [
+            {
+                "panel": "Project Overview",
+                "metrics": ["Project Value ($45.5M)", "Completion (67.3%)", "Budget Status", "Schedule Status"],
+                "widgets": ["Progress Ring", "Cost Chart", "Schedule Gantt", "Weather Widget"]
+            },
+            {
+                "panel": "Safety Dashboard", 
+                "metrics": ["OSHA Compliance (98.5%)", "Safety Incidents", "Days Without Incident", "Safety Training"],
+                "widgets": ["Safety Score", "Incident Heatmap", "Training Progress", "Compliance Gauge"]
+            },
+            {
+                "panel": "Financial Summary",
+                "metrics": ["Budget vs Actual", "Cost Variance", "Payment Status", "Cash Flow"],
+                "widgets": ["Cost Breakdown Chart", "Variance Analysis", "Payment Timeline", "Forecast Graph"]
+            }
+        ]
+        
+        for panel in dashboard_panels:
+            with st.expander(f"🎛️ {panel['panel']} Panel"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.markdown("**Key Metrics:**")
+                    for metric in panel['metrics']:
+                        st.markdown(f"• {metric}")
+                
+                with col2:
+                    st.markdown("**Visual Widgets:**")
+                    for widget in panel['widgets']:
+                        st.markdown(f"• {widget}")
+    
+    with panel_tabs[1]:
+        st.markdown("## 🔧 Module-Specific Panels")
+        
+        module_panels = {
+            "RFI Management": ["RFI Status Chart", "Priority Distribution", "Response Time Analytics", "Cost Impact Summary"],
+            "Quality Control": ["Inspection Pass Rate", "Deficiency Trends", "Checklist Completion", "Quality Metrics"],
+            "Progress Photos": ["Photo Gallery View", "Location-based Filters", "Category Analytics", "Timeline View"],
+            "Cost Management": ["Budget Breakdown", "Variance Charts", "Payment Status", "Forecast Models"]
+        }
+        
+        for module, panels in module_panels.items():
+            st.markdown(f"### 📊 {module}")
+            for panel in panels:
+                st.markdown(f"• {panel}")
+    
+    with panel_tabs[2]:
+        st.markdown("## 📱 Mobile-Optimized Panels")
+        
+        st.markdown("""
+        ### Field-Ready Interface
+        - **Touch-friendly controls** for tablet and phone use
+        - **Simplified navigation** for outdoor conditions
+        - **Large buttons and text** for work gloves
+        - **Offline capabilities** for areas with poor connectivity
+        
+        ### Mobile-Specific Features
+        - **Photo capture** with GPS location tagging
+        - **Voice notes** for quick reporting
+        - **Digital signatures** for approvals
+        - **QR code scanning** for equipment tracking
         """)
     
-    st.markdown("### 🆘 Emergency Contacts")
+    with panel_tabs[3]:
+        st.markdown("## ⚙️ Custom Panel Configuration")
+        
+        st.markdown("""
+        ### Dashboard Customization
+        - **Drag-and-drop** panel arrangement
+        - **Widget selection** from library
+        - **Custom KPI** definitions
+        - **Role-based** default layouts
+        
+        ### Advanced Features
+        - **Real-time data** refresh intervals
+        - **Alert thresholds** and notifications
+        - **Export capabilities** (PDF, Excel)
+        - **Sharing options** for stakeholders
+        """)
+
+def render_charts_guide():
+    """Charts and Visualization Guide"""
+    st.markdown("# 📈 Charts & Visualizations")
+    st.markdown("**Interactive data visualization and analytics**")
     
-    st.warning("""
-    **For Safety Emergencies**: Call 911 immediately, then contact the Safety Manager
+    chart_tabs = st.tabs(["📊 Chart Types", "🎨 Styling", "⚡ Interactive", "📱 Responsive"])
     
-    **For System Critical Issues**: Contact IT Help Desk or use emergency after-hours number
-    """)
+    with chart_tabs[0]:
+        st.markdown("## 📊 Available Chart Types")
+        
+        # Sample charts with Highland Tower data
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("### 📈 Progress Charts")
+            
+            # Progress chart example
+            import plotly.express as px
+            progress_data = pd.DataFrame({
+                'Phase': ['Foundation', 'Structure', 'MEP', 'Finishes', 'Closeout'],
+                'Planned': [100, 100, 85, 40, 0],
+                'Actual': [100, 95, 75, 35, 0]
+            })
+            
+            fig = px.bar(progress_data, x='Phase', y=['Planned', 'Actual'], 
+                        title="Highland Tower - Phase Progress",
+                        barmode='group')
+            st.plotly_chart(fig, use_container_width=True)
+        
+        with col2:
+            st.markdown("### 🥧 Cost Distribution")
+            
+            # Pie chart example
+            cost_data = pd.DataFrame({
+                'Category': ['Labor', 'Materials', 'Equipment', 'Overhead'],
+                'Amount': [18.2, 15.4, 7.8, 4.1]
+            })
+            
+            fig_pie = px.pie(cost_data, values='Amount', names='Category',
+                           title="Highland Tower - Cost Breakdown ($M)")
+            st.plotly_chart(fig_pie, use_container_width=True)
+        
+        st.markdown("### 📉 Timeline Charts")
+        
+        # Timeline example
+        timeline_data = pd.DataFrame({
+            'Task': ['Design', 'Permits', 'Foundation', 'Structure', 'MEP', 'Finishes'],
+            'Start': ['2024-01-01', '2024-03-01', '2024-05-01', '2024-08-01', '2024-11-01', '2025-02-01'],
+            'End': ['2024-04-30', '2024-06-30', '2024-09-30', '2024-12-31', '2025-03-31', '2025-06-30'],
+            'Status': ['Complete', 'Complete', 'Complete', 'Active', 'Planned', 'Planned']
+        })
+        
+        timeline_data['Start'] = pd.to_datetime(timeline_data['Start'])
+        timeline_data['End'] = pd.to_datetime(timeline_data['End'])
+        
+        fig_timeline = px.timeline(timeline_data, x_start='Start', x_end='End', y='Task', 
+                                 color='Status', title="Highland Tower - Project Timeline")
+        st.plotly_chart(fig_timeline, use_container_width=True)
     
-    st.markdown("### 📧 General Information")
+    with chart_tabs[1]:
+        st.markdown("## 🎨 Chart Styling & Themes")
+        
+        st.markdown("""
+        ### Highland Tower Theme
+        - **Primary Colors:** Navy Blue (#1e3c72), Highland Blue (#2a5298)
+        - **Accent Colors:** Gold (#f59e0b), Success Green (#10b981)
+        - **Background:** Dark theme for professional appearance
+        - **Typography:** Clean, modern fonts optimized for construction data
+        
+        ### Chart Customization
+        - **Color palettes** aligned with brand identity
+        - **Responsive design** for mobile and desktop
+        - **Professional styling** for client presentations
+        - **Accessibility features** for better readability
+        """)
     
-    st.info("""
-    **Project Website**: www.highlandtower.dev
+    with chart_tabs[2]:
+        st.markdown("## ⚡ Interactive Features")
+        
+        st.markdown("""
+        ### User Interactions
+        - **Zoom and pan** for detailed data exploration
+        - **Hover tooltips** with additional information
+        - **Click events** to drill down into data
+        - **Filter controls** for dynamic data views
+        
+        ### Advanced Interactions
+        - **Brushing and linking** across multiple charts
+        - **Time series** scrubbing and range selection
+        - **Export functionality** for reports and presentations
+        - **Real-time updates** with live data feeds
+        """)
     
-    **Document Portal**: docs.highlandtower.dev
+    with chart_tabs[3]:
+        st.markdown("## 📱 Responsive Design")
+        
+        st.markdown("""
+        ### Mobile Optimization
+        - **Adaptive layouts** that work on all screen sizes
+        - **Touch-friendly** controls for tablet use
+        - **Simplified views** for mobile devices
+        - **Fast loading** even on slower connections
+        
+        ### Performance Features
+        - **Efficient rendering** for large datasets
+        - **Lazy loading** for better performance
+        - **Caching strategies** to reduce load times
+        - **Progressive enhancement** for better user experience
+        """)
+
+def render_api_reference():
+    """API Reference documentation"""
+    st.markdown("# 🔧 API Reference")
+    st.markdown("**Complete API documentation for Highland Tower Development**")
     
-    **Training Resources**: Available through your project manager
-    """)
+    api_tabs = st.tabs(["🔑 Authentication", "📋 Endpoints", "💾 Database", "🔌 Integration"])
+    
+    with api_tabs[0]:
+        st.markdown("## 🔑 Authentication API")
+        
+        st.code("""
+# Login Endpoint
+POST /api/auth/login
+{
+    "username": "admin",
+    "password": "Highland2025!"
+}
+
+# Response
+{
+    "token": "jwt_token_here",
+    "user": {
+        "id": "htd_001",
+        "username": "admin",
+        "role": "admin",
+        "permissions": ["read_all", "write_all"]
+    }
+}
+
+# Using JWT Token
+Authorization: Bearer jwt_token_here
+        """, language="json")
+    
+    with api_tabs[1]:
+        st.markdown("## 📋 Module Endpoints")
+        
+        endpoints = [
+            {
+                "module": "RFIs",
+                "endpoints": [
+                    "GET /api/rfis - List all RFIs",
+                    "POST /api/rfis - Create new RFI", 
+                    "GET /api/rfis/{id} - Get RFI details",
+                    "PUT /api/rfis/{id} - Update RFI",
+                    "DELETE /api/rfis/{id} - Delete RFI"
+                ]
+            },
+            {
+                "module": "Documents",
+                "endpoints": [
+                    "GET /api/documents - List documents",
+                    "POST /api/documents/upload - Upload document",
+                    "GET /api/documents/{id} - Download document",
+                    "PUT /api/documents/{id} - Update metadata",
+                    "DELETE /api/documents/{id} - Delete document"
+                ]
+            },
+            {
+                "module": "Progress Photos",
+                "endpoints": [
+                    "GET /api/photos - List photos",
+                    "POST /api/photos/upload - Upload photo",
+                    "GET /api/photos/{id} - Get photo",
+                    "PUT /api/photos/{id} - Update photo data",
+                    "DELETE /api/photos/{id} - Delete photo"
+                ]
+            }
+        ]
+        
+        for endpoint_group in endpoints:
+            with st.expander(f"🔌 {endpoint_group['module']} API"):
+                for endpoint in endpoint_group['endpoints']:
+                    st.markdown(f"• `{endpoint}`")
+    
+    with api_tabs[2]:
+        st.markdown("## 💾 Database Schema")
+        
+        st.markdown("""
+        ### Core Tables
+        - **users** - User accounts and authentication
+        - **projects** - Project information and metadata
+        - **rfis** - Request for Information records
+        - **documents** - Document management and storage
+        - **progress_photos** - Photo documentation
+        - **daily_reports** - Daily activity reports
+        - **quality_inspections** - Quality control records
+        - **cost_items** - Budget and cost tracking
+        - **subcontractors** - Subcontractor management
+        - **audit_logs** - System audit trail
+        
+        ### Sample Query
+        ```sql
+        SELECT r.rfi_number, r.subject, r.status, u.full_name as submitted_by
+        FROM rfis r
+        JOIN users u ON r.submitted_by = u.user_id
+        WHERE r.project_id = 'HTD_2025_001'
+        AND r.status = 'Open'
+        ORDER BY r.priority DESC, r.submitted_date DESC;
+        ```
+        """)
+    
+    with api_tabs[3]:
+        st.markdown("## 🔌 Integration Options")
+        
+        st.markdown("""
+        ### External System Integration
+        
+        #### BIM Software
+        - **Autodesk Construction Cloud** - Model coordination
+        - **Bentley SYNCHRO** - 4D scheduling integration
+        - **Tekla Structures** - Steel detailing sync
+        
+        #### Accounting Systems
+        - **QuickBooks Enterprise** - Financial data sync
+        - **Sage 300 Construction** - Cost accounting
+        - **Viewpoint Vista** - ERP integration
+        
+        #### Mobile Applications
+        - **Native mobile app** - iOS/Android companion
+        - **Progressive Web App** - Offline capabilities
+        - **Tablet optimization** - Field-ready interface
+        
+        ### Webhook Support
+        ```json
+        {
+            "event": "rfi.created",
+            "data": {
+                "rfi_id": "HTD-RFI-001",
+                "project_id": "HTD_2025_001",
+                "priority": "High"
+            },
+            "timestamp": "2025-05-25T10:30:00Z"
+        }
+        ```
+        """)
+
+def render_examples():
+    """Examples and Use Cases"""
+    st.markdown("# 📖 Examples & Use Cases")
+    st.markdown("**Real-world examples from Highland Tower Development**")
+    
+    example_tabs = st.tabs(["🏗️ Construction", "📊 Analytics", "📱 Mobile", "🔄 Workflows"])
+    
+    with example_tabs[0]:
+        st.markdown("## 🏗️ Construction Examples")
+        
+        with st.expander("📝 Creating an RFI for Structural Issues"):
+            st.markdown("""
+            **Scenario:** Steel beam connection detail needs clarification
+            
+            **Steps:**
+            1. Navigate to **Advanced Tools > RFIs**
+            2. Click **➕ Create RFI**
+            3. Fill in details:
+               - Subject: "Steel beam connection detail clarification Level 12-13"
+               - Location: "Level 12-13, Grid Line A-B"
+               - Discipline: "Structural Engineering"
+               - Priority: "High"
+               - Assign to: "Highland Structural Engineering"
+            4. Add detailed description and attach drawings
+            5. Submit RFI for review
+            
+            **Result:** RFI tracked with automatic notifications and response timeline
+            """)
+        
+        with st.expander("📸 Documenting Daily Progress"):
+            st.markdown("""
+            **Scenario:** End-of-day progress documentation
+            
+            **Steps:**
+            1. Navigate to **Core Tools > Daily Reports**
+            2. Use **Smart Report** tab for AI assistance
+            3. Auto-populate weather and crew data
+            4. Document work completed by location
+            5. Upload progress photos with GPS tagging
+            6. Note any safety incidents or quality issues
+            7. Submit report for project records
+            
+            **Result:** Comprehensive daily record with photo verification
+            """)
+    
+    with example_tabs[1]:
+        st.markdown("## 📊 Analytics Examples")
+        
+        with st.expander("💰 Cost Variance Analysis"):
+            st.markdown("""
+            **Scenario:** Monthly cost performance review
+            
+            **Analysis Steps:**
+            1. Open **Core Tools > Cost Management**
+            2. Review budget vs. actual spending
+            3. Identify cost overruns by category
+            4. Analyze variance trends over time
+            5. Generate forecasts for completion
+            
+            **Key Metrics:**
+            - Budget: $45.5M | Spent: $30.7M | Variance: -$2.1M (Under budget)
+            - Labor efficiency: 94.2%
+            - Material cost trends: Stable
+            """)
+        
+        with st.expander("📈 Schedule Performance Tracking"):
+            st.markdown("""
+            **Scenario:** Weekly schedule review meeting
+            
+            **Dashboard Review:**
+            1. Check overall completion: 67.3%
+            2. Review critical path activities
+            3. Identify schedule risks and delays
+            4. Update resource allocation
+            5. Communicate status to stakeholders
+            
+            **Current Status:**
+            - 5 days ahead of planned schedule
+            - Critical path: MEP rough-in activities
+            - Resource conflicts: Level 12 coordination
+            """)
+    
+    with example_tabs[2]:
+        st.markdown("## 📱 Mobile Use Cases")
+        
+        with st.expander("🏗️ Field Inspection with Tablet"):
+            st.markdown("""
+            **Scenario:** Quality inspector using tablet on-site
+            
+            **Mobile Workflow:**
+            1. Open Highland Tower app on tablet
+            2. Navigate to **Quality Control > Inspections**
+            3. Select scheduled inspection
+            4. Complete digital checklist
+            5. Capture photos of any deficiencies
+            6. Add GPS coordinates and notes
+            7. Submit inspection results
+            8. Generate automatic corrective action items
+            
+            **Benefits:**
+            - Real-time data entry
+            - Photo documentation with location
+            - Immediate notification to responsible parties
+            """)
+    
+    with example_tabs[3]:
+        st.markdown("## 🔄 Workflow Examples")
+        
+        with st.expander("⚠️ Safety Incident Response Workflow"):
+            st.markdown("""
+            **Scenario:** Minor safety incident requires documentation
+            
+            **Response Workflow:**
+            1. **Immediate Response:**
+               - Ensure worker safety and medical attention
+               - Secure the area and document scene
+            
+            2. **Digital Documentation:**
+               - Open **Core Tools > Safety**
+               - Create new incident report
+               - Add photos and witness statements
+               - Classify incident type and severity
+            
+            3. **Follow-up Actions:**
+               - Assign corrective actions
+               - Schedule safety training
+               - Update safety protocols
+               - Generate compliance reports
+            
+            **Result:** Complete incident tracking with OSHA compliance
+            """)
+        
+        with st.expander("🔄 Document Approval Workflow"):
+            st.markdown("""
+            **Scenario:** Architectural drawing revision approval
+            
+            **Approval Process:**
+            1. **Upload:** Architect uploads revised drawing
+            2. **Review:** Project manager reviews changes
+            3. **Coordination:** Check for MEP/Structural conflicts
+            4. **Approval:** Final approval and version control
+            5. **Distribution:** Notify field teams of changes
+            
+            **Digital Signatures:** Track approval chain with timestamps
+            """)
+
+# Main render function
+def render_docs():
+    """Main documentation render function"""
+    render()
 
 if __name__ == "__main__":
-    render()
+    render_docs()

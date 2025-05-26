@@ -954,6 +954,12 @@ def render_sidebar():
                         st.session_state.current_menu = module
                         st.rerun()
         
+        # Documentation & Resources
+        st.markdown("### 📚 Resources")
+        if st.button("📚 Quick Start Guide", key="documentation", use_container_width=True):
+            st.session_state.current_menu = "Documentation"
+            st.rerun()
+        
         # User section and logout
         st.markdown("---")
         
@@ -2154,6 +2160,7 @@ def render_main_content():
             "Subcontractor Management": lambda: __import__("modules.subcontractor_management").subcontractor_management.render(),
             "Inspections": lambda: __import__("modules.inspections").inspections.render(),
             "Issues & Risks": lambda: __import__("modules.issues_risks").issues_risks.render(),
+            "Documentation": lambda: __import__("modules.docs").docs.render(),
         }
     
     if current_menu in module_functions:

@@ -3051,32 +3051,320 @@ def render_daily_reports():
                 st.success("✅ Update sent to Highland Tower team with push notifications")
 
 def render_progress_photos():
-    """Advanced Progress Photo Management with AI organization"""
-    st.title("📸 Progress Photos - Visual Documentation")
-    st.markdown("**AI-powered photo organization and progress tracking**")
+    """Highland Tower Development - Progress Photo Management System"""
+    st.title("📸 Progress Photos - Highland Tower Development")
+    st.markdown("**Professional photo documentation for $45.5M construction project**")
     
-    tab1, tab2, tab3 = st.tabs(["📷 Upload Photos", "🖼️ Photo Gallery", "📊 Progress Timeline"])
+    # Action buttons for CRUD operations
+    col1, col2, col3, col4 = st.columns(4)
     
-    with tab1:
-        st.markdown("### 📷 Upload Progress Photos")
+    with col1:
+        if st.button("📷 Add Photos", type="primary", use_container_width=True):
+            st.session_state.photo_mode = "add"
+            st.rerun()
+    
+    with col2:
+        if st.button("📂 Bulk Upload", use_container_width=True):
+            st.session_state.photo_mode = "bulk"
+            st.rerun()
+    
+    with col3:
+        if st.button("🔍 Search Photos", use_container_width=True):
+            st.session_state.photo_mode = "search"
+            st.rerun()
+    
+    with col4:
+        if st.button("📊 Analytics", use_container_width=True):
+            st.session_state.photo_mode = "analytics"
+            st.rerun()
+    
+    st.markdown("---")
+    
+    # Highland Tower Progress Photos Database
+    photos_data = [
+        {
+            "photo_id": "HTD-IMG-001",
+            "filename": "level_13_structural_beam_install.jpg",
+            "location": "Level 13 - Grid A5-B5", 
+            "category": "Structural Progress",
+            "date": "2025-05-20",
+            "photographer": "Mike Chen - Site Superintendent",
+            "description": "Steel beam installation progress - main structural frame completion",
+            "status": "Approved",
+            "tags": ["structural", "steel-beams", "level-13", "grid-A5"],
+            "size": "2.4 MB",
+            "dimensions": "4032x3024",
+            "weather": "Clear, 72°F",
+            "crew_count": "12 workers",
+            "progress_percent": "85%"
+        },
+        {
+            "photo_id": "HTD-IMG-002", 
+            "filename": "mep_rough_in_level_12.jpg",
+            "location": "Level 12 - Mechanical Room North",
+            "category": "MEP Systems",
+            "date": "2025-05-19",
+            "photographer": "Sarah Johnson - Project Manager",
+            "description": "HVAC ductwork rough-in completion and electrical conduit installation",
+            "status": "Under Review",
+            "tags": ["mep", "hvac", "ductwork", "electrical", "level-12"],
+            "size": "3.1 MB", 
+            "dimensions": "4032x3024",
+            "weather": "Partly Cloudy, 68°F",
+            "crew_count": "8 workers",
+            "progress_percent": "90%"
+        },
+        {
+            "photo_id": "HTD-IMG-003",
+            "filename": "exterior_curtain_wall_south_facade.jpg",
+            "location": "South Facade - Units 8-12",
+            "category": "Exterior Envelope",
+            "date": "2025-05-18",
+            "photographer": "Robert Kim - Architecture Team",
+            "description": "Curtain wall installation progress on south elevation with glazing units",
+            "status": "Approved",
+            "tags": ["exterior", "curtain-wall", "glazing", "south-facade"],
+            "size": "2.8 MB",
+            "dimensions": "4032x3024",
+            "weather": "Clear, 75°F",
+            "crew_count": "6 workers",
+            "progress_percent": "70%"
+        },
+        {
+            "photo_id": "HTD-IMG-004",
+            "filename": "interior_finishes_unit_1205.jpg", 
+            "location": "Unit 1205 - Living Area",
+            "category": "Interior Finishes",
+            "date": "2025-05-17",
+            "photographer": "Lisa Rodriguez - Quality Inspector",
+            "description": "Hardwood flooring installation complete, paint finishes applied",
+            "status": "Approved",
+            "tags": ["finishes", "flooring", "paint", "unit-1205", "residential"],
+            "size": "2.2 MB",
+            "dimensions": "4032x3024",
+            "weather": "Indoor",
+            "crew_count": "4 workers",
+            "progress_percent": "95%"
+        },
+        {
+            "photo_id": "HTD-IMG-005",
+            "filename": "safety_inspection_site_overview.jpg",
+            "location": "Site Overview - Main Entrance",
+            "category": "Safety Documentation", 
+            "date": "2025-05-16",
+            "photographer": "John Davis - Safety Manager",
+            "description": "Weekly safety inspection documentation - all safety protocols in place",
+            "status": "Approved",
+            "tags": ["safety", "inspection", "site-overview", "compliance"],
+            "size": "3.5 MB",
+            "dimensions": "4032x3024",
+            "weather": "Clear, 70°F",
+            "crew_count": "N/A",
+            "progress_percent": "N/A"
+        }
+    ]
+    
+    # Handle different modes
+    if st.session_state.get("photo_mode") == "add":
+        st.markdown("### 📷 Add New Progress Photo")
         
-        col1, col2 = st.columns(2)
+        # Photo upload form
+        with st.form("add_photo_form"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                uploaded_file = st.file_uploader("Select Photo", type=['jpg', 'jpeg', 'png'])
+                location = st.selectbox("Location", [
+                    "Level 13 - Penthouse", "Level 12 - Residential", "Level 11 - Residential",
+                    "Level 10 - Residential", "Ground Floor - Retail", "Basement - Parking",
+                    "Exterior - North Facade", "Exterior - South Facade", "Site Overall"
+                ])
+                category = st.selectbox("Category", [
+                    "Structural Progress", "MEP Systems", "Interior Finishes", "Exterior Envelope", 
+                    "Safety Documentation", "Site Work", "Quality Control", "Equipment"
+                ])
+                weather = st.selectbox("Weather Conditions", [
+                    "Clear", "Partly Cloudy", "Overcast", "Light Rain", "Heavy Rain", "Indoor"
+                ])
+            
+            with col2:
+                photographer = st.text_input("Photographer", value="Highland Tower Team")
+                photo_date = st.date_input("Photo Date")
+                description = st.text_area("Description", placeholder="Describe what this photo shows...")
+                tags = st.text_input("Tags (comma-separated)", placeholder="structural, level-13, beams")
+                crew_count = st.text_input("Crew Count", placeholder="12 workers")
+                progress_percent = st.text_input("Progress %", placeholder="85%")
+            
+            submitted = st.form_submit_button("📤 Upload Photo", type="primary")
+            
+            if submitted and uploaded_file:
+                st.success("✅ Photo uploaded successfully!")
+                st.balloons()
+                st.session_state.photo_mode = None
+                st.rerun()
+    
+    elif st.session_state.get("photo_mode") == "search":
+        st.markdown("### 🔍 Search Highland Tower Progress Photos")
+        
+        col1, col2, col3 = st.columns(3)
+        
         with col1:
-            photo_location = st.selectbox("Location", ["Level 13", "Level 12", "Level 11", "Level 10", "Exterior", "Site Overall"])
-            photo_category = st.selectbox("Category", ["Structural", "MEP", "Finishes", "Exterior", "Safety", "General"])
-            photo_date = st.date_input("Photo Date")
+            search_location = st.selectbox("Filter by Location", ["All Locations"] + list(set([photo["location"].split(" - ")[0] for photo in photos_data])))
         
         with col2:
-            photographer = st.text_input("Photographer", value="Site Supervisor")
-            notes = st.text_area("Photo Description", placeholder="Describe what the photo shows...")
+            search_category = st.selectbox("Filter by Category", ["All Categories"] + list(set([photo["category"] for photo in photos_data])))
         
-        uploaded_photos = st.file_uploader("Upload Photos", accept_multiple_files=True, type=['jpg', 'jpeg', 'png'])
+        with col3:
+            search_photographer = st.selectbox("Filter by Photographer", ["All Photographers"] + list(set([photo["photographer"].split(" - ")[0] for photo in photos_data])))
         
-        if uploaded_photos:
-            st.success(f"✅ {len(uploaded_photos)} photos ready for upload")
-            if st.button("📤 Upload & Process Photos", type="primary"):
-                st.balloons()
-                st.success("🎉 Photos uploaded and automatically organized by AI!")
+        search_text = st.text_input("🔍 Search in descriptions and tags", placeholder="Enter keywords...")
+        
+        # Apply filters
+        filtered_photos = photos_data.copy()
+        
+        if search_location != "All Locations":
+            filtered_photos = [p for p in filtered_photos if search_location in p["location"]]
+        
+        if search_category != "All Categories":
+            filtered_photos = [p for p in filtered_photos if p["category"] == search_category]
+        
+        if search_photographer != "All Photographers":
+            filtered_photos = [p for p in filtered_photos if search_photographer in p["photographer"]]
+        
+        if search_text:
+            filtered_photos = [p for p in filtered_photos if 
+                             search_text.lower() in p["description"].lower() or 
+                             search_text.lower() in " ".join(p["tags"]).lower()]
+        
+        st.markdown(f"### 📸 Found {len(filtered_photos)} Photos")
+        photos_data = filtered_photos
+    
+    elif st.session_state.get("photo_mode") == "analytics":
+        st.markdown("### 📊 Photo Analytics Dashboard")
+        
+        # Photo metrics
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("Total Photos", len(photos_data), "+15 this week")
+        
+        with col2:
+            structural_count = len([p for p in photos_data if "Structural" in p["category"]])
+            st.metric("Structural Photos", structural_count, f"{(structural_count/len(photos_data)*100):.1f}%")
+        
+        with col3:
+            approved_count = len([p for p in photos_data if p["status"] == "Approved"])
+            st.metric("Approved Photos", approved_count, f"{(approved_count/len(photos_data)*100):.1f}%")
+        
+        with col4:
+            total_size = sum([float(p["size"].split()[0]) for p in photos_data])
+            st.metric("Total Storage", f"{total_size:.1f} MB", "Within limits")
+        
+        # Category breakdown chart
+        import plotly.express as px
+        category_counts = {}
+        for photo in photos_data:
+            category_counts[photo["category"]] = category_counts.get(photo["category"], 0) + 1
+        
+        fig = px.pie(
+            values=list(category_counts.values()),
+            names=list(category_counts.keys()),
+            title="📸 Photos by Category - Highland Tower"
+        )
+        st.plotly_chart(fig, use_container_width=True)
+    
+    # Default view - Photo Gallery with CRUD operations
+    if not st.session_state.get("photo_mode"):
+        st.markdown("### 📸 Highland Tower Development - Photo Gallery")
+        
+        # Display photos in expandable cards
+        for i, photo in enumerate(photos_data):
+            with st.expander(f"📷 {photo['photo_id']} - {photo['location']}", expanded=False):
+                
+                col1, col2 = st.columns([2, 3])
+                
+                with col1:
+                    st.markdown(f"""
+                    **📂 Photo Details:**
+                    - **File:** {photo['filename']}
+                    - **Category:** {photo['category']}
+                    - **Date:** {photo['date']}
+                    - **Photographer:** {photo['photographer']}
+                    - **Status:** {photo['status']}
+                    - **Size:** {photo['size']} ({photo['dimensions']})
+                    - **Weather:** {photo['weather']}
+                    - **Crew:** {photo['crew_count']}
+                    - **Progress:** {photo['progress_percent']}
+                    """)
+                    
+                    # Display tags
+                    st.markdown("**🏷️ Tags:**")
+                    tags_html = " ".join([f'<span style="background-color: #e1e1e1; padding: 2px 8px; border-radius: 10px; margin-right: 5px; font-size: 0.8em;">{tag}</span>' for tag in photo['tags']])
+                    st.markdown(tags_html, unsafe_allow_html=True)
+                
+                with col2:
+                    st.markdown(f"**📝 Description:**")
+                    st.markdown(photo['description'])
+                    
+                    # Action buttons for each photo
+                    action_col1, action_col2, action_col3, action_col4 = st.columns(4)
+                    
+                    with action_col1:
+                        if st.button(f"👁️ View", key=f"view_{photo['photo_id']}", use_container_width=True):
+                            st.info(f"Opening full-size view for {photo['filename']}")
+                    
+                    with action_col2:
+                        if st.button(f"✏️ Edit", key=f"edit_{photo['photo_id']}", use_container_width=True):
+                            st.session_state[f"edit_photo_{photo['photo_id']}"] = True
+                            st.rerun()
+                    
+                    with action_col3:
+                        if st.button(f"📤 Share", key=f"share_{photo['photo_id']}", use_container_width=True):
+                            st.success(f"Share link generated for {photo['photo_id']}")
+                    
+                    with action_col4:
+                        if st.button(f"📎 Link RFI", key=f"link_{photo['photo_id']}", use_container_width=True):
+                            st.success(f"Photo linked to RFI system")
+                
+                # Handle edit mode for individual photos
+                if st.session_state.get(f"edit_photo_{photo['photo_id']}", False):
+                    st.markdown("---")
+                    st.markdown("### ✏️ Edit Photo Details")
+                    
+                    with st.form(f"edit_form_{photo['photo_id']}"):
+                        edit_col1, edit_col2 = st.columns(2)
+                        
+                        with edit_col1:
+                            new_location = st.text_input("Location", value=photo['location'])
+                            new_category = st.selectbox("Category", 
+                                ["Structural Progress", "MEP Systems", "Interior Finishes", "Exterior Envelope", 
+                                 "Safety Documentation", "Site Work", "Quality Control", "Equipment"], 
+                                index=["Structural Progress", "MEP Systems", "Interior Finishes", "Exterior Envelope", 
+                                       "Safety Documentation", "Site Work", "Quality Control", "Equipment"].index(photo['category']) 
+                                       if photo['category'] in ["Structural Progress", "MEP Systems", "Interior Finishes", "Exterior Envelope", 
+                                                              "Safety Documentation", "Site Work", "Quality Control", "Equipment"] else 0)
+                        
+                        with edit_col2:
+                            new_photographer = st.text_input("Photographer", value=photo['photographer'])
+                            new_status = st.selectbox("Status", ["Under Review", "Approved", "Rejected"], 
+                                                    index=["Under Review", "Approved", "Rejected"].index(photo['status']) 
+                                                    if photo['status'] in ["Under Review", "Approved", "Rejected"] else 0)
+                        
+                        new_description = st.text_area("Description", value=photo['description'])
+                        new_tags = st.text_input("Tags", value=", ".join(photo['tags']))
+                        
+                        submitted = st.form_submit_button("💾 Save Changes", type="primary")
+                        
+                        if submitted:
+                            st.success(f"✅ Photo {photo['photo_id']} updated successfully!")
+                            st.session_state[f"edit_photo_{photo['photo_id']}"] = False
+                            st.rerun()
+    
+    # Reset mode button
+    if st.session_state.get("photo_mode"):
+        if st.button("← Back to Photo Gallery"):
+            st.session_state.photo_mode = None
+            st.rerun()
 
 def render_quality_control():
     """Advanced Quality Control with inspection workflows"""

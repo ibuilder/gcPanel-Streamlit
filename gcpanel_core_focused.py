@@ -2129,11 +2129,17 @@ def render_main_content():
             "Daily Reports": render_daily_reports,
             "Quality Control": render_quality_control,
             "Material Management": render_material_management,
+            "Progress Photos": render_progress_photos,
+            "Performance Snapshot": render_performance_snapshot,
+            "Subcontractor Management": render_subcontractor_management,
+            "Inspections": render_inspections,
+            "Issues & Risks": render_issues_risks,
+            "Documentation": render_documentation,
         })
         
     except Exception as e:
         st.error(f"Error loading sophisticated modules: {str(e)}")
-        # Fallback to basic functions - only use what's actually defined
+        # Core Highland Tower Development modules
         module_functions = {
             "Dashboard": render_dashboard,
             "PreConstruction": render_preconstruction,
@@ -2144,7 +2150,7 @@ def render_main_content():
             "Cost Management": render_cost_management,
             "BIM": render_bim,
             "Analytics": render_analytics,
-            "Documents": lambda: __import__("modules.documents").documents.render_documents(),
+            "Documents": render_documents,
             "Scheduling": render_scheduling,
             "AI Assistant": render_ai_assistant,
             "Mobile Companion": render_mobile_companion,
@@ -2156,6 +2162,7 @@ def render_main_content():
             "Quality Control": render_quality_control,
             "Material Management": render_material_management,
             "RFIs": render_rfis,
+            "Progress Photos": render_progress_photos,
             "Performance Snapshot": render_performance_snapshot,
             "Subcontractor Management": render_subcontractor_management,
             "Inspections": render_inspections,

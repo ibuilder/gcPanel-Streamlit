@@ -2156,11 +2156,11 @@ def render_main_content():
             "Quality Control": render_quality_control,
             "Material Management": render_material_management,
             "RFIs": render_rfis,
-            "Performance Snapshot": lambda: __import__("modules.performance_snapshot").performance_snapshot.render(),
-            "Subcontractor Management": lambda: __import__("modules.subcontractor_management").subcontractor_management.render(),
-            "Inspections": lambda: __import__("modules.inspections").inspections.render(),
-            "Issues & Risks": lambda: __import__("modules.issues_risks").issues_risks.render(),
-            "Documentation": lambda: __import__("modules.docs").docs.render(),
+            "Performance Snapshot": render_performance_snapshot,
+            "Subcontractor Management": render_subcontractor_management,
+            "Inspections": render_inspections,
+            "Issues & Risks": render_issues_risks,
+            "Documentation": render_documentation,
         }
     
     if current_menu in module_functions:
@@ -4546,6 +4546,66 @@ def render_project_planning_section():
         st.metric("Design Review", "Complete", "Approved")
     with col3:
         st.metric("Permits", "Pending", "2 weeks")
+
+def render_performance_snapshot():
+    """Performance Snapshot - Executive dashboard"""
+    try:
+        import sys
+        sys.path.append('.')
+        from modules.performance_snapshot import render
+        render()
+    except Exception as e:
+        st.error(f"Error loading Performance Snapshot module: {e}")
+        st.markdown("### 📊 Performance Snapshot - Highland Tower Development")
+        st.markdown("**Executive dashboard temporarily unavailable**")
+
+def render_subcontractor_management():
+    """Subcontractor Management - Enterprise coordination"""
+    try:
+        import sys
+        sys.path.append('.')
+        from modules.subcontractor_management import render
+        render()
+    except Exception as e:
+        st.error(f"Error loading Subcontractor Management module: {e}")
+        st.markdown("### 🏗️ Subcontractor Management - Highland Tower Development")
+        st.markdown("**Subcontractor coordination temporarily unavailable**")
+
+def render_inspections():
+    """Inspections - Quality control system"""
+    try:
+        import sys
+        sys.path.append('.')
+        from modules.inspections import render
+        render()
+    except Exception as e:
+        st.error(f"Error loading Inspections module: {e}")
+        st.markdown("### 🔍 Inspections - Highland Tower Development")
+        st.markdown("**Inspection management temporarily unavailable**")
+
+def render_issues_risks():
+    """Issues & Risks - Risk management system"""
+    try:
+        import sys
+        sys.path.append('.')
+        from modules.issues_risks import render
+        render()
+    except Exception as e:
+        st.error(f"Error loading Issues & Risks module: {e}")
+        st.markdown("### ⚠️ Issues & Risks - Highland Tower Development")
+        st.markdown("**Risk management temporarily unavailable**")
+
+def render_documentation():
+    """Documentation - Quick Start guide"""
+    try:
+        import sys
+        sys.path.append('.')
+        from modules.docs import render
+        render()
+    except Exception as e:
+        st.error(f"Error loading Documentation module: {e}")
+        st.markdown("### 📚 Documentation - Highland Tower Development")
+        st.markdown("**Documentation temporarily unavailable**")
 
 def render_documents():
     """Document Management - Your sophisticated document system"""

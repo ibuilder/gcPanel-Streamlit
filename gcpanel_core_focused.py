@@ -1836,77 +1836,58 @@ def render_rfis():
         if st.button("← Back to RFI List"):
             st.session_state.rfi_mode = None
             st.rerun()
+    # Main RFI display when no special mode is active
+    if not st.session_state.get("rfi_mode"):
+        # Show statistics
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            st.markdown("### 📋 Active RFIs")
+            
+            # Display RFI table
+            for i, rfi in enumerate(rfis_data[:10]):  # Show first 10 RFIs
+                with st.expander(f"**{rfi['rfi_number']}** - {rfi['subject']}", expanded=(i < 3)):
+                    col_a, col_b, col_c = st.columns(3)
+                    
+                    with col_a:
+                        st.write(f"**Status:** {rfi['status']}")
+                        st.write(f"**Priority:** {rfi['priority']}")
+                        st.write(f"**Discipline:** {rfi['discipline']}")
+                    
+                    with col_b:
+                        st.write(f"**Location:** {rfi['location']}")
+                        st.write(f"**Submitted by:** {rfi['submitted_by']}")
+                        st.write(f"**Due Date:** {rfi['due_date']}")
+                    
+                    with col_c:
+                        st.write(f"**Days Open:** {rfi['days_open']}")
+                        st.write(f"**Cost Impact:** {rfi['cost_impact']}")
+                        st.write(f"**Schedule Impact:** {rfi['schedule_impact']}")
+                    
+                    st.markdown(f"**Description:** {rfi['description']}")
+                    
+                    # Action buttons for each RFI
+                    btn_col1, btn_col2, btn_col3 = st.columns(3)
+                    with btn_col1:
+                        if st.button(f"✏️ Edit", key=f"edit_{rfi['rfi_id']}"):
+                            st.session_state[f"edit_rfi_{rfi['rfi_id']}"] = True
+                            st.rerun()
+                    
+                    with btn_col2:
+                        if st.button(f"💬 Respond", key=f"respond_{rfi['rfi_id']}"):
+                            st.session_state[f"respond_rfi_{rfi['rfi_id']}"] = True
+                            st.rerun()
+                    
+                    with btn_col3:
+                        if st.button(f"📁 View Details", key=f"view_{rfi['rfi_id']}"):
+                            st.info("Detailed view would open here")
         
         with col2:
             st.markdown("### RFI Statistics")
-            st.metric("Total RFIs", "47", "+5")
+            st.metric("Total RFIs", "23", "+3 this week")
             st.metric("Open RFIs", "12", "+2")
             st.metric("Avg Response Time", "2.3 days", "-0.5 days")
-            st.metric("This Week", "8", "+3")
-            
-            if st.button("📊 Full Analytics", use_container_width=True):
-                st.session_state.current_menu = "RFI Analytics"
-                st.rerun()
-    
-    with tab2:
-        st.markdown("### RFI Performance Analytics")
-        
-        # RFI trend chart
-        rfi_dates = pd.date_range(start='2024-01-01', end='2024-05-25', freq='W')
-        rfi_counts = [2, 3, 5, 4, 6, 3, 7, 4, 5, 6, 8, 4, 7, 5, 6, 8, 9, 7, 6, 8, 5]
-        
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=rfi_dates[:len(rfi_counts)], y=rfi_counts, mode='lines+markers', name='RFIs per Week'))
-        fig.update_layout(title="RFI Submission Trends", plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-        st.plotly_chart(fig, use_container_width=True)
-        
-        # Response time analysis
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown("#### Response Time by Priority")
-            priority_data = pd.DataFrame({
-                'Priority': ['High', 'Medium', 'Low'],
-                'Avg Response Time (days)': [1.2, 2.3, 4.1],
-                'Target (days)': [1.0, 3.0, 5.0]
-            })
-            st.dataframe(priority_data)
-        
-        with col2:
-            st.markdown("#### RFI Sources")
-            source_data = pd.DataFrame({
-                'Source': ['Highland Construction', 'Elite MEP', 'Safety First', 'Premium Interiors'],
-                'Count': [18, 12, 8, 9]
-            })
-            fig = px.bar(source_data, x='Source', y='Count', title="RFIs by Source")
-            st.plotly_chart(fig, use_container_width=True)
-    
-    with tab3:
-        st.markdown("### Create New RFI")
-        with st.form("new_rfi_form"):
-            col1, col2 = st.columns(2)
-            with col1:
-                rfi_subject = st.text_input("RFI Subject", placeholder="Brief description of the request")
-                priority = st.selectbox("Priority", ["High", "Medium", "Low"])
-                category = st.selectbox("Category", ["Electrical", "Mechanical", "Structural", "Architectural", "Civil"])
-            
-            with col2:
-                submitter = st.text_input("Submitted By", value=st.session_state.username)
-                due_date = st.date_input("Response Due Date")
-                assign_to = st.selectbox("Assign To", ["Project Manager", "MEP Engineer", "Structural Engineer", "Architect"])
-            
-            description = st.text_area("Detailed Description", height=100)
-            
-            # File upload for attachments
-            uploaded_files = st.file_uploader("Attach Files", accept_multiple_files=True, type=['pdf', 'jpg', 'png', 'dwg'])
-            
-            submitted = st.form_submit_button("Submit RFI", use_container_width=True)
-            
-            if submitted:
-                if rfi_subject and description:
-                    st.success(f"✅ RFI submitted successfully! Reference: RFI-2024-{len(rfi_data)+1:03d}")
-                    st.info("RFI has been assigned and notifications sent to relevant parties.")
-                else:
-                    st.error("Please fill in all required fields.")
+            st.metric("Critical RFIs", "4", "Needs attention")
 
 def render_scheduling():
     """Render advanced scheduling module"""

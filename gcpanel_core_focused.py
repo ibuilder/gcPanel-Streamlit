@@ -596,6 +596,19 @@ def check_module_access(module_name):
     
     return False
 
+def clear_cache():
+    """Clear Streamlit cache to refresh modules"""
+    st.cache_data.clear()
+    st.cache_resource.clear()
+    
+    # Clear session state cache variables
+    cache_keys = [key for key in st.session_state.keys() if 'cache' in key.lower() or 'temp' in key.lower()]
+    for key in cache_keys:
+        del st.session_state[key]
+    
+    st.success("✅ Cache cleared successfully!")
+    st.rerun()
+
 def initialize_session_state():
     """Initialize session state with role-based security."""
     defaults = {
@@ -943,6 +956,10 @@ def render_sidebar():
         
         # User section and logout
         st.markdown("---")
+        
+        # Cache clearing button for troubleshooting
+        if st.button("🔄 Clear Cache", use_container_width=True, help="Clear cache to refresh modules"):
+            clear_cache()
         
         # Move logout to bottom of sidebar
         st.markdown("---")

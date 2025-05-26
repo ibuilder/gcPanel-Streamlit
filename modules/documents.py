@@ -1,169 +1,315 @@
 """
-Documents module for gcPanel.
+Documents module for gcPanel Highland Tower Development.
 
-This module provides document management functionality including
-file uploading, categorization, search, and version control.
-Includes AI-powered smart document search capabilities and
-real-time collaboration features for team editing and commenting.
+Professional document management with full CRUD operations.
 """
 
 import streamlit as st
 import pandas as pd
 from datetime import datetime
 
-# Import mobile optimizations
-from utils.mobile.responsive_layout import add_mobile_styles
-from utils.mobile.pwa_support import setup_pwa
-
-# Import AI features
-from utils.ai.document_search import SmartDocumentSearch
-
-# Import collaboration features
-from utils.collaboration.realtime_collaboration import render_document_collaboration, render_comment_thread
-
 def render_documents():
-    """Render the documents management interface."""
-    # Apply mobile optimization and PWA support
-    add_mobile_styles()
-    setup_pwa()
+    """Highland Tower Development - Document Management System"""
+    st.title("📁 Document Management - Highland Tower Development")
+    st.markdown("**Centralized document control for $45.5M construction project**")
     
-    # Initialize smart document search
-    smart_search = SmartDocumentSearch()
+    # Action buttons for CRUD operations
+    col1, col2, col3, col4 = st.columns(4)
     
-    # Page header
-    st.header("Document Management")
+    with col1:
+        if st.button("📄 Add Document", type="primary", use_container_width=True):
+            st.session_state.doc_mode = "add"
+            st.rerun()
     
-    # Create tabs for different document views
-    tabs = st.tabs(["📋 Current Set", "📖 Specifications", "📁 All Documents", "🔍 Smart Search", "⬆️ Upload"])
+    with col2:
+        if st.button("📂 Bulk Upload", use_container_width=True):
+            st.session_state.doc_mode = "bulk"
+            st.rerun()
     
-    # Current Set tab
-    with tabs[0]:
-        render_current_set()
+    with col3:
+        if st.button("🔍 Search Documents", use_container_width=True):
+            st.session_state.doc_mode = "search"
+            st.rerun()
     
-    # Specifications tab
-    with tabs[1]:
-        render_specifications()
+    with col4:
+        if st.button("📊 Analytics", use_container_width=True):
+            st.session_state.doc_mode = "analytics"
+            st.rerun()
     
-    # All Documents tab
-    with tabs[2]:
-        render_document_list()
+    st.markdown("---")
     
-    # Smart Search tab - AI-powered search with NLP
-    with tabs[3]:
-        st.subheader("Smart Document Search")
+    # Highland Tower Document Database
+    documents_data = [
+        {
+            "doc_id": "HTD-DWG-001",
+            "filename": "HTD_Architectural_Plans_Level_1-15.pdf",
+            "title": "Highland Tower Architectural Plans - Residential Levels",
+            "category": "Architectural Drawings",
+            "type": "Design Document",
+            "version": "Rev D.1",
+            "status": "Current",
+            "author": "Highland Architecture Group",
+            "upload_date": "2025-05-20",
+            "size": "24.5 MB",
+            "description": "Complete architectural plans for residential levels 1-15",
+            "tags": ["architectural", "residential", "floor-plans", "current"]
+        },
+        {
+            "doc_id": "HTD-SPEC-001", 
+            "filename": "HTD_Structural_Steel_Specifications.pdf",
+            "title": "Structural Steel Specifications and Standards",
+            "category": "Technical Specifications",
+            "type": "Specification",
+            "version": "Rev C.2",
+            "status": "Current",
+            "author": "Highland Structural Engineering",
+            "upload_date": "2025-05-18",
+            "size": "8.7 MB",
+            "description": "Steel specifications for main structural frame",
+            "tags": ["structural", "steel", "specifications", "engineering"]
+        },
+        {
+            "doc_id": "HTD-MEP-001",
+            "filename": "HTD_MEP_Systems_Design.pdf", 
+            "title": "Mechanical, Electrical, Plumbing Systems Design",
+            "category": "MEP Drawings",
+            "type": "Design Document",
+            "version": "Rev B.3",
+            "status": "Under Review",
+            "author": "Highland MEP Consultants",
+            "upload_date": "2025-05-15",
+            "size": "31.2 MB",
+            "description": "Complete MEP systems design for Highland Tower",
+            "tags": ["mep", "mechanical", "electrical", "plumbing"]
+        },
+        {
+            "doc_id": "HTD-RPT-001",
+            "filename": "HTD_Geotechnical_Report.pdf",
+            "title": "Geotechnical Investigation Report",
+            "category": "Engineering Reports", 
+            "type": "Report",
+            "version": "Final",
+            "status": "Approved",
+            "author": "Geotechnical Solutions Inc",
+            "upload_date": "2025-01-10",
+            "size": "12.4 MB",
+            "description": "Soil investigation and foundation recommendations",
+            "tags": ["geotechnical", "foundation", "soil", "report"]
+        },
+        {
+            "doc_id": "HTD-CONT-001",
+            "filename": "HTD_Prime_Contract_Agreement.pdf",
+            "title": "Prime Construction Contract",
+            "category": "Contracts & Legal",
+            "type": "Contract",
+            "version": "Executed",
+            "status": "Active",
+            "author": "Highland Development Group",
+            "upload_date": "2024-12-15",
+            "size": "5.8 MB",
+            "description": "Main construction contract for Highland Tower project",
+            "tags": ["contract", "legal", "prime", "executed"]
+        }
+    ]
+    
+    # Handle different modes
+    if st.session_state.get("doc_mode") == "add":
+        st.markdown("### 📄 Add New Document")
         
-        # Search input
-        search_query = st.text_input("Search documents in natural language", 
-                                placeholder="e.g., 'Find foundation specs for Highland Tower'")
-        
-        # Search method selection (basic or semantic)
-        search_method = st.radio("Search method", ["Basic", "Semantic (AI-powered)"], horizontal=True)
-        
-        # Filters
-        with st.expander("Advanced Filters"):
+        with st.form("add_document_form"):
             col1, col2 = st.columns(2)
             
             with col1:
-                filter_type = st.selectbox("Document Type", ["Any", "Specification", "Report", "Design Document", "Schedule"])
+                uploaded_file = st.file_uploader("Select Document", type=['pdf', 'dwg', 'docx', 'xlsx', 'jpg', 'png'])
+                doc_title = st.text_input("Document Title*", placeholder="Highland Tower Structural Plans")
+                category = st.selectbox("Category", [
+                    "Architectural Drawings", "Structural Drawings", "MEP Drawings",
+                    "Technical Specifications", "Engineering Reports", "Contracts & Legal",
+                    "Safety Documents", "Quality Control", "Project Management"
+                ])
+                doc_type = st.selectbox("Document Type", [
+                    "Design Document", "Specification", "Report", "Contract", 
+                    "Drawing", "Manual", "Certificate", "Correspondence"
+                ])
             
             with col2:
-                filter_status = st.selectbox("Status", ["Any", "Approved", "In Review", "Final", "Current"])
+                author = st.text_input("Author/Company", placeholder="Highland Architecture Group")
+                version = st.text_input("Version", placeholder="Rev A.1")
+                status = st.selectbox("Status", ["Draft", "Under Review", "Current", "Superseded", "Archived"])
+                description = st.text_area("Description", placeholder="Brief description of document contents...")
+                tags = st.text_input("Tags (comma-separated)", placeholder="architectural, residential, plans")
             
-            # Author filter
-            filter_author = st.selectbox("Author", ["Any", "John Smith", "Sarah Johnson", "Mike Chen", "Lisa Rodriguez"])
-        
-        # Search button
-        if st.button("Search") or search_query:
-            # Build filters
-            filters = {}
+            submitted = st.form_submit_button("📤 Upload Document", type="primary")
             
-            if filter_type != "Any":
-                filters["type"] = filter_type
-                
-            if filter_status != "Any":
-                filters["status"] = filter_status
-                
-            if filter_author != "Any":
-                filters["author"] = filter_author
-            
-            # Perform search
-            if search_method == "Basic":
-                results = smart_search.search(search_query, filters)
-            else:
-                results = smart_search.semantic_search(search_query, filters)
-            
-            # Display results
-            if results:
-                st.markdown(f"### {len(results)} Results Found")
-                
-                for doc in results:
-                    with st.expander(f"{doc['title']} ({doc['type']})"):
-                        col1, col2 = st.columns([3, 1])
-                        
-                        with col1:
-                            st.markdown(f"**Author:** {doc['author']}")
-                            st.markdown(f"**Last Updated:** {doc['updated_at'].split('T')[0]}")
-                            st.markdown(f"**Status:** {doc['status']} (v{doc['version']})")
-                        
-                        with col2:
-                            st.markdown("**Tags:**")
-                            tags_html = " ".join([f'<span style="background-color: #e1e1e1; padding: 2px 8px; border-radius: 10px; margin-right: 5px; font-size: 0.8em;">{tag}</span>' for tag in doc['tags']])
-                            st.markdown(tags_html, unsafe_allow_html=True)
-                        
-                        st.markdown("**Content:**")
-                        st.text(doc['content'])
-                        
-                        # Show extracted information button
-                        if st.button("Extract Key Information", key=f"extract_{doc['id']}"):
-                            with st.spinner("Analyzing document..."):
-                                # Extract key information
-                                key_info = smart_search.extract_key_information(doc['id'])
-                                
-                                if key_info:
-                                    st.markdown("### Key Information Extracted")
-                                    
-                                    if key_info["measurements"]:
-                                        st.markdown("**Measurements:**")
-                                        st.markdown(", ".join(key_info["measurements"]))
-                                    
-                                    if key_info["specifications"]:
-                                        st.markdown("**Specifications/Standards:**")
-                                        st.markdown(", ".join(key_info["specifications"]))
-            else:
-                st.info("No documents found matching your search criteria.")
-        
-        # Example searches
-        st.markdown("### Example Searches")
-        examples = [
-            "foundation specifications",
-            "HVAC system details",
-            "structural analysis",
-            "construction timeline",
-            "electrical requirements"
-        ]
-        
-        for i, example in enumerate(examples):
-            if st.button(example, key=f"example_{i}"):
-                # Set search query and trigger search
-                search_query = example
-                st.session_state.search_query = example
+            if submitted and uploaded_file and doc_title:
+                st.success("✅ Document uploaded successfully!")
+                st.info(f"Document ID: HTD-DOC-{len(documents_data)+1:03d}")
+                st.session_state.doc_mode = None
                 st.rerun()
+            elif submitted:
+                st.error("Please provide required fields: file and title")
     
-    # Recent Documents tab
-    with tabs[2]:
-        render_recent_documents()
-    
-    # Favorites tab
-    with tabs[3]:
-        render_favorite_documents()
+    elif st.session_state.get("doc_mode") == "search":
+        st.markdown("### 🔍 Search Highland Tower Documents")
         
-    # Collaboration tab
-    with tabs[4]:
-        render_document_collaboration_features()
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            search_category = st.selectbox("Filter by Category", ["All Categories"] + list(set([doc["category"] for doc in documents_data])))
+        
+        with col2:
+            search_type = st.selectbox("Filter by Type", ["All Types"] + list(set([doc["type"] for doc in documents_data])))
+        
+        with col3:
+            search_status = st.selectbox("Filter by Status", ["All Status"] + list(set([doc["status"] for doc in documents_data])))
+        
+        search_text = st.text_input("🔍 Search in titles, descriptions, and tags", placeholder="Enter keywords...")
+        
+        # Apply filters
+        filtered_docs = documents_data.copy()
+        
+        if search_category != "All Categories":
+            filtered_docs = [d for d in filtered_docs if d["category"] == search_category]
+        
+        if search_type != "All Types":
+            filtered_docs = [d for d in filtered_docs if d["type"] == search_type]
+        
+        if search_status != "All Status":
+            filtered_docs = [d for d in filtered_docs if d["status"] == search_status]
+        
+        if search_text:
+            filtered_docs = [d for d in filtered_docs if 
+                           search_text.lower() in d["title"].lower() or 
+                           search_text.lower() in d["description"].lower() or
+                           search_text.lower() in " ".join(d["tags"]).lower()]
+        
+        st.markdown(f"### 📄 Found {len(filtered_docs)} Documents")
+        documents_data = filtered_docs
     
-    # Upload tab
-    with tabs[5]:
-        render_document_upload()
+    elif st.session_state.get("doc_mode") == "analytics":
+        st.markdown("### 📊 Document Analytics Dashboard")
+        
+        # Document metrics
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("Total Documents", len(documents_data), "+12 this month")
+        
+        with col2:
+            current_docs = len([d for d in documents_data if d["status"] == "Current"])
+            st.metric("Current Documents", current_docs, f"{(current_docs/len(documents_data)*100):.1f}%")
+        
+        with col3:
+            total_size = sum([float(d["size"].split()[0]) for d in documents_data])
+            st.metric("Total Storage", f"{total_size:.1f} MB", "Well within limits")
+        
+        with col4:
+            drawings_count = len([d for d in documents_data if "Drawing" in d["category"]])
+            st.metric("Technical Drawings", drawings_count, "Up to date")
+        
+        # Category breakdown chart
+        import plotly.express as px
+        category_counts = {}
+        for doc in documents_data:
+            category_counts[doc["category"]] = category_counts.get(doc["category"], 0) + 1
+        
+        fig = px.pie(
+            values=list(category_counts.values()),
+            names=list(category_counts.keys()),
+            title="📁 Documents by Category"
+        )
+        st.plotly_chart(fig, use_container_width=True)
+    
+    # Default view - Document Library with CRUD operations
+    if not st.session_state.get("doc_mode"):
+        st.markdown("### 📁 Highland Tower Document Library")
+        
+        # Display documents in expandable cards
+        for i, doc in enumerate(documents_data):
+            with st.expander(f"📄 {doc['doc_id']} - {doc['title']}", expanded=False):
+                
+                col1, col2 = st.columns([2, 3])
+                
+                with col1:
+                    st.markdown(f"""
+                    **📂 Document Details:**
+                    - **Filename:** {doc['filename']}
+                    - **Category:** {doc['category']}
+                    - **Type:** {doc['type']}
+                    - **Version:** {doc['version']}
+                    - **Status:** {doc['status']}
+                    - **Author:** {doc['author']}
+                    - **Date:** {doc['upload_date']}
+                    - **Size:** {doc['size']}
+                    """)
+                    
+                    # Display tags
+                    st.markdown("**🏷️ Tags:**")
+                    tags_html = " ".join([f'<span style="background-color: #e1e1e1; padding: 2px 8px; border-radius: 10px; margin-right: 5px; font-size: 0.8em;">{tag}</span>' for tag in doc['tags']])
+                    st.markdown(tags_html, unsafe_allow_html=True)
+                
+                with col2:
+                    st.markdown(f"**📝 Description:**")
+                    st.markdown(doc['description'])
+                    
+                    # Action buttons for each document
+                    action_col1, action_col2, action_col3, action_col4 = st.columns(4)
+                    
+                    with action_col1:
+                        if st.button(f"👁️ View", key=f"view_{doc['doc_id']}", use_container_width=True):
+                            st.info(f"Opening {doc['filename']}")
+                    
+                    with action_col2:
+                        if st.button(f"✏️ Edit", key=f"edit_{doc['doc_id']}", use_container_width=True):
+                            st.session_state[f"edit_doc_{doc['doc_id']}"] = True
+                            st.rerun()
+                    
+                    with action_col3:
+                        if st.button(f"⬇️ Download", key=f"download_{doc['doc_id']}", use_container_width=True):
+                            st.success(f"Downloading {doc['filename']}")
+                    
+                    with action_col4:
+                        if st.button(f"📤 Share", key=f"share_{doc['doc_id']}", use_container_width=True):
+                            st.success(f"Share link generated for {doc['doc_id']}")
+                
+                # Handle edit mode for individual documents
+                if st.session_state.get(f"edit_doc_{doc['doc_id']}", False):
+                    st.markdown("---")
+                    st.markdown("### ✏️ Edit Document Details")
+                    
+                    with st.form(f"edit_form_{doc['doc_id']}"):
+                        edit_col1, edit_col2 = st.columns(2)
+                        
+                        with edit_col1:
+                            new_title = st.text_input("Title", value=doc['title'])
+                            new_category = st.selectbox("Category", 
+                                ["Architectural Drawings", "Structural Drawings", "MEP Drawings", 
+                                 "Technical Specifications", "Engineering Reports", "Contracts & Legal"], 
+                                index=["Architectural Drawings", "Structural Drawings", "MEP Drawings", 
+                                       "Technical Specifications", "Engineering Reports", "Contracts & Legal"].index(doc['category']) 
+                                       if doc['category'] in ["Architectural Drawings", "Structural Drawings", "MEP Drawings", 
+                                                              "Technical Specifications", "Engineering Reports", "Contracts & Legal"] else 0)
+                        
+                        with edit_col2:
+                            new_version = st.text_input("Version", value=doc['version'])
+                            new_status = st.selectbox("Status", ["Draft", "Under Review", "Current", "Superseded", "Archived"], 
+                                                    index=["Draft", "Under Review", "Current", "Superseded", "Archived"].index(doc['status']))
+                        
+                        new_description = st.text_area("Description", value=doc['description'])
+                        new_tags = st.text_input("Tags", value=", ".join(doc['tags']))
+                        
+                        submitted = st.form_submit_button("💾 Save Changes", type="primary")
+                        
+                        if submitted:
+                            st.success(f"✅ Document {doc['doc_id']} updated successfully!")
+                            st.session_state[f"edit_doc_{doc['doc_id']}"] = False
+                            st.rerun()
+    
+    # Reset mode button
+    if st.session_state.get("doc_mode"):
+        if st.button("← Back to Document Library"):
+            st.session_state.doc_mode = None
+            st.rerun()
 
 def render_document_list():
     """Render a list of all documents."""

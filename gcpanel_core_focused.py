@@ -1440,26 +1440,379 @@ def render_contracts():
         st.plotly_chart(fig, use_container_width=True)
 
 def render_rfis():
-    """Render comprehensive RFI management"""
-    st.markdown("## 📝 Request for Information (RFIs) - Advanced Management")
+    """Highland Tower Development - RFI Management System"""
+    st.title("📝 Request for Information (RFIs) - Highland Tower Development")
+    st.markdown("**Professional RFI management for $45.5M construction project**")
     
-    tab1, tab2, tab3 = st.tabs(["Active RFIs", "RFI Analytics", "Create New RFI"])
+    # Action buttons for CRUD operations
+    col1, col2, col3, col4 = st.columns(4)
     
-    with tab1:
-        col1, col2 = st.columns([3, 1])
+    with col1:
+        if st.button("➕ Create RFI", type="primary", use_container_width=True):
+            st.session_state.rfi_mode = "create"
+            st.rerun()
+    
+    with col2:
+        if st.button("🔍 Search RFIs", use_container_width=True):
+            st.session_state.rfi_mode = "search"
+            st.rerun()
+    
+    with col3:
+        if st.button("📊 Analytics", use_container_width=True):
+            st.session_state.rfi_mode = "analytics"
+            st.rerun()
+    
+    with col4:
+        if st.button("📋 Reports", use_container_width=True):
+            st.session_state.rfi_mode = "reports"
+            st.rerun()
+    
+    st.markdown("---")
+    
+    # Highland Tower RFI Database
+    rfis_data = [
+        {
+            "rfi_id": "HTD-RFI-001",
+            "rfi_number": "RFI-2025-001",
+            "subject": "Steel beam connection detail clarification Level 12-13",
+            "location": "Level 12-13, Grid Line A-B",
+            "discipline": "Structural Engineering",
+            "priority": "High",
+            "status": "Open",
+            "submitted_by": "Mike Chen - Site Superintendent",
+            "assigned_to": "Highland Structural Engineering",
+            "submitted_date": "2025-05-20",
+            "due_date": "2025-05-27",
+            "days_open": 5,
+            "description": "Need clarification on connection detail for main structural beams at Grid Line A between floors 12-13. Current drawings show conflicting details.",
+            "cost_impact": "$15,000 - $25,000",
+            "schedule_impact": "2-3 days"
+        },
+        {
+            "rfi_id": "HTD-RFI-002", 
+            "rfi_number": "RFI-2025-002",
+            "subject": "HVAC ductwork routing coordination Level 12 mechanical room",
+            "location": "Level 12 - Mechanical Room North",
+            "discipline": "MEP Engineering",
+            "priority": "Medium",
+            "status": "In Review",
+            "submitted_by": "Sarah Johnson - Project Manager",
+            "assigned_to": "Highland MEP Consultants",
+            "submitted_date": "2025-05-18",
+            "due_date": "2025-05-25",
+            "days_open": 7,
+            "description": "HVAC ductwork conflicts with structural beams in north mechanical room. Need routing solution.",
+            "cost_impact": "$5,000 - $10,000",
+            "schedule_impact": "1-2 days"
+        },
+        {
+            "rfi_id": "HTD-RFI-003",
+            "rfi_number": "RFI-2025-003", 
+            "subject": "Exterior curtain wall material specification south facade",
+            "location": "South Facade - Units 8-12",
+            "discipline": "Architectural",
+            "priority": "Medium",
+            "status": "Answered",
+            "submitted_by": "Robert Kim - Architecture Team",
+            "assigned_to": "Highland Architecture Group",
+            "submitted_date": "2025-05-15",
+            "due_date": "2025-05-22",
+            "days_open": 10,
+            "description": "Clarification needed on glass specifications for south-facing residential units 8-12.",
+            "cost_impact": "$8,000 - $12,000",
+            "schedule_impact": "No impact"
+        },
+        {
+            "rfi_id": "HTD-RFI-004",
+            "rfi_number": "RFI-2025-004",
+            "subject": "Electrical panel location retail space ground floor",
+            "location": "Ground Floor - Retail Space 3",
+            "discipline": "Electrical Engineering",
+            "priority": "Low",
+            "status": "Open",
+            "submitted_by": "Lisa Rodriguez - Quality Inspector",
+            "assigned_to": "Highland Electrical Consultants",
+            "submitted_date": "2025-05-22",
+            "due_date": "2025-05-29",
+            "days_open": 3,
+            "description": "Electrical panel location conflicts with retail tenant requirements. Need alternative placement.",
+            "cost_impact": "$2,000 - $5,000",
+            "schedule_impact": "1 day"
+        },
+        {
+            "rfi_id": "HTD-RFI-005",
+            "rfi_number": "RFI-2025-005",
+            "subject": "Fire safety system integration residential levels",
+            "location": "Levels 2-15 - Residential",
+            "discipline": "Fire Safety",
+            "priority": "Critical",
+            "status": "Open",
+            "submitted_by": "John Davis - Safety Manager",
+            "assigned_to": "Fire Safety Consultants Inc",
+            "submitted_date": "2025-05-23",
+            "due_date": "2025-05-26",
+            "days_open": 2,
+            "description": "Fire safety system requires integration with building automation. Critical for occupancy permit.",
+            "cost_impact": "$25,000 - $40,000",
+            "schedule_impact": "5-7 days"
+        }
+    ]
+    
+    # Handle different modes
+    if st.session_state.get("rfi_mode") == "create":
+        st.markdown("### ➕ Create New RFI")
+        
+        with st.form("create_rfi_form"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                subject = st.text_input("RFI Subject*", placeholder="Brief description of the question or issue")
+                location = st.selectbox("Location", [
+                    "Level B2 - Parking", "Level B1 - Storage", "Ground Floor - Retail",
+                    "Level 2-5 - Residential", "Level 6-10 - Residential", "Level 11-15 - Residential", 
+                    "Mechanical Penthouse", "Roof Level", "Site Overall"
+                ])
+                discipline = st.selectbox("Engineering Discipline", [
+                    "Structural Engineering", "MEP Engineering", "Architectural", 
+                    "Electrical Engineering", "Fire Safety", "Civil Engineering", "Geotechnical"
+                ])
+                priority = st.selectbox("Priority Level", ["Low", "Medium", "High", "Critical"])
+            
+            with col2:
+                submitted_by = st.text_input("Submitted By", value="Highland Tower Team")
+                assigned_to = st.selectbox("Assign To", [
+                    "Highland Structural Engineering", "Highland MEP Consultants", 
+                    "Highland Architecture Group", "Highland Electrical Consultants",
+                    "Fire Safety Consultants Inc", "Project Engineering Team"
+                ])
+                due_date = st.date_input("Response Due Date", datetime.now() + timedelta(days=7))
+                cost_impact = st.selectbox("Estimated Cost Impact", [
+                    "No Impact", "$0 - $2,000", "$2,000 - $5,000", "$5,000 - $15,000", 
+                    "$15,000 - $25,000", "$25,000+"
+                ])
+            
+            description = st.text_area("Detailed Description*", height=120, 
+                placeholder="Provide detailed description of the question, issue, or clarification needed...")
+            
+            schedule_impact = st.selectbox("Schedule Impact", ["No Impact", "1 day", "2-3 days", "4-7 days", "1-2 weeks", "2+ weeks"])
+            
+            attachments = st.file_uploader("Attach Files", accept_multiple_files=True, 
+                type=['pdf', 'dwg', 'jpg', 'png', 'xlsx', 'docx'])
+            
+            submitted = st.form_submit_button("📤 Submit RFI", type="primary")
+            
+            if submitted and subject and description:
+                new_rfi_number = f"RFI-2025-{len(rfis_data)+1:03d}"
+                st.success(f"✅ RFI created successfully! Reference: {new_rfi_number}")
+                st.info("📧 Notification sent to assigned engineering team")
+                st.session_state.rfi_mode = None
+                st.rerun()
+            elif submitted:
+                st.error("Please provide required fields: Subject and Description")
+    
+    elif st.session_state.get("rfi_mode") == "search":
+        st.markdown("### 🔍 Search Highland Tower RFIs")
+        
+        col1, col2, col3 = st.columns(3)
         
         with col1:
-            st.markdown("### Active RFIs")
-            rfi_data = pd.DataFrame({
-                'RFI Number': ['RFI-2024-001', 'RFI-2024-002', 'RFI-2024-003', 'RFI-2024-004', 'RFI-2024-005'],
-                'Subject': ['Electrical panel specifications', 'HVAC duct routing clarification', 'Fire safety system integration', 'Structural beam connection detail', 'Plumbing fixture specifications'],
-                'Submitted By': ['Elite MEP', 'Highland Construction', 'Safety First Inc', 'Highland Construction', 'Elite MEP'],
-                'Status': ['Pending Response', 'Under Review', 'Answered', 'Pending Response', 'Draft'],
-                'Priority': ['High', 'Medium', 'Low', 'High', 'Medium'],
-                'Days Open': [3, 7, 0, 5, 1],
-                'Assigned To': ['Project Manager', 'MEP Engineer', 'Safety Coordinator', 'Structural Engineer', 'Project Manager']
-            })
-            st.dataframe(rfi_data, use_container_width=True)
+            search_discipline = st.selectbox("Filter by Discipline", ["All Disciplines"] + list(set([rfi["discipline"] for rfi in rfis_data])))
+        
+        with col2:
+            search_priority = st.selectbox("Filter by Priority", ["All Priorities"] + list(set([rfi["priority"] for rfi in rfis_data])))
+        
+        with col3:
+            search_status = st.selectbox("Filter by Status", ["All Status"] + list(set([rfi["status"] for rfi in rfis_data])))
+        
+        search_text = st.text_input("🔍 Search in subjects and descriptions", placeholder="Enter keywords...")
+        
+        # Apply filters
+        filtered_rfis = rfis_data.copy()
+        
+        if search_discipline != "All Disciplines":
+            filtered_rfis = [r for r in filtered_rfis if r["discipline"] == search_discipline]
+        
+        if search_priority != "All Priorities":
+            filtered_rfis = [r for r in filtered_rfis if r["priority"] == search_priority]
+        
+        if search_status != "All Status":
+            filtered_rfis = [r for r in filtered_rfis if r["status"] == search_status]
+        
+        if search_text:
+            filtered_rfis = [r for r in filtered_rfis if 
+                           search_text.lower() in r["subject"].lower() or 
+                           search_text.lower() in r["description"].lower()]
+        
+        st.markdown(f"### 📝 Found {len(filtered_rfis)} RFIs")
+        rfis_data = filtered_rfis
+    
+    elif st.session_state.get("rfi_mode") == "analytics":
+        st.markdown("### 📊 RFI Analytics Dashboard")
+        
+        # RFI metrics
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("Total RFIs", len(rfis_data), "+3 this week")
+        
+        with col2:
+            open_rfis = len([r for r in rfis_data if r["status"] == "Open"])
+            st.metric("Open RFIs", open_rfis, "Needs attention")
+        
+        with col3:
+            critical_rfis = len([r for r in rfis_data if r["priority"] == "Critical"])
+            st.metric("Critical RFIs", critical_rfis, "High priority")
+        
+        with col4:
+            avg_days = sum([r["days_open"] for r in rfis_data]) / len(rfis_data)
+            st.metric("Avg Days Open", f"{avg_days:.1f}", "Target: 5 days")
+        
+        # Priority breakdown chart
+        import plotly.express as px
+        priority_counts = {}
+        for rfi in rfis_data:
+            priority_counts[rfi["priority"]] = priority_counts.get(rfi["priority"], 0) + 1
+        
+        fig = px.pie(
+            values=list(priority_counts.values()),
+            names=list(priority_counts.keys()),
+            title="📝 RFIs by Priority Level"
+        )
+        st.plotly_chart(fig, use_container_width=True)
+    
+    # Default view - RFI List with CRUD operations
+    if not st.session_state.get("rfi_mode"):
+        st.markdown("### 📝 Highland Tower Development - Active RFIs")
+        
+        # RFI summary metrics
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("Total RFIs", len(rfis_data))
+        
+        with col2:
+            open_count = len([r for r in rfis_data if r["status"] == "Open"])
+            st.metric("Open", open_count)
+        
+        with col3:
+            critical_count = len([r for r in rfis_data if r["priority"] == "Critical"])
+            st.metric("Critical", critical_count)
+        
+        with col4:
+            answered_count = len([r for r in rfis_data if r["status"] == "Answered"])
+            st.metric("Answered", answered_count)
+        
+        st.markdown("---")
+        
+        # Display RFIs in expandable cards
+        for i, rfi in enumerate(rfis_data):
+            priority_colors = {"Critical": "🔴", "High": "🟠", "Medium": "🟡", "Low": "🟢"}
+            status_colors = {"Open": "🔴", "In Review": "🟡", "Answered": "🟢"}
+            
+            with st.expander(f"{priority_colors[rfi['priority']]} {rfi['rfi_number']} - {rfi['subject']}", expanded=False):
+                
+                col1, col2 = st.columns([2, 3])
+                
+                with col1:
+                    st.markdown(f"""
+                    **📋 RFI Details:**
+                    - **Number:** {rfi['rfi_number']}
+                    - **Location:** {rfi['location']}
+                    - **Discipline:** {rfi['discipline']}
+                    - **Priority:** {rfi['priority']}
+                    - **Status:** {rfi['status']}
+                    - **Submitted By:** {rfi['submitted_by']}
+                    - **Assigned To:** {rfi['assigned_to']}
+                    - **Submitted Date:** {rfi['submitted_date']}
+                    - **Due Date:** {rfi['due_date']}
+                    - **Days Open:** {rfi['days_open']}
+                    """)
+                
+                with col2:
+                    st.markdown(f"**📝 Description:**")
+                    st.markdown(rfi['description'])
+                    
+                    st.markdown(f"**💰 Cost Impact:** {rfi['cost_impact']}")
+                    st.markdown(f"**📅 Schedule Impact:** {rfi['schedule_impact']}")
+                    
+                    # Action buttons for each RFI
+                    action_col1, action_col2, action_col3, action_col4 = st.columns(4)
+                    
+                    with action_col1:
+                        if st.button(f"👁️ View", key=f"view_{rfi['rfi_id']}", use_container_width=True):
+                            st.info(f"Opening detailed view for {rfi['rfi_number']}")
+                    
+                    with action_col2:
+                        if st.button(f"✏️ Edit", key=f"edit_{rfi['rfi_id']}", use_container_width=True):
+                            st.session_state[f"edit_rfi_{rfi['rfi_id']}"] = True
+                            st.rerun()
+                    
+                    with action_col3:
+                        if st.button(f"💬 Respond", key=f"respond_{rfi['rfi_id']}", use_container_width=True):
+                            st.session_state[f"respond_rfi_{rfi['rfi_id']}"] = True
+                            st.rerun()
+                    
+                    with action_col4:
+                        if st.button(f"📎 Files", key=f"files_{rfi['rfi_id']}", use_container_width=True):
+                            st.success(f"Opening attachment manager for {rfi['rfi_number']}")
+                
+                # Handle edit mode for individual RFIs
+                if st.session_state.get(f"edit_rfi_{rfi['rfi_id']}", False):
+                    st.markdown("---")
+                    st.markdown("### ✏️ Edit RFI Details")
+                    
+                    with st.form(f"edit_form_{rfi['rfi_id']}"):
+                        edit_col1, edit_col2 = st.columns(2)
+                        
+                        with edit_col1:
+                            new_subject = st.text_input("Subject", value=rfi['subject'])
+                            new_priority = st.selectbox("Priority", ["Low", "Medium", "High", "Critical"], 
+                                                      index=["Low", "Medium", "High", "Critical"].index(rfi['priority']))
+                            new_status = st.selectbox("Status", ["Open", "In Review", "Answered", "Closed"], 
+                                                    index=["Open", "In Review", "Answered", "Closed"].index(rfi['status']) 
+                                                    if rfi['status'] in ["Open", "In Review", "Answered", "Closed"] else 0)
+                        
+                        with edit_col2:
+                            new_assigned_to = st.text_input("Assigned To", value=rfi['assigned_to'])
+                            new_cost_impact = st.text_input("Cost Impact", value=rfi['cost_impact'])
+                            new_schedule_impact = st.text_input("Schedule Impact", value=rfi['schedule_impact'])
+                        
+                        new_description = st.text_area("Description", value=rfi['description'])
+                        
+                        submitted = st.form_submit_button("💾 Save Changes", type="primary")
+                        
+                        if submitted:
+                            st.success(f"✅ RFI {rfi['rfi_number']} updated successfully!")
+                            st.session_state[f"edit_rfi_{rfi['rfi_id']}"] = False
+                            st.rerun()
+                
+                # Handle response mode
+                if st.session_state.get(f"respond_rfi_{rfi['rfi_id']}", False):
+                    st.markdown("---")
+                    st.markdown("### 💬 RFI Response")
+                    
+                    with st.form(f"response_form_{rfi['rfi_id']}"):
+                        response_text = st.text_area("Response", height=120, 
+                            placeholder="Provide detailed response to the RFI question...")
+                        
+                        response_attachments = st.file_uploader("Attach Response Files", accept_multiple_files=True, 
+                            type=['pdf', 'dwg', 'jpg', 'png', 'xlsx', 'docx'])
+                        
+                        submitted = st.form_submit_button("📤 Submit Response", type="primary")
+                        
+                        if submitted and response_text:
+                            st.success(f"✅ Response submitted for {rfi['rfi_number']}!")
+                            st.info("📧 Notification sent to RFI submitter")
+                            st.session_state[f"respond_rfi_{rfi['rfi_id']}"] = False
+                            st.rerun()
+                        elif submitted:
+                            st.error("Please provide a response")
+    
+    # Reset mode button
+    if st.session_state.get("rfi_mode"):
+        if st.button("← Back to RFI List"):
+            st.session_state.rfi_mode = None
+            st.rerun()
         
         with col2:
             st.markdown("### RFI Statistics")

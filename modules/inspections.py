@@ -109,7 +109,7 @@ def render():
             "location": "All Levels - Fire Protection",
             "inspector": "Maria Rodriguez - Fire Safety Inspector",
             "scheduled_date": "2025-05-18",
-            "completed_date": null,
+            "completed_date": None,
             "status": "Scheduled",
             "priority": "High",
             "checklist_items": 32,

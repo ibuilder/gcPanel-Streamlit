@@ -4556,63 +4556,355 @@ def render_project_planning_section():
 
 def render_performance_snapshot():
     """Performance Snapshot - Executive dashboard"""
-    try:
-        import sys
-        sys.path.append('.')
-        from modules.performance_snapshot import render
-        render()
-    except Exception as e:
-        st.error(f"Error loading Performance Snapshot module: {e}")
-        st.markdown("### 📊 Performance Snapshot - Highland Tower Development")
-        st.markdown("**Executive dashboard temporarily unavailable**")
+    st.title("📊 Performance Snapshot - Highland Tower Development")
+    st.markdown("**Executive dashboard for $45.5M mixed-use construction project**")
+    
+    # Key Performance Indicators
+    col1, col2, col3, col4, col5 = st.columns(5)
+    
+    with col1:
+        st.metric("🏗️ Project Progress", "67.3%", "↗️ 2.1% this week")
+    with col2:
+        st.metric("📅 Schedule Status", "5 days ahead", "↗️ Accelerated")
+    with col3:
+        st.metric("💰 Budget Status", "$2.1M under", "↗️ 4.6% savings")
+    with col4:
+        st.metric("🛡️ Safety Score", "98.5%", "↗️ 0.3% improved")
+    with col5:
+        st.metric("⭐ Quality Rating", "4.8/5.0", "↗️ 0.2 improved")
+    
+    st.markdown("---")
+    
+    # Quick performance summary
+    st.markdown("### 📈 Executive Performance Summary")
+    
+    highlights = [
+        "✅ Level 13 structural steel installation completed ahead of schedule",
+        "✅ MEP rough-in Level 12 passed inspection with zero deficiencies", 
+        "✅ South facade curtain wall installation 70% complete",
+        "⚠️ Minor electrical conduit spacing issue resolved in Level 12",
+        "📈 Overall project efficiency improved to 94.2% this week"
+    ]
+    
+    for highlight in highlights:
+        st.markdown(highlight)
+    
+    # Critical success factors
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("#### 🎯 Critical Success Factors")
+        success_factors = [
+            {"factor": "Schedule Performance", "score": 95},
+            {"factor": "Budget Control", "score": 92}, 
+            {"factor": "Quality Standards", "score": 96},
+            {"factor": "Safety Compliance", "score": 98},
+            {"factor": "Stakeholder Satisfaction", "score": 88},
+            {"factor": "Resource Utilization", "score": 91}
+        ]
+        
+        for factor in success_factors:
+            st.markdown(f"**{factor['factor']}:** {factor['score']}%")
+            st.progress(factor['score'] / 100)
+    
+    with col2:
+        st.markdown("#### 🚨 Key Risk Indicators")
+        st.markdown("**Overall Risk Score:** 23/50 (Moderate)")
+        st.progress(23/50)
+        st.markdown("- MEP coordination requires attention")
+        st.markdown("- Winter weather preparations needed")
+        st.markdown("- All other metrics within acceptable ranges")
 
 def render_subcontractor_management():
     """Subcontractor Management - Enterprise coordination"""
-    try:
-        import sys
-        sys.path.append('.')
-        from modules.subcontractor_management import render
-        render()
-    except Exception as e:
-        st.error(f"Error loading Subcontractor Management module: {e}")
-        st.markdown("### 🏗️ Subcontractor Management - Highland Tower Development")
-        st.markdown("**Subcontractor coordination temporarily unavailable**")
+    st.title("🏗️ Subcontractor Management - Highland Tower Development")
+    st.markdown("**Enterprise subcontractor coordination for $45.5M mixed-use project**")
+    
+    # Action buttons
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        if st.button("➕ Add Subcontractor", type="primary", use_container_width=True):
+            st.info("Add subcontractor form would open here")
+    with col2:
+        if st.button("📋 Performance Review", use_container_width=True):
+            st.info("Performance review dashboard would open here")
+    with col3:
+        if st.button("📄 Insurance Tracking", use_container_width=True):
+            st.info("Insurance tracking dashboard would open here")
+    with col4:
+        if st.button("📊 Analytics", use_container_width=True):
+            st.info("Analytics dashboard would open here")
+    
+    st.markdown("---")
+    
+    # Key metrics
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Active Subcontractors", "5", "All current")
+    with col2:
+        st.metric("Avg Performance", "4.7/5.0", "↗️ +0.2")
+    with col3:
+        st.metric("Insurance Compliance", "100%", "All current")
+    with col4:
+        st.metric("Payment Status", "Current", "No delays")
+    
+    # Subcontractor list
+    st.markdown("### 🏗️ Highland Tower Subcontractor Directory")
+    
+    subcontractors = [
+        {"name": "Apex Steel Construction", "trade": "Structural Steel", "status": "Active", "rating": 4.8},
+        {"name": "Premier MEP Systems", "trade": "MEP", "status": "Active", "rating": 4.6},
+        {"name": "Elite Glass & Glazing", "trade": "Curtain Wall", "status": "Active", "rating": 4.9},
+        {"name": "Precision Concrete Works", "trade": "Concrete", "status": "Completed", "rating": 4.9},
+        {"name": "Highland Interior Finishes", "trade": "Finishes", "status": "Starting Soon", "rating": 4.7}
+    ]
+    
+    for sub in subcontractors:
+        with st.expander(f"🏗️ {sub['name']} - {sub['trade']} | {sub['status']}", expanded=False):
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown(f"**Trade:** {sub['trade']}")
+                st.markdown(f"**Status:** {sub['status']}")
+                st.markdown(f"**Rating:** {sub['rating']}/5.0")
+            with col2:
+                if st.button(f"View Details", key=f"view_{sub['name']}", use_container_width=True):
+                    st.success(f"Opening details for {sub['name']}")
+                if st.button(f"Contact", key=f"contact_{sub['name']}", use_container_width=True):
+                    st.info(f"Contacting {sub['name']}")
 
 def render_inspections():
     """Inspections - Quality control system"""
-    try:
-        import sys
-        sys.path.append('.')
-        from modules.inspections import render
-        render()
-    except Exception as e:
-        st.error(f"Error loading Inspections module: {e}")
-        st.markdown("### 🔍 Inspections - Highland Tower Development")
-        st.markdown("**Inspection management temporarily unavailable**")
+    st.title("🔍 Inspections - Highland Tower Development")
+    st.markdown("**Professional quality control and inspection management for $45.5M project**")
+    
+    # Action buttons
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        if st.button("➕ Schedule Inspection", type="primary", use_container_width=True):
+            st.info("Schedule inspection form would open here")
+    with col2:
+        if st.button("📋 Digital Checklists", use_container_width=True):
+            st.info("Digital checklists would open here")
+    with col3:
+        if st.button("📊 Compliance Reports", use_container_width=True):
+            st.info("Compliance reports would open here")
+    with col4:
+        if st.button("📈 Analytics", use_container_width=True):
+            st.info("Analytics dashboard would open here")
+    
+    st.markdown("---")
+    
+    # Key metrics
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Total Inspections", "25", "This month")
+    with col2:
+        st.metric("Pass Rate", "96.8%", "↗️ +1.5%")
+    with col3:
+        st.metric("Failed Inspections", "1", "Requires action")
+    with col4:
+        st.metric("Pending", "2", "This week")
+    
+    # Active inspections
+    st.markdown("### 🔍 Highland Tower Development - Active Inspections")
+    
+    inspections = [
+        {"id": "HTD-INS-001", "type": "Structural Steel", "location": "Level 13", "status": "Passed", "inspector": "John Davis"},
+        {"id": "HTD-INS-002", "type": "MEP Rough-in", "location": "Level 12", "status": "Failed", "inspector": "Sarah Wilson"},
+        {"id": "HTD-INS-003", "type": "Curtain Wall", "location": "South Facade", "status": "Passed", "inspector": "Robert Kim"},
+        {"id": "HTD-INS-004", "type": "Fire Safety", "location": "All Levels", "status": "Scheduled", "inspector": "Maria Rodriguez"}
+    ]
+    
+    for inspection in inspections:
+        status_color = "🟢" if inspection["status"] == "Passed" else "🔴" if inspection["status"] == "Failed" else "🔵"
+        with st.expander(f"{status_color} {inspection['id']} - {inspection['type']} | {inspection['status']}", expanded=False):
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown(f"**Type:** {inspection['type']}")
+                st.markdown(f"**Location:** {inspection['location']}")
+                st.markdown(f"**Status:** {inspection['status']}")
+            with col2:
+                st.markdown(f"**Inspector:** {inspection['inspector']}")
+                if st.button(f"View Details", key=f"view_{inspection['id']}", use_container_width=True):
+                    st.success(f"Opening details for {inspection['id']}")
 
 def render_issues_risks():
     """Issues & Risks - Risk management system"""
-    try:
-        import sys
-        sys.path.append('.')
-        from modules.issues_risks import render
-        render()
-    except Exception as e:
-        st.error(f"Error loading Issues & Risks module: {e}")
-        st.markdown("### ⚠️ Issues & Risks - Highland Tower Development")
-        st.markdown("**Risk management temporarily unavailable**")
+    st.title("⚠️ Issues & Risks - Highland Tower Development")
+    st.markdown("**Proactive risk management and issue resolution for $45.5M project**")
+    
+    # Action buttons
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        if st.button("➕ Report Issue/Risk", type="primary", use_container_width=True):
+            st.info("Issue/Risk reporting form would open here")
+    with col2:
+        if st.button("📊 Risk Matrix", use_container_width=True):
+            st.info("Risk matrix visualization would open here")
+    with col3:
+        if st.button("📈 Analytics", use_container_width=True):
+            st.info("Risk analytics would open here")
+    with col4:
+        if st.button("📋 Action Plans", use_container_width=True):
+            st.info("Action plans would open here")
+    
+    st.markdown("---")
+    
+    # Key metrics
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Total Items", "5", "Active tracking")
+    with col2:
+        st.metric("Active", "3", "60% active")
+    with col3:
+        st.metric("High Impact", "2", "Priority focus")
+    with col4:
+        st.metric("Avg Risk Score", "8.4", "Moderate")
+    
+    # Issues and risks list
+    st.markdown("### ⚠️ Highland Tower Development - Issues & Risks Dashboard")
+    
+    items = [
+        {"id": "HTD-RISK-001", "type": "Risk", "title": "MEP Coordination Delays", "impact": "High", "status": "Active"},
+        {"id": "HTD-ISS-001", "type": "Issue", "title": "Curtain Wall Seal Failure", "impact": "High", "status": "In Progress"},
+        {"id": "HTD-RISK-002", "type": "Risk", "title": "Winter Weather Operations", "impact": "Medium", "status": "Monitoring"},
+        {"id": "HTD-ISS-002", "type": "Issue", "title": "Steel Price Escalation", "impact": "Medium", "status": "Resolved"}
+    ]
+    
+    for item in items:
+        type_icon = "🔥" if item["type"] == "Issue" else "⚡"
+        status_color = "🔴" if item["status"] == "Active" else "🟡" if item["status"] == "In Progress" else "🟢" if item["status"] == "Resolved" else "🔵"
+        impact_icon = "🚨" if item["impact"] == "High" else "⚠️"
+        
+        with st.expander(f"{status_color} {type_icon} {item['id']} - {item['title']} | {item['status']} {impact_icon}", expanded=False):
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown(f"**Type:** {item['type']}")
+                st.markdown(f"**Impact:** {item['impact']}")
+                st.markdown(f"**Status:** {item['status']}")
+            with col2:
+                if st.button(f"View Details", key=f"view_{item['id']}", use_container_width=True):
+                    st.success(f"Opening details for {item['id']}")
 
 def render_documentation():
     """Documentation - Quick Start guide"""
-    try:
-        import sys
-        sys.path.append('.')
-        from modules.docs import render
-        render()
-    except Exception as e:
-        st.error(f"Error loading Documentation module: {e}")
-        st.markdown("### 📚 Documentation - Highland Tower Development")
-        st.markdown("**Documentation temporarily unavailable**")
+    st.title("📚 Highland Tower Development - Quick Start Guide")
+    st.markdown("**Complete construction management platform documentation**")
+    
+    # Navigation tabs
+    tab1, tab2, tab3 = st.tabs(["🚀 Quick Start", "⭐ Core Features", "📖 Examples"])
+    
+    with tab1:
+        st.markdown("### 🚀 Quick Start Guide")
+        st.markdown("**Get up and running with Highland Tower Development in minutes**")
+        
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            st.markdown("""
+            ## 📋 Getting Started Checklist
+            
+            ### Step 1: Login & Authentication
+            ✅ **Login with your credentials:**
+            - Username: `admin` Password: `Highland2025!` (Administrator)
+            - Username: `pmgr_johnson` Password: `ProjectMgr2025!` (Project Manager)
+            - Username: `super_chen` Password: `Superintendent2025!` (Superintendent)
+            
+            ### Step 2: Navigate the Platform
+            ✅ **Explore main sections:**
+            - **Dashboard** - Project overview and real-time metrics
+            - **Core Tools** - Daily operations (Reports, Photos, Safety)
+            - **Advanced Tools** - Professional modules (RFIs, Documents, Subcontractors)
+            - **Analytics & AI** - Performance insights and AI assistance
+            
+            ### Step 3: Key Daily Operations
+            ✅ **Essential workflows:**
+            1. Create daily reports in **Daily Reports** module
+            2. Upload progress photos in **Progress Photos**
+            3. Submit RFIs in **RFIs** module
+            4. Track safety incidents in **Safety** module
+            5. Monitor costs in **Cost Management**
+            """)
+        
+        with col2:
+            st.markdown("### 🎯 Project Overview")
+            st.info("""
+            **Highland Tower Development**
+            📍 $45.5M Mixed-Use Project
+            🏢 120 Residential + 8 Retail Units
+            📅 67.3% Complete (5 days ahead)
+            💰 $2.1M Under Budget
+            ⚡ 98.5% OSHA Compliance
+            """)
+            
+            st.markdown("### 📞 Support")
+            st.success("""
+            **Need Help?**
+            📧 support@highlandtower.com
+            📱 +1-555-HIGHLAND
+            🌐 docs.highlandtower.com
+            """)
+    
+    with tab2:
+        st.markdown("### ⭐ Core Features")
+        
+        st.markdown("""
+        #### 🏗️ Construction Management
+        - **RFI Management** - Professional Request for Information system
+        - **Daily Reports** - Smart daily reporting with AI suggestions
+        - **Quality Control** - Comprehensive inspection workflows
+        - **Subcontractor Management** - Complete sub-trade coordination
+        - **Progress Photos** - AI-powered photo organization
+        
+        #### 📊 Analytics & Insights
+        - **Performance Snapshot** - Executive dashboard with KPIs
+        - **Issues & Risks** - Proactive risk management
+        - **Cost Management** - Real-time budget tracking
+        - **Safety Management** - OSHA compliance monitoring
+        
+        #### 🔒 Security Features
+        - **JWT-based security** with session management
+        - **Role-based access control** with granular permissions
+        - **Audit logging** for all system changes
+        - **Data encryption** in transit and at rest
+        """)
+    
+    with tab3:
+        st.markdown("### 📖 Real-World Examples")
+        
+        st.markdown("""
+        #### 📝 Creating an RFI for Structural Issues
+        **Scenario:** Steel beam connection detail needs clarification
+        
+        **Steps:**
+        1. Navigate to **Advanced Tools > RFIs**
+        2. Click **➕ Create RFI**
+        3. Fill in details:
+           - Subject: "Steel beam connection detail clarification Level 12-13"
+           - Location: "Level 12-13, Grid Line A-B"
+           - Discipline: "Structural Engineering"
+           - Priority: "High"
+        4. Add detailed description and attach drawings
+        5. Submit RFI for review
+        
+        **Result:** RFI tracked with automatic notifications and response timeline
+        
+        #### 📸 Documenting Daily Progress
+        **Scenario:** End-of-day progress documentation
+        
+        **Steps:**
+        1. Navigate to **Core Tools > Daily Reports**
+        2. Use **Smart Report** tab for AI assistance
+        3. Auto-populate weather and crew data
+        4. Document work completed by location
+        5. Upload progress photos with GPS tagging
+        6. Submit report for project records
+        
+        **Result:** Comprehensive daily record with photo verification
+        """)
+        
+        if st.button("🎬 Watch Demo Videos", use_container_width=True):
+            st.info("Demo videos would open here")
 
 def render_documents():
     """Document Management - Your sophisticated document system"""

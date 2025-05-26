@@ -2154,6 +2154,10 @@ def render_main_content():
     if current_menu in module_functions:
         module_functions[current_menu]()
     else:
+        # Debug information
+        st.error(f"Module '{current_menu}' not found in module_functions")
+        st.write("Available modules:", list(module_functions.keys()))
+        
         # Advanced preview for remaining modules
         st.markdown(f"## {current_menu}")
         st.info(f"The {current_menu} module is being developed with enterprise-grade features designed to outperform Procore.")

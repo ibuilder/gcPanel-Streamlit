@@ -1869,17 +1869,17 @@ def render_rfis():
                     # Action buttons for each RFI
                     btn_col1, btn_col2, btn_col3 = st.columns(3)
                     with btn_col1:
-                        if st.button(f"✏️ Edit", key=f"edit_{rfi['rfi_id']}"):
+                        if st.button(f"✏️ Edit", key=f"main_edit_{rfi['rfi_id']}"):
                             st.session_state[f"edit_rfi_{rfi['rfi_id']}"] = True
                             st.rerun()
                     
                     with btn_col2:
-                        if st.button(f"💬 Respond", key=f"respond_{rfi['rfi_id']}"):
+                        if st.button(f"💬 Respond", key=f"main_respond_{rfi['rfi_id']}"):
                             st.session_state[f"respond_rfi_{rfi['rfi_id']}"] = True
                             st.rerun()
                     
                     with btn_col3:
-                        if st.button(f"📁 View Details", key=f"view_{rfi['rfi_id']}"):
+                        if st.button(f"📁 View Details", key=f"main_view_{rfi['rfi_id']}"):
                             st.info("Detailed view would open here")
         
         with col2:

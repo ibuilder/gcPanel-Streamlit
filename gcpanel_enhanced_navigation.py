@@ -69,9 +69,9 @@ def apply_styling():
     /* === ENTERPRISE SIDEBAR === */
     
     .css-1d391kg {
-        background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
-        border-right: 2px solid #334155 !important;
-        box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15) !important;
+        background: linear-gradient(180deg, #0f172a 0%, #020617 100%) !important;
+        border-right: 2px solid #1e293b !important;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25) !important;
         padding: 0 !important;
         width: 280px !important;
     }
@@ -1042,20 +1042,25 @@ def render_daily_reports():
             
             with col1:
                 # Crew size over time
-                crew_data = pd.DataFrame([
-                    {"Date": r['date'], "Crew Size": r['crew_size']} 
-                    for r in st.session_state.daily_reports
-                ])
-                fig_crew = px.line(crew_data, x='Date', y='Crew Size', title="Crew Size Over Time")
+                dates = [r['date'] for r in st.session_state.daily_reports]
+                crew_sizes = [r['crew_size'] for r in st.session_state.daily_reports]
+                crew_data = pd.DataFrame({
+                    'Date': dates,
+                    'Crew_Size': crew_sizes
+                })
+                fig_crew = px.line(crew_data, x='Date', y='Crew_Size', title="Crew Size Over Time")
                 st.plotly_chart(fig_crew, use_container_width=True)
             
             with col2:
                 # Weather distribution
-                weather_counts = pd.DataFrame([
-                    {"Weather": weather, "Count": [r['weather'] for r in st.session_state.daily_reports].count(weather)}
-                    for weather in set(r['weather'] for r in st.session_state.daily_reports)
-                ])
-                fig_weather = px.pie(weather_counts, values='Count', names='Weather', title="Weather Distribution")
+                weather_list = [r['weather'] for r in st.session_state.daily_reports]
+                weather_unique = list(set(weather_list))
+                weather_counts_list = [weather_list.count(w) for w in weather_unique]
+                weather_data = pd.DataFrame({
+                    'Weather': weather_unique,
+                    'Count': weather_counts_list
+                })
+                fig_weather = px.pie(weather_data, values='Count', names='Weather', title="Weather Distribution")
                 st.plotly_chart(fig_weather, use_container_width=True)
     
     with tab4:
@@ -2301,7 +2306,12 @@ def render_rfis():
                     status = rfi['status']
                     status_counts[status] = status_counts.get(status, 0) + 1
                 
-                status_df = pd.DataFrame(list(status_counts.items()), columns=['Status', 'Count'])
+                status_list = list(status_counts.keys())
+                count_list = list(status_counts.values())
+                status_df = pd.DataFrame({
+                    'Status': status_list,
+                    'Count': count_list
+                })
                 fig_status = px.pie(status_df, values='Count', names='Status', title="RFI Status Distribution")
                 st.plotly_chart(fig_status, use_container_width=True)
                 
@@ -2311,7 +2321,12 @@ def render_rfis():
                     priority = rfi['priority']
                     priority_counts[priority] = priority_counts.get(priority, 0) + 1
                 
-                priority_df = pd.DataFrame(list(priority_counts.items()), columns=['Priority', 'Count'])
+                priority_list = list(priority_counts.keys())
+                priority_count_list = list(priority_counts.values())
+                priority_df = pd.DataFrame({
+                    'Priority': priority_list,
+                    'Count': priority_count_list
+                })
                 fig_priority = px.bar(priority_df, x='Priority', y='Count', title="RFI Priority Distribution")
                 st.plotly_chart(fig_priority, use_container_width=True)
             
@@ -2322,7 +2337,12 @@ def render_rfis():
                     category = rfi['category']
                     category_counts[category] = category_counts.get(category, 0) + 1
                 
-                category_df = pd.DataFrame(list(category_counts.items()), columns=['Category', 'Count'])
+                category_list = list(category_counts.keys())
+                category_count_list = list(category_counts.values())
+                category_df = pd.DataFrame({
+                    'Category': category_list,
+                    'Count': category_count_list
+                })
                 fig_category = px.bar(category_df, x='Category', y='Count', title="RFI by Category")
                 st.plotly_chart(fig_category, use_container_width=True)
                 
@@ -2332,7 +2352,12 @@ def render_rfis():
                     trade = rfi['trade']
                     trade_counts[trade] = trade_counts.get(trade, 0) + 1
                 
-                trade_df = pd.DataFrame(list(trade_counts.items()), columns=['Trade', 'Count'])
+                trade_list = list(trade_counts.keys())
+                trade_count_list = list(trade_counts.values())
+                trade_df = pd.DataFrame({
+                    'Trade': trade_list,
+                    'Count': trade_count_list
+                })
                 fig_trade = px.bar(trade_df, x='Trade', y='Count', title="RFI by Trade")
                 st.plotly_chart(fig_trade, use_container_width=True)
     

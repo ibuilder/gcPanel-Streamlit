@@ -1,0 +1,1150 @@
+# gcDeliver Streamlit Integration Guide
+
+## Overview
+This guide provides comprehensive instructions for integrating the gcDeliver Construction Project Management System features into a Streamlit application using Python.
+
+## Table of Contents
+1. [Project Structure](#project-structure)
+2. [Database Setup](#database-setup)
+3. [Core Models](#core-models)
+4. [Authentication System](#authentication-system)
+5. [Dashboard Implementation](#dashboard-implementation)
+6. [Project Management Module](#project-management-module)
+7. [Partner Management Module](#partner-management-module)
+8. [Items/Inventory Module](#itemsinventory-module)
+9. [Delivery Management Module](#delivery-management-module)
+10. [Schedule/Timeline Module](#scheduletimeline-module)
+11. [Daily Reports Module](#daily-reports-module)
+12. [Settings Module](#settings-module)
+13. [Deployment Configuration](#deployment-configuration)
+
+## Project Structure
+
+```
+gcdeliver_streamlit/
+├── app.py                     # Main Streamlit application
+├── requirements.txt           # Python dependencies
+├── config/
+│   ├── __init__.py
+│   ├── database.py           # Database configuration
+│   └── settings.py           # Application settings
+├── models/
+│   ├── __init__.py
+│   ├── base.py              # Base model classes
+│   ├── user.py              # User model
+│   ├── project.py           # Project model
+│   ├── partner.py           # Partner model
+│   ├── item.py              # Item model
+│   ├── delivery.py          # Delivery model
+│   ├── activity.py          # Schedule activity model
+│   └── daily_report.py      # Daily report model
+├── pages/
+│   ├── __init__.py
+│   ├── dashboard.py         # Dashboard page
+│   ├── projects.py          # Projects management
+│   ├── partners.py          # Partners management
+│   ├── items.py             # Items/inventory management
+│   ├── deliveries.py        # Delivery management
+│   ├── schedule.py          # Schedule/timeline management
+│   ├── daily_reports.py     # Daily reports
+│   └── settings.py          # Settings page
+├── services/
+│   ├── __init__.py
+│   ├── auth_service.py      # Authentication service
+│   ├── project_service.py   # Project business logic
+│   ├── partner_service.py   # Partner business logic
+│   ├── item_service.py      # Item business logic
+│   ├── delivery_service.py  # Delivery business logic
+│   ├── schedule_service.py  # Schedule business logic
+│   └── report_service.py    # Reporting business logic
+├── utils/
+│   ├── __init__.py
+│   ├── helpers.py           # Helper functions
+│   ├── validators.py        # Data validation
+│   └── formatters.py        # Data formatting
+└── static/
+    ├── styles.css           # Custom CSS
+    └── images/              # Static images
+```
+
+## Database Setup
+
+### 1. Install Required Dependencies
+
+```python
+# requirements.txt
+streamlit==1.29.0
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+pandas==2.1.4
+plotly==5.17.0
+pydantic==2.5.2
+python-dotenv==1.0.0
+bcrypt==4.1.2
+streamlit-authenticator==0.2.3
+streamlit-option-menu==0.3.6
+streamlit-aggrid==0.3.4.post3
+```
+
+### 2. Database Configuration
+
+```python
+# config/database.py
+import os
+from sqlalchemy import create_engine, MetaData
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Database URL from environment variables
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost/gcdeliver")
+
+# SQLAlchemy setup
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+metadata = MetaData()
+
+def get_db():
+    """Get database session"""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+def init_database():
+    """Initialize database tables"""
+    Base.metadata.create_all(bind=engine)
+```
+
+### 3. Application Settings
+
+```python
+# config/settings.py
+import os
+from pydantic import BaseSettings
+
+class Settings(BaseSettings):
+    app_name: str = "gcDeliver"
+    app_version: str = "1.0.0"
+    database_url: str = os.getenv("DATABASE_URL", "postgresql://user:password@localhost/gcdeliver")
+    secret_key: str = os.getenv("SECRET_KEY", "your-secret-key-here")
+    debug: bool = os.getenv("DEBUG", "False").lower() == "true"
+    
+    class Config:
+        env_file = ".env"
+
+settings = Settings()
+```
+
+## Core Models
+
+### 1. Base Model
+
+```python
+# models/base.py
+from sqlalchemy import Column, Integer, DateTime, func
+from sqlalchemy.ext.declarative import declarative_base
+from datetime import datetime
+
+Base = declarative_base()
+
+class BaseModel(Base):
+    __abstract__ = True
+    
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+```
+
+### 2. User Model
+
+```python
+# models/user.py
+from sqlalchemy import Column, String, Boolean
+from sqlalchemy.orm import relationship
+from .base import BaseModel
+import bcrypt
+
+class User(BaseModel):
+    __tablename__ = "users"
+    
+    username = Column(String(50), unique=True, index=True, nullable=False)
+    email = Column(String(100), unique=True, index=True, nullable=False)
+    full_name = Column(String(100), nullable=False)
+    hashed_password = Column(String(255), nullable=False)
+    is_active = Column(Boolean, default=True)
+    role = Column(String(50), default="user")
+    phone = Column(String(20))
+    company = Column(String(100))
+    
+    def set_password(self, password: str):
+        """Hash and set password"""
+        salt = bcrypt.gensalt()
+        self.hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+    
+    def check_password(self, password: str) -> bool:
+        """Check if password is correct"""
+        return bcrypt.checkpw(password.encode('utf-8'), self.hashed_password.encode('utf-8'))
+```
+
+### 3. Project Model
+
+```python
+# models/project.py
+from sqlalchemy import Column, String, Text, Date, Decimal, Enum, ForeignKey
+from sqlalchemy.orm import relationship
+from .base import BaseModel
+import enum
+
+class ProjectStatus(enum.Enum):
+    PLANNING = "planning"
+    IN_PROGRESS = "in_progress"
+    ON_HOLD = "on_hold"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+class Project(BaseModel):
+    __tablename__ = "projects"
+    
+    name = Column(String(200), nullable=False, index=True)
+    description = Column(Text)
+    status = Column(Enum(ProjectStatus), default=ProjectStatus.PLANNING)
+    start_date = Column(Date)
+    end_date = Column(Date)
+    budget = Column(Decimal(15, 2))
+    location = Column(String(255))
+    client_name = Column(String(100))
+    project_manager = Column(String(100))
+    progress = Column(Decimal(5, 2), default=0)  # Percentage
+    
+    # Relationships
+    activities = relationship("Activity", back_populates="project")
+    items = relationship("Item", back_populates="project")
+    deliveries = relationship("Delivery", back_populates="project")
+    daily_reports = relationship("DailyReport", back_populates="project")
+```
+
+### 4. Partner Model
+
+```python
+# models/partner.py
+from sqlalchemy import Column, String, Text, Decimal, Enum
+from sqlalchemy.orm import relationship
+from .base import BaseModel
+import enum
+
+class PartnerType(enum.Enum):
+    SUPPLIER = "supplier"
+    SUBCONTRACTOR = "subcontractor"
+    CONSULTANT = "consultant"
+
+class Partner(BaseModel):
+    __tablename__ = "partners"
+    
+    name = Column(String(200), nullable=False, index=True)
+    contact_person = Column(String(100))
+    email = Column(String(100))
+    phone = Column(String(20))
+    address = Column(Text)
+    partner_type = Column(Enum(PartnerType), nullable=False)
+    category = Column(String(100))  # Specialty/category
+    rating = Column(Decimal(3, 2), default=0)  # Rating out of 5
+    notes = Column(Text)
+    
+    # Relationships
+    items = relationship("ItemPartner", back_populates="partner")
+```
+
+### 5. Item Model
+
+```python
+# models/item.py
+from sqlalchemy import Column, String, Text, Integer, Decimal, ForeignKey, Enum
+from sqlalchemy.orm import relationship
+from .base import BaseModel
+import enum
+
+class ItemStatus(enum.Enum):
+    PENDING = "pending"
+    ORDERED = "ordered"
+    DELIVERED = "delivered"
+    INSTALLED = "installed"
+
+class Item(BaseModel):
+    __tablename__ = "items"
+    
+    name = Column(String(200), nullable=False, index=True)
+    description = Column(Text)
+    category = Column(String(100), index=True)
+    unit = Column(String(50))  # Unit of measurement
+    quantity = Column(Integer, default=0)
+    unit_price = Column(Decimal(10, 2))
+    total_price = Column(Decimal(15, 2))
+    status = Column(Enum(ItemStatus), default=ItemStatus.PENDING)
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    
+    # Relationships
+    project = relationship("Project", back_populates="items")
+    partners = relationship("ItemPartner", back_populates="item")
+    delivery_items = relationship("DeliveryItem", back_populates="item")
+
+class ItemPartner(BaseModel):
+    __tablename__ = "item_partners"
+    
+    item_id = Column(Integer, ForeignKey("items.id"))
+    partner_id = Column(Integer, ForeignKey("partners.id"))
+    
+    # Relationships
+    item = relationship("Item", back_populates="partners")
+    partner = relationship("Partner", back_populates="items")
+```
+
+### 6. Additional Models (Delivery, Activity, DailyReport)
+
+```python
+# models/delivery.py
+from sqlalchemy import Column, String, Text, Date, ForeignKey, Enum, Integer
+from sqlalchemy.orm import relationship
+from .base import BaseModel
+import enum
+
+class DeliveryStatus(enum.Enum):
+    SCHEDULED = "scheduled"
+    IN_TRANSIT = "in_transit"
+    DELIVERED = "delivered"
+    DELAYED = "delayed"
+    CANCELLED = "cancelled"
+
+class Delivery(BaseModel):
+    __tablename__ = "deliveries"
+    
+    reference = Column(String(100), unique=True, index=True)
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    supplier_id = Column(Integer, ForeignKey("partners.id"))
+    expected_date = Column(Date)
+    actual_date = Column(Date)
+    status = Column(Enum(DeliveryStatus), default=DeliveryStatus.SCHEDULED)
+    location = Column(String(255))
+    contact_person = Column(String(100))
+    contact_phone = Column(String(20))
+    notes = Column(Text)
+    
+    # Relationships
+    project = relationship("Project", back_populates="deliveries")
+    supplier = relationship("Partner")
+    items = relationship("DeliveryItem", back_populates="delivery")
+
+class DeliveryItem(BaseModel):
+    __tablename__ = "delivery_items"
+    
+    delivery_id = Column(Integer, ForeignKey("deliveries.id"))
+    item_id = Column(Integer, ForeignKey("items.id"))
+    quantity = Column(Integer)
+    
+    # Relationships
+    delivery = relationship("Delivery", back_populates="items")
+    item = relationship("Item", back_populates="delivery_items")
+```
+
+## Authentication System
+
+### 1. Authentication Service
+
+```python
+# services/auth_service.py
+import streamlit as st
+from sqlalchemy.orm import Session
+from models.user import User
+from config.database import get_db
+
+class AuthService:
+    @staticmethod
+    def login(username: str, password: str) -> bool:
+        """Authenticate user login"""
+        db = next(get_db())
+        user = db.query(User).filter(User.username == username).first()
+        
+        if user and user.check_password(password) and user.is_active:
+            st.session_state.authenticated = True
+            st.session_state.user = {
+                'id': user.id,
+                'username': user.username,
+                'full_name': user.full_name,
+                'email': user.email,
+                'role': user.role
+            }
+            return True
+        return False
+    
+    @staticmethod
+    def logout():
+        """Logout user"""
+        for key in ['authenticated', 'user']:
+            if key in st.session_state:
+                del st.session_state[key]
+    
+    @staticmethod
+    def is_authenticated() -> bool:
+        """Check if user is authenticated"""
+        return st.session_state.get('authenticated', False)
+    
+    @staticmethod
+    def get_current_user():
+        """Get current user from session"""
+        return st.session_state.get('user', None)
+    
+    @staticmethod
+    def register_user(username: str, email: str, full_name: str, password: str) -> bool:
+        """Register new user"""
+        db = next(get_db())
+        
+        # Check if user already exists
+        existing_user = db.query(User).filter(
+            (User.username == username) | (User.email == email)
+        ).first()
+        
+        if existing_user:
+            return False
+        
+        # Create new user
+        user = User(
+            username=username,
+            email=email,
+            full_name=full_name
+        )
+        user.set_password(password)
+        
+        db.add(user)
+        db.commit()
+        return True
+```
+
+### 2. Authentication Component
+
+```python
+# utils/auth_component.py
+import streamlit as st
+from services.auth_service import AuthService
+
+def login_form():
+    """Display login form"""
+    st.subheader("Login to gcDeliver")
+    
+    with st.form("login_form"):
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        submit_button = st.form_submit_button("Login")
+        
+        if submit_button:
+            if AuthService.login(username, password):
+                st.success("Login successful!")
+                st.rerun()
+            else:
+                st.error("Invalid username or password")
+
+def register_form():
+    """Display registration form"""
+    st.subheader("Register New Account")
+    
+    with st.form("register_form"):
+        username = st.text_input("Username")
+        email = st.text_input("Email")
+        full_name = st.text_input("Full Name")
+        password = st.text_input("Password", type="password")
+        confirm_password = st.text_input("Confirm Password", type="password")
+        submit_button = st.form_submit_button("Register")
+        
+        if submit_button:
+            if password != confirm_password:
+                st.error("Passwords do not match")
+            elif AuthService.register_user(username, email, full_name, password):
+                st.success("Registration successful! Please login.")
+            else:
+                st.error("Username or email already exists")
+
+def require_auth(func):
+    """Decorator to require authentication"""
+    def wrapper(*args, **kwargs):
+        if not AuthService.is_authenticated():
+            st.warning("Please login to access this page")
+            login_form()
+            return None
+        return func(*args, **kwargs)
+    return wrapper
+```
+
+## Dashboard Implementation
+
+### 1. Dashboard Service
+
+```python
+# services/dashboard_service.py
+from sqlalchemy.orm import Session
+from sqlalchemy import func
+from models.project import Project, ProjectStatus
+from models.delivery import Delivery, DeliveryStatus
+from models.item import Item, ItemStatus
+from models.partner import Partner
+from config.database import get_db
+from datetime import datetime, timedelta
+
+class DashboardService:
+    @staticmethod
+    def get_dashboard_stats():
+        """Get dashboard statistics"""
+        db = next(get_db())
+        
+        # Project statistics
+        total_projects = db.query(Project).count()
+        active_projects = db.query(Project).filter(
+            Project.status == ProjectStatus.IN_PROGRESS
+        ).count()
+        
+        # Delivery statistics
+        today = datetime.now().date()
+        today_deliveries = db.query(Delivery).filter(
+            Delivery.expected_date == today
+        ).count()
+        
+        # Item statistics
+        pending_items = db.query(Item).filter(
+            Item.status == ItemStatus.PENDING
+        ).count()
+        
+        # Partner statistics
+        total_partners = db.query(Partner).count()
+        
+        return {
+            'total_projects': total_projects,
+            'active_projects': active_projects,
+            'today_deliveries': today_deliveries,
+            'pending_items': pending_items,
+            'total_partners': total_partners
+        }
+    
+    @staticmethod
+    def get_project_progress_data():
+        """Get project progress data for charts"""
+        db = next(get_db())
+        
+        projects = db.query(Project).filter(
+            Project.status.in_([ProjectStatus.IN_PROGRESS, ProjectStatus.PLANNING])
+        ).all()
+        
+        return [
+            {
+                'name': project.name,
+                'progress': float(project.progress or 0),
+                'status': project.status.value
+            }
+            for project in projects
+        ]
+    
+    @staticmethod
+    def get_delivery_timeline():
+        """Get upcoming deliveries timeline"""
+        db = next(get_db())
+        
+        upcoming_deliveries = db.query(Delivery).filter(
+            Delivery.expected_date >= datetime.now().date(),
+            Delivery.status == DeliveryStatus.SCHEDULED
+        ).order_by(Delivery.expected_date).limit(10).all()
+        
+        return [
+            {
+                'reference': delivery.reference,
+                'project': delivery.project.name,
+                'date': delivery.expected_date,
+                'supplier': delivery.supplier.name if delivery.supplier else 'Unknown'
+            }
+            for delivery in upcoming_deliveries
+        ]
+```
+
+### 2. Dashboard Page
+
+```python
+# pages/dashboard.py
+import streamlit as st
+import plotly.express as px
+import plotly.graph_objects as go
+from services.dashboard_service import DashboardService
+from utils.auth_component import require_auth
+
+@require_auth
+def show_dashboard():
+    """Display dashboard page"""
+    st.title("🏗️ gcDeliver Dashboard")
+    
+    # Get dashboard data
+    stats = DashboardService.get_dashboard_stats()
+    project_progress = DashboardService.get_project_progress_data()
+    upcoming_deliveries = DashboardService.get_delivery_timeline()
+    
+    # Key Metrics Row
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric(
+            label="Total Projects",
+            value=stats['total_projects'],
+            delta=f"{stats['active_projects']} active"
+        )
+    
+    with col2:
+        st.metric(
+            label="Today's Deliveries",
+            value=stats['today_deliveries']
+        )
+    
+    with col3:
+        st.metric(
+            label="Pending Items",
+            value=stats['pending_items']
+        )
+    
+    with col4:
+        st.metric(
+            label="Total Partners",
+            value=stats['total_partners']
+        )
+    
+    # Charts Row
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("Project Progress")
+        if project_progress:
+            fig = px.bar(
+                project_progress,
+                x='name',
+                y='progress',
+                color='status',
+                title="Project Progress Overview"
+            )
+            fig.update_layout(height=400)
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("No active projects to display")
+    
+    with col2:
+        st.subheader("Project Status Distribution")
+        if project_progress:
+            status_counts = {}
+            for project in project_progress:
+                status = project['status']
+                status_counts[status] = status_counts.get(status, 0) + 1
+            
+            fig = px.pie(
+                values=list(status_counts.values()),
+                names=list(status_counts.keys()),
+                title="Projects by Status"
+            )
+            fig.update_layout(height=400)
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("No project data to display")
+    
+    # Upcoming Deliveries
+    st.subheader("📦 Upcoming Deliveries")
+    if upcoming_deliveries:
+        import pandas as pd
+        df = pd.DataFrame(upcoming_deliveries)
+        st.dataframe(df, use_container_width=True)
+    else:
+        st.info("No upcoming deliveries scheduled")
+    
+    # Recent Activity
+    st.subheader("📋 Recent Activity")
+    # This could be implemented with an activity log table
+    st.info("Activity tracking feature coming soon")
+```
+
+## Project Management Module
+
+### 1. Project Service
+
+```python
+# services/project_service.py
+from sqlalchemy.orm import Session
+from sqlalchemy import desc
+from models.project import Project, ProjectStatus
+from config.database import get_db
+from typing import List, Optional
+import pandas as pd
+
+class ProjectService:
+    @staticmethod
+    def get_all_projects() -> List[Project]:
+        """Get all projects"""
+        db = next(get_db())
+        return db.query(Project).order_by(desc(Project.created_at)).all()
+    
+    @staticmethod
+    def get_project_by_id(project_id: int) -> Optional[Project]:
+        """Get project by ID"""
+        db = next(get_db())
+        return db.query(Project).filter(Project.id == project_id).first()
+    
+    @staticmethod
+    def create_project(project_data: dict) -> Project:
+        """Create new project"""
+        db = next(get_db())
+        
+        project = Project(**project_data)
+        db.add(project)
+        db.commit()
+        db.refresh(project)
+        
+        return project
+    
+    @staticmethod
+    def update_project(project_id: int, project_data: dict) -> Optional[Project]:
+        """Update existing project"""
+        db = next(get_db())
+        
+        project = db.query(Project).filter(Project.id == project_id).first()
+        if not project:
+            return None
+        
+        for key, value in project_data.items():
+            if hasattr(project, key):
+                setattr(project, key, value)
+        
+        db.commit()
+        db.refresh(project)
+        
+        return project
+    
+    @staticmethod
+    def delete_project(project_id: int) -> bool:
+        """Delete project"""
+        db = next(get_db())
+        
+        project = db.query(Project).filter(Project.id == project_id).first()
+        if not project:
+            return False
+        
+        db.delete(project)
+        db.commit()
+        
+        return True
+    
+    @staticmethod
+    def get_projects_dataframe() -> pd.DataFrame:
+        """Get projects as pandas DataFrame"""
+        projects = ProjectService.get_all_projects()
+        
+        data = []
+        for project in projects:
+            data.append({
+                'ID': project.id,
+                'Name': project.name,
+                'Status': project.status.value,
+                'Start Date': project.start_date,
+                'End Date': project.end_date,
+                'Budget': project.budget,
+                'Progress': project.progress,
+                'Client': project.client_name,
+                'Manager': project.project_manager
+            })
+        
+        return pd.DataFrame(data)
+```
+
+### 2. Projects Page
+
+```python
+# pages/projects.py
+import streamlit as st
+import pandas as pd
+from datetime import date
+from services.project_service import ProjectService
+from models.project import ProjectStatus
+from utils.auth_component import require_auth
+
+@require_auth
+def show_projects():
+    """Display projects management page"""
+    st.title("🏗️ Project Management")
+    
+    # Action buttons
+    col1, col2, col3 = st.columns([2, 1, 1])
+    with col1:
+        st.subheader("All Projects")
+    with col2:
+        if st.button("➕ New Project"):
+            st.session_state.show_new_project_form = True
+    with col3:
+        view_mode = st.selectbox("View", ["Cards", "Table"])
+    
+    # New Project Form
+    if st.session_state.get('show_new_project_form', False):
+        show_new_project_form()
+    
+    # Projects Display
+    projects = ProjectService.get_all_projects()
+    
+    if not projects:
+        st.info("No projects found. Create your first project to get started!")
+        return
+    
+    # Filters
+    with st.expander("🔍 Filters"):
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            status_filter = st.multiselect(
+                "Status",
+                options=[status.value for status in ProjectStatus],
+                default=[status.value for status in ProjectStatus]
+            )
+        
+        with col2:
+            # Date range filter could be added here
+            pass
+        
+        with col3:
+            # Manager filter could be added here
+            pass
+    
+    # Filter projects
+    filtered_projects = [
+        p for p in projects 
+        if p.status.value in status_filter
+    ]
+    
+    # Display projects
+    if view_mode == "Cards":
+        show_projects_cards(filtered_projects)
+    else:
+        show_projects_table(filtered_projects)
+
+def show_new_project_form():
+    """Show new project creation form"""
+    st.subheader("Create New Project")
+    
+    with st.form("new_project_form"):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            name = st.text_input("Project Name*", key="project_name")
+            client_name = st.text_input("Client Name", key="client_name")
+            start_date = st.date_input("Start Date", key="start_date")
+            budget = st.number_input("Budget ($)", min_value=0, key="budget")
+        
+        with col2:
+            location = st.text_input("Location", key="location")
+            project_manager = st.text_input("Project Manager", key="manager")
+            end_date = st.date_input("End Date", key="end_date")
+            status = st.selectbox("Status", [s.value for s in ProjectStatus], key="status")
+        
+        description = st.text_area("Description", key="description")
+        
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            submit = st.form_submit_button("Create Project", type="primary")
+        with col2:
+            cancel = st.form_submit_button("Cancel")
+        
+        if submit:
+            if not name:
+                st.error("Project name is required")
+                return
+            
+            project_data = {
+                'name': name,
+                'description': description,
+                'status': ProjectStatus(status),
+                'start_date': start_date,
+                'end_date': end_date,
+                'budget': budget,
+                'location': location,
+                'client_name': client_name,
+                'project_manager': project_manager
+            }
+            
+            try:
+                project = ProjectService.create_project(project_data)
+                st.success(f"Project '{project.name}' created successfully!")
+                st.session_state.show_new_project_form = False
+                st.rerun()
+            except Exception as e:
+                st.error(f"Error creating project: {str(e)}")
+        
+        if cancel:
+            st.session_state.show_new_project_form = False
+            st.rerun()
+
+def show_projects_cards(projects):
+    """Display projects as cards"""
+    for i in range(0, len(projects), 3):
+        cols = st.columns(3)
+        for j, col in enumerate(cols):
+            if i + j < len(projects):
+                project = projects[i + j]
+                with col:
+                    with st.container():
+                        st.subheader(project.name)
+                        st.write(f"**Status:** {project.status.value.title()}")
+                        st.write(f"**Client:** {project.client_name or 'N/A'}")
+                        st.write(f"**Manager:** {project.project_manager or 'N/A'}")
+                        
+                        if project.progress:
+                            st.progress(float(project.progress) / 100)
+                            st.write(f"Progress: {project.progress}%")
+                        
+                        if project.budget:
+                            st.write(f"**Budget:** ${project.budget:,.2f}")
+                        
+                        if st.button(f"View Details", key=f"view_{project.id}"):
+                            show_project_details(project)
+
+def show_projects_table(projects):
+    """Display projects as table"""
+    df = ProjectService.get_projects_dataframe()
+    if not df.empty:
+        st.dataframe(df, use_container_width=True)
+    else:
+        st.info("No projects to display")
+
+def show_project_details(project):
+    """Show detailed project information"""
+    st.subheader(f"Project Details: {project.name}")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.write(f"**ID:** {project.id}")
+        st.write(f"**Status:** {project.status.value.title()}")
+        st.write(f"**Client:** {project.client_name or 'N/A'}")
+        st.write(f"**Manager:** {project.project_manager or 'N/A'}")
+        st.write(f"**Location:** {project.location or 'N/A'}")
+    
+    with col2:
+        st.write(f"**Start Date:** {project.start_date or 'N/A'}")
+        st.write(f"**End Date:** {project.end_date or 'N/A'}")
+        st.write(f"**Budget:** ${project.budget:,.2f}" if project.budget else "Budget: N/A")
+        st.write(f"**Progress:** {project.progress}%" if project.progress else "Progress: 0%")
+    
+    if project.description:
+        st.write(f"**Description:** {project.description}")
+    
+    # Action buttons
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("Edit Project"):
+            # Implement edit functionality
+            pass
+    with col2:
+        if st.button("View Activities"):
+            # Navigate to schedule page filtered by this project
+            pass
+    with col3:
+        if st.button("View Reports"):
+            # Navigate to reports page filtered by this project
+            pass
+```
+
+## Deployment Configuration
+
+### 1. Environment Configuration
+
+```python
+# .env (example)
+DATABASE_URL=postgresql://username:password@localhost:5432/gcdeliver
+SECRET_KEY=your-secret-key-here
+DEBUG=False
+```
+
+### 2. Streamlit Configuration
+
+```toml
+# .streamlit/config.toml
+[global]
+dataFrameSerialization = "legacy"
+
+[server]
+enableCORS = false
+enableXsrfProtection = false
+
+[theme]
+primaryColor = "#FF6B6B"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F0F2F6"
+textColor = "#262730"
+```
+
+### 3. Main Application File
+
+```python
+# app.py
+import streamlit as st
+from streamlit_option_menu import option_menu
+from config.database import init_database
+from services.auth_service import AuthService
+from utils.auth_component import login_form, register_form
+import pages.dashboard as dashboard
+import pages.projects as projects
+import pages.partners as partners
+import pages.items as items
+import pages.deliveries as deliveries
+import pages.schedule as schedule
+import pages.daily_reports as daily_reports
+import pages.settings as settings
+
+# Page configuration
+st.set_page_config(
+    page_title="gcDeliver",
+    page_icon="🏗️",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Initialize database
+init_database()
+
+# Custom CSS
+st.markdown("""
+<style>
+    .main-header {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+    .metric-card {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
+""", unsafe_allow_html=True)
+
+def main():
+    """Main application function"""
+    
+    # Check authentication
+    if not AuthService.is_authenticated():
+        st.title("🏗️ gcDeliver - Construction Project Management")
+        
+        tab1, tab2 = st.tabs(["Login", "Register"])
+        
+        with tab1:
+            login_form()
+        
+        with tab2:
+            register_form()
+        
+        return
+    
+    # Authenticated user interface
+    user = AuthService.get_current_user()
+    
+    # Sidebar with navigation
+    with st.sidebar:
+        st.write(f"Welcome, {user['full_name']}!")
+        
+        selected = option_menu(
+            menu_title="gcDeliver",
+            options=[
+                "Dashboard",
+                "Projects", 
+                "Partners",
+                "Items",
+                "Deliveries",
+                "Schedule",
+                "Daily Reports",
+                "Settings"
+            ],
+            icons=[
+                "house",
+                "building",
+                "people",
+                "box",
+                "truck",
+                "calendar",
+                "clipboard",
+                "gear"
+            ],
+            menu_icon="tools",
+            default_index=0,
+        )
+        
+        st.markdown("---")
+        if st.button("Logout"):
+            AuthService.logout()
+            st.rerun()
+    
+    # Page routing
+    if selected == "Dashboard":
+        dashboard.show_dashboard()
+    elif selected == "Projects":
+        projects.show_projects()
+    elif selected == "Partners":
+        partners.show_partners()
+    elif selected == "Items":
+        items.show_items()
+    elif selected == "Deliveries":
+        deliveries.show_deliveries()
+    elif selected == "Schedule":
+        schedule.show_schedule()
+    elif selected == "Daily Reports":
+        daily_reports.show_daily_reports()
+    elif selected == "Settings":
+        settings.show_settings()
+
+if __name__ == "__main__":
+    main()
+```
+
+## Implementation Instructions
+
+### 1. Setup Steps
+
+1. **Environment Setup:**
+   ```bash
+   python -m venv gcdeliver_env
+   source gcdeliver_env/bin/activate  # Linux/Mac
+   # or
+   gcdeliver_env\Scripts\activate  # Windows
+   ```
+
+2. **Install Dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Database Setup:**
+   - Set up PostgreSQL database
+   - Update DATABASE_URL in .env file
+   - Run the application to auto-create tables
+
+4. **Run Application:**
+   ```bash
+   streamlit run app.py
+   ```
+
+### 2. Development Guidelines
+
+1. **Follow the service pattern** - Keep business logic in service classes
+2. **Use proper error handling** - Wrap database operations in try-catch blocks
+3. **Implement proper validation** - Validate user inputs before processing
+4. **Add logging** - Use Python logging for debugging and monitoring
+5. **Write tests** - Create unit tests for service methods
+6. **Use environment variables** - Never hardcode sensitive information
+
+### 3. Customization Options
+
+1. **Styling** - Modify the CSS in the main app file
+2. **Authentication** - Extend the auth system for role-based access
+3. **Reporting** - Add export functionality using pandas and openpyxl
+4. **File uploads** - Integrate file upload for documents and images
+5. **Notifications** - Add email/SMS notifications for important events
+
+This comprehensive guide provides the foundation for building a complete construction project management system using Streamlit and Python. Each module can be extended with additional features as needed.

@@ -69,8 +69,8 @@ def apply_styling():
     /* === ENTERPRISE SIDEBAR === */
     
     .css-1d391kg {
-        background: linear-gradient(180deg, #0f172a 0%, #020617 100%) !important;
-        border-right: 2px solid #1e293b !important;
+        background: linear-gradient(180deg, #374151 0%, #1f2937 100%) !important;
+        border-right: 2px solid #4b5563 !important;
         box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25) !important;
         padding: 0 !important;
         width: 280px !important;

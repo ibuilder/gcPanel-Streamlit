@@ -223,7 +223,7 @@ def render_create_report_form():
         work_summary = st.text_area("Work Summary", height=100)
         challenges = st.text_area("Challenges Encountered", height=80)
         next_day_plan = st.text_area("Next Day Plan", height=80)
-        notes = st.text_area("Additional Notes", height=60)
+        notes = st.text_area("Additional Notes", height=68)
         
         # Submit button
         if st.form_submit_button("📋 Create Report", use_container_width=True):

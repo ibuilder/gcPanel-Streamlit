@@ -1395,10 +1395,10 @@ def render_daily_reports():
             st.markdown("**📦 Additional Information**")
             col3, col4 = st.columns(2)
             with col3:
-                inspections = st.text_area("Inspections Completed", height=60,
+                inspections = st.text_area("Inspections Completed", height=68,
                     placeholder="List any inspections completed today...")
             with col4:
-                materials_delivered = st.text_area("Materials Delivered", height=60,
+                materials_delivered = st.text_area("Materials Delivered", height=68,
                     placeholder="List materials and quantities delivered...")
             
             submitted = st.form_submit_button("💾 Save Daily Report", type="primary", use_container_width=True)

@@ -7015,14 +7015,638 @@ def render_scheduling():
                 st.rerun()
 
 def render_quality_control():
-    """Quality control module"""
+    """Complete Quality Control with full CRUD functionality"""
     st.markdown("""
     <div class="module-header">
         <h1>🔍 Quality Control</h1>
-        <p>Inspection management and quality assurance</p>
+        <p>Comprehensive inspection management, quality assurance, and compliance tracking</p>
     </div>
     """, unsafe_allow_html=True)
-    st.info("🔍 Quality Control module with inspection workflows")
+    
+    # Initialize quality control data
+    if "qc_inspections" not in st.session_state:
+        st.session_state.qc_inspections = [
+            {
+                "id": "QC-001",
+                "inspection_id": "HTD-QC-2025-045",
+                "inspection_type": "Structural Steel",
+                "location": "Level 13 - Grid Lines C-F",
+                "status": "In Progress",
+                "inspector": "John Davis, P.E.",
+                "inspection_date": "2025-05-27",
+                "scheduled_date": "2025-05-27",
+                "trade": "Structural",
+                "description": "Structural steel connection inspection for beam-to-column connections",
+                "pass_criteria": "All connections meet AWS D1.1 standards, proper bolt torque, alignment within tolerance",
+                "findings": "Minor alignment issue at Grid C3 requires adjustment before final approval",
+                "recommendations": "Adjust alignment at Grid C3 and re-inspect",
+                "photos_required": True,
+                "follow_up_required": True,
+                "follow_up_date": "2025-05-29",
+                "severity": "Minor",
+                "corrective_actions": ["Realign connection at Grid C3", "Verify torque values"],
+                "responsible_contractor": "Steel Solutions Inc"
+            },
+            {
+                "id": "QC-002",
+                "inspection_id": "HTD-QC-2025-044",
+                "inspection_type": "MEP Rough-in",
+                "location": "Level 11 - Electrical Rooms",
+                "status": "Passed",
+                "inspector": "Maria Garcia, P.E.",
+                "inspection_date": "2025-05-25",
+                "scheduled_date": "2025-05-25",
+                "trade": "Electrical",
+                "description": "Electrical rough-in inspection for conduit installation and panel connections",
+                "pass_criteria": "Conduit properly secured, panels correctly labeled, grounding verified",
+                "findings": "All electrical work meets NEC standards and project specifications",
+                "recommendations": "Continue with installation as planned",
+                "photos_required": True,
+                "follow_up_required": False,
+                "follow_up_date": "",
+                "severity": "None",
+                "corrective_actions": [],
+                "responsible_contractor": "Elite MEP Systems"
+            },
+            {
+                "id": "QC-003",
+                "inspection_id": "HTD-QC-2025-043",
+                "inspection_type": "Concrete Pour",
+                "location": "Level 12 - East Wing Slab",
+                "status": "Failed",
+                "inspector": "Robert Kim, ACI",
+                "inspection_date": "2025-05-23",
+                "scheduled_date": "2025-05-23",
+                "trade": "Concrete",
+                "description": "Post-pour concrete inspection for Level 12 slab",
+                "pass_criteria": "Surface finish within tolerance, no significant cracking, proper curing",
+                "findings": "Surface irregularities exceed tolerance in Zone C, minor honeycomb in one location",
+                "recommendations": "Repair surface irregularities and honeycomb areas before proceeding",
+                "photos_required": True,
+                "follow_up_required": True,
+                "follow_up_date": "2025-05-30",
+                "severity": "Major",
+                "corrective_actions": ["Grind surface irregularities", "Patch honeycomb areas", "Re-inspect"],
+                "responsible_contractor": "Highland Construction LLC"
+            }
+        ]
+    
+    if "qc_checklists" not in st.session_state:
+        st.session_state.qc_checklists = [
+            {
+                "id": "CHK-001",
+                "checklist_name": "Structural Steel Connection Checklist",
+                "trade": "Structural",
+                "checklist_items": [
+                    {"item": "Beam alignment verified", "status": "Pass", "notes": "Within 1/4 inch tolerance"},
+                    {"item": "Bolt grade verified", "status": "Pass", "notes": "A325 bolts confirmed"},
+                    {"item": "Bolt torque applied", "status": "Pending", "notes": "Awaiting final torque"},
+                    {"item": "Connection welding complete", "status": "Pass", "notes": "All welds inspected"}
+                ],
+                "created_date": "2025-05-20",
+                "last_updated": "2025-05-27",
+                "inspector": "John Davis, P.E.",
+                "overall_status": "In Progress",
+                "completion_percentage": 75
+            },
+            {
+                "id": "CHK-002",
+                "checklist_name": "MEP Rough-in Quality Checklist",
+                "trade": "MEP",
+                "checklist_items": [
+                    {"item": "Conduit properly secured", "status": "Pass", "notes": "All supports in place"},
+                    {"item": "Panel labeling complete", "status": "Pass", "notes": "Clear labeling verified"},
+                    {"item": "Grounding connections verified", "status": "Pass", "notes": "Continuity tested"},
+                    {"item": "Fire stopping complete", "status": "Pass", "notes": "All penetrations sealed"}
+                ],
+                "created_date": "2025-05-18",
+                "last_updated": "2025-05-25",
+                "inspector": "Maria Garcia, P.E.",
+                "overall_status": "Complete",
+                "completion_percentage": 100
+            }
+        ]
+    
+    if "qc_defects" not in st.session_state:
+        st.session_state.qc_defects = [
+            {
+                "id": "DEF-001",
+                "defect_id": "HTD-DEF-001",
+                "title": "Surface irregularities in concrete slab",
+                "description": "Concrete surface finish exceeds flatness tolerance in multiple areas",
+                "location": "Level 12 - East Wing",
+                "trade": "Concrete",
+                "severity": "Major",
+                "status": "Open",
+                "identified_date": "2025-05-23",
+                "identified_by": "Robert Kim, ACI",
+                "assigned_to": "Highland Construction LLC",
+                "target_resolution": "2025-05-30",
+                "actual_resolution": "",
+                "cost_impact": 15000.00,
+                "schedule_impact": 3,
+                "corrective_actions": ["Grind high spots", "Apply self-leveling compound", "Re-inspect surface"],
+                "root_cause": "Inadequate screeding during pour",
+                "prevention_measures": "Enhanced screed board setup and additional training"
+            },
+            {
+                "id": "DEF-002",
+                "defect_id": "HTD-DEF-002",
+                "title": "Steel beam alignment issue",
+                "description": "Beam alignment at Grid C3 exceeds tolerance by 3/8 inch",
+                "location": "Level 13 - Grid C3",
+                "trade": "Structural",
+                "severity": "Minor",
+                "status": "In Progress", 
+                "identified_date": "2025-05-27",
+                "identified_by": "John Davis, P.E.",
+                "assigned_to": "Steel Solutions Inc",
+                "target_resolution": "2025-05-29",
+                "actual_resolution": "",
+                "cost_impact": 2500.00,
+                "schedule_impact": 1,
+                "corrective_actions": ["Loosen connections", "Realign beam", "Re-torque bolts"],
+                "root_cause": "Survey error during initial placement",
+                "prevention_measures": "Enhanced survey verification process"
+            }
+        ]
+    
+    # Key Quality Control Metrics
+    col1, col2, col3, col4 = st.columns(4)
+    
+    total_inspections = len(st.session_state.qc_inspections)
+    passed_inspections = len([insp for insp in st.session_state.qc_inspections if insp['status'] == 'Passed'])
+    open_defects = len([def_item for def_item in st.session_state.qc_defects if def_item['status'] == 'Open'])
+    quality_score = (passed_inspections / total_inspections * 100) if total_inspections > 0 else 0
+    
+    with col1:
+        st.metric("Total Inspections", total_inspections, delta_color="normal")
+    with col2:
+        st.metric("Passed", passed_inspections, delta_color="normal")
+    with col3:
+        st.metric("Open Defects", open_defects, delta_color="normal")
+    with col4:
+        st.metric("Quality Score", f"{quality_score:.1f}%", delta_color="normal")
+    
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["🔍 Inspections", "📋 Checklists", "⚠️ Defects", "📈 Analytics", "🔧 Management"])
+    
+    with tab1:
+        st.subheader("🔍 Quality Inspections")
+        
+        insp_sub_tab1, insp_sub_tab2 = st.tabs(["📝 Schedule Inspection", "📊 View Inspections"])
+        
+        with insp_sub_tab1:
+            st.markdown("**Schedule New Quality Inspection**")
+            
+            with st.form("inspection_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    inspection_type = st.selectbox("Inspection Type", [
+                        "Structural Steel", "Concrete Pour", "MEP Rough-in", "Electrical", "Plumbing", 
+                        "HVAC", "Fire Protection", "Architectural", "Site Work"
+                    ])
+                    location = st.text_input("Location", placeholder="Building level, area, grid lines")
+                    trade = st.selectbox("Trade", ["Structural", "Concrete", "Electrical", "Plumbing", "HVAC", "Architectural", "Site Work"])
+                    inspector = st.text_input("Inspector", placeholder="Inspector name and credentials")
+                    scheduled_date = st.date_input("Scheduled Date", value=datetime.now().date())
+                
+                with col2:
+                    responsible_contractor = st.text_input("Responsible Contractor", placeholder="Contractor performing work")
+                    photos_required = st.checkbox("Photos Required", value=True)
+                    description = st.text_area("Inspection Description", placeholder="Detailed description of inspection scope")
+                    pass_criteria = st.text_area("Pass Criteria", placeholder="Criteria that must be met for inspection to pass")
+                
+                if st.form_submit_button("🔍 Schedule Inspection", type="primary"):
+                    if inspection_type and location and inspector:
+                        new_inspection = {
+                            "id": f"QC-{len(st.session_state.qc_inspections) + 1:03d}",
+                            "inspection_id": f"HTD-QC-2025-{len(st.session_state.qc_inspections) + 46:03d}",
+                            "inspection_type": inspection_type,
+                            "location": location,
+                            "status": "Scheduled",
+                            "inspector": inspector,
+                            "inspection_date": "",
+                            "scheduled_date": str(scheduled_date),
+                            "trade": trade,
+                            "description": description,
+                            "pass_criteria": pass_criteria,
+                            "findings": "",
+                            "recommendations": "",
+                            "photos_required": photos_required,
+                            "follow_up_required": False,
+                            "follow_up_date": "",
+                            "severity": "None",
+                            "corrective_actions": [],
+                            "responsible_contractor": responsible_contractor
+                        }
+                        st.session_state.qc_inspections.append(new_inspection)
+                        st.success("✅ Inspection scheduled successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields!")
+        
+        with insp_sub_tab2:
+            st.markdown("**All Quality Inspections**")
+            
+            # Filters
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                status_filter = st.selectbox("Filter by Status", ["All", "Scheduled", "In Progress", "Passed", "Failed", "Cancelled"])
+            with col2:
+                trade_filter = st.selectbox("Filter by Trade", ["All"] + list(set(insp['trade'] for insp in st.session_state.qc_inspections)))
+            with col3:
+                inspector_filter = st.selectbox("Filter by Inspector", ["All"] + list(set(insp['inspector'] for insp in st.session_state.qc_inspections)))
+            
+            # Display inspections
+            filtered_inspections = st.session_state.qc_inspections
+            if status_filter != "All":
+                filtered_inspections = [insp for insp in filtered_inspections if insp['status'] == status_filter]
+            if trade_filter != "All":
+                filtered_inspections = [insp for insp in filtered_inspections if insp['trade'] == trade_filter]
+            if inspector_filter != "All":
+                filtered_inspections = [insp for insp in filtered_inspections if insp['inspector'] == inspector_filter]
+            
+            for inspection in filtered_inspections:
+                status_icon = {"Scheduled": "📅", "In Progress": "🔄", "Passed": "✅", "Failed": "❌", "Cancelled": "⏹️"}.get(inspection['status'], "📋")
+                
+                with st.expander(f"{status_icon} {inspection['inspection_id']} - {inspection['inspection_type']} ({inspection['status']})"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**🔍 Type:** {inspection['inspection_type']}")
+                        st.write(f"**📍 Location:** {inspection['location']}")
+                        st.write(f"**🔧 Trade:** {inspection['trade']}")
+                        st.write(f"**👤 Inspector:** {inspection['inspector']}")
+                        st.write(f"**📅 Scheduled:** {inspection['scheduled_date']}")
+                        if inspection['inspection_date']:
+                            st.write(f"**📅 Completed:** {inspection['inspection_date']}")
+                        st.write(f"**📊 Status:** {inspection['status']}")
+                    
+                    with col2:
+                        st.write(f"**🏢 Contractor:** {inspection['responsible_contractor']}")
+                        st.write(f"**📸 Photos Required:** {'Yes' if inspection['photos_required'] else 'No'}")
+                        if inspection['follow_up_required']:
+                            st.write(f"**🔄 Follow-up Date:** {inspection['follow_up_date']}")
+                        if inspection['severity'] != "None":
+                            st.write(f"**⚠️ Severity:** {inspection['severity']}")
+                    
+                    if inspection['description']:
+                        st.write(f"**📝 Description:** {inspection['description']}")
+                    if inspection['pass_criteria']:
+                        st.write(f"**✅ Pass Criteria:** {inspection['pass_criteria']}")
+                    if inspection['findings']:
+                        st.write(f"**🔍 Findings:** {inspection['findings']}")
+                    if inspection['recommendations']:
+                        st.write(f"**💡 Recommendations:** {inspection['recommendations']}")
+                    
+                    # Action buttons
+                    col1, col2, col3, col4 = st.columns(4)
+                    with col1:
+                        if inspection['status'] == 'Scheduled' and st.button(f"▶️ Start", key=f"start_insp_{inspection['id']}"):
+                            inspection['status'] = 'In Progress'
+                            inspection['inspection_date'] = str(datetime.now().date())
+                            st.success("Inspection started!")
+                            st.rerun()
+                    with col2:
+                        if inspection['status'] == 'In Progress' and st.button(f"✅ Pass", key=f"pass_{inspection['id']}"):
+                            inspection['status'] = 'Passed'
+                            st.success("Inspection passed!")
+                            st.rerun()
+                    with col3:
+                        if inspection['status'] == 'In Progress' and st.button(f"❌ Fail", key=f"fail_{inspection['id']}"):
+                            inspection['status'] = 'Failed'
+                            st.error("Inspection failed!")
+                            st.rerun()
+                    with col4:
+                        if st.button(f"🗑️ Delete", key=f"delete_insp_{inspection['id']}"):
+                            st.session_state.qc_inspections.remove(inspection)
+                            st.success("Inspection deleted!")
+                            st.rerun()
+    
+    with tab2:
+        st.subheader("📋 Quality Checklists")
+        
+        checklist_sub_tab1, checklist_sub_tab2 = st.tabs(["📝 Create Checklist", "📊 View Checklists"])
+        
+        with checklist_sub_tab1:
+            st.markdown("**Create New Quality Checklist**")
+            
+            with st.form("checklist_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    checklist_name = st.text_input("Checklist Name", placeholder="Descriptive checklist name")
+                    trade = st.selectbox("Trade", ["Structural", "Concrete", "Electrical", "Plumbing", "HVAC", "Architectural", "Site Work"])
+                    inspector = st.text_input("Inspector", placeholder="Inspector name")
+                
+                with col2:
+                    overall_status = st.selectbox("Status", ["Not Started", "In Progress", "Complete", "On Hold"])
+                
+                st.markdown("**Checklist Items**")
+                checklist_items = []
+                for i in range(5):  # Allow up to 5 items
+                    item_name = st.text_input(f"Item {i+1}", placeholder=f"Checklist item {i+1}", key=f"item_{i}")
+                    if item_name:
+                        item_status = st.selectbox(f"Status {i+1}", ["Pending", "Pass", "Fail", "N/A"], key=f"status_{i}")
+                        item_notes = st.text_input(f"Notes {i+1}", placeholder="Optional notes", key=f"notes_{i}")
+                        checklist_items.append({"item": item_name, "status": item_status, "notes": item_notes})
+                
+                if st.form_submit_button("📋 Create Checklist", type="primary"):
+                    if checklist_name and trade and checklist_items:
+                        completed_items = len([item for item in checklist_items if item['status'] in ['Pass', 'N/A']])
+                        completion_percentage = (completed_items / len(checklist_items) * 100) if checklist_items else 0
+                        
+                        new_checklist = {
+                            "id": f"CHK-{len(st.session_state.qc_checklists) + 1:03d}",
+                            "checklist_name": checklist_name,
+                            "trade": trade,
+                            "checklist_items": checklist_items,
+                            "created_date": str(datetime.now().date()),
+                            "last_updated": str(datetime.now().date()),
+                            "inspector": inspector,
+                            "overall_status": overall_status,
+                            "completion_percentage": completion_percentage
+                        }
+                        st.session_state.qc_checklists.append(new_checklist)
+                        st.success("✅ Checklist created successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in required fields and add at least one checklist item!")
+        
+        with checklist_sub_tab2:
+            st.markdown("**All Quality Checklists**")
+            
+            for checklist in st.session_state.qc_checklists:
+                status_icon = {"Not Started": "⏸️", "In Progress": "🔄", "Complete": "✅", "On Hold": "⏸️"}.get(checklist['overall_status'], "📋")
+                
+                with st.expander(f"{status_icon} {checklist['checklist_name']} - {checklist['trade']} ({checklist['completion_percentage']:.0f}%)"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📋 Checklist:** {checklist['checklist_name']}")
+                        st.write(f"**🔧 Trade:** {checklist['trade']}")
+                        st.write(f"**👤 Inspector:** {checklist['inspector']}")
+                        st.write(f"**📅 Created:** {checklist['created_date']}")
+                        st.write(f"**📅 Last Updated:** {checklist['last_updated']}")
+                        st.write(f"**📊 Status:** {checklist['overall_status']}")
+                    
+                    with col2:
+                        st.write(f"**📈 Completion:** {checklist['completion_percentage']:.0f}%")
+                        st.progress(checklist['completion_percentage'] / 100)
+                    
+                    # Checklist items
+                    st.write("**📝 Checklist Items:**")
+                    for i, item in enumerate(checklist['checklist_items']):
+                        item_icon = {"Pass": "✅", "Fail": "❌", "Pending": "⏳", "N/A": "➖"}.get(item['status'], "📋")
+                        st.write(f"{item_icon} {item['item']} - {item['status']}")
+                        if item['notes']:
+                            st.write(f"    📝 {item['notes']}")
+                    
+                    # Action buttons
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        if st.button(f"✅ Complete", key=f"complete_checklist_{checklist['id']}"):
+                            checklist['overall_status'] = 'Complete'
+                            checklist['last_updated'] = str(datetime.now().date())
+                            st.success("Checklist completed!")
+                            st.rerun()
+                    with col2:
+                        if st.button(f"✏️ Edit", key=f"edit_checklist_{checklist['id']}"):
+                            st.info("Edit functionality - would open edit form")
+                    with col3:
+                        if st.button(f"🗑️ Delete", key=f"delete_checklist_{checklist['id']}"):
+                            st.session_state.qc_checklists.remove(checklist)
+                            st.success("Checklist deleted!")
+                            st.rerun()
+    
+    with tab3:
+        st.subheader("⚠️ Quality Defects")
+        
+        defect_sub_tab1, defect_sub_tab2 = st.tabs(["📝 Report Defect", "📊 View Defects"])
+        
+        with defect_sub_tab1:
+            st.markdown("**Report New Quality Defect**")
+            
+            with st.form("defect_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    defect_title = st.text_input("Defect Title", placeholder="Brief description of defect")
+                    location = st.text_input("Location", placeholder="Specific location of defect")
+                    trade = st.selectbox("Trade", ["Structural", "Concrete", "Electrical", "Plumbing", "HVAC", "Architectural", "Site Work"])
+                    severity = st.selectbox("Severity", ["Minor", "Major", "Critical"])
+                    identified_by = st.text_input("Identified By", placeholder="Inspector or person reporting")
+                    assigned_to = st.text_input("Assigned To", placeholder="Contractor responsible for fix")
+                
+                with col2:
+                    target_resolution = st.date_input("Target Resolution", value=datetime.now().date() + timedelta(days=7))
+                    cost_impact = st.number_input("Cost Impact ($)", value=0.00, format="%.2f")
+                    schedule_impact = st.number_input("Schedule Impact (days)", value=0, format="%d")
+                    root_cause = st.text_input("Root Cause", placeholder="Why did this defect occur?")
+                    prevention_measures = st.text_input("Prevention Measures", placeholder="How to prevent recurrence")
+                
+                description = st.text_area("Detailed Description", placeholder="Detailed description of the defect")
+                corrective_actions = st.text_area("Corrective Actions", placeholder="Required actions to fix defect (comma-separated)")
+                
+                if st.form_submit_button("⚠️ Report Defect", type="primary"):
+                    if defect_title and description and location:
+                        new_defect = {
+                            "id": f"DEF-{len(st.session_state.qc_defects) + 1:03d}",
+                            "defect_id": f"HTD-DEF-{len(st.session_state.qc_defects) + 3:03d}",
+                            "title": defect_title,
+                            "description": description,
+                            "location": location,
+                            "trade": trade,
+                            "severity": severity,
+                            "status": "Open",
+                            "identified_date": str(datetime.now().date()),
+                            "identified_by": identified_by,
+                            "assigned_to": assigned_to,
+                            "target_resolution": str(target_resolution),
+                            "actual_resolution": "",
+                            "cost_impact": cost_impact,
+                            "schedule_impact": schedule_impact,
+                            "corrective_actions": [action.strip() for action in corrective_actions.split(',') if action.strip()],
+                            "root_cause": root_cause,
+                            "prevention_measures": prevention_measures
+                        }
+                        st.session_state.qc_defects.append(new_defect)
+                        st.success("✅ Defect reported successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields!")
+        
+        with defect_sub_tab2:
+            st.markdown("**All Quality Defects**")
+            
+            # Filters
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                defect_status_filter = st.selectbox("Filter by Status", ["All", "Open", "In Progress", "Resolved", "Closed"])
+            with col2:
+                severity_filter = st.selectbox("Filter by Severity", ["All", "Minor", "Major", "Critical"])
+            with col3:
+                defect_trade_filter = st.selectbox("Filter by Trade", ["All"] + list(set(defect['trade'] for defect in st.session_state.qc_defects)))
+            
+            # Display defects
+            filtered_defects = st.session_state.qc_defects
+            if defect_status_filter != "All":
+                filtered_defects = [defect for defect in filtered_defects if defect['status'] == defect_status_filter]
+            if severity_filter != "All":
+                filtered_defects = [defect for defect in filtered_defects if defect['severity'] == severity_filter]
+            if defect_trade_filter != "All":
+                filtered_defects = [defect for defect in filtered_defects if defect['trade'] == defect_trade_filter]
+            
+            for defect in filtered_defects:
+                severity_icon = {"Minor": "🟡", "Major": "🟠", "Critical": "🔴"}.get(defect['severity'], "⚪")
+                status_icon = {"Open": "🔓", "In Progress": "🔄", "Resolved": "✅", "Closed": "🔒"}.get(defect['status'], "📋")
+                
+                with st.expander(f"{severity_icon} {defect['defect_id']} - {defect['title']} ({defect['status']})"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**⚠️ Defect:** {defect['title']}")
+                        st.write(f"**📍 Location:** {defect['location']}")
+                        st.write(f"**🔧 Trade:** {defect['trade']}")
+                        st.write(f"**⚠️ Severity:** {defect['severity']}")
+                        st.write(f"**📊 Status:** {defect['status']}")
+                        st.write(f"**👤 Identified By:** {defect['identified_by']}")
+                        st.write(f"**👤 Assigned To:** {defect['assigned_to']}")
+                    
+                    with col2:
+                        st.write(f"**📅 Identified:** {defect['identified_date']}")
+                        st.write(f"**🎯 Target Resolution:** {defect['target_resolution']}")
+                        if defect['actual_resolution']:
+                            st.write(f"**✅ Resolved:** {defect['actual_resolution']}")
+                        st.write(f"**💰 Cost Impact:** ${defect['cost_impact']:,.2f}")
+                        st.write(f"**📅 Schedule Impact:** {defect['schedule_impact']} days")
+                    
+                    st.write(f"**📝 Description:** {defect['description']}")
+                    if defect['corrective_actions']:
+                        st.write(f"**🔧 Corrective Actions:** {', '.join(defect['corrective_actions'])}")
+                    if defect['root_cause']:
+                        st.write(f"**🎯 Root Cause:** {defect['root_cause']}")
+                    if defect['prevention_measures']:
+                        st.write(f"**🛡️ Prevention:** {defect['prevention_measures']}")
+                    
+                    # Action buttons
+                    col1, col2, col3, col4 = st.columns(4)
+                    with col1:
+                        if defect['status'] == 'Open' and st.button(f"🔄 In Progress", key=f"progress_def_{defect['id']}"):
+                            defect['status'] = 'In Progress'
+                            st.info("Defect in progress!")
+                            st.rerun()
+                    with col2:
+                        if defect['status'] in ['Open', 'In Progress'] and st.button(f"✅ Resolve", key=f"resolve_def_{defect['id']}"):
+                            defect['status'] = 'Resolved'
+                            defect['actual_resolution'] = str(datetime.now().date())
+                            st.success("Defect resolved!")
+                            st.rerun()
+                    with col3:
+                        if st.button(f"✏️ Edit", key=f"edit_def_{defect['id']}"):
+                            st.info("Edit functionality - would open edit form")
+                    with col4:
+                        if st.button(f"🗑️ Delete", key=f"delete_def_{defect['id']}"):
+                            st.session_state.qc_defects.remove(defect)
+                            st.success("Defect deleted!")
+                            st.rerun()
+    
+    with tab4:
+        st.subheader("📈 Quality Control Analytics")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Inspection status distribution
+            if st.session_state.qc_inspections:
+                insp_status_counts = {}
+                for insp in st.session_state.qc_inspections:
+                    status = insp['status']
+                    insp_status_counts[status] = insp_status_counts.get(status, 0) + 1
+                
+                insp_status_list = list(insp_status_counts.keys())
+                insp_count_list = list(insp_status_counts.values())
+                insp_status_df = pd.DataFrame({
+                    'Status': insp_status_list,
+                    'Count': insp_count_list
+                })
+                fig_insp_status = px.pie(insp_status_df, values='Count', names='Status', title="Inspection Status Distribution")
+                st.plotly_chart(fig_insp_status, use_container_width=True)
+        
+        with col2:
+            # Defect severity distribution
+            if st.session_state.qc_defects:
+                defect_severity_counts = {}
+                for defect in st.session_state.qc_defects:
+                    severity = defect['severity']
+                    defect_severity_counts[severity] = defect_severity_counts.get(severity, 0) + 1
+                
+                severity_list = list(defect_severity_counts.keys())
+                severity_count_list = list(defect_severity_counts.values())
+                severity_df = pd.DataFrame({
+                    'Severity': severity_list,
+                    'Count': severity_count_list
+                })
+                fig_severity = px.bar(severity_df, x='Severity', y='Count', title="Defect Severity Distribution")
+                st.plotly_chart(fig_severity, use_container_width=True)
+    
+    with tab5:
+        st.subheader("🔧 Quality Control Management")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown("**🔍 Inspection Summary**")
+            if st.session_state.qc_inspections:
+                insp_stats_data = pd.DataFrame([
+                    {"Metric": "Total Inspections", "Value": len(st.session_state.qc_inspections)},
+                    {"Metric": "Passed", "Value": len([i for i in st.session_state.qc_inspections if i['status'] == 'Passed'])},
+                    {"Metric": "Failed", "Value": len([i for i in st.session_state.qc_inspections if i['status'] == 'Failed'])},
+                    {"Metric": "In Progress", "Value": len([i for i in st.session_state.qc_inspections if i['status'] == 'In Progress'])},
+                ])
+                st.dataframe(insp_stats_data, use_container_width=True)
+        
+        with col2:
+            st.markdown("**📋 Checklist Summary**")
+            if st.session_state.qc_checklists:
+                checklist_stats_data = pd.DataFrame([
+                    {"Metric": "Total Checklists", "Value": len(st.session_state.qc_checklists)},
+                    {"Metric": "Complete", "Value": len([c for c in st.session_state.qc_checklists if c['overall_status'] == 'Complete'])},
+                    {"Metric": "In Progress", "Value": len([c for c in st.session_state.qc_checklists if c['overall_status'] == 'In Progress'])},
+                    {"Metric": "Avg Completion", "Value": f"{sum(c['completion_percentage'] for c in st.session_state.qc_checklists) / len(st.session_state.qc_checklists):.1f}%"},
+                ])
+                st.dataframe(checklist_stats_data, use_container_width=True)
+        
+        with col3:
+            st.markdown("**⚠️ Defect Summary**")
+            if st.session_state.qc_defects:
+                defect_stats_data = pd.DataFrame([
+                    {"Metric": "Total Defects", "Value": len(st.session_state.qc_defects)},
+                    {"Metric": "Open", "Value": len([d for d in st.session_state.qc_defects if d['status'] == 'Open'])},
+                    {"Metric": "Resolved", "Value": len([d for d in st.session_state.qc_defects if d['status'] == 'Resolved'])},
+                    {"Metric": "Total Cost Impact", "Value": f"${sum(d['cost_impact'] for d in st.session_state.qc_defects):,.2f}"},
+                ])
+                st.dataframe(defect_stats_data, use_container_width=True)
+        
+        # Data management
+        st.markdown("**⚠️ Data Management**")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("🗑️ Clear Inspections", type="secondary"):
+                st.session_state.qc_inspections = []
+                st.success("All inspections cleared!")
+                st.rerun()
+        with col2:
+            if st.button("🗑️ Clear Checklists", type="secondary"):
+                st.session_state.qc_checklists = []
+                st.success("All checklists cleared!")
+                st.rerun()
+        with col3:
+            if st.button("🗑️ Clear Defects", type="secondary"):
+                st.session_state.qc_defects = []
+                st.success("All defects cleared!")
+                st.rerun()
 
 def render_progress_photos():
     """Progress photos module"""

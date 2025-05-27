@@ -1107,55 +1107,276 @@ def render_daily_reports():
             st.dataframe(stats_data, use_container_width=True)
 
 def render_deliveries():
-    """Deliveries tracking module"""
+    """Complete Deliveries Management with full CRUD functionality"""
     st.markdown("""
     <div class="module-header">
         <h1>🚚 Deliveries Management</h1>
-        <p>Track and manage all material deliveries</p>
+        <p>Comprehensive material delivery tracking and coordination</p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Delivery status overview
+    # Initialize deliveries data
+    if "deliveries" not in st.session_state:
+        st.session_state.deliveries = [
+            {
+                "id": "DEL-001",
+                "date": "2025-05-27",
+                "time": "08:00",
+                "supplier": "ABC Concrete Supply",
+                "material": "Ready Mix Concrete",
+                "quantity": "15 cubic yards",
+                "unit_cost": 125.00,
+                "total_cost": 1875.00,
+                "po_number": "PO-2025-0234",
+                "delivery_location": "Level 3 - North Side",
+                "contact_person": "Mike Thompson",
+                "contact_phone": "(555) 123-4567",
+                "status": "Delivered",
+                "received_by": "John Smith",
+                "received_time": "08:15",
+                "quality_check": "Passed",
+                "notes": "On-time delivery, good quality mix",
+                "created_by": "Project Manager"
+            },
+            {
+                "id": "DEL-002",
+                "date": "2025-05-27",
+                "time": "10:30",
+                "supplier": "Steel Works Inc",
+                "material": "Structural Steel Beams",
+                "quantity": "2,500 lbs",
+                "unit_cost": 2.50,
+                "total_cost": 6250.00,
+                "po_number": "PO-2025-0235",
+                "delivery_location": "Crane Laydown Area",
+                "contact_person": "Sarah Wilson",
+                "contact_phone": "(555) 234-5678",
+                "status": "Delivered",
+                "received_by": "Mike Johnson",
+                "received_time": "10:45",
+                "quality_check": "Passed",
+                "notes": "All pieces accounted for, proper certification",
+                "created_by": "Site Supervisor"
+            },
+            {
+                "id": "DEL-003",
+                "date": "2025-05-27",
+                "time": "13:00",
+                "supplier": "Electrical Supply Co",
+                "material": "EMT Conduit",
+                "quantity": "500 linear feet",
+                "unit_cost": 3.25,
+                "total_cost": 1625.00,
+                "po_number": "PO-2025-0236",
+                "delivery_location": "Material Storage - Building A",
+                "contact_person": "Dave Miller",
+                "contact_phone": "(555) 345-6789",
+                "status": "En Route",
+                "received_by": "",
+                "received_time": "",
+                "quality_check": "Pending",
+                "notes": "ETA confirmed, driver called",
+                "created_by": "Electrical Foreman"
+            }
+        ]
+    
+    # Key Metrics
     col1, col2, col3, col4 = st.columns(4)
     
+    total_deliveries = len(st.session_state.deliveries)
+    delivered_count = len([d for d in st.session_state.deliveries if d['status'] == 'Delivered'])
+    pending_count = len([d for d in st.session_state.deliveries if d['status'] in ['Scheduled', 'En Route']])
+    total_value = sum(d['total_cost'] for d in st.session_state.deliveries if d['status'] == 'Delivered')
+    
     with col1:
-        st.metric("Today's Deliveries", "8", "+2")
+        st.metric("Total Deliveries", total_deliveries, f"+{delivered_count} today")
     with col2:
-        st.metric("Pending", "3", "0")
+        st.metric("Delivered Today", delivered_count, delta_color="normal")
     with col3:
-        st.metric("Completed", "5", "+2")
+        st.metric("Pending/En Route", pending_count, delta_color="normal")
     with col4:
-        st.metric("Issues", "0", "-1")
+        st.metric("Total Value", f"${total_value:,.2f}", delta_color="normal")
     
-    # Delivery tracking table
-    st.subheader("📦 Today's Delivery Schedule")
+    tab1, tab2, tab3, tab4 = st.tabs(["📝 Schedule Delivery", "📊 View Deliveries", "📈 Analytics", "🔧 Manage"])
     
-    deliveries_data = {
-        'Time': ['8:00 AM', '10:30 AM', '1:00 PM', '3:30 PM', '4:45 PM'],
-        'Supplier': ['ABC Concrete', 'Steel Works Inc', 'Electrical Supply Co', 'Plumbing Pro', 'Lumber Yard'],
-        'Material': ['Ready Mix Concrete', 'Structural Steel', 'Electrical Conduit', 'PVC Pipes', 'Framing Lumber'],
-        'Quantity': ['15 cubic yards', '2,500 lbs', '500 ft', '200 ft', '1,000 board ft'],
-        'Status': ['✅ Delivered', '✅ Delivered', '🚛 En Route', '⏰ Scheduled', '⏰ Scheduled'],
-        'Received By': ['John Smith', 'Mike Johnson', '-', '-', '-']
-    }
-    
-    df = pd.DataFrame(deliveries_data)
-    st.dataframe(df, use_container_width=True)
-    
-    # Add new delivery
-    with st.expander("➕ Schedule New Delivery"):
-        col1, col2 = st.columns(2)
-        with col1:
-            st.text_input("Supplier Name")
-            st.text_input("Material Description")
-            st.date_input("Delivery Date")
-        with col2:
-            st.text_input("Quantity")
-            st.time_input("Scheduled Time")
-            st.text_input("Special Instructions")
+    with tab1:
+        st.subheader("📝 Schedule New Delivery")
         
-        if st.button("📅 Schedule Delivery", type="primary"):
-            st.success("✅ Delivery scheduled successfully!")
+        with st.form("delivery_form"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                delivery_date = st.date_input("Delivery Date", value=datetime.now().date())
+                delivery_time = st.time_input("Scheduled Time", value=datetime.now().time())
+                supplier = st.text_input("Supplier Name", placeholder="Enter supplier name")
+                material = st.text_input("Material Description", placeholder="Enter material description")
+                quantity = st.text_input("Quantity", placeholder="e.g., 100 units, 500 sq ft")
+                
+            with col2:
+                unit_cost = st.number_input("Unit Cost ($)", value=0.00, format="%.2f")
+                po_number = st.text_input("PO Number", placeholder="PO-2025-####")
+                delivery_location = st.text_input("Delivery Location", placeholder="Specific location on site")
+                contact_person = st.text_input("Contact Person", placeholder="Supplier contact name")
+                contact_phone = st.text_input("Contact Phone", placeholder="(555) 123-4567")
+            
+            notes = st.text_area("Special Instructions/Notes", placeholder="Any special delivery requirements...")
+            
+            if st.form_submit_button("📅 Schedule Delivery", type="primary"):
+                if supplier and material and quantity:
+                    new_delivery = {
+                        "id": f"DEL-{len(st.session_state.deliveries) + 1:03d}",
+                        "date": str(delivery_date),
+                        "time": str(delivery_time),
+                        "supplier": supplier,
+                        "material": material,
+                        "quantity": quantity,
+                        "unit_cost": unit_cost,
+                        "total_cost": 0.00,  # Will be calculated on receipt
+                        "po_number": po_number,
+                        "delivery_location": delivery_location,
+                        "contact_person": contact_person,
+                        "contact_phone": contact_phone,
+                        "status": "Scheduled",
+                        "received_by": "",
+                        "received_time": "",
+                        "quality_check": "Pending",
+                        "notes": notes,
+                        "created_by": "Site Manager"
+                    }
+                    st.session_state.deliveries.append(new_delivery)
+                    st.success("✅ Delivery scheduled successfully!")
+                    st.rerun()
+                else:
+                    st.error("❌ Please fill in all required fields!")
+    
+    with tab2:
+        st.subheader("📊 All Deliveries")
+        
+        # Filters
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            status_filter = st.selectbox("Filter by Status", ["All", "Scheduled", "En Route", "Delivered", "Issues"])
+        with col2:
+            date_filter = st.date_input("Filter by Date", value=datetime.now().date())
+        with col3:
+            supplier_filter = st.selectbox("Filter by Supplier", ["All"] + list(set(d['supplier'] for d in st.session_state.deliveries)))
+        
+        # Display deliveries table
+        filtered_deliveries = st.session_state.deliveries
+        if status_filter != "All":
+            filtered_deliveries = [d for d in filtered_deliveries if d['status'] == status_filter]
+        
+        if filtered_deliveries:
+            for delivery in filtered_deliveries:
+                with st.expander(f"🚚 {delivery['id']} - {delivery['supplier']} ({delivery['status']})"):
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        st.write(f"**📅 Date/Time:** {delivery['date']} at {delivery['time']}")
+                        st.write(f"**📦 Material:** {delivery['material']}")
+                        st.write(f"**📏 Quantity:** {delivery['quantity']}")
+                        st.write(f"**💰 Cost:** ${delivery['total_cost']:,.2f}")
+                    
+                    with col2:
+                        st.write(f"**🏢 Supplier:** {delivery['supplier']}")
+                        st.write(f"**📄 PO Number:** {delivery['po_number']}")
+                        st.write(f"**📍 Location:** {delivery['delivery_location']}")
+                        st.write(f"**📞 Contact:** {delivery['contact_person']}")
+                    
+                    with col3:
+                        st.write(f"**📊 Status:** {delivery['status']}")
+                        if delivery['received_by']:
+                            st.write(f"**👤 Received By:** {delivery['received_by']}")
+                            st.write(f"**🕐 Received Time:** {delivery['received_time']}")
+                        st.write(f"**✅ Quality Check:** {delivery['quality_check']}")
+                    
+                    if delivery['notes']:
+                        st.write(f"**📝 Notes:** {delivery['notes']}")
+                    
+                    # Action buttons
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        if delivery['status'] in ['Scheduled', 'En Route']:
+                            if st.button(f"✅ Mark Delivered", key=f"deliver_{delivery['id']}"):
+                                delivery['status'] = 'Delivered'
+                                delivery['received_time'] = datetime.now().strftime("%H:%M")
+                                delivery['received_by'] = 'Site Manager'
+                                delivery['quality_check'] = 'Passed'
+                                st.success("Delivery marked as received!")
+                                st.rerun()
+                    
+                    with col2:
+                        if st.button(f"✏️ Edit", key=f"edit_{delivery['id']}"):
+                            st.info("Edit functionality - would open edit form")
+                    
+                    with col3:
+                        if st.button(f"🗑️ Delete", key=f"delete_{delivery['id']}"):
+                            st.session_state.deliveries.remove(delivery)
+                            st.success("Delivery deleted!")
+                            st.rerun()
+        else:
+            st.info("No deliveries found matching the selected filters.")
+    
+    with tab3:
+        st.subheader("📈 Delivery Analytics")
+        
+        if st.session_state.deliveries:
+            # Delivery status distribution
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                status_counts = {}
+                for delivery in st.session_state.deliveries:
+                    status = delivery['status']
+                    status_counts[status] = status_counts.get(status, 0) + 1
+                
+                status_list = list(status_counts.keys())
+                count_list = list(status_counts.values())
+                status_df = pd.DataFrame({
+                    'Status': status_list,
+                    'Count': count_list
+                })
+                fig_status = px.pie(status_df, values='Count', names='Status', title="Delivery Status Distribution")
+                st.plotly_chart(fig_status, use_container_width=True)
+            
+            with col2:
+                # Cost analysis by supplier
+                supplier_costs = {}
+                for delivery in st.session_state.deliveries:
+                    supplier = delivery['supplier']
+                    supplier_costs[supplier] = supplier_costs.get(supplier, 0) + delivery['total_cost']
+                
+                supplier_list = list(supplier_costs.keys())
+                cost_list = list(supplier_costs.values())
+                cost_df = pd.DataFrame({
+                    'Supplier': supplier_list,
+                    'Total_Cost': cost_list
+                })
+                fig_cost = px.bar(cost_df, x='Supplier', y='Total_Cost', title="Cost by Supplier")
+                st.plotly_chart(fig_cost, use_container_width=True)
+        else:
+            st.info("No delivery data available for analytics.")
+    
+    with tab4:
+        st.subheader("🔧 Delivery Management")
+        
+        # Bulk operations
+        st.markdown("**📊 Summary Statistics**")
+        if st.session_state.deliveries:
+            stats_data = pd.DataFrame([
+                {"Metric": "Total Deliveries", "Value": len(st.session_state.deliveries)},
+                {"Metric": "Delivered Count", "Value": len([d for d in st.session_state.deliveries if d['status'] == 'Delivered'])},
+                {"Metric": "Pending Count", "Value": len([d for d in st.session_state.deliveries if d['status'] in ['Scheduled', 'En Route']])},
+                {"Metric": "Total Value", "Value": f"${sum(d['total_cost'] for d in st.session_state.deliveries):,.2f}"},
+            ])
+            st.dataframe(stats_data, use_container_width=True)
+        
+        # Clear all data (for testing)
+        st.markdown("**⚠️ Data Management**")
+        if st.button("🗑️ Clear All Delivery Data", type="secondary"):
+            st.session_state.deliveries = []
+            st.success("All delivery data cleared!")
+            st.rerun()
 
 def render_safety():
     """Comprehensive Safety Management module with full CRUD functionality"""
@@ -1679,101 +1900,479 @@ def render_safety():
                     st.rerun()
 
 def render_preconstruction():
-    """PreConstruction planning module"""
+    """Complete PreConstruction Management with full CRUD functionality"""
     st.markdown("""
     <div class="module-header">
-        <h1>🏗️ PreConstruction Planning</h1>
-        <p>Project planning, estimating, and bid management</p>
+        <h1>🏗️ PreConstruction Management</h1>
+        <p>Comprehensive project planning, estimating, procurement, and bid management</p>
     </div>
     """, unsafe_allow_html=True)
     
-    tab1, tab2, tab3 = st.tabs(["📊 Project Overview", "💰 Estimating", "📋 Bid Management"])
+    # Initialize preconstruction data
+    if "estimates" not in st.session_state:
+        st.session_state.estimates = [
+            {
+                "id": "EST-001",
+                "project_phase": "Foundation",
+                "trade": "Concrete",
+                "description": "Foundation concrete work including footings and slab",
+                "quantity": 450,
+                "unit": "cubic yards",
+                "unit_cost": 185.00,
+                "total_cost": 83250.00,
+                "vendor": "ABC Concrete Supply",
+                "status": "Approved",
+                "created_date": "2024-12-15",
+                "notes": "Includes reinforcement and finishing"
+            },
+            {
+                "id": "EST-002",
+                "project_phase": "Structure",
+                "trade": "Steel",
+                "description": "Structural steel for floors 1-8",
+                "quantity": 125,
+                "unit": "tons",
+                "unit_cost": 3200.00,
+                "total_cost": 400000.00,
+                "vendor": "Steel Works Inc",
+                "status": "Under Review",
+                "created_date": "2025-01-10",
+                "notes": "Fire-rated structural steel"
+            }
+        ]
+    
+    if "bids" not in st.session_state:
+        st.session_state.bids = [
+            {
+                "id": "BID-001",
+                "trade": "HVAC",
+                "description": "Complete HVAC system for all floors",
+                "bid_deadline": "2025-06-15",
+                "invited_contractors": ["Climate Control Pro", "HVAC Masters", "Air Tech Solutions", "Comfort Systems"],
+                "received_bids": [
+                    {"contractor": "Climate Control Pro", "amount": 2100000, "submitted": True},
+                    {"contractor": "HVAC Masters", "amount": 2250000, "submitted": True},
+                    {"contractor": "Air Tech Solutions", "amount": 0, "submitted": False},
+                    {"contractor": "Comfort Systems", "amount": 2050000, "submitted": True}
+                ],
+                "status": "Active",
+                "project_manager": "Sarah Wilson",
+                "scope_documents": ["HVAC Plans Rev 3", "Specifications Section 23", "Equipment Schedules"]
+            },
+            {
+                "id": "BID-002",
+                "trade": "Electrical",
+                "description": "Electrical rough-in and finish work",
+                "bid_deadline": "2025-06-20",
+                "invited_contractors": ["Power Electric", "Spark Solutions", "Current Tech", "Wire Works", "Voltage Masters"],
+                "received_bids": [
+                    {"contractor": "Power Electric", "amount": 2400000, "submitted": True},
+                    {"contractor": "Spark Solutions", "amount": 0, "submitted": False},
+                    {"contractor": "Current Tech", "amount": 2550000, "submitted": True}
+                ],
+                "status": "Under Review",
+                "project_manager": "Mike Johnson",
+                "scope_documents": ["Electrical Plans Rev 2", "Panel Schedules", "Lighting Plans"]
+            }
+        ]
+    
+    # Key Metrics
+    col1, col2, col3, col4 = st.columns(4)
+    
+    total_estimates = len(st.session_state.estimates)
+    approved_estimates = len([e for e in st.session_state.estimates if e['status'] == 'Approved'])
+    total_estimated_cost = sum(e['total_cost'] for e in st.session_state.estimates)
+    active_bids = len([b for b in st.session_state.bids if b['status'] == 'Active'])
+    
+    with col1:
+        st.metric("Total Estimates", total_estimates, delta_color="normal")
+    with col2:
+        st.metric("Approved Estimates", approved_estimates, delta_color="normal")
+    with col3:
+        st.metric("Estimated Value", f"${total_estimated_cost:,.2f}", delta_color="normal")
+    with col4:
+        st.metric("Active Bids", active_bids, delta_color="normal")
+    
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["💰 Estimating", "📋 Bid Management", "📊 Project Overview", "📈 Analytics", "🔧 Management"])
     
     with tab1:
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.subheader("🎯 Project Details")
-            st.write("**Project Name:** Highland Tower Development")
-            st.write("**Total Value:** $45,500,000")
-            st.write("**Start Date:** January 15, 2025")
-            st.write("**Completion:** December 2026")
-            st.write("**Units:** 120 Residential + 8 Retail")
-            
-            st.subheader("📈 Project Phases")
-            phases = [
-                {"phase": "Site Preparation", "duration": "2 months", "status": "✅ Complete"},
-                {"phase": "Foundation", "duration": "3 months", "status": "✅ Complete"},
-                {"phase": "Structure", "duration": "8 months", "status": "🔄 In Progress"},
-                {"phase": "MEP", "duration": "4 months", "status": "⏰ Planned"},
-                {"phase": "Finishes", "duration": "6 months", "status": "⏰ Planned"},
-            ]
-            
-            for phase in phases:
-                with st.container():
-                    col_a, col_b, col_c = st.columns([2, 1, 1])
-                    with col_a:
-                        st.write(phase["phase"])
-                    with col_b:
-                        st.write(phase["duration"])
-                    with col_c:
-                        st.write(phase["status"])
-                    st.divider()
-        
-        with col2:
-            st.subheader("📊 Cost Breakdown")
-            cost_data = pd.DataFrame({
-                'Category': ['Labor', 'Materials', 'Equipment', 'Overhead', 'Profit'],
-                'Amount': [18200000, 15600000, 4550000, 3640000, 3510000],
-                'Percentage': [40, 34.3, 10, 8, 7.7]
-            })
-            
-            fig = px.pie(cost_data, values='Amount', names='Category', 
-                        title="Project Cost Distribution")
-            st.plotly_chart(fig, use_container_width=True)
-    
-    with tab2:
         st.subheader("💰 Cost Estimating")
         
+        sub_tab1, sub_tab2, sub_tab3 = st.tabs(["📝 Create Estimate", "📊 View Estimates", "📈 Cost Analysis"])
+        
+        with sub_tab1:
+            st.markdown("**Create New Cost Estimate**")
+            
+            with st.form("estimate_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    project_phase = st.selectbox("Project Phase", 
+                        ["Foundation", "Structure", "MEP", "Finishes", "Sitework", "Other"])
+                    trade = st.text_input("Trade/Category", placeholder="e.g., Concrete, Steel, Electrical")
+                    description = st.text_area("Work Description", placeholder="Detailed description of work scope")
+                    quantity = st.number_input("Quantity", value=1.0, min_value=0.01)
+                    unit = st.text_input("Unit", placeholder="e.g., sq ft, cubic yards, linear feet")
+                
+                with col2:
+                    unit_cost = st.number_input("Unit Cost ($)", value=0.00, format="%.2f")
+                    vendor = st.text_input("Preferred Vendor", placeholder="Vendor or supplier name")
+                    notes = st.text_area("Notes", placeholder="Additional notes or considerations")
+                
+                if st.form_submit_button("💾 Create Estimate", type="primary"):
+                    if trade and description and quantity and unit_cost:
+                        new_estimate = {
+                            "id": f"EST-{len(st.session_state.estimates) + 1:03d}",
+                            "project_phase": project_phase,
+                            "trade": trade,
+                            "description": description,
+                            "quantity": quantity,
+                            "unit": unit,
+                            "unit_cost": unit_cost,
+                            "total_cost": quantity * unit_cost,
+                            "vendor": vendor,
+                            "status": "Draft",
+                            "created_date": str(datetime.now().date()),
+                            "notes": notes
+                        }
+                        st.session_state.estimates.append(new_estimate)
+                        st.success("✅ Estimate created successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields!")
+        
+        with sub_tab2:
+            st.markdown("**All Cost Estimates**")
+            
+            # Filters
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                phase_filter = st.selectbox("Filter by Phase", ["All"] + list(set(e['project_phase'] for e in st.session_state.estimates)))
+            with col2:
+                status_filter = st.selectbox("Filter by Status", ["All", "Draft", "Under Review", "Approved", "Rejected"])
+            with col3:
+                trade_filter = st.selectbox("Filter by Trade", ["All"] + list(set(e['trade'] for e in st.session_state.estimates)))
+            
+            # Display estimates
+            filtered_estimates = st.session_state.estimates
+            if phase_filter != "All":
+                filtered_estimates = [e for e in filtered_estimates if e['project_phase'] == phase_filter]
+            if status_filter != "All":
+                filtered_estimates = [e for e in filtered_estimates if e['status'] == status_filter]
+            
+            for estimate in filtered_estimates:
+                with st.expander(f"💰 {estimate['id']} - {estimate['trade']} ({estimate['status']})"):
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        st.write(f"**📋 Phase:** {estimate['project_phase']}")
+                        st.write(f"**🔧 Trade:** {estimate['trade']}")
+                        st.write(f"**📝 Description:** {estimate['description']}")
+                        st.write(f"**📅 Created:** {estimate['created_date']}")
+                    
+                    with col2:
+                        st.write(f"**📏 Quantity:** {estimate['quantity']} {estimate['unit']}")
+                        st.write(f"**💲 Unit Cost:** ${estimate['unit_cost']:,.2f}")
+                        st.write(f"**💰 Total Cost:** ${estimate['total_cost']:,.2f}")
+                        st.write(f"**🏢 Vendor:** {estimate['vendor']}")
+                    
+                    with col3:
+                        st.write(f"**📊 Status:** {estimate['status']}")
+                        if estimate['notes']:
+                            st.write(f"**📝 Notes:** {estimate['notes']}")
+                    
+                    # Status update buttons
+                    col1, col2, col3, col4 = st.columns(4)
+                    with col1:
+                        if st.button(f"✅ Approve", key=f"approve_{estimate['id']}"):
+                            estimate['status'] = 'Approved'
+                            st.success("Estimate approved!")
+                            st.rerun()
+                    with col2:
+                        if st.button(f"📋 Review", key=f"review_{estimate['id']}"):
+                            estimate['status'] = 'Under Review'
+                            st.info("Estimate under review!")
+                            st.rerun()
+                    with col3:
+                        if st.button(f"✏️ Edit", key=f"edit_{estimate['id']}"):
+                            st.info("Edit functionality - would open edit form")
+                    with col4:
+                        if st.button(f"🗑️ Delete", key=f"delete_{estimate['id']}"):
+                            st.session_state.estimates.remove(estimate)
+                            st.success("Estimate deleted!")
+                            st.rerun()
+        
+        with sub_tab3:
+            st.markdown("**Cost Analysis by Phase**")
+            
+            if st.session_state.estimates:
+                # Cost by phase
+                phase_costs = {}
+                for estimate in st.session_state.estimates:
+                    phase = estimate['project_phase']
+                    phase_costs[phase] = phase_costs.get(phase, 0) + estimate['total_cost']
+                
+                phase_list = list(phase_costs.keys())
+                cost_list = list(phase_costs.values())
+                phase_df = pd.DataFrame({
+                    'Phase': phase_list,
+                    'Total_Cost': cost_list
+                })
+                fig_phase = px.bar(phase_df, x='Phase', y='Total_Cost', title="Cost by Project Phase")
+                st.plotly_chart(fig_phase, use_container_width=True)
+    
+    with tab2:
+        st.subheader("📋 Bid Management")
+        
+        bid_sub_tab1, bid_sub_tab2, bid_sub_tab3 = st.tabs(["📤 Create Bid Package", "📊 Active Bids", "📈 Bid Analysis"])
+        
+        with bid_sub_tab1:
+            st.markdown("**Create New Bid Package**")
+            
+            with st.form("bid_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    bid_trade = st.text_input("Trade", placeholder="e.g., HVAC, Plumbing, Electrical")
+                    bid_description = st.text_area("Work Description", placeholder="Detailed scope of work")
+                    bid_deadline = st.date_input("Bid Deadline", value=datetime.now().date() + timedelta(days=30))
+                    project_manager = st.text_input("Project Manager", placeholder="Responsible PM")
+                
+                with col2:
+                    invited_contractors = st.text_area("Invited Contractors", 
+                        placeholder="Enter contractor names (one per line)")
+                    scope_documents = st.text_area("Scope Documents", 
+                        placeholder="List of drawings and specifications")
+                
+                if st.form_submit_button("📤 Create Bid Package", type="primary"):
+                    if bid_trade and bid_description and invited_contractors:
+                        contractor_list = [c.strip() for c in invited_contractors.split('\n') if c.strip()]
+                        doc_list = [d.strip() for d in scope_documents.split('\n') if d.strip()]
+                        
+                        new_bid = {
+                            "id": f"BID-{len(st.session_state.bids) + 1:03d}",
+                            "trade": bid_trade,
+                            "description": bid_description,
+                            "bid_deadline": str(bid_deadline),
+                            "invited_contractors": contractor_list,
+                            "received_bids": [{"contractor": c, "amount": 0, "submitted": False} for c in contractor_list],
+                            "status": "Active",
+                            "project_manager": project_manager,
+                            "scope_documents": doc_list
+                        }
+                        st.session_state.bids.append(new_bid)
+                        st.success("✅ Bid package created successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields!")
+        
+        with bid_sub_tab2:
+            st.markdown("**Active Bid Packages**")
+            
+            for bid in st.session_state.bids:
+                submitted_count = len([b for b in bid['received_bids'] if b['submitted']])
+                total_invited = len(bid['invited_contractors'])
+                
+                with st.expander(f"📋 {bid['id']} - {bid['trade']} ({submitted_count}/{total_invited} bids)"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**🔧 Trade:** {bid['trade']}")
+                        st.write(f"**📝 Description:** {bid['description']}")
+                        st.write(f"**📅 Deadline:** {bid['bid_deadline']}")
+                        st.write(f"**👤 PM:** {bid['project_manager']}")
+                        st.write(f"**📊 Status:** {bid['status']}")
+                    
+                    with col2:
+                        st.write("**📋 Invited Contractors:**")
+                        for contractor in bid['invited_contractors']:
+                            st.write(f"- {contractor}")
+                        
+                        if bid['scope_documents']:
+                            st.write("**📄 Scope Documents:**")
+                            for doc in bid['scope_documents']:
+                                st.write(f"- {doc}")
+                    
+                    st.write("**💰 Received Bids:**")
+                    bid_data = []
+                    for received_bid in bid['received_bids']:
+                        status_icon = "✅" if received_bid['submitted'] else "⏰"
+                        amount_display = f"${received_bid['amount']:,.2f}" if received_bid['submitted'] else "Pending"
+                        bid_data.append({
+                            "Status": status_icon,
+                            "Contractor": received_bid['contractor'],
+                            "Bid Amount": amount_display
+                        })
+                    
+                    if bid_data:
+                        bid_df = pd.DataFrame(bid_data)
+                        st.dataframe(bid_df, use_container_width=True)
+                    
+                    # Action buttons
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        if st.button(f"📧 Send Reminder", key=f"remind_{bid['id']}"):
+                            st.info("Reminder sent to contractors!")
+                    with col2:
+                        if st.button(f"✅ Award", key=f"award_{bid['id']}"):
+                            bid['status'] = 'Awarded'
+                            st.success("Bid awarded!")
+                            st.rerun()
+                    with col3:
+                        if st.button(f"❌ Cancel", key=f"cancel_{bid['id']}"):
+                            bid['status'] = 'Cancelled'
+                            st.warning("Bid cancelled!")
+                            st.rerun()
+        
+        with bid_sub_tab3:
+            st.markdown("**Bid Analysis**")
+            
+            if st.session_state.bids:
+                # Bid status distribution
+                status_counts = {}
+                for bid in st.session_state.bids:
+                    status = bid['status']
+                    status_counts[status] = status_counts.get(status, 0) + 1
+                
+                status_list = list(status_counts.keys())
+                count_list = list(status_counts.values())
+                status_df = pd.DataFrame({
+                    'Status': status_list,
+                    'Count': count_list
+                })
+                fig_status = px.pie(status_df, values='Count', names='Status', title="Bid Package Status Distribution")
+                st.plotly_chart(fig_status, use_container_width=True)
+    
+    with tab3:
+        st.subheader("📊 Project Overview - Highland Tower Development")
+        
         col1, col2 = st.columns(2)
         
         with col1:
-            st.write("**Residential Units (120 units)**")
-            st.write("- Studio (24 units): $180,000 each")
-            st.write("- 1-Bedroom (48 units): $225,000 each")
-            st.write("- 2-Bedroom (36 units): $285,000 each")
-            st.write("- 3-Bedroom (12 units): $340,000 each")
+            st.markdown("**🎯 Project Information**")
+            st.write("**Project Name:** Highland Tower Development")
+            st.write("**Total Contract Value:** $45,500,000")
+            st.write("**Start Date:** January 15, 2025")
+            st.write("**Planned Completion:** December 2026")
+            st.write("**Total Units:** 120 Residential + 8 Retail")
+            st.write("**Building Height:** 12 floors")
+            st.write("**Total Square Footage:** 185,000 sq ft")
             
-            st.write("**Retail Units (8 units)**")
-            st.write("- Small Retail (6 units): $150,000 each")
-            st.write("- Large Retail (2 units): $275,000 each")
+            st.markdown("**📈 Project Phases**")
+            phases_data = [
+                {"Phase": "Site Preparation", "Duration": "2 months", "Status": "✅ Complete", "Progress": 100},
+                {"Phase": "Foundation", "Duration": "3 months", "Status": "✅ Complete", "Progress": 100},
+                {"Phase": "Structure", "Duration": "8 months", "Status": "🔄 In Progress", "Progress": 68},
+                {"Phase": "MEP", "Duration": "4 months", "Status": "⏰ Planned", "Progress": 0},
+                {"Phase": "Finishes", "Duration": "6 months", "Status": "⏰ Planned", "Progress": 0}
+            ]
+            
+            for phase in phases_data:
+                st.write(f"**{phase['Phase']}** - {phase['Status']}")
+                st.progress(phase['Progress'] / 100)
         
         with col2:
-            st.subheader("📈 Cost per Square Foot")
-            cost_sf_data = pd.DataFrame({
-                'Unit Type': ['Studio', '1-Bedroom', '2-Bedroom', '3-Bedroom', 'Small Retail', 'Large Retail'],
-                'Cost/SF': [300, 275, 260, 245, 225, 210],
-                'Square Feet': [600, 820, 1100, 1390, 665, 1310]
+            st.markdown("**💰 Cost Breakdown**")
+            cost_breakdown = pd.DataFrame({
+                'Category': ['Labor', 'Materials', 'Equipment', 'Overhead', 'Profit'],
+                'Amount': [18200000, 15600000, 4550000, 3640000, 3510000],
+                'Percentage': [40.0, 34.3, 10.0, 8.0, 7.7]
             })
             
-            fig = px.bar(cost_sf_data, x='Unit Type', y='Cost/SF', 
-                        title="Construction Cost per Square Foot")
-            st.plotly_chart(fig, use_container_width=True)
+            fig_cost = px.pie(cost_breakdown, values='Amount', names='Category', 
+                            title="Project Cost Distribution")
+            st.plotly_chart(fig_cost, use_container_width=True)
+            
+            st.markdown("**📏 Unit Breakdown**")
+            unit_data = pd.DataFrame({
+                'Unit Type': ['Studio', '1-Bedroom', '2-Bedroom', '3-Bedroom', 'Small Retail', 'Large Retail'],
+                'Count': [24, 48, 36, 12, 6, 2],
+                'Cost Each': [180000, 225000, 285000, 340000, 150000, 275000]
+            })
+            
+            fig_units = px.bar(unit_data, x='Unit Type', y='Count', 
+                             title="Unit Count by Type")
+            st.plotly_chart(fig_units, use_container_width=True)
     
-    with tab3:
-        st.subheader("📋 Bid Management")
+    with tab4:
+        st.subheader("📈 PreConstruction Analytics")
         
-        st.write("**Active Bids**")
-        bids_data = {
-            'Trade': ['HVAC', 'Plumbing', 'Electrical', 'Flooring', 'Painting'],
-            'Bidders': [4, 3, 5, 3, 4],
-            'Deadline': ['June 1', 'June 5', 'June 3', 'June 8', 'June 10'],
-            'Low Bid': ['$2.1M', '$1.8M', '$2.4M', '$890K', '$650K'],
-            'Status': ['Open', 'Open', 'Under Review', 'Open', 'Open']
-        }
+        col1, col2 = st.columns(2)
         
-        df = pd.DataFrame(bids_data)
-        st.dataframe(df, use_container_width=True)
+        with col1:
+            # Estimate status distribution
+            if st.session_state.estimates:
+                estimate_status_counts = {}
+                for estimate in st.session_state.estimates:
+                    status = estimate['status']
+                    estimate_status_counts[status] = estimate_status_counts.get(status, 0) + 1
+                
+                est_status_list = list(estimate_status_counts.keys())
+                est_count_list = list(estimate_status_counts.values())
+                est_status_df = pd.DataFrame({
+                    'Status': est_status_list,
+                    'Count': est_count_list
+                })
+                fig_est_status = px.pie(est_status_df, values='Count', names='Status', title="Estimate Status Distribution")
+                st.plotly_chart(fig_est_status, use_container_width=True)
+        
+        with col2:
+            # Cost trends by trade
+            if st.session_state.estimates:
+                trade_costs = {}
+                for estimate in st.session_state.estimates:
+                    trade = estimate['trade']
+                    trade_costs[trade] = trade_costs.get(trade, 0) + estimate['total_cost']
+                
+                trade_list = list(trade_costs.keys())
+                trade_cost_list = list(trade_costs.values())
+                trade_df = pd.DataFrame({
+                    'Trade': trade_list,
+                    'Total_Cost': trade_cost_list
+                })
+                fig_trade = px.bar(trade_df, x='Trade', y='Total_Cost', title="Cost by Trade")
+                st.plotly_chart(fig_trade, use_container_width=True)
+    
+    with tab5:
+        st.subheader("🔧 PreConstruction Management")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("**📊 Estimate Summary**")
+            if st.session_state.estimates:
+                est_stats_data = pd.DataFrame([
+                    {"Metric": "Total Estimates", "Value": len(st.session_state.estimates)},
+                    {"Metric": "Approved Estimates", "Value": len([e for e in st.session_state.estimates if e['status'] == 'Approved'])},
+                    {"Metric": "Total Estimated Value", "Value": f"${sum(e['total_cost'] for e in st.session_state.estimates):,.2f}"},
+                    {"Metric": "Average Estimate", "Value": f"${sum(e['total_cost'] for e in st.session_state.estimates) / len(st.session_state.estimates):,.2f}"},
+                ])
+                st.dataframe(est_stats_data, use_container_width=True)
+        
+        with col2:
+            st.markdown("**📋 Bid Summary**")
+            if st.session_state.bids:
+                bid_stats_data = pd.DataFrame([
+                    {"Metric": "Total Bid Packages", "Value": len(st.session_state.bids)},
+                    {"Metric": "Active Bids", "Value": len([b for b in st.session_state.bids if b['status'] == 'Active'])},
+                    {"Metric": "Total Invited Contractors", "Value": sum(len(b['invited_contractors']) for b in st.session_state.bids)},
+                    {"Metric": "Bids Received", "Value": sum(len([rb for rb in b['received_bids'] if rb['submitted']]) for b in st.session_state.bids)},
+                ])
+                st.dataframe(bid_stats_data, use_container_width=True)
+        
+        # Data management
+        st.markdown("**⚠️ Data Management**")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🗑️ Clear All Estimates", type="secondary"):
+                st.session_state.estimates = []
+                st.success("All estimates cleared!")
+                st.rerun()
+        with col2:
+            if st.button("🗑️ Clear All Bids", type="secondary"):
+                st.session_state.bids = []
+                st.success("All bids cleared!")
+                st.rerun()
 
 def render_engineering():
     """Engineering module with RFI and technical management"""

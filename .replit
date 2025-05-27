@@ -48,6 +48,10 @@ args = "gcPanel Core Focused"
 task = "workflow.run"
 args = "gcPanel Optimized"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "gcPanel Enhanced"
+
 [[workflows.workflow]]
 name = "gcPanel Sidebar"
 author = "agent"
@@ -118,6 +122,15 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "streamlit run gcpanel_optimized.py --server.port 5000"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "gcPanel Enhanced"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "streamlit run gcpanel_enhanced_navigation.py --server.port 5000"
 waitForPort = 5000
 
 [[ports]]

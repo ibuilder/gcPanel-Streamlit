@@ -1369,7 +1369,19 @@ def render_dashboard():
         st.plotly_chart(fig, use_container_width=True)
 
 def render_daily_reports():
-    """Enhanced Daily Reports module with full CRUD functionality"""
+    """Enterprise Daily Reports module with robust Python backend"""
+    try:
+        from modules.daily_reports_ui import render_daily_reports_enterprise
+        render_daily_reports_enterprise()
+        return
+    except ImportError:
+        st.error("Enterprise Daily Reports module not available")
+    
+    # Fallback to basic version
+    render_daily_reports_basic()
+
+def render_daily_reports_basic():
+    """Basic Daily Reports module - fallback version"""
     st.markdown("""
     <div class="module-header">
         <h1>📋 Daily Reports Management</h1>

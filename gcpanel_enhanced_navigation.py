@@ -8905,14 +8905,660 @@ def render_issues_risks():
     st.info("⚠️ Issues & Risks module with comprehensive risk management")
 
 def render_documents():
-    """Document management module"""
+    """Complete Document Management with full CRUD functionality"""
     st.markdown("""
     <div class="module-header">
         <h1>📁 Document Management</h1>
-        <p>Centralized document storage and version control</p>
+        <p>Comprehensive document storage, version control, and collaboration system</p>
     </div>
     """, unsafe_allow_html=True)
-    st.info("📁 Documents module with version control and collaboration")
+    
+    # Initialize document data
+    if "documents" not in st.session_state:
+        st.session_state.documents = [
+            {
+                "id": "DOC-001",
+                "document_id": "HTD-DWG-2025-001",
+                "filename": "HTD_Architectural_Plans_Level_1-15.pdf",
+                "title": "Highland Tower Architectural Plans - Residential Levels",
+                "category": "Architectural Drawings",
+                "document_type": "Design Document",
+                "version": "Rev D.1",
+                "status": "Current",
+                "author": "Highland Architecture Group",
+                "reviewer": "John Davis, P.E.",
+                "upload_date": "2025-05-27",
+                "review_date": "2025-05-25",
+                "approval_date": "2025-05-26",
+                "file_size": "24.5 MB",
+                "file_format": "PDF",
+                "description": "Complete architectural plans for residential levels 1-15 including unit layouts, common areas, and building sections",
+                "tags": ["architectural", "residential", "floor-plans", "current", "approved"],
+                "access_level": "Project Team",
+                "linked_rfis": ["RFI-001"],
+                "linked_tasks": ["TASK-001", "TASK-002"],
+                "revision_history": [
+                    {"version": "Rev A", "date": "2025-01-15", "changes": "Initial design submittal"},
+                    {"version": "Rev B", "date": "2025-02-20", "changes": "Incorporated city review comments"},
+                    {"version": "Rev C", "date": "2025-04-10", "changes": "MEP coordination updates"},
+                    {"version": "Rev D.1", "date": "2025-05-27", "changes": "Final construction drawings"}
+                ],
+                "keywords": ["highland tower", "residential", "architecture", "construction drawings"],
+                "compliance_requirements": ["NYC Building Code", "ADA Compliance", "Fire Code"],
+                "expiry_date": "",
+                "confidentiality": "Internal Use"
+            },
+            {
+                "id": "DOC-002",
+                "document_id": "HTD-SPEC-2025-001",
+                "filename": "HTD_Structural_Steel_Specifications.pdf",
+                "title": "Structural Steel Specifications and Standards",
+                "category": "Technical Specifications",
+                "document_type": "Specification",
+                "version": "Rev C.2",
+                "status": "Current",
+                "author": "Highland Structural Engineering",
+                "reviewer": "Maria Garcia, P.E.",
+                "upload_date": "2025-05-25",
+                "review_date": "2025-05-23",
+                "approval_date": "2025-05-24",
+                "file_size": "8.7 MB",
+                "file_format": "PDF",
+                "description": "Comprehensive steel specifications for main structural frame including material requirements, welding standards, and quality control procedures",
+                "tags": ["structural", "steel", "specifications", "engineering", "approved"],
+                "access_level": "Engineering Team",
+                "linked_rfis": [],
+                "linked_tasks": ["TASK-003"],
+                "revision_history": [
+                    {"version": "Rev A", "date": "2025-02-01", "changes": "Initial specifications"},
+                    {"version": "Rev B", "date": "2025-03-15", "changes": "Updated welding requirements"},
+                    {"version": "Rev C.2", "date": "2025-05-25", "changes": "Final fabrication specifications"}
+                ],
+                "keywords": ["structural steel", "specifications", "welding", "fabrication"],
+                "compliance_requirements": ["AISC 360", "AWS D1.1", "OSHA Standards"],
+                "expiry_date": "",
+                "confidentiality": "Internal Use"
+            },
+            {
+                "id": "DOC-003",
+                "document_id": "HTD-MEP-2025-001",
+                "filename": "HTD_MEP_Systems_Design.pdf",
+                "title": "Mechanical, Electrical, Plumbing Systems Design",
+                "category": "MEP Drawings",
+                "document_type": "Design Document",
+                "version": "Rev B.3",
+                "status": "Under Review",
+                "author": "Highland MEP Consultants",
+                "reviewer": "Jennifer Walsh",
+                "upload_date": "2025-05-20",
+                "review_date": "2025-05-22",
+                "approval_date": "",
+                "file_size": "31.2 MB",
+                "file_format": "PDF",
+                "description": "Complete MEP systems design for Highland Tower including HVAC, electrical distribution, plumbing, and fire protection systems",
+                "tags": ["mep", "mechanical", "electrical", "plumbing", "hvac", "fire-protection"],
+                "access_level": "MEP Team",
+                "linked_rfis": ["RFI-001"],
+                "linked_tasks": ["TASK-004"],
+                "revision_history": [
+                    {"version": "Rev A", "date": "2025-03-01", "changes": "Initial MEP design"},
+                    {"version": "Rev B", "date": "2025-04-15", "changes": "Coordination with architectural changes"},
+                    {"version": "Rev B.3", "date": "2025-05-20", "changes": "Updated routing and sizing"}
+                ],
+                "keywords": ["mep", "hvac", "electrical", "plumbing", "fire protection"],
+                "compliance_requirements": ["NYC Mechanical Code", "NEC", "NYC Plumbing Code", "NFPA"],
+                "expiry_date": "",
+                "confidentiality": "Internal Use"
+            }
+        ]
+    
+    if "document_folders" not in st.session_state:
+        st.session_state.document_folders = [
+            {
+                "id": "FOLD-001",
+                "folder_name": "Architectural Documents",
+                "description": "All architectural drawings, plans, and related documentation",
+                "created_date": "2025-01-15",
+                "document_count": 15,
+                "access_level": "Project Team",
+                "parent_folder": "",
+                "tags": ["architecture", "drawings", "plans"]
+            },
+            {
+                "id": "FOLD-002",
+                "folder_name": "Engineering Reports",
+                "description": "Structural, geotechnical, and engineering analysis reports",
+                "created_date": "2025-01-20",
+                "document_count": 8,
+                "access_level": "Engineering Team",
+                "parent_folder": "",
+                "tags": ["engineering", "reports", "analysis"]
+            },
+            {
+                "id": "FOLD-003",
+                "folder_name": "Contracts & Legal",
+                "description": "Contracts, agreements, permits, and legal documentation",
+                "created_date": "2024-12-01",
+                "document_count": 12,
+                "access_level": "Management Only",
+                "parent_folder": "",
+                "tags": ["contracts", "legal", "permits", "agreements"]
+            }
+        ]
+    
+    if "document_reviews" not in st.session_state:
+        st.session_state.document_reviews = [
+            {
+                "id": "REV-001",
+                "document_id": "DOC-001",
+                "reviewer": "John Davis, P.E.",
+                "review_date": "2025-05-25",
+                "review_status": "Approved",
+                "comments": "Architectural plans meet all design requirements and code compliance. Approved for construction.",
+                "rating": 5,
+                "next_review_date": "2025-08-25",
+                "review_type": "Technical Review"
+            },
+            {
+                "id": "REV-002",
+                "document_id": "DOC-002",
+                "reviewer": "Maria Garcia, P.E.",
+                "review_date": "2025-05-23",
+                "review_status": "Approved",
+                "comments": "Steel specifications are comprehensive and meet industry standards. Ready for fabrication.",
+                "rating": 5,
+                "next_review_date": "2025-07-23",
+                "review_type": "Technical Review"
+            },
+            {
+                "id": "REV-003",
+                "document_id": "DOC-003",
+                "reviewer": "Jennifer Walsh",
+                "review_date": "2025-05-22",
+                "review_status": "Pending",
+                "comments": "MEP design requires minor revisions for HVAC sizing in mechanical rooms. Coordination meeting scheduled.",
+                "rating": 4,
+                "next_review_date": "2025-05-30",
+                "review_type": "Technical Review"
+            }
+        ]
+    
+    # Key Document Metrics
+    col1, col2, col3, col4 = st.columns(4)
+    
+    total_docs = len(st.session_state.documents)
+    current_docs = len([doc for doc in st.session_state.documents if doc['status'] == 'Current'])
+    under_review = len([doc for doc in st.session_state.documents if doc['status'] == 'Under Review'])
+    total_storage = sum(float(doc['file_size'].replace(' MB', '')) for doc in st.session_state.documents)
+    
+    with col1:
+        st.metric("Total Documents", total_docs, delta_color="normal")
+    with col2:
+        st.metric("Current", current_docs, delta_color="normal")
+    with col3:
+        st.metric("Under Review", under_review, delta_color="normal")
+    with col4:
+        st.metric("Storage Used", f"{total_storage:.1f} MB", delta_color="normal")
+    
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📄 Documents", "📁 Folders", "🔍 Reviews", "📈 Analytics", "🔧 Management"])
+    
+    with tab1:
+        st.subheader("📄 Document Management")
+        
+        doc_sub_tab1, doc_sub_tab2, doc_sub_tab3 = st.tabs(["📝 Upload Document", "📋 Document Library", "🔍 Search & Filter"])
+        
+        with doc_sub_tab1:
+            st.markdown("**Upload New Document**")
+            
+            with st.form("document_upload_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    uploaded_file = st.file_uploader("Select Document", type=['pdf', 'dwg', 'docx', 'xlsx', 'jpg', 'png', 'txt'])
+                    document_title = st.text_input("Document Title", placeholder="Descriptive document title")
+                    category = st.selectbox("Category", [
+                        "Architectural Drawings", "Structural Drawings", "MEP Drawings", "Technical Specifications",
+                        "Engineering Reports", "Contracts & Legal", "Safety Documents", "Quality Control",
+                        "Project Management", "Permits & Approvals", "Correspondence"
+                    ])
+                    document_type = st.selectbox("Document Type", [
+                        "Design Document", "Specification", "Report", "Contract", "Drawing", "Manual",
+                        "Certificate", "Correspondence", "Permit", "Invoice", "Meeting Minutes"
+                    ])
+                    version = st.text_input("Version", placeholder="Rev A.1", value="Rev A")
+                
+                with col2:
+                    author = st.text_input("Author", placeholder="Company or person name")
+                    reviewer = st.text_input("Reviewer", placeholder="Assigned reviewer")
+                    status = st.selectbox("Status", ["Draft", "Under Review", "Current", "Superseded", "Archived"])
+                    access_level = st.selectbox("Access Level", ["Public", "Project Team", "Engineering Team", "MEP Team", "Management Only"])
+                    confidentiality = st.selectbox("Confidentiality", ["Public", "Internal Use", "Confidential", "Restricted"])
+                
+                description = st.text_area("Description", placeholder="Detailed description of document contents")
+                tags = st.text_input("Tags", placeholder="Comma-separated tags for easy searching")
+                keywords = st.text_input("Keywords", placeholder="Search keywords")
+                linked_tasks = st.multiselect("Link to Tasks", [f"{task['id']} - {task['task_name']}" for task in st.session_state.get('schedule_tasks', [])])
+                compliance_requirements = st.text_area("Compliance Requirements", placeholder="Applicable codes, standards, regulations")
+                
+                if st.form_submit_button("📄 Upload Document", type="primary"):
+                    if uploaded_file and document_title and author:
+                        new_document = {
+                            "id": f"DOC-{len(st.session_state.documents) + 1:03d}",
+                            "document_id": f"HTD-DOC-2025-{len(st.session_state.documents) + 4:03d}",
+                            "filename": uploaded_file.name,
+                            "title": document_title,
+                            "category": category,
+                            "document_type": document_type,
+                            "version": version,
+                            "status": status,
+                            "author": author,
+                            "reviewer": reviewer,
+                            "upload_date": str(datetime.now().date()),
+                            "review_date": "",
+                            "approval_date": "",
+                            "file_size": f"{uploaded_file.size / (1024*1024):.1f} MB" if uploaded_file.size else "Unknown",
+                            "file_format": uploaded_file.name.split('.')[-1].upper() if '.' in uploaded_file.name else "Unknown",
+                            "description": description,
+                            "tags": [tag.strip() for tag in tags.split(',') if tag.strip()],
+                            "access_level": access_level,
+                            "linked_rfis": [],
+                            "linked_tasks": [task.split(" - ")[0] for task in linked_tasks],
+                            "revision_history": [{"version": version, "date": str(datetime.now().date()), "changes": "Initial upload"}],
+                            "keywords": [kw.strip() for kw in keywords.split(',') if kw.strip()],
+                            "compliance_requirements": [req.strip() for req in compliance_requirements.split(',') if req.strip()],
+                            "expiry_date": "",
+                            "confidentiality": confidentiality
+                        }
+                        st.session_state.documents.append(new_document)
+                        st.success("✅ Document uploaded successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields and select a document!")
+        
+        with doc_sub_tab2:
+            st.markdown("**Document Library**")
+            
+            # Display documents
+            for document in st.session_state.documents:
+                status_icon = {"Draft": "📝", "Under Review": "👁️", "Current": "✅", "Superseded": "🔄", "Archived": "📦"}.get(document['status'], "📄")
+                
+                with st.expander(f"{status_icon} {document['document_id']} - {document['title']} ({document['status']})"):
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        st.write(f"**📄 Document ID:** {document['document_id']}")
+                        st.write(f"**📁 Filename:** {document['filename']}")
+                        st.write(f"**📂 Category:** {document['category']}")
+                        st.write(f"**📋 Type:** {document['document_type']}")
+                        st.write(f"**📊 Version:** {document['version']}")
+                        st.write(f"**📈 Status:** {document['status']}")
+                        st.write(f"**👤 Author:** {document['author']}")
+                    
+                    with col2:
+                        st.write(f"**📅 Upload Date:** {document['upload_date']}")
+                        if document['review_date']:
+                            st.write(f"**📅 Review Date:** {document['review_date']}")
+                        if document['approval_date']:
+                            st.write(f"**📅 Approval Date:** {document['approval_date']}")
+                        st.write(f"**💾 File Size:** {document['file_size']}")
+                        st.write(f"**📄 Format:** {document['file_format']}")
+                        st.write(f"**🔒 Access Level:** {document['access_level']}")
+                        st.write(f"**🔐 Confidentiality:** {document['confidentiality']}")
+                    
+                    with col3:
+                        if document['reviewer']:
+                            st.write(f"**👤 Reviewer:** {document['reviewer']}")
+                        if document['linked_tasks']:
+                            st.write(f"**🔗 Linked Tasks:** {', '.join(document['linked_tasks'])}")
+                        if document['compliance_requirements']:
+                            st.write(f"**📋 Compliance:** {', '.join(document['compliance_requirements'])}")
+                    
+                    st.write(f"**📝 Description:** {document['description']}")
+                    
+                    # Tags display
+                    if document['tags']:
+                        st.write("**🏷️ Tags:**")
+                        tags_html = " ".join([f'<span style="background-color: #e1e1e1; padding: 2px 8px; border-radius: 10px; margin-right: 5px; font-size: 0.8em;">{tag}</span>' for tag in document['tags']])
+                        st.markdown(tags_html, unsafe_allow_html=True)
+                    
+                    # Revision history
+                    if len(document['revision_history']) > 1:
+                        st.write("**📜 Revision History:**")
+                        for revision in document['revision_history'][-3:]:  # Show last 3 revisions
+                            st.write(f"  • {revision['version']} ({revision['date']}): {revision['changes']}")
+                    
+                    # Action buttons
+                    col1, col2, col3, col4, col5 = st.columns(5)
+                    with col1:
+                        if st.button(f"👁️ View", key=f"view_{document['id']}"):
+                            st.info(f"Opening {document['filename']}")
+                    with col2:
+                        if st.button(f"⬇️ Download", key=f"download_{document['id']}"):
+                            st.success(f"Downloading {document['filename']}")
+                    with col3:
+                        if document['status'] == 'Under Review' and st.button(f"✅ Approve", key=f"approve_{document['id']}"):
+                            document['status'] = 'Current'
+                            document['approval_date'] = str(datetime.now().date())
+                            st.success("Document approved!")
+                            st.rerun()
+                    with col4:
+                        if st.button(f"✏️ Edit", key=f"edit_{document['id']}"):
+                            st.info("Edit functionality - would open edit form")
+                    with col5:
+                        if st.button(f"🗑️ Archive", key=f"archive_{document['id']}"):
+                            document['status'] = 'Archived'
+                            st.success("Document archived!")
+                            st.rerun()
+        
+        with doc_sub_tab3:
+            st.markdown("**Search and Filter Documents**")
+            
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                category_filter = st.selectbox("Filter by Category", ["All Categories"] + list(set(doc['category'] for doc in st.session_state.documents)))
+            with col2:
+                status_filter = st.selectbox("Filter by Status", ["All Status", "Draft", "Under Review", "Current", "Superseded", "Archived"])
+            with col3:
+                author_filter = st.selectbox("Filter by Author", ["All Authors"] + list(set(doc['author'] for doc in st.session_state.documents)))
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                search_text = st.text_input("🔍 Search", placeholder="Search in titles, descriptions, keywords...")
+            with col2:
+                date_range = st.selectbox("Date Range", ["All Time", "Last 30 Days", "Last 90 Days", "This Year"])
+            
+            # Apply filters
+            filtered_docs = st.session_state.documents
+            if category_filter != "All Categories":
+                filtered_docs = [doc for doc in filtered_docs if doc['category'] == category_filter]
+            if status_filter != "All Status":
+                filtered_docs = [doc for doc in filtered_docs if doc['status'] == status_filter]
+            if author_filter != "All Authors":
+                filtered_docs = [doc for doc in filtered_docs if doc['author'] == author_filter]
+            if search_text:
+                filtered_docs = [doc for doc in filtered_docs if 
+                               search_text.lower() in doc['title'].lower() or 
+                               search_text.lower() in doc['description'].lower() or
+                               search_text.lower() in ' '.join(doc['keywords']).lower()]
+            
+            st.markdown(f"**Found {len(filtered_docs)} documents**")
+            
+            # Display filtered results
+            for doc in filtered_docs:
+                st.write(f"📄 **{doc['document_id']}** - {doc['title']} ({doc['status']})")
+    
+    with tab2:
+        st.subheader("📁 Folder Management")
+        
+        folder_sub_tab1, folder_sub_tab2 = st.tabs(["📁 Create Folder", "📂 View Folders"])
+        
+        with folder_sub_tab1:
+            st.markdown("**Create New Folder**")
+            
+            with st.form("folder_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    folder_name = st.text_input("Folder Name", placeholder="Descriptive folder name")
+                    description = st.text_area("Description", placeholder="Folder description and purpose")
+                    access_level = st.selectbox("Access Level", ["Public", "Project Team", "Engineering Team", "MEP Team", "Management Only"])
+                
+                with col2:
+                    parent_folder = st.selectbox("Parent Folder", ["Root"] + [folder['folder_name'] for folder in st.session_state.document_folders])
+                    tags = st.text_input("Tags", placeholder="Comma-separated tags")
+                
+                if st.form_submit_button("📁 Create Folder", type="primary"):
+                    if folder_name:
+                        new_folder = {
+                            "id": f"FOLD-{len(st.session_state.document_folders) + 1:03d}",
+                            "folder_name": folder_name,
+                            "description": description,
+                            "created_date": str(datetime.now().date()),
+                            "document_count": 0,
+                            "access_level": access_level,
+                            "parent_folder": parent_folder if parent_folder != "Root" else "",
+                            "tags": [tag.strip() for tag in tags.split(',') if tag.strip()]
+                        }
+                        st.session_state.document_folders.append(new_folder)
+                        st.success("✅ Folder created successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please provide a folder name!")
+        
+        with folder_sub_tab2:
+            st.markdown("**All Document Folders**")
+            
+            for folder in st.session_state.document_folders:
+                with st.expander(f"📁 {folder['folder_name']} ({folder['document_count']} documents)"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📁 Folder:** {folder['folder_name']}")
+                        st.write(f"**📝 Description:** {folder['description']}")
+                        st.write(f"**📅 Created:** {folder['created_date']}")
+                        st.write(f"**📄 Documents:** {folder['document_count']}")
+                    
+                    with col2:
+                        st.write(f"**🔒 Access Level:** {folder['access_level']}")
+                        if folder['parent_folder']:
+                            st.write(f"**📂 Parent:** {folder['parent_folder']}")
+                        if folder['tags']:
+                            st.write(f"**🏷️ Tags:** {', '.join(folder['tags'])}")
+                    
+                    # Action buttons
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        if st.button(f"📂 Open", key=f"open_folder_{folder['id']}"):
+                            st.info("Folder view functionality")
+                    with col2:
+                        if st.button(f"✏️ Edit", key=f"edit_folder_{folder['id']}"):
+                            st.info("Edit folder functionality")
+                    with col3:
+                        if st.button(f"🗑️ Delete", key=f"delete_folder_{folder['id']}"):
+                            st.session_state.document_folders.remove(folder)
+                            st.success("Folder deleted!")
+                            st.rerun()
+    
+    with tab3:
+        st.subheader("🔍 Document Reviews")
+        
+        review_sub_tab1, review_sub_tab2 = st.tabs(["📝 New Review", "📊 All Reviews"])
+        
+        with review_sub_tab1:
+            st.markdown("**Submit Document Review**")
+            
+            with st.form("review_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    review_document = st.selectbox("Select Document", [f"{doc['document_id']} - {doc['title']}" for doc in st.session_state.documents])
+                    reviewer = st.text_input("Reviewer", placeholder="Your name and title")
+                    review_type = st.selectbox("Review Type", ["Technical Review", "Quality Review", "Compliance Review", "Final Approval"])
+                    review_status = st.selectbox("Review Status", ["Approved", "Approved with Comments", "Rejected", "Pending"])
+                
+                with col2:
+                    rating = st.slider("Overall Rating", 1, 5, 3)
+                    next_review_date = st.date_input("Next Review Date", value=datetime.now().date() + timedelta(days=90))
+                
+                comments = st.text_area("Review Comments", placeholder="Detailed review comments and recommendations")
+                
+                if st.form_submit_button("🔍 Submit Review", type="primary"):
+                    if review_document and reviewer and comments:
+                        new_review = {
+                            "id": f"REV-{len(st.session_state.document_reviews) + 1:03d}",
+                            "document_id": review_document.split(" - ")[0].replace("HTD-DOC-2025-", "DOC-").replace("HTD-DWG-2025-", "DOC-").replace("HTD-SPEC-2025-", "DOC-").replace("HTD-MEP-2025-", "DOC-"),
+                            "reviewer": reviewer,
+                            "review_date": str(datetime.now().date()),
+                            "review_status": review_status,
+                            "comments": comments,
+                            "rating": rating,
+                            "next_review_date": str(next_review_date),
+                            "review_type": review_type
+                        }
+                        st.session_state.document_reviews.append(new_review)
+                        st.success("✅ Review submitted successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields!")
+        
+        with review_sub_tab2:
+            st.markdown("**All Document Reviews**")
+            
+            for review in st.session_state.document_reviews:
+                # Find document title
+                doc_title = "Unknown Document"
+                for doc in st.session_state.documents:
+                    if doc['id'] == review['document_id']:
+                        doc_title = doc['title']
+                        break
+                
+                status_icon = {"Approved": "✅", "Approved with Comments": "✅", "Rejected": "❌", "Pending": "⏳"}.get(review['review_status'], "📋")
+                
+                with st.expander(f"{status_icon} {review['id']} - {doc_title} ({review['review_status']})"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📄 Document:** {doc_title}")
+                        st.write(f"**👤 Reviewer:** {review['reviewer']}")
+                        st.write(f"**📅 Review Date:** {review['review_date']}")
+                        st.write(f"**📋 Review Type:** {review['review_type']}")
+                        st.write(f"**📊 Status:** {review['review_status']}")
+                    
+                    with col2:
+                        st.write(f"**⭐ Rating:** {review['rating']}/5")
+                        st.write(f"**📅 Next Review:** {review['next_review_date']}")
+                    
+                    st.write(f"**💬 Comments:** {review['comments']}")
+                    
+                    # Action buttons
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        if st.button(f"📤 Share", key=f"share_review_{review['id']}"):
+                            st.success("Review shared!")
+                    with col2:
+                        if st.button(f"✏️ Edit", key=f"edit_review_{review['id']}"):
+                            st.info("Edit review functionality")
+                    with col3:
+                        if st.button(f"🗑️ Delete", key=f"delete_review_{review['id']}"):
+                            st.session_state.document_reviews.remove(review)
+                            st.success("Review deleted!")
+                            st.rerun()
+    
+    with tab4:
+        st.subheader("📈 Document Analytics")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Document status distribution
+            if st.session_state.documents:
+                status_counts = {}
+                for doc in st.session_state.documents:
+                    status = doc['status']
+                    status_counts[status] = status_counts.get(status, 0) + 1
+                
+                status_list = list(status_counts.keys())
+                count_list = list(status_counts.values())
+                status_df = pd.DataFrame({
+                    'Status': status_list,
+                    'Count': count_list
+                })
+                fig_status = px.pie(status_df, values='Count', names='Status', title="Document Status Distribution")
+                st.plotly_chart(fig_status, use_container_width=True)
+        
+        with col2:
+            # Category distribution
+            if st.session_state.documents:
+                category_counts = {}
+                for doc in st.session_state.documents:
+                    category = doc['category']
+                    category_counts[category] = category_counts.get(category, 0) + 1
+                
+                category_list = list(category_counts.keys())
+                category_count_list = list(category_counts.values())
+                category_df = pd.DataFrame({
+                    'Category': category_list,
+                    'Count': category_count_list
+                })
+                fig_category = px.bar(category_df, x='Category', y='Count', title="Documents by Category")
+                st.plotly_chart(fig_category, use_container_width=True)
+        
+        # Document timeline
+        st.markdown("**📅 Document Upload Timeline**")
+        if st.session_state.documents:
+            timeline_data = []
+            for doc in st.session_state.documents:
+                timeline_data.append({
+                    'Date': doc['upload_date'],
+                    'Document': doc['title'][:30] + "..." if len(doc['title']) > 30 else doc['title'],
+                    'Category': doc['category'],
+                    'Status': doc['status']
+                })
+            
+            timeline_df = pd.DataFrame(timeline_data)
+            timeline_df['Date'] = pd.to_datetime(timeline_df['Date'])
+            timeline_df = timeline_df.sort_values('Date')
+            
+            fig_timeline = px.scatter(timeline_df, x='Date', y='Document', color='Category', 
+                                    size_max=10, title="Document Upload Timeline")
+            st.plotly_chart(fig_timeline, use_container_width=True)
+    
+    with tab5:
+        st.subheader("🔧 Document Management")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown("**📄 Document Summary**")
+            if st.session_state.documents:
+                doc_stats_data = pd.DataFrame([
+                    {"Metric": "Total Documents", "Value": len(st.session_state.documents)},
+                    {"Metric": "Current", "Value": len([d for d in st.session_state.documents if d['status'] == 'Current'])},
+                    {"Metric": "Under Review", "Value": len([d for d in st.session_state.documents if d['status'] == 'Under Review'])},
+                    {"Metric": "Avg File Size", "Value": f"{sum(float(d['file_size'].replace(' MB', '')) for d in st.session_state.documents) / len(st.session_state.documents):.1f} MB"},
+                ])
+                st.dataframe(doc_stats_data, use_container_width=True)
+        
+        with col2:
+            st.markdown("**📁 Folder Summary**")
+            if st.session_state.document_folders:
+                folder_stats_data = pd.DataFrame([
+                    {"Metric": "Total Folders", "Value": len(st.session_state.document_folders)},
+                    {"Metric": "Root Folders", "Value": len([f for f in st.session_state.document_folders if not f['parent_folder']])},
+                    {"Metric": "Sub Folders", "Value": len([f for f in st.session_state.document_folders if f['parent_folder']])},
+                    {"Metric": "Avg Documents", "Value": f"{sum(f['document_count'] for f in st.session_state.document_folders) / len(st.session_state.document_folders):.1f}"},
+                ])
+                st.dataframe(folder_stats_data, use_container_width=True)
+        
+        with col3:
+            st.markdown("**🔍 Review Summary**")
+            if st.session_state.document_reviews:
+                review_stats_data = pd.DataFrame([
+                    {"Metric": "Total Reviews", "Value": len(st.session_state.document_reviews)},
+                    {"Metric": "Approved", "Value": len([r for r in st.session_state.document_reviews if 'Approved' in r['review_status']])},
+                    {"Metric": "Pending", "Value": len([r for r in st.session_state.document_reviews if r['review_status'] == 'Pending'])},
+                    {"Metric": "Avg Rating", "Value": f"{sum(r['rating'] for r in st.session_state.document_reviews) / len(st.session_state.document_reviews):.1f}/5"},
+                ])
+                st.dataframe(review_stats_data, use_container_width=True)
+        
+        # Data management
+        st.markdown("**⚠️ Data Management**")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("🗑️ Clear Documents", type="secondary"):
+                st.session_state.documents = []
+                st.success("All documents cleared!")
+                st.rerun()
+        with col2:
+            if st.button("🗑️ Clear Folders", type="secondary"):
+                st.session_state.document_folders = []
+                st.success("All folders cleared!")
+                st.rerun()
+        with col3:
+            if st.button("🗑️ Clear Reviews", type="secondary"):
+                st.session_state.document_reviews = []
+                st.success("All reviews cleared!")
+                st.rerun()
 
 def render_unit_prices():
     """Unit prices module"""

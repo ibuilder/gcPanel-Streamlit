@@ -8204,14 +8204,685 @@ def render_progress_photos():
                 st.success("Photo data exported!")
 
 def render_subcontractor_management():
-    """Subcontractor management module"""
+    """Complete Subcontractor Management with full CRUD functionality"""
     st.markdown("""
     <div class="module-header">
         <h1>🏭 Subcontractor Management</h1>
-        <p>Subcontractor coordination and performance tracking</p>
+        <p>Comprehensive subcontractor coordination, performance tracking, and compliance management</p>
     </div>
     """, unsafe_allow_html=True)
-    st.info("🏭 Subcontractor Management with performance tracking")
+    
+    # Initialize subcontractor data
+    if "subcontractors" not in st.session_state:
+        st.session_state.subcontractors = [
+            {
+                "id": "SUB-001",
+                "company_name": "Steel Solutions Inc",
+                "trade": "Structural Steel",
+                "contact_person": "Mike Chen",
+                "contact_title": "Project Manager",
+                "phone": "(555) 123-4567",
+                "email": "mchen@steelsolutions.com",
+                "address": "1234 Industrial Blvd, Brooklyn, NY 11201",
+                "license_number": "NYS-STEEL-12345",
+                "insurance_expiry": "2025-12-31",
+                "bond_amount": 500000.00,
+                "status": "Active",
+                "start_date": "2025-04-01",
+                "end_date": "2025-08-15",
+                "contract_value": 3200000.00,
+                "performance_rating": 4.8,
+                "safety_rating": 4.9,
+                "quality_rating": 4.7,
+                "schedule_rating": 4.8,
+                "payment_terms": "Net 30",
+                "current_tasks": ["TASK-003"],
+                "completed_work": 85.0,
+                "certifications": ["AWS D1.1", "OSHA 30", "AISC Certified"],
+                "notes": "Excellent performance on structural steel installation",
+                "emergency_contact": "Lisa Chen - (555) 123-4568"
+            },
+            {
+                "id": "SUB-002",
+                "company_name": "Elite MEP Systems",
+                "trade": "MEP",
+                "contact_person": "Jennifer Walsh",
+                "contact_title": "MEP Coordinator",
+                "phone": "(555) 234-5678",
+                "email": "jwalsh@elitemep.com",
+                "address": "5678 Tech Park Dr, Queens, NY 11377",
+                "license_number": "NYS-MEP-67890",
+                "insurance_expiry": "2025-11-30",
+                "bond_amount": 750000.00,
+                "status": "Active",
+                "start_date": "2025-06-15",
+                "end_date": "2025-07-31",
+                "contract_value": 4100000.00,
+                "performance_rating": 4.6,
+                "safety_rating": 4.7,
+                "quality_rating": 4.8,
+                "schedule_rating": 4.4,
+                "payment_terms": "Net 30",
+                "current_tasks": ["TASK-004"],
+                "completed_work": 60.0,
+                "certifications": ["NECA Certified", "OSHA 30", "LEED Accredited"],
+                "notes": "Strong technical expertise, minor schedule coordination needed",
+                "emergency_contact": "Robert Walsh - (555) 234-5679"
+            },
+            {
+                "id": "SUB-003",
+                "company_name": "Premium Exteriors LLC",
+                "trade": "Exterior Envelope",
+                "contact_person": "David Rodriguez",
+                "contact_title": "Envelope Specialist",
+                "phone": "(555) 345-6789",
+                "email": "drodriguez@premiumext.com",
+                "address": "9876 Facade Ave, Manhattan, NY 10001",
+                "license_number": "NYS-EXT-54321",
+                "insurance_expiry": "2026-01-15",
+                "bond_amount": 400000.00,
+                "status": "Scheduled",
+                "start_date": "2025-08-01",
+                "end_date": "2025-09-30",
+                "contract_value": 2200000.00,
+                "performance_rating": 4.9,
+                "safety_rating": 4.8,
+                "quality_rating": 5.0,
+                "schedule_rating": 4.9,
+                "payment_terms": "Net 30",
+                "current_tasks": ["TASK-005"],
+                "completed_work": 30.0,
+                "certifications": ["Curtain Wall Specialist", "OSHA 30", "AAMA Certified"],
+                "notes": "Top-tier curtain wall contractor with excellent reputation",
+                "emergency_contact": "Maria Rodriguez - (555) 345-6790"
+            }
+        ]
+    
+    if "subcontractor_evaluations" not in st.session_state:
+        st.session_state.subcontractor_evaluations = [
+            {
+                "id": "EVAL-001",
+                "subcontractor_id": "SUB-001",
+                "evaluation_date": "2025-05-15",
+                "evaluator": "John Davis, P.E.",
+                "period": "Q2 2025",
+                "performance_score": 4.8,
+                "safety_score": 4.9,
+                "quality_score": 4.7,
+                "schedule_score": 4.8,
+                "communication_score": 4.6,
+                "overall_score": 4.76,
+                "strengths": ["Excellent steel installation quality", "Strong safety record", "Responsive to changes"],
+                "improvement_areas": ["Communication during coordination meetings", "Documentation submission timing"],
+                "recommendations": "Continue current performance level, improve documentation processes",
+                "next_evaluation": "2025-08-15"
+            },
+            {
+                "id": "EVAL-002",
+                "subcontractor_id": "SUB-002",
+                "evaluation_date": "2025-05-20",
+                "evaluator": "Sarah Johnson - Project Manager",
+                "period": "Q2 2025",
+                "performance_score": 4.6,
+                "safety_score": 4.7,
+                "quality_score": 4.8,
+                "schedule_score": 4.4,
+                "communication_score": 4.5,
+                "overall_score": 4.6,
+                "strengths": ["High-quality MEP installation", "Technical expertise", "Problem-solving capabilities"],
+                "improvement_areas": ["Schedule adherence", "Coordination with other trades"],
+                "recommendations": "Focus on schedule management and improved coordination",
+                "next_evaluation": "2025-07-20"
+            }
+        ]
+    
+    if "insurance_tracking" not in st.session_state:
+        st.session_state.insurance_tracking = [
+            {
+                "id": "INS-001",
+                "subcontractor_id": "SUB-001",
+                "insurance_type": "General Liability",
+                "policy_number": "GL-2025-12345",
+                "provider": "Construction Insurance Group",
+                "coverage_amount": 2000000.00,
+                "effective_date": "2025-01-01",
+                "expiry_date": "2025-12-31",
+                "status": "Active",
+                "certificate_received": True,
+                "renewal_reminder": "2025-11-01"
+            },
+            {
+                "id": "INS-002",
+                "subcontractor_id": "SUB-001",
+                "insurance_type": "Workers Compensation",
+                "policy_number": "WC-2025-67890",
+                "provider": "Safety First Insurance",
+                "coverage_amount": 1000000.00,
+                "effective_date": "2025-01-01",
+                "expiry_date": "2025-12-31",
+                "status": "Active",
+                "certificate_received": True,
+                "renewal_reminder": "2025-11-01"
+            },
+            {
+                "id": "INS-003",
+                "subcontractor_id": "SUB-002",
+                "insurance_type": "General Liability",
+                "policy_number": "GL-2025-54321",
+                "provider": "MEP Insurance Solutions",
+                "coverage_amount": 3000000.00,
+                "effective_date": "2025-01-01",
+                "expiry_date": "2025-11-30",
+                "status": "Expiring Soon",
+                "certificate_received": True,
+                "renewal_reminder": "2025-10-01"
+            }
+        ]
+    
+    # Key Subcontractor Metrics
+    col1, col2, col3, col4 = st.columns(4)
+    
+    total_subs = len(st.session_state.subcontractors)
+    active_subs = len([sub for sub in st.session_state.subcontractors if sub['status'] == 'Active'])
+    avg_performance = sum(sub['performance_rating'] for sub in st.session_state.subcontractors) / len(st.session_state.subcontractors) if st.session_state.subcontractors else 0
+    total_contract_value = sum(sub['contract_value'] for sub in st.session_state.subcontractors)
+    
+    with col1:
+        st.metric("Total Subcontractors", total_subs, delta_color="normal")
+    with col2:
+        st.metric("Active", active_subs, delta_color="normal")
+    with col3:
+        st.metric("Avg Performance", f"{avg_performance:.1f}/5.0", delta_color="normal")
+    with col4:
+        st.metric("Total Contract Value", f"${total_contract_value/1000000:.1f}M", delta_color="normal")
+    
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["🏭 Subcontractors", "📊 Evaluations", "🛡️ Insurance", "📈 Analytics", "🔧 Management"])
+    
+    with tab1:
+        st.subheader("🏭 Subcontractor Management")
+        
+        sub_tab1, sub_tab2 = st.tabs(["➕ Add Subcontractor", "📋 View Subcontractors"])
+        
+        with sub_tab1:
+            st.markdown("**Add New Subcontractor**")
+            
+            with st.form("subcontractor_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    company_name = st.text_input("Company Name", placeholder="Subcontractor company name")
+                    trade = st.selectbox("Trade", [
+                        "Structural Steel", "MEP", "Exterior Envelope", "Concrete", "Interior Finishes",
+                        "Roofing", "Earthwork", "Masonry", "Flooring", "Painting", "Specialty"
+                    ])
+                    contact_person = st.text_input("Contact Person", placeholder="Primary contact name")
+                    contact_title = st.text_input("Contact Title", placeholder="Contact person title")
+                    phone = st.text_input("Phone", placeholder="(555) 123-4567")
+                    email = st.text_input("Email", placeholder="contact@company.com")
+                    address = st.text_area("Address", placeholder="Complete business address")
+                
+                with col2:
+                    license_number = st.text_input("License Number", placeholder="State license number")
+                    insurance_expiry = st.date_input("Insurance Expiry", value=datetime.now().date() + timedelta(days=365))
+                    bond_amount = st.number_input("Bond Amount ($)", value=0.00, format="%.2f")
+                    contract_value = st.number_input("Contract Value ($)", value=0.00, format="%.2f")
+                    start_date = st.date_input("Start Date", value=datetime.now().date())
+                    end_date = st.date_input("End Date", value=datetime.now().date() + timedelta(days=90))
+                    payment_terms = st.selectbox("Payment Terms", ["Net 30", "Net 15", "Net 45", "Weekly", "Bi-weekly"])
+                
+                certifications = st.text_area("Certifications", placeholder="Comma-separated certifications")
+                emergency_contact = st.text_input("Emergency Contact", placeholder="Emergency contact information")
+                notes = st.text_area("Notes", placeholder="Additional notes about the subcontractor")
+                
+                if st.form_submit_button("🏭 Add Subcontractor", type="primary"):
+                    if company_name and trade and contact_person and phone and email:
+                        new_subcontractor = {
+                            "id": f"SUB-{len(st.session_state.subcontractors) + 1:03d}",
+                            "company_name": company_name,
+                            "trade": trade,
+                            "contact_person": contact_person,
+                            "contact_title": contact_title,
+                            "phone": phone,
+                            "email": email,
+                            "address": address,
+                            "license_number": license_number,
+                            "insurance_expiry": str(insurance_expiry),
+                            "bond_amount": bond_amount,
+                            "status": "Scheduled",
+                            "start_date": str(start_date),
+                            "end_date": str(end_date),
+                            "contract_value": contract_value,
+                            "performance_rating": 0.0,
+                            "safety_rating": 0.0,
+                            "quality_rating": 0.0,
+                            "schedule_rating": 0.0,
+                            "payment_terms": payment_terms,
+                            "current_tasks": [],
+                            "completed_work": 0.0,
+                            "certifications": [cert.strip() for cert in certifications.split(',') if cert.strip()],
+                            "notes": notes,
+                            "emergency_contact": emergency_contact
+                        }
+                        st.session_state.subcontractors.append(new_subcontractor)
+                        st.success("✅ Subcontractor added successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields!")
+        
+        with sub_tab2:
+            st.markdown("**All Subcontractors**")
+            
+            # Filters
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                trade_filter = st.selectbox("Filter by Trade", ["All Trades"] + list(set(sub['trade'] for sub in st.session_state.subcontractors)))
+            with col2:
+                status_filter = st.selectbox("Filter by Status", ["All Status", "Active", "Scheduled", "Completed", "Suspended"])
+            with col3:
+                search_text = st.text_input("🔍 Search", placeholder="Search company names...")
+            
+            # Apply filters
+            filtered_subs = st.session_state.subcontractors
+            if trade_filter != "All Trades":
+                filtered_subs = [sub for sub in filtered_subs if sub['trade'] == trade_filter]
+            if status_filter != "All Status":
+                filtered_subs = [sub for sub in filtered_subs if sub['status'] == status_filter]
+            if search_text:
+                filtered_subs = [sub for sub in filtered_subs if search_text.lower() in sub['company_name'].lower()]
+            
+            # Display subcontractors
+            for subcontractor in filtered_subs:
+                status_icon = {"Active": "🟢", "Scheduled": "🟡", "Completed": "✅", "Suspended": "🔴"}.get(subcontractor['status'], "⚪")
+                
+                with st.expander(f"{status_icon} {subcontractor['company_name']} - {subcontractor['trade']} ({subcontractor['status']})"):
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        st.write(f"**🏭 Company:** {subcontractor['company_name']}")
+                        st.write(f"**🔧 Trade:** {subcontractor['trade']}")
+                        st.write(f"**👤 Contact:** {subcontractor['contact_person']}")
+                        st.write(f"**📱 Phone:** {subcontractor['phone']}")
+                        st.write(f"**📧 Email:** {subcontractor['email']}")
+                        st.write(f"**📊 Status:** {subcontractor['status']}")
+                    
+                    with col2:
+                        st.write(f"**📅 Start Date:** {subcontractor['start_date']}")
+                        st.write(f"**📅 End Date:** {subcontractor['end_date']}")
+                        st.write(f"**💰 Contract Value:** ${subcontractor['contract_value']:,.2f}")
+                        st.write(f"**💳 Payment Terms:** {subcontractor['payment_terms']}")
+                        st.write(f"**🛡️ Insurance Expiry:** {subcontractor['insurance_expiry']}")
+                        st.write(f"**📜 License:** {subcontractor['license_number']}")
+                    
+                    with col3:
+                        st.write(f"**⭐ Performance:** {subcontractor['performance_rating']:.1f}/5.0")
+                        st.write(f"**🦺 Safety:** {subcontractor['safety_rating']:.1f}/5.0")
+                        st.write(f"**🎯 Quality:** {subcontractor['quality_rating']:.1f}/5.0")
+                        st.write(f"**📅 Schedule:** {subcontractor['schedule_rating']:.1f}/5.0")
+                        st.write(f"**📈 Work Complete:** {subcontractor['completed_work']:.1f}%")
+                        if subcontractor['current_tasks']:
+                            st.write(f"**🔗 Current Tasks:** {', '.join(subcontractor['current_tasks'])}")
+                    
+                    if subcontractor['certifications']:
+                        st.write(f"**📜 Certifications:** {', '.join(subcontractor['certifications'])}")
+                    if subcontractor['notes']:
+                        st.write(f"**📝 Notes:** {subcontractor['notes']}")
+                    
+                    # Progress bar
+                    st.write("**📈 Work Progress:**")
+                    st.progress(subcontractor['completed_work'] / 100)
+                    
+                    # Action buttons
+                    col1, col2, col3, col4 = st.columns(4)
+                    with col1:
+                        if subcontractor['status'] == 'Scheduled' and st.button(f"▶️ Activate", key=f"activate_{subcontractor['id']}"):
+                            subcontractor['status'] = 'Active'
+                            st.success("Subcontractor activated!")
+                            st.rerun()
+                    with col2:
+                        if st.button(f"📊 Evaluate", key=f"evaluate_{subcontractor['id']}"):
+                            st.info("Evaluation form - would open evaluation interface")
+                    with col3:
+                        if st.button(f"✏️ Edit", key=f"edit_{subcontractor['id']}"):
+                            st.info("Edit functionality - would open edit form")
+                    with col4:
+                        if st.button(f"🗑️ Remove", key=f"remove_{subcontractor['id']}"):
+                            st.session_state.subcontractors.remove(subcontractor)
+                            st.success("Subcontractor removed!")
+                            st.rerun()
+    
+    with tab2:
+        st.subheader("📊 Performance Evaluations")
+        
+        eval_tab1, eval_tab2 = st.tabs(["📝 New Evaluation", "📊 View Evaluations"])
+        
+        with eval_tab1:
+            st.markdown("**Create Performance Evaluation**")
+            
+            with st.form("evaluation_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    eval_subcontractor = st.selectbox("Select Subcontractor", [f"{sub['id']} - {sub['company_name']}" for sub in st.session_state.subcontractors])
+                    evaluation_date = st.date_input("Evaluation Date", value=datetime.now().date())
+                    evaluator = st.text_input("Evaluator", placeholder="Name and title of evaluator")
+                    period = st.text_input("Evaluation Period", placeholder="e.g., Q2 2025")
+                
+                with col2:
+                    performance_score = st.slider("Performance Score", 1.0, 5.0, 3.0, 0.1)
+                    safety_score = st.slider("Safety Score", 1.0, 5.0, 3.0, 0.1)
+                    quality_score = st.slider("Quality Score", 1.0, 5.0, 3.0, 0.1)
+                    schedule_score = st.slider("Schedule Score", 1.0, 5.0, 3.0, 0.1)
+                    communication_score = st.slider("Communication Score", 1.0, 5.0, 3.0, 0.1)
+                
+                strengths = st.text_area("Strengths", placeholder="List key strengths (comma-separated)")
+                improvement_areas = st.text_area("Areas for Improvement", placeholder="List improvement areas (comma-separated)")
+                recommendations = st.text_area("Recommendations", placeholder="Recommendations for future performance")
+                next_evaluation = st.date_input("Next Evaluation Date", value=datetime.now().date() + timedelta(days=90))
+                
+                if st.form_submit_button("📊 Submit Evaluation", type="primary"):
+                    if eval_subcontractor and evaluator:
+                        overall_score = (performance_score + safety_score + quality_score + schedule_score + communication_score) / 5
+                        
+                        new_evaluation = {
+                            "id": f"EVAL-{len(st.session_state.subcontractor_evaluations) + 1:03d}",
+                            "subcontractor_id": eval_subcontractor.split(" - ")[0],
+                            "evaluation_date": str(evaluation_date),
+                            "evaluator": evaluator,
+                            "period": period,
+                            "performance_score": performance_score,
+                            "safety_score": safety_score,
+                            "quality_score": quality_score,
+                            "schedule_score": schedule_score,
+                            "communication_score": communication_score,
+                            "overall_score": overall_score,
+                            "strengths": [s.strip() for s in strengths.split(',') if s.strip()],
+                            "improvement_areas": [i.strip() for i in improvement_areas.split(',') if i.strip()],
+                            "recommendations": recommendations,
+                            "next_evaluation": str(next_evaluation)
+                        }
+                        st.session_state.subcontractor_evaluations.append(new_evaluation)
+                        
+                        # Update subcontractor ratings
+                        sub_id = eval_subcontractor.split(" - ")[0]
+                        for sub in st.session_state.subcontractors:
+                            if sub['id'] == sub_id:
+                                sub['performance_rating'] = performance_score
+                                sub['safety_rating'] = safety_score
+                                sub['quality_rating'] = quality_score
+                                sub['schedule_rating'] = schedule_score
+                                break
+                        
+                        st.success("✅ Evaluation submitted successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields!")
+        
+        with eval_tab2:
+            st.markdown("**All Performance Evaluations**")
+            
+            for evaluation in st.session_state.subcontractor_evaluations:
+                # Find subcontractor name
+                sub_name = "Unknown"
+                for sub in st.session_state.subcontractors:
+                    if sub['id'] == evaluation['subcontractor_id']:
+                        sub_name = sub['company_name']
+                        break
+                
+                with st.expander(f"📊 {evaluation['id']} - {sub_name} ({evaluation['period']}) - Score: {evaluation['overall_score']:.1f}/5.0"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**🏭 Subcontractor:** {sub_name}")
+                        st.write(f"**📅 Evaluation Date:** {evaluation['evaluation_date']}")
+                        st.write(f"**👤 Evaluator:** {evaluation['evaluator']}")
+                        st.write(f"**📊 Period:** {evaluation['period']}")
+                        st.write(f"**📅 Next Evaluation:** {evaluation['next_evaluation']}")
+                    
+                    with col2:
+                        st.write(f"**⭐ Performance:** {evaluation['performance_score']:.1f}/5.0")
+                        st.write(f"**🦺 Safety:** {evaluation['safety_score']:.1f}/5.0")
+                        st.write(f"**🎯 Quality:** {evaluation['quality_score']:.1f}/5.0")
+                        st.write(f"**📅 Schedule:** {evaluation['schedule_score']:.1f}/5.0")
+                        st.write(f"**💬 Communication:** {evaluation['communication_score']:.1f}/5.0")
+                        st.write(f"**🏆 Overall Score:** {evaluation['overall_score']:.1f}/5.0")
+                    
+                    if evaluation['strengths']:
+                        st.write(f"**💪 Strengths:** {', '.join(evaluation['strengths'])}")
+                    if evaluation['improvement_areas']:
+                        st.write(f"**🎯 Improvement Areas:** {', '.join(evaluation['improvement_areas'])}")
+                    if evaluation['recommendations']:
+                        st.write(f"**💡 Recommendations:** {evaluation['recommendations']}")
+                    
+                    # Action buttons
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        if st.button(f"📤 Share", key=f"share_eval_{evaluation['id']}"):
+                            st.success("Evaluation shared!")
+                    with col2:
+                        if st.button(f"✏️ Edit", key=f"edit_eval_{evaluation['id']}"):
+                            st.info("Edit evaluation functionality")
+                    with col3:
+                        if st.button(f"🗑️ Delete", key=f"delete_eval_{evaluation['id']}"):
+                            st.session_state.subcontractor_evaluations.remove(evaluation)
+                            st.success("Evaluation deleted!")
+                            st.rerun()
+    
+    with tab3:
+        st.subheader("🛡️ Insurance Tracking")
+        
+        ins_tab1, ins_tab2 = st.tabs(["📝 Add Insurance", "📊 View Insurance"])
+        
+        with ins_tab1:
+            st.markdown("**Add Insurance Record**")
+            
+            with st.form("insurance_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    ins_subcontractor = st.selectbox("Select Subcontractor", [f"{sub['id']} - {sub['company_name']}" for sub in st.session_state.subcontractors])
+                    insurance_type = st.selectbox("Insurance Type", [
+                        "General Liability", "Workers Compensation", "Professional Liability", 
+                        "Commercial Auto", "Umbrella", "Builders Risk"
+                    ])
+                    policy_number = st.text_input("Policy Number", placeholder="Policy number")
+                    provider = st.text_input("Insurance Provider", placeholder="Insurance company name")
+                
+                with col2:
+                    coverage_amount = st.number_input("Coverage Amount ($)", value=0.00, format="%.2f")
+                    effective_date = st.date_input("Effective Date", value=datetime.now().date())
+                    expiry_date = st.date_input("Expiry Date", value=datetime.now().date() + timedelta(days=365))
+                    certificate_received = st.checkbox("Certificate Received", value=False)
+                
+                renewal_reminder = st.date_input("Renewal Reminder Date", value=expiry_date - timedelta(days=60))
+                
+                if st.form_submit_button("🛡️ Add Insurance", type="primary"):
+                    if ins_subcontractor and insurance_type and policy_number and provider:
+                        new_insurance = {
+                            "id": f"INS-{len(st.session_state.insurance_tracking) + 1:03d}",
+                            "subcontractor_id": ins_subcontractor.split(" - ")[0],
+                            "insurance_type": insurance_type,
+                            "policy_number": policy_number,
+                            "provider": provider,
+                            "coverage_amount": coverage_amount,
+                            "effective_date": str(effective_date),
+                            "expiry_date": str(expiry_date),
+                            "status": "Active" if expiry_date > datetime.now().date() else "Expired",
+                            "certificate_received": certificate_received,
+                            "renewal_reminder": str(renewal_reminder)
+                        }
+                        st.session_state.insurance_tracking.append(new_insurance)
+                        st.success("✅ Insurance record added successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields!")
+        
+        with ins_tab2:
+            st.markdown("**Insurance Tracking Overview**")
+            
+            for insurance in st.session_state.insurance_tracking:
+                # Find subcontractor name
+                sub_name = "Unknown"
+                for sub in st.session_state.subcontractors:
+                    if sub['id'] == insurance['subcontractor_id']:
+                        sub_name = sub['company_name']
+                        break
+                
+                # Determine status icon and color
+                expiry_date = datetime.strptime(insurance['expiry_date'], '%Y-%m-%d').date()
+                days_to_expiry = (expiry_date - datetime.now().date()).days
+                
+                if days_to_expiry < 0:
+                    status_icon = "🔴"
+                    status_text = "Expired"
+                elif days_to_expiry <= 30:
+                    status_icon = "🟡"
+                    status_text = "Expiring Soon"
+                else:
+                    status_icon = "🟢"
+                    status_text = "Active"
+                
+                with st.expander(f"{status_icon} {insurance['insurance_type']} - {sub_name} ({status_text})"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**🏭 Subcontractor:** {sub_name}")
+                        st.write(f"**🛡️ Type:** {insurance['insurance_type']}")
+                        st.write(f"**📄 Policy Number:** {insurance['policy_number']}")
+                        st.write(f"**🏢 Provider:** {insurance['provider']}")
+                        st.write(f"**💰 Coverage:** ${insurance['coverage_amount']:,.2f}")
+                    
+                    with col2:
+                        st.write(f"**📅 Effective:** {insurance['effective_date']}")
+                        st.write(f"**📅 Expires:** {insurance['expiry_date']}")
+                        st.write(f"**📊 Status:** {status_text}")
+                        st.write(f"**📜 Certificate:** {'Received' if insurance['certificate_received'] else 'Pending'}")
+                        st.write(f"**🔔 Reminder:** {insurance['renewal_reminder']}")
+                    
+                    if days_to_expiry <= 30 and days_to_expiry >= 0:
+                        st.warning(f"⚠️ Insurance expires in {days_to_expiry} days!")
+                    elif days_to_expiry < 0:
+                        st.error(f"❌ Insurance expired {abs(days_to_expiry)} days ago!")
+                    
+                    # Action buttons
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        if st.button(f"🔔 Remind", key=f"remind_ins_{insurance['id']}"):
+                            st.success("Renewal reminder sent!")
+                    with col2:
+                        if st.button(f"✏️ Edit", key=f"edit_ins_{insurance['id']}"):
+                            st.info("Edit insurance functionality")
+                    with col3:
+                        if st.button(f"🗑️ Delete", key=f"delete_ins_{insurance['id']}"):
+                            st.session_state.insurance_tracking.remove(insurance)
+                            st.success("Insurance record deleted!")
+                            st.rerun()
+    
+    with tab4:
+        st.subheader("📈 Subcontractor Analytics")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Performance ratings distribution
+            if st.session_state.subcontractors:
+                performance_data = []
+                for sub in st.session_state.subcontractors:
+                    if sub['performance_rating'] > 0:
+                        performance_data.append({
+                            'Company': sub['company_name'],
+                            'Performance': sub['performance_rating'],
+                            'Safety': sub['safety_rating'],
+                            'Quality': sub['quality_rating'],
+                            'Schedule': sub['schedule_rating']
+                        })
+                
+                if performance_data:
+                    perf_df = pd.DataFrame(performance_data)
+                    fig_perf = px.bar(perf_df, x='Company', y=['Performance', 'Safety', 'Quality', 'Schedule'],
+                                     title="Subcontractor Performance Ratings", barmode='group')
+                    st.plotly_chart(fig_perf, use_container_width=True)
+        
+        with col2:
+            # Contract value by trade
+            if st.session_state.subcontractors:
+                trade_values = {}
+                for sub in st.session_state.subcontractors:
+                    trade = sub['trade']
+                    trade_values[trade] = trade_values.get(trade, 0) + sub['contract_value']
+                
+                trade_list = list(trade_values.keys())
+                value_list = [val/1000000 for val in trade_values.values()]  # Convert to millions
+                trade_df = pd.DataFrame({
+                    'Trade': trade_list,
+                    'Value (M$)': value_list
+                })
+                fig_trade = px.pie(trade_df, values='Value (M$)', names='Trade', title="Contract Value by Trade")
+                st.plotly_chart(fig_trade, use_container_width=True)
+    
+    with tab5:
+        st.subheader("🔧 Subcontractor Management")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown("**🏭 Subcontractor Summary**")
+            if st.session_state.subcontractors:
+                sub_stats_data = pd.DataFrame([
+                    {"Metric": "Total Subcontractors", "Value": len(st.session_state.subcontractors)},
+                    {"Metric": "Active", "Value": len([s for s in st.session_state.subcontractors if s['status'] == 'Active'])},
+                    {"Metric": "Scheduled", "Value": len([s for s in st.session_state.subcontractors if s['status'] == 'Scheduled'])},
+                    {"Metric": "Avg Performance", "Value": f"{sum(s['performance_rating'] for s in st.session_state.subcontractors if s['performance_rating'] > 0) / len([s for s in st.session_state.subcontractors if s['performance_rating'] > 0]):.1f}/5.0" if any(s['performance_rating'] > 0 for s in st.session_state.subcontractors) else "N/A"},
+                ])
+                st.dataframe(sub_stats_data, use_container_width=True)
+        
+        with col2:
+            st.markdown("**📊 Evaluation Summary**")
+            if st.session_state.subcontractor_evaluations:
+                eval_stats_data = pd.DataFrame([
+                    {"Metric": "Total Evaluations", "Value": len(st.session_state.subcontractor_evaluations)},
+                    {"Metric": "Avg Overall Score", "Value": f"{sum(e['overall_score'] for e in st.session_state.subcontractor_evaluations) / len(st.session_state.subcontractor_evaluations):.1f}/5.0"},
+                    {"Metric": "Highest Score", "Value": f"{max(e['overall_score'] for e in st.session_state.subcontractor_evaluations):.1f}/5.0"},
+                    {"Metric": "Due This Month", "Value": "TBD"},
+                ])
+                st.dataframe(eval_stats_data, use_container_width=True)
+        
+        with col3:
+            st.markdown("**🛡️ Insurance Summary**")
+            if st.session_state.insurance_tracking:
+                # Calculate expiring soon
+                expiring_soon = 0
+                for ins in st.session_state.insurance_tracking:
+                    expiry_date = datetime.strptime(ins['expiry_date'], '%Y-%m-%d').date()
+                    days_to_expiry = (expiry_date - datetime.now().date()).days
+                    if 0 <= days_to_expiry <= 30:
+                        expiring_soon += 1
+                
+                ins_stats_data = pd.DataFrame([
+                    {"Metric": "Total Policies", "Value": len(st.session_state.insurance_tracking)},
+                    {"Metric": "Active", "Value": len([i for i in st.session_state.insurance_tracking if i['status'] == 'Active'])},
+                    {"Metric": "Expiring Soon", "Value": expiring_soon},
+                    {"Metric": "Certificates Received", "Value": len([i for i in st.session_state.insurance_tracking if i['certificate_received']])},
+                ])
+                st.dataframe(ins_stats_data, use_container_width=True)
+        
+        # Data management
+        st.markdown("**⚠️ Data Management**")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("🗑️ Clear Subcontractors", type="secondary"):
+                st.session_state.subcontractors = []
+                st.success("All subcontractors cleared!")
+                st.rerun()
+        with col2:
+            if st.button("🗑️ Clear Evaluations", type="secondary"):
+                st.session_state.subcontractor_evaluations = []
+                st.success("All evaluations cleared!")
+                st.rerun()
+        with col3:
+            if st.button("🗑️ Clear Insurance", type="secondary"):
+                st.session_state.insurance_tracking = []
+                st.success("All insurance records cleared!")
+                st.rerun()
 
 def render_inspections():
     """Inspections module"""

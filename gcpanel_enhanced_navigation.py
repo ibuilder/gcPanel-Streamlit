@@ -1609,8 +1609,8 @@ def render_deliveries():
     </div>
     """, unsafe_allow_html=True)
     
-    # Initialize deliveries data
-    if "deliveries" not in st.session_state:
+    # Initialize deliveries data - ensure it's always a list
+    if "deliveries" not in st.session_state or not isinstance(st.session_state.deliveries, list):
         st.session_state.deliveries = [
             {
                 "id": "DEL-001",

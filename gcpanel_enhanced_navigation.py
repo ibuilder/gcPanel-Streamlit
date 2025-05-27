@@ -4634,7 +4634,19 @@ def render_contracts():
                 st.rerun()
 
 def render_cost_management():
-    """Complete Cost Management with full CRUD functionality"""
+    """Enterprise Cost Management with robust Python backend"""
+    try:
+        from modules.cost_management_ui import render_cost_management_enterprise
+        render_cost_management_enterprise()
+        return
+    except ImportError:
+        st.error("Enterprise Cost Management module not available")
+    
+    # Fallback to basic version
+    render_cost_management_basic()
+
+def render_cost_management_basic():
+    """Basic Cost Management - fallback version"""
     st.markdown("""
     <div class="module-header">
         <h1>💰 Cost Management</h1>

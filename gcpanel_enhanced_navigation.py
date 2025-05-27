@@ -2012,9 +2012,9 @@ def render_safety():
                 
                 # Root Cause and Prevention
                 st.markdown("**🔍 Analysis & Prevention**")
-                root_cause = st.text_area("Root Cause Analysis", height=60,
+                root_cause = st.text_area("Root Cause Analysis", height=68,
                     placeholder="What was the underlying cause of this incident...")
-                corrective_action = st.text_area("Corrective Actions", height=60,
+                corrective_action = st.text_area("Corrective Actions", height=68,
                     placeholder="What actions will be taken to prevent recurrence...")
                 
                 # Follow-up
@@ -2238,7 +2238,7 @@ def render_safety():
                 
                 with col2:
                     duration = st.text_input("Duration")
-                    attendees = st.text_area("Expected Attendees", height=60)
+                    attendees = st.text_area("Expected Attendees", height=68)
                     certification_period = st.text_input("Certification Valid Period")
                 
                 if st.form_submit_button("📚 Schedule Training"):

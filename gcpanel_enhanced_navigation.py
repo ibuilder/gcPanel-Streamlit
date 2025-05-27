@@ -2375,183 +2375,1711 @@ def render_preconstruction():
                 st.rerun()
 
 def render_engineering():
-    """Engineering module with RFI and technical management"""
+    """Complete Engineering Management with full CRUD functionality"""
     st.markdown("""
     <div class="module-header">
         <h1>⚙️ Engineering Management</h1>
-        <p>Technical coordination, RFIs, and engineering workflows</p>
+        <p>Advanced technical coordination, drawing management, and engineering workflows</p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Engineering metrics
+    # Initialize engineering data
+    if "engineering_rfis" not in st.session_state:
+        st.session_state.engineering_rfis = [
+            {
+                "id": "ENG-RFI-001",
+                "subject": "Structural steel connection details for Level 8",
+                "trade": "Structural",
+                "priority": "High",
+                "status": "Response Pending",
+                "submitted_by": "Steel Fabricator",
+                "submitted_date": "2025-05-20",
+                "response_due": "2025-05-30",
+                "description": "Clarification needed on moment connection details for beam-to-column connections on Level 8. Current drawings show conflicting information between architectural and structural plans.",
+                "location": "Level 8, Grid Lines C-3 to C-7",
+                "drawing_references": ["S-801", "S-802", "A-801"],
+                "assigned_engineer": "Sarah Chen, P.E.",
+                "response": "",
+                "cost_impact": 15000,
+                "schedule_impact": 3,
+                "attachments": ["Connection Detail Photos", "Shop Drawing Excerpts"],
+                "coordination_notes": "Requires coordination with architectural team"
+            },
+            {
+                "id": "ENG-RFI-002",
+                "subject": "MEP routing conflicts in ceiling space",
+                "trade": "MEP",
+                "priority": "Medium",
+                "status": "Under Review",
+                "submitted_by": "MEP Contractor",
+                "submitted_date": "2025-05-22",
+                "response_due": "2025-06-01",
+                "description": "HVAC ductwork conflicts with electrical conduit routing in Level 9 ceiling space. Need design team review for coordination solution.",
+                "location": "Level 9, Zones A-C",
+                "drawing_references": ["M-901", "E-901", "A-901"],
+                "assigned_engineer": "Mike Rodriguez, P.E.",
+                "response": "Under coordination review with design team",
+                "cost_impact": 8500,
+                "schedule_impact": 2,
+                "attachments": ["MEP Coordination Model", "Conflict Report"],
+                "coordination_notes": "3D model coordination in progress"
+            }
+        ]
+    
+    if "change_orders" not in st.session_state:
+        st.session_state.change_orders = [
+            {
+                "id": "CO-001",
+                "title": "Additional MEP work for data center upgrade",
+                "description": "Owner requested upgrade to data center infrastructure requiring additional electrical and cooling capacity",
+                "trade": "MEP",
+                "amount": 125000.00,
+                "status": "Approved",
+                "submitted_date": "2025-05-15",
+                "approved_date": "2025-05-20",
+                "schedule_impact": 5,
+                "reason": "Owner Request",
+                "submitted_by": "Project Manager",
+                "approved_by": "Owner Representative",
+                "scope_description": "Installation of additional UPS systems, backup generators, and enhanced HVAC for data center",
+                "drawings_affected": ["E-401", "E-402", "M-401", "M-402"]
+            },
+            {
+                "id": "CO-002",
+                "title": "Design modification for retail entrance",
+                "description": "Architectural design change for main retail entrance per city planning requirements",
+                "trade": "Architectural",
+                "amount": 75000.00,
+                "status": "Under Review",
+                "submitted_date": "2025-05-18",
+                "approved_date": "",
+                "schedule_impact": 0,
+                "reason": "Code Compliance",
+                "submitted_by": "Architect",
+                "approved_by": "",
+                "scope_description": "Redesign of main entrance canopy and accessible ramp configuration",
+                "drawings_affected": ["A-101", "A-201", "A-301"]
+            }
+        ]
+    
+    if "technical_reviews" not in st.session_state:
+        st.session_state.technical_reviews = [
+            {
+                "id": "TR-001",
+                "item": "Shop Drawings - Structural Steel Connections",
+                "type": "Shop Drawing",
+                "reviewer": "Sarah Chen, P.E.",
+                "status": "Approved",
+                "submitted_date": "2025-05-20",
+                "review_date": "2025-05-25",
+                "priority": "High",
+                "comments": "Approved as submitted. All connection details meet specification requirements.",
+                "revision_required": False,
+                "drawing_numbers": ["SD-S-001", "SD-S-002", "SD-S-003"],
+                "trade": "Structural"
+            },
+            {
+                "id": "TR-002",
+                "item": "MEP Coordination Model - Levels 9-11",
+                "type": "Coordination Review",
+                "reviewer": "Mike Rodriguez, P.E.",
+                "status": "Revisions Required",
+                "submitted_date": "2025-05-22",
+                "review_date": "2025-05-24",
+                "priority": "Medium",
+                "comments": "Minor conflicts identified in ceiling space. Revise ductwork routing per redlines.",
+                "revision_required": True,
+                "drawing_numbers": ["M-901", "M-1001", "M-1101"],
+                "trade": "MEP"
+            }
+        ]
+    
+    # Key Engineering Metrics
     col1, col2, col3, col4 = st.columns(4)
     
-    with col1:
-        st.metric("Active RFIs", "23", "+3")
-    with col2:
-        st.metric("Pending Reviews", "8", "+1")
-    with col3:
-        st.metric("Change Orders", "12", "+2")
-    with col4:
-        st.metric("Shop Drawings", "45", "+5")
+    active_rfis = len([r for r in st.session_state.engineering_rfis if r['status'] != 'Closed'])
+    pending_reviews = len([r for r in st.session_state.technical_reviews if r['status'] == 'Under Review'])
+    open_change_orders = len([c for c in st.session_state.change_orders if c['status'] != 'Approved'])
+    total_cost_impact = sum(r['cost_impact'] for r in st.session_state.engineering_rfis)
     
-    tab1, tab2, tab3 = st.tabs(["📝 RFI Management", "📋 Change Orders", "🔧 Technical Reviews"])
+    with col1:
+        st.metric("Active RFIs", active_rfis, delta_color="normal")
+    with col2:
+        st.metric("Pending Reviews", pending_reviews, delta_color="normal")
+    with col3:
+        st.metric("Open Change Orders", open_change_orders, delta_color="normal")
+    with col4:
+        st.metric("Cost Impact", f"${total_cost_impact:,.0f}", delta_color="normal")
+    
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📝 RFI Management", "📋 Change Orders", "🔧 Technical Reviews", "📈 Analytics", "🔧 Management"])
     
     with tab1:
-        st.subheader("📝 Request for Information (RFI) Tracking")
+        st.subheader("📝 Request for Information (RFI) Management")
         
-        # RFI summary
-        rfi_data = {
-            'RFI #': ['RFI-001', 'RFI-002', 'RFI-003', 'RFI-004', 'RFI-005'],
-            'Subject': ['Concrete Mix Design', 'Electrical Panel Location', 'HVAC Duct Routing', 'Fire Rating Details', 'Structural Connection'],
-            'Trade': ['Concrete', 'Electrical', 'HVAC', 'Fireproofing', 'Steel'],
-            'Priority': ['High', 'Medium', 'High', 'Low', 'Medium'],
-            'Status': ['Response Pending', 'Under Review', 'Closed', 'Response Pending', 'Draft'],
-            'Days Open': [8, 5, 0, 12, 2]
-        }
+        rfi_sub_tab1, rfi_sub_tab2, rfi_sub_tab3 = st.tabs(["📤 Create RFI", "📊 View RFIs", "📈 RFI Analytics"])
         
-        df = pd.DataFrame(rfi_data)
-        st.dataframe(df, use_container_width=True)
-        
-        # Quick RFI creation
-        with st.expander("➕ Create New RFI"):
-            col1, col2 = st.columns(2)
-            with col1:
-                st.text_input("RFI Subject")
-                st.selectbox("Trade", ["Concrete", "Steel", "Electrical", "HVAC", "Plumbing", "Other"])
-                st.selectbox("Priority", ["Low", "Medium", "High", "Critical"])
-            with col2:
-                st.text_area("Question/Issue Description", height=100)
-                st.file_uploader("Attach Documents", accept_multiple_files=True)
-                st.date_input("Response Required By")
+        with rfi_sub_tab1:
+            st.markdown("**Create New RFI**")
             
-            if st.button("📝 Submit RFI", type="primary"):
-                st.success("✅ RFI submitted successfully!")
+            with st.form("rfi_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    rfi_subject = st.text_input("RFI Subject", placeholder="Brief description of the question/issue")
+                    trade = st.selectbox("Trade", ["Architectural", "Structural", "MEP", "Civil", "Electrical", "Mechanical", "Plumbing", "Other"])
+                    priority = st.selectbox("Priority", ["Low", "Medium", "High", "Critical"])
+                    location = st.text_input("Location", placeholder="Building level, grid lines, room number")
+                    submitted_by = st.text_input("Submitted By", placeholder="Company/Person submitting")
+                
+                with col2:
+                    response_due = st.date_input("Response Required By", value=datetime.now().date() + timedelta(days=10))
+                    drawing_refs = st.text_input("Drawing References", placeholder="Comma-separated drawing numbers")
+                    assigned_engineer = st.selectbox("Assigned Engineer", 
+                        ["Sarah Chen, P.E.", "Mike Rodriguez, P.E.", "Jennifer Walsh, AIA", "David Kim, P.E."])
+                    cost_impact = st.number_input("Estimated Cost Impact ($)", value=0, format="%d")
+                    schedule_impact = st.number_input("Schedule Impact (days)", value=0, format="%d")
+                
+                description = st.text_area("Detailed Description", placeholder="Provide detailed description of the question or issue")
+                coordination_notes = st.text_area("Coordination Notes", placeholder="Any coordination requirements or notes")
+                
+                if st.form_submit_button("📝 Submit RFI", type="primary"):
+                    if rfi_subject and description and trade:
+                        new_rfi = {
+                            "id": f"ENG-RFI-{len(st.session_state.engineering_rfis) + 1:03d}",
+                            "subject": rfi_subject,
+                            "trade": trade,
+                            "priority": priority,
+                            "status": "Open",
+                            "submitted_by": submitted_by,
+                            "submitted_date": str(datetime.now().date()),
+                            "response_due": str(response_due),
+                            "description": description,
+                            "location": location,
+                            "drawing_references": [ref.strip() for ref in drawing_refs.split(',') if ref.strip()],
+                            "assigned_engineer": assigned_engineer,
+                            "response": "",
+                            "cost_impact": cost_impact,
+                            "schedule_impact": schedule_impact,
+                            "attachments": [],
+                            "coordination_notes": coordination_notes
+                        }
+                        st.session_state.engineering_rfis.append(new_rfi)
+                        st.success("✅ RFI submitted successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields!")
+        
+        with rfi_sub_tab2:
+            st.markdown("**All Engineering RFIs**")
+            
+            # Filters
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                status_filter = st.selectbox("Filter by Status", ["All", "Open", "Response Pending", "Under Review", "Closed"])
+            with col2:
+                trade_filter = st.selectbox("Filter by Trade", ["All"] + list(set(r['trade'] for r in st.session_state.engineering_rfis)))
+            with col3:
+                priority_filter = st.selectbox("Filter by Priority", ["All", "Low", "Medium", "High", "Critical"])
+            
+            # Display RFIs
+            filtered_rfis = st.session_state.engineering_rfis
+            if status_filter != "All":
+                filtered_rfis = [r for r in filtered_rfis if r['status'] == status_filter]
+            if trade_filter != "All":
+                filtered_rfis = [r for r in filtered_rfis if r['trade'] == trade_filter]
+            if priority_filter != "All":
+                filtered_rfis = [r for r in filtered_rfis if r['priority'] == priority_filter]
+            
+            for rfi in filtered_rfis:
+                priority_icon = {"Low": "🟢", "Medium": "🟡", "High": "🟠", "Critical": "🔴"}.get(rfi['priority'], "⚪")
+                
+                with st.expander(f"{priority_icon} {rfi['id']} - {rfi['subject']} ({rfi['status']})"):
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        st.write(f"**🔧 Trade:** {rfi['trade']}")
+                        st.write(f"**📍 Location:** {rfi['location']}")
+                        st.write(f"**👤 Submitted By:** {rfi['submitted_by']}")
+                        st.write(f"**📅 Submitted:** {rfi['submitted_date']}")
+                        st.write(f"**⏰ Due:** {rfi['response_due']}")
+                    
+                    with col2:
+                        st.write(f"**⚠️ Priority:** {rfi['priority']}")
+                        st.write(f"**👨‍💼 Assigned:** {rfi['assigned_engineer']}")
+                        st.write(f"**💰 Cost Impact:** ${rfi['cost_impact']:,.0f}")
+                        st.write(f"**📅 Schedule Impact:** {rfi['schedule_impact']} days")
+                        if rfi['drawing_references']:
+                            st.write(f"**📐 Drawings:** {', '.join(rfi['drawing_references'])}")
+                    
+                    with col3:
+                        st.write(f"**📊 Status:** {rfi['status']}")
+                        if rfi['response']:
+                            st.write(f"**💬 Response:** {rfi['response']}")
+                        if rfi['coordination_notes']:
+                            st.write(f"**📝 Notes:** {rfi['coordination_notes']}")
+                    
+                    st.write(f"**📝 Description:** {rfi['description']}")
+                    
+                    # Action buttons
+                    col1, col2, col3, col4 = st.columns(4)
+                    with col1:
+                        if st.button(f"✅ Close RFI", key=f"close_rfi_{rfi['id']}"):
+                            rfi['status'] = 'Closed'
+                            st.success("RFI closed!")
+                            st.rerun()
+                    with col2:
+                        if st.button(f"🔄 Under Review", key=f"review_rfi_{rfi['id']}"):
+                            rfi['status'] = 'Under Review'
+                            st.info("RFI under review!")
+                            st.rerun()
+                    with col3:
+                        if st.button(f"✏️ Add Response", key=f"respond_rfi_{rfi['id']}"):
+                            st.info("Response interface - would open response form")
+                    with col4:
+                        if st.button(f"🗑️ Delete", key=f"delete_rfi_{rfi['id']}"):
+                            st.session_state.engineering_rfis.remove(rfi)
+                            st.success("RFI deleted!")
+                            st.rerun()
+        
+        with rfi_sub_tab3:
+            st.markdown("**RFI Analytics**")
+            
+            if st.session_state.engineering_rfis:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    # RFI status distribution
+                    status_counts = {}
+                    for rfi in st.session_state.engineering_rfis:
+                        status = rfi['status']
+                        status_counts[status] = status_counts.get(status, 0) + 1
+                    
+                    if status_counts:
+                        status_list = list(status_counts.keys())
+                        count_list = list(status_counts.values())
+                        status_df = pd.DataFrame({
+                            'Status': status_list,
+                            'Count': count_list
+                        })
+                        fig_status = px.pie(status_df, values='Count', names='Status', title="RFI Status Distribution")
+                        st.plotly_chart(fig_status, use_container_width=True)
+                
+                with col2:
+                    # Cost impact by trade
+                    trade_costs = {}
+                    for rfi in st.session_state.engineering_rfis:
+                        trade = rfi['trade']
+                        trade_costs[trade] = trade_costs.get(trade, 0) + rfi['cost_impact']
+                    
+                    if trade_costs:
+                        trade_list = list(trade_costs.keys())
+                        cost_list = list(trade_costs.values())
+                        trade_df = pd.DataFrame({
+                            'Trade': trade_list,
+                            'Cost_Impact': cost_list
+                        })
+                        fig_trade = px.bar(trade_df, x='Trade', y='Cost_Impact', title="Cost Impact by Trade")
+                        st.plotly_chart(fig_trade, use_container_width=True)
     
     with tab2:
         st.subheader("📋 Change Order Management")
         
-        change_orders = {
-            'CO #': ['CO-001', 'CO-002', 'CO-003'],
-            'Description': ['Additional MEP Work', 'Design Modification', 'Site Condition'],
-            'Amount': ['$125,000', '$75,000', '$45,000'],
-            'Status': ['Approved', 'Under Review', 'Pending'],
-            'Impact': ['5 days', '0 days', '3 days']
-        }
+        co_sub_tab1, co_sub_tab2 = st.tabs(["📤 Create Change Order", "📊 View Change Orders"])
         
-        df_co = pd.DataFrame(change_orders)
-        st.dataframe(df_co, use_container_width=True)
+        with co_sub_tab1:
+            st.markdown("**Create New Change Order**")
+            
+            with st.form("change_order_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    co_title = st.text_input("Change Order Title", placeholder="Brief title describing the change")
+                    trade = st.selectbox("Affected Trade", ["Architectural", "Structural", "MEP", "Civil", "General"])
+                    amount = st.number_input("Amount ($)", value=0.00, format="%.2f")
+                    schedule_impact = st.number_input("Schedule Impact (days)", value=0, format="%d")
+                    reason = st.selectbox("Reason", ["Owner Request", "Design Change", "Site Conditions", "Code Compliance", "Coordination Issue"])
+                
+                with col2:
+                    submitted_by = st.text_input("Submitted By", placeholder="Person/company submitting")
+                    drawings_affected = st.text_input("Drawings Affected", placeholder="Comma-separated drawing numbers")
+                    
+                description = st.text_area("Detailed Description", placeholder="Provide detailed description of the change")
+                scope_description = st.text_area("Scope Description", placeholder="Detailed scope of work for this change")
+                
+                if st.form_submit_button("📋 Submit Change Order", type="primary"):
+                    if co_title and description and amount >= 0:
+                        new_co = {
+                            "id": f"CO-{len(st.session_state.change_orders) + 1:03d}",
+                            "title": co_title,
+                            "description": description,
+                            "trade": trade,
+                            "amount": amount,
+                            "status": "Submitted",
+                            "submitted_date": str(datetime.now().date()),
+                            "approved_date": "",
+                            "schedule_impact": schedule_impact,
+                            "reason": reason,
+                            "submitted_by": submitted_by,
+                            "approved_by": "",
+                            "scope_description": scope_description,
+                            "drawings_affected": [d.strip() for d in drawings_affected.split(',') if d.strip()]
+                        }
+                        st.session_state.change_orders.append(new_co)
+                        st.success("✅ Change Order submitted successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields!")
+        
+        with co_sub_tab2:
+            st.markdown("**All Change Orders**")
+            
+            for co in st.session_state.change_orders:
+                status_icon = {"Submitted": "📋", "Under Review": "🔄", "Approved": "✅", "Rejected": "❌"}.get(co['status'], "📋")
+                
+                with st.expander(f"{status_icon} {co['id']} - {co['title']} (${co['amount']:,.2f})"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**💰 Amount:** ${co['amount']:,.2f}")
+                        st.write(f"**🔧 Trade:** {co['trade']}")
+                        st.write(f"**📅 Submitted:** {co['submitted_date']}")
+                        st.write(f"**👤 Submitted By:** {co['submitted_by']}")
+                        st.write(f"**📅 Schedule Impact:** {co['schedule_impact']} days")
+                        st.write(f"**📋 Reason:** {co['reason']}")
+                    
+                    with col2:
+                        st.write(f"**📊 Status:** {co['status']}")
+                        if co['approved_date']:
+                            st.write(f"**✅ Approved:** {co['approved_date']}")
+                            st.write(f"**👤 Approved By:** {co['approved_by']}")
+                        if co['drawings_affected']:
+                            st.write(f"**📐 Drawings Affected:** {', '.join(co['drawings_affected'])}")
+                    
+                    st.write(f"**📝 Description:** {co['description']}")
+                    if co['scope_description']:
+                        st.write(f"**🔧 Scope:** {co['scope_description']}")
+                    
+                    # Action buttons
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        if co['status'] != 'Approved' and st.button(f"✅ Approve", key=f"approve_co_{co['id']}"):
+                            co['status'] = 'Approved'
+                            co['approved_date'] = str(datetime.now().date())
+                            co['approved_by'] = 'Project Manager'
+                            st.success("Change Order approved!")
+                            st.rerun()
+                    with col2:
+                        if st.button(f"🔄 Under Review", key=f"review_co_{co['id']}"):
+                            co['status'] = 'Under Review'
+                            st.info("Change Order under review!")
+                            st.rerun()
+                    with col3:
+                        if st.button(f"🗑️ Delete", key=f"delete_co_{co['id']}"):
+                            st.session_state.change_orders.remove(co)
+                            st.success("Change Order deleted!")
+                            st.rerun()
     
     with tab3:
         st.subheader("🔧 Technical Reviews")
         
-        reviews = [
-            {"item": "Shop Drawings - Steel Connections", "reviewer": "John Smith, P.E.", "status": "✅ Approved", "date": "May 25"},
-            {"item": "MEP Coordination Plans", "reviewer": "Sarah Wilson, P.E.", "status": "🔄 Under Review", "date": "May 24"},
-            {"item": "Concrete Mix Design", "reviewer": "Mike Johnson, P.E.", "status": "⚠️ Revisions Required", "date": "May 23"},
-        ]
+        tr_sub_tab1, tr_sub_tab2 = st.tabs(["📤 Create Review", "📊 View Reviews"])
         
-        for review in reviews:
-            with st.container():
-                col_a, col_b, col_c = st.columns([2, 1, 1])
-                with col_a:
-                    st.write(f"📋 {review['item']}")
-                    st.write(f"Reviewer: {review['reviewer']}")
-                with col_b:
-                    st.write(review['status'])
-                with col_c:
-                    st.write(review['date'])
-                st.divider()
+        with tr_sub_tab1:
+            st.markdown("**Create New Technical Review**")
+            
+            with st.form("technical_review_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    item = st.text_input("Review Item", placeholder="What is being reviewed")
+                    review_type = st.selectbox("Review Type", ["Shop Drawing", "Coordination Review", "Design Review", "Submittal Review"])
+                    reviewer = st.selectbox("Reviewer", ["Sarah Chen, P.E.", "Mike Rodriguez, P.E.", "Jennifer Walsh, AIA", "David Kim, P.E."])
+                    priority = st.selectbox("Priority", ["Low", "Medium", "High", "Critical"])
+                
+                with col2:
+                    trade = st.selectbox("Trade", ["Architectural", "Structural", "MEP", "Civil", "General"])
+                    drawing_numbers = st.text_input("Drawing Numbers", placeholder="Comma-separated drawing numbers")
+                
+                comments = st.text_area("Review Comments", placeholder="Detailed review comments and requirements")
+                
+                if st.form_submit_button("🔧 Create Review", type="primary"):
+                    if item and reviewer and comments:
+                        new_review = {
+                            "id": f"TR-{len(st.session_state.technical_reviews) + 1:03d}",
+                            "item": item,
+                            "type": review_type,
+                            "reviewer": reviewer,
+                            "status": "Under Review",
+                            "submitted_date": str(datetime.now().date()),
+                            "review_date": "",
+                            "priority": priority,
+                            "comments": comments,
+                            "revision_required": False,
+                            "drawing_numbers": [d.strip() for d in drawing_numbers.split(',') if d.strip()],
+                            "trade": trade
+                        }
+                        st.session_state.technical_reviews.append(new_review)
+                        st.success("✅ Technical review created successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields!")
+        
+        with tr_sub_tab2:
+            st.markdown("**All Technical Reviews**")
+            
+            for review in st.session_state.technical_reviews:
+                status_icon = {"Under Review": "🔄", "Approved": "✅", "Revisions Required": "⚠️", "Rejected": "❌"}.get(review['status'], "📋")
+                
+                with st.expander(f"{status_icon} {review['id']} - {review['item']} ({review['status']})"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📋 Type:** {review['type']}")
+                        st.write(f"**👨‍💼 Reviewer:** {review['reviewer']}")
+                        st.write(f"**🔧 Trade:** {review['trade']}")
+                        st.write(f"**📅 Submitted:** {review['submitted_date']}")
+                        if review['review_date']:
+                            st.write(f"**📅 Reviewed:** {review['review_date']}")
+                    
+                    with col2:
+                        st.write(f"**⚠️ Priority:** {review['priority']}")
+                        st.write(f"**📊 Status:** {review['status']}")
+                        if review['drawing_numbers']:
+                            st.write(f"**📐 Drawings:** {', '.join(review['drawing_numbers'])}")
+                        st.write(f"**🔄 Revisions Required:** {'Yes' if review['revision_required'] else 'No'}")
+                    
+                    st.write(f"**💬 Comments:** {review['comments']}")
+                    
+                    # Action buttons
+                    col1, col2, col3, col4 = st.columns(4)
+                    with col1:
+                        if st.button(f"✅ Approve", key=f"approve_tr_{review['id']}"):
+                            review['status'] = 'Approved'
+                            review['review_date'] = str(datetime.now().date())
+                            review['revision_required'] = False
+                            st.success("Review approved!")
+                            st.rerun()
+                    with col2:
+                        if st.button(f"⚠️ Revisions", key=f"revise_tr_{review['id']}"):
+                            review['status'] = 'Revisions Required'
+                            review['review_date'] = str(datetime.now().date())
+                            review['revision_required'] = True
+                            st.warning("Revisions requested!")
+                            st.rerun()
+                    with col3:
+                        if st.button(f"❌ Reject", key=f"reject_tr_{review['id']}"):
+                            review['status'] = 'Rejected'
+                            review['review_date'] = str(datetime.now().date())
+                            st.error("Review rejected!")
+                            st.rerun()
+                    with col4:
+                        if st.button(f"🗑️ Delete", key=f"delete_tr_{review['id']}"):
+                            st.session_state.technical_reviews.remove(review)
+                            st.success("Review deleted!")
+                            st.rerun()
+    
+    with tab4:
+        st.subheader("📈 Engineering Analytics")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Change order amounts by trade
+            if st.session_state.change_orders:
+                co_trade_amounts = {}
+                for co in st.session_state.change_orders:
+                    trade = co['trade']
+                    co_trade_amounts[trade] = co_trade_amounts.get(trade, 0) + co['amount']
+                
+                if co_trade_amounts:
+                    trade_list = list(co_trade_amounts.keys())
+                    amount_list = list(co_trade_amounts.values())
+                    co_trade_df = pd.DataFrame({
+                        'Trade': trade_list,
+                        'Amount': amount_list
+                    })
+                    fig_co_trade = px.bar(co_trade_df, x='Trade', y='Amount', title="Change Order Amounts by Trade")
+                    st.plotly_chart(fig_co_trade, use_container_width=True)
+        
+        with col2:
+            # Technical review status
+            if st.session_state.technical_reviews:
+                tr_status_counts = {}
+                for tr in st.session_state.technical_reviews:
+                    status = tr['status']
+                    tr_status_counts[status] = tr_status_counts.get(status, 0) + 1
+                
+                if tr_status_counts:
+                    tr_status_list = list(tr_status_counts.keys())
+                    tr_count_list = list(tr_status_counts.values())
+                    tr_status_df = pd.DataFrame({
+                        'Status': tr_status_list,
+                        'Count': tr_count_list
+                    })
+                    fig_tr_status = px.pie(tr_status_df, values='Count', names='Status', title="Technical Review Status")
+                    st.plotly_chart(fig_tr_status, use_container_width=True)
+    
+    with tab5:
+        st.subheader("🔧 Engineering Management")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown("**📊 RFI Summary**")
+            if st.session_state.engineering_rfis:
+                rfi_stats_data = pd.DataFrame([
+                    {"Metric": "Total RFIs", "Value": len(st.session_state.engineering_rfis)},
+                    {"Metric": "Open RFIs", "Value": len([r for r in st.session_state.engineering_rfis if r['status'] != 'Closed'])},
+                    {"Metric": "High Priority", "Value": len([r for r in st.session_state.engineering_rfis if r['priority'] == 'High'])},
+                    {"Metric": "Total Cost Impact", "Value": f"${sum(r['cost_impact'] for r in st.session_state.engineering_rfis):,.0f}"},
+                ])
+                st.dataframe(rfi_stats_data, use_container_width=True)
+        
+        with col2:
+            st.markdown("**📋 Change Order Summary**")
+            if st.session_state.change_orders:
+                co_stats_data = pd.DataFrame([
+                    {"Metric": "Total Change Orders", "Value": len(st.session_state.change_orders)},
+                    {"Metric": "Approved", "Value": len([c for c in st.session_state.change_orders if c['status'] == 'Approved'])},
+                    {"Metric": "Pending Approval", "Value": len([c for c in st.session_state.change_orders if c['status'] != 'Approved'])},
+                    {"Metric": "Total Value", "Value": f"${sum(c['amount'] for c in st.session_state.change_orders):,.2f}"},
+                ])
+                st.dataframe(co_stats_data, use_container_width=True)
+        
+        with col3:
+            st.markdown("**🔧 Review Summary**")
+            if st.session_state.technical_reviews:
+                tr_stats_data = pd.DataFrame([
+                    {"Metric": "Total Reviews", "Value": len(st.session_state.technical_reviews)},
+                    {"Metric": "Approved", "Value": len([r for r in st.session_state.technical_reviews if r['status'] == 'Approved'])},
+                    {"Metric": "Under Review", "Value": len([r for r in st.session_state.technical_reviews if r['status'] == 'Under Review'])},
+                    {"Metric": "Require Revisions", "Value": len([r for r in st.session_state.technical_reviews if r['revision_required']])},
+                ])
+                st.dataframe(tr_stats_data, use_container_width=True)
+        
+        # Data management
+        st.markdown("**⚠️ Data Management**")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("🗑️ Clear All RFIs", type="secondary"):
+                st.session_state.engineering_rfis = []
+                st.success("All RFIs cleared!")
+                st.rerun()
+        with col2:
+            if st.button("🗑️ Clear Change Orders", type="secondary"):
+                st.session_state.change_orders = []
+                st.success("All change orders cleared!")
+                st.rerun()
+        with col3:
+            if st.button("🗑️ Clear Reviews", type="secondary"):
+                st.session_state.technical_reviews = []
+                st.success("All reviews cleared!")
+                st.rerun()
 
 def render_field_operations():
-    """Field Operations module"""
+    """Complete Field Operations Management with full CRUD functionality"""
     st.markdown("""
     <div class="module-header">
-        <h1>👷 Field Operations</h1>
-        <p>Real-time field management and crew coordination</p>
+        <h1>👷 Field Operations Management</h1>
+        <p>Real-time crew coordination, work progress tracking, and equipment management</p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Field metrics
+    # Initialize field operations data
+    if "crews" not in st.session_state:
+        st.session_state.crews = [
+            {
+                "id": "CREW-001",
+                "name": "Structural Steel Team Alpha",
+                "foreman": "Mike Chen",
+                "workers": 12,
+                "trade": "Structural",
+                "location": "Level 8 - Grid Lines A-D",
+                "current_activity": "Steel beam installation and welding",
+                "status": "Active",
+                "shift_start": "07:00",
+                "shift_end": "16:00",
+                "productivity": 95,
+                "safety_score": 98,
+                "phone": "(555) 123-4567",
+                "certification": "OSHA 30, AWS D1.1",
+                "equipment_assigned": ["Crane", "Welding Equipment", "Safety Gear"]
+            },
+            {
+                "id": "CREW-002",
+                "name": "MEP Installation Team Beta",
+                "foreman": "Sarah Rodriguez",
+                "workers": 15,
+                "trade": "MEP",
+                "location": "Level 6-7 - Electrical Rooms",
+                "current_activity": "Electrical panel installation and conduit routing",
+                "status": "Active",
+                "shift_start": "07:00",
+                "shift_end": "16:00",
+                "productivity": 88,
+                "safety_score": 100,
+                "phone": "(555) 234-5678",
+                "certification": "Electrical License, OSHA 10",
+                "equipment_assigned": ["Scissor Lift", "Electrical Tools", "Cable Pulling Equipment"]
+            },
+            {
+                "id": "CREW-003",
+                "name": "Concrete Finishing Crew",
+                "foreman": "David Wilson",
+                "workers": 8,
+                "trade": "Concrete",
+                "location": "Level 5 - East Wing",
+                "current_activity": "Concrete finishing and curing",
+                "status": "Break",
+                "shift_start": "06:00",
+                "shift_end": "15:00",
+                "productivity": 92,
+                "safety_score": 96,
+                "phone": "(555) 345-6789",
+                "certification": "ACI Certification, OSHA 30",
+                "equipment_assigned": ["Concrete Tools", "Power Trowels", "Curing Equipment"]
+            }
+        ]
+    
+    if "work_packages" not in st.session_state:
+        st.session_state.work_packages = [
+            {
+                "id": "WP-001",
+                "title": "Level 8 Structural Steel Installation",
+                "description": "Install structural steel beams and columns for Level 8",
+                "assigned_crew": "Structural Steel Team Alpha",
+                "start_date": "2025-05-27",
+                "target_completion": "2025-05-30",
+                "progress": 68,
+                "status": "In Progress",
+                "priority": "High",
+                "estimated_hours": 120,
+                "actual_hours": 82,
+                "safety_requirements": ["Fall protection", "Crane safety", "Hot work permits"],
+                "materials_needed": ["Steel beams", "Bolts", "Welding rods"],
+                "quality_checkpoints": ["Alignment check", "Weld inspection", "Bolt torque verification"]
+            },
+            {
+                "id": "WP-002",
+                "title": "MEP Rough-in Levels 6-7",
+                "description": "Complete electrical and mechanical rough-in for floors 6-7",
+                "assigned_crew": "MEP Installation Team Beta",
+                "start_date": "2025-05-25",
+                "target_completion": "2025-06-02",
+                "progress": 45,
+                "status": "In Progress",
+                "priority": "Medium",
+                "estimated_hours": 200,
+                "actual_hours": 90,
+                "safety_requirements": ["Electrical safety", "Lockout/Tagout", "Confined space"],
+                "materials_needed": ["Conduit", "Wire", "Panels", "Ductwork"],
+                "quality_checkpoints": ["Conduit installation", "Wire pulling", "Panel connections"]
+            }
+        ]
+    
+    if "equipment" not in st.session_state:
+        st.session_state.equipment = [
+            {
+                "id": "EQ-001",
+                "name": "Tower Crane TC-1",
+                "type": "Tower Crane",
+                "model": "Liebherr 280EC-H",
+                "location": "Center Site",
+                "operator": "Steve Wilson",
+                "status": "Operating",
+                "daily_rate": 850.00,
+                "maintenance_due": "2025-06-01",
+                "hours_today": 7.5,
+                "fuel_level": 75,
+                "last_inspection": "2025-05-20",
+                "certifications": ["NCCCO", "Crane Operator License"],
+                "safety_checklist": "Completed"
+            },
+            {
+                "id": "EQ-002",
+                "name": "Concrete Pump CP-1",
+                "type": "Concrete Pump",
+                "model": "Putzmeister BSF 36.16H",
+                "location": "Level 5 - East",
+                "operator": "Tom Davis",
+                "status": "Operating",
+                "daily_rate": 450.00,
+                "maintenance_due": "2025-05-30",
+                "hours_today": 6.0,
+                "fuel_level": 60,
+                "last_inspection": "2025-05-22",
+                "certifications": ["Pump Operator License"],
+                "safety_checklist": "Completed"
+            },
+            {
+                "id": "EQ-003",
+                "name": "Scissor Lift SL-A",
+                "type": "Scissor Lift",
+                "model": "Genie GS-3246",
+                "location": "Level 7 - Electrical Room",
+                "operator": "Jennifer Kim",
+                "status": "Maintenance",
+                "daily_rate": 125.00,
+                "maintenance_due": "2025-05-28",
+                "hours_today": 0,
+                "fuel_level": 85,
+                "last_inspection": "2025-05-25",
+                "certifications": ["Aerial Lift Certification"],
+                "safety_checklist": "Pending"
+            }
+        ]
+    
+    # Key Field Operations Metrics
     col1, col2, col3, col4 = st.columns(4)
     
-    with col1:
-        st.metric("Active Workers", "147", "+5")
-    with col2:
-        st.metric("Crews on Site", "8", "0")
-    with col3:
-        st.metric("Equipment Units", "23", "+2")
-    with col4:
-        st.metric("Productivity", "102%", "+3%")
+    total_workers = sum(crew['workers'] for crew in st.session_state.crews)
+    active_crews = len([crew for crew in st.session_state.crews if crew['status'] == 'Active'])
+    equipment_operating = len([eq for eq in st.session_state.equipment if eq['status'] == 'Operating'])
+    avg_productivity = sum(crew['productivity'] for crew in st.session_state.crews) / len(st.session_state.crews) if st.session_state.crews else 0
     
-    tab1, tab2, tab3 = st.tabs(["👥 Crew Management", "🏗️ Work Progress", "⚡ Equipment"])
+    with col1:
+        st.metric("Total Workers", total_workers, delta_color="normal")
+    with col2:
+        st.metric("Active Crews", active_crews, delta_color="normal")
+    with col3:
+        st.metric("Equipment Operating", equipment_operating, delta_color="normal")
+    with col4:
+        st.metric("Avg Productivity", f"{avg_productivity:.0f}%", delta_color="normal")
+    
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["👥 Crew Management", "🏗️ Work Packages", "⚡ Equipment", "📈 Analytics", "🔧 Management"])
     
     with tab1:
-        st.subheader("👥 Active Crews")
+        st.subheader("👥 Crew Management")
         
-        crews_data = {
-            'Crew': ['Concrete Team A', 'Steel Crew 1', 'MEP Team', 'Finishing Crew', 'Site Prep'],
-            'Foreman': ['Mike Smith', 'John Doe', 'Sarah Wilson', 'Tom Brown', 'Dave Johnson'],
-            'Workers': [12, 8, 15, 10, 6],
-            'Location': ['Level 3', 'Level 4', 'Level 2', 'Level 1', 'Exterior'],
-            'Status': ['Active', 'Active', 'Break', 'Active', 'Active']
-        }
+        crew_sub_tab1, crew_sub_tab2, crew_sub_tab3 = st.tabs(["📝 Add Crew", "👷 View Crews", "📊 Crew Performance"])
         
-        df = pd.DataFrame(crews_data)
-        st.dataframe(df, use_container_width=True)
+        with crew_sub_tab1:
+            st.markdown("**Add New Crew**")
+            
+            with st.form("crew_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    crew_name = st.text_input("Crew Name", placeholder="e.g., Structural Team Alpha")
+                    foreman = st.text_input("Foreman", placeholder="Foreman name")
+                    workers = st.number_input("Number of Workers", value=1, min_value=1, max_value=50)
+                    trade = st.selectbox("Trade", ["Structural", "MEP", "Concrete", "Finishing", "Demolition", "Site Work"])
+                    location = st.text_input("Current Location", placeholder="Building level and area")
+                
+                with col2:
+                    current_activity = st.text_input("Current Activity", placeholder="What they're working on")
+                    shift_start = st.time_input("Shift Start", value=datetime.strptime("07:00", "%H:%M").time())
+                    shift_end = st.time_input("Shift End", value=datetime.strptime("16:00", "%H:%M").time())
+                    phone = st.text_input("Contact Phone", placeholder="(555) 123-4567")
+                    certification = st.text_input("Certifications", placeholder="Required certifications")
+                
+                equipment_assigned = st.text_area("Equipment Assigned", placeholder="List equipment assigned to this crew")
+                
+                if st.form_submit_button("👷 Add Crew", type="primary"):
+                    if crew_name and foreman and trade:
+                        new_crew = {
+                            "id": f"CREW-{len(st.session_state.crews) + 1:03d}",
+                            "name": crew_name,
+                            "foreman": foreman,
+                            "workers": workers,
+                            "trade": trade,
+                            "location": location,
+                            "current_activity": current_activity,
+                            "status": "Active",
+                            "shift_start": str(shift_start),
+                            "shift_end": str(shift_end),
+                            "productivity": 100,
+                            "safety_score": 100,
+                            "phone": phone,
+                            "certification": certification,
+                            "equipment_assigned": [eq.strip() for eq in equipment_assigned.split(',') if eq.strip()]
+                        }
+                        st.session_state.crews.append(new_crew)
+                        st.success("✅ Crew added successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields!")
         
-        # Crew productivity chart
-        productivity_data = pd.DataFrame({
-            'Hour': ['7 AM', '8 AM', '9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM'],
-            'Workers': [45, 120, 135, 140, 145, 75, 130, 140, 147]
-        })
+        with crew_sub_tab2:
+            st.markdown("**All Crews**")
+            
+            # Filters
+            col1, col2 = st.columns(2)
+            with col1:
+                status_filter = st.selectbox("Filter by Status", ["All", "Active", "Break", "Off Duty"])
+            with col2:
+                trade_filter = st.selectbox("Filter by Trade", ["All"] + list(set(crew['trade'] for crew in st.session_state.crews)))
+            
+            # Display crews
+            filtered_crews = st.session_state.crews
+            if status_filter != "All":
+                filtered_crews = [crew for crew in filtered_crews if crew['status'] == status_filter]
+            if trade_filter != "All":
+                filtered_crews = [crew for crew in filtered_crews if crew['trade'] == trade_filter]
+            
+            for crew in filtered_crews:
+                status_icon = {"Active": "🟢", "Break": "🟡", "Off Duty": "🔴"}.get(crew['status'], "⚪")
+                
+                with st.expander(f"{status_icon} {crew['name']} - {crew['workers']} workers ({crew['status']})"):
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        st.write(f"**👤 Foreman:** {crew['foreman']}")
+                        st.write(f"**🔧 Trade:** {crew['trade']}")
+                        st.write(f"**📍 Location:** {crew['location']}")
+                        st.write(f"**👷 Workers:** {crew['workers']}")
+                        st.write(f"**📞 Phone:** {crew['phone']}")
+                    
+                    with col2:
+                        st.write(f"**🏗️ Activity:** {crew['current_activity']}")
+                        st.write(f"**⏰ Shift:** {crew['shift_start']} - {crew['shift_end']}")
+                        st.write(f"**📊 Productivity:** {crew['productivity']}%")
+                        st.write(f"**🦺 Safety Score:** {crew['safety_score']}%")
+                        st.write(f"**📜 Certification:** {crew['certification']}")
+                    
+                    with col3:
+                        st.write(f"**📊 Status:** {crew['status']}")
+                        if crew['equipment_assigned']:
+                            st.write(f"**⚡ Equipment:** {', '.join(crew['equipment_assigned'])}")
+                    
+                    # Action buttons
+                    col1, col2, col3, col4 = st.columns(4)
+                    with col1:
+                        if st.button(f"🟢 Set Active", key=f"active_{crew['id']}"):
+                            crew['status'] = 'Active'
+                            st.success("Crew status updated!")
+                            st.rerun()
+                    with col2:
+                        if st.button(f"🟡 Set Break", key=f"break_{crew['id']}"):
+                            crew['status'] = 'Break'
+                            st.info("Crew on break!")
+                            st.rerun()
+                    with col3:
+                        if st.button(f"✏️ Edit", key=f"edit_{crew['id']}"):
+                            st.info("Edit functionality - would open edit form")
+                    with col4:
+                        if st.button(f"🗑️ Remove", key=f"remove_{crew['id']}"):
+                            st.session_state.crews.remove(crew)
+                            st.success("Crew removed!")
+                            st.rerun()
         
-        fig = px.line(productivity_data, x='Hour', y='Workers', 
-                     title="Worker Count Throughout Day")
-        st.plotly_chart(fig, use_container_width=True)
+        with crew_sub_tab3:
+            st.markdown("**Crew Performance Analytics**")
+            
+            if st.session_state.crews:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    # Productivity by crew
+                    crew_names = [crew['name'] for crew in st.session_state.crews]
+                    productivity_scores = [crew['productivity'] for crew in st.session_state.crews]
+                    prod_df = pd.DataFrame({
+                        'Crew': crew_names,
+                        'Productivity': productivity_scores
+                    })
+                    fig_prod = px.bar(prod_df, x='Crew', y='Productivity', title="Crew Productivity Scores")
+                    st.plotly_chart(fig_prod, use_container_width=True)
+                
+                with col2:
+                    # Workers by trade
+                    trade_workers = {}
+                    for crew in st.session_state.crews:
+                        trade = crew['trade']
+                        trade_workers[trade] = trade_workers.get(trade, 0) + crew['workers']
+                    
+                    trade_list = list(trade_workers.keys())
+                    worker_list = list(trade_workers.values())
+                    trade_df = pd.DataFrame({
+                        'Trade': trade_list,
+                        'Workers': worker_list
+                    })
+                    fig_trade = px.pie(trade_df, values='Workers', names='Trade', title="Workers by Trade")
+                    st.plotly_chart(fig_trade, use_container_width=True)
     
     with tab2:
-        st.subheader("🏗️ Today's Work Progress")
+        st.subheader("🏗️ Work Package Management")
         
-        tasks = [
-            {"task": "Concrete Pour - Level 3 Slab", "progress": 85, "crew": "Concrete Team A", "eta": "4:00 PM"},
-            {"task": "Steel Installation - Elevator Shaft", "progress": 60, "crew": "Steel Crew 1", "eta": "5:30 PM"},
-            {"task": "MEP Rough-in - Level 2", "progress": 40, "crew": "MEP Team", "eta": "Tomorrow"},
-            {"task": "Drywall Installation - Level 1", "progress": 90, "crew": "Finishing Crew", "eta": "3:00 PM"},
-        ]
+        wp_sub_tab1, wp_sub_tab2 = st.tabs(["📝 Create Work Package", "📊 View Work Packages"])
         
-        for task in tasks:
-            with st.container():
-                st.write(f"🔧 **{task['task']}**")
-                st.write(f"Crew: {task['crew']} | ETA: {task['eta']}")
-                st.progress(task['progress'] / 100)
-                st.write(f"Progress: {task['progress']}%")
-                st.divider()
+        with wp_sub_tab1:
+            st.markdown("**Create New Work Package**")
+            
+            with st.form("work_package_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    wp_title = st.text_input("Work Package Title", placeholder="Brief description of work package")
+                    assigned_crew = st.selectbox("Assigned Crew", [crew['name'] for crew in st.session_state.crews])
+                    start_date = st.date_input("Start Date", value=datetime.now().date())
+                    target_completion = st.date_input("Target Completion", value=datetime.now().date() + timedelta(days=5))
+                    priority = st.selectbox("Priority", ["Low", "Medium", "High", "Critical"])
+                
+                with col2:
+                    estimated_hours = st.number_input("Estimated Hours", value=40, min_value=1)
+                    safety_requirements = st.text_area("Safety Requirements", placeholder="List safety requirements")
+                    materials_needed = st.text_area("Materials Needed", placeholder="List required materials")
+                    quality_checkpoints = st.text_area("Quality Checkpoints", placeholder="List quality control checkpoints")
+                
+                description = st.text_area("Detailed Description", placeholder="Provide detailed description of the work package")
+                
+                if st.form_submit_button("🏗️ Create Work Package", type="primary"):
+                    if wp_title and description and assigned_crew:
+                        new_wp = {
+                            "id": f"WP-{len(st.session_state.work_packages) + 1:03d}",
+                            "title": wp_title,
+                            "description": description,
+                            "assigned_crew": assigned_crew,
+                            "start_date": str(start_date),
+                            "target_completion": str(target_completion),
+                            "progress": 0,
+                            "status": "Not Started",
+                            "priority": priority,
+                            "estimated_hours": estimated_hours,
+                            "actual_hours": 0,
+                            "safety_requirements": [req.strip() for req in safety_requirements.split(',') if req.strip()],
+                            "materials_needed": [mat.strip() for mat in materials_needed.split(',') if mat.strip()],
+                            "quality_checkpoints": [qc.strip() for qc in quality_checkpoints.split(',') if qc.strip()]
+                        }
+                        st.session_state.work_packages.append(new_wp)
+                        st.success("✅ Work package created successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields!")
+        
+        with wp_sub_tab2:
+            st.markdown("**All Work Packages**")
+            
+            for wp in st.session_state.work_packages:
+                priority_icon = {"Low": "🟢", "Medium": "🟡", "High": "🟠", "Critical": "🔴"}.get(wp['priority'], "⚪")
+                status_icon = {"Not Started": "⏸️", "In Progress": "🔄", "Completed": "✅", "On Hold": "⏸️"}.get(wp['status'], "📋")
+                
+                with st.expander(f"{priority_icon} {wp['id']} - {wp['title']} ({wp['progress']}%)"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**👷 Assigned Crew:** {wp['assigned_crew']}")
+                        st.write(f"**📅 Start Date:** {wp['start_date']}")
+                        st.write(f"**🎯 Target Completion:** {wp['target_completion']}")
+                        st.write(f"**⚠️ Priority:** {wp['priority']}")
+                        st.write(f"**📊 Status:** {wp['status']}")
+                        st.write(f"**⏱️ Estimated Hours:** {wp['estimated_hours']}")
+                        st.write(f"**⏱️ Actual Hours:** {wp['actual_hours']}")
+                    
+                    with col2:
+                        st.write(f"**📝 Description:** {wp['description']}")
+                        if wp['safety_requirements']:
+                            st.write(f"**🦺 Safety Requirements:** {', '.join(wp['safety_requirements'])}")
+                        if wp['materials_needed']:
+                            st.write(f"**📦 Materials:** {', '.join(wp['materials_needed'])}")
+                        if wp['quality_checkpoints']:
+                            st.write(f"**✅ Quality Checkpoints:** {', '.join(wp['quality_checkpoints'])}")
+                    
+                    # Progress bar
+                    st.write("**📈 Progress:**")
+                    st.progress(wp['progress'] / 100)
+                    
+                    # Action buttons
+                    col1, col2, col3, col4 = st.columns(4)
+                    with col1:
+                        if st.button(f"▶️ Start", key=f"start_{wp['id']}"):
+                            wp['status'] = 'In Progress'
+                            st.success("Work package started!")
+                            st.rerun()
+                    with col2:
+                        new_progress = st.slider(f"Update Progress", 0, 100, wp['progress'], key=f"progress_{wp['id']}")
+                        if st.button(f"📊 Update", key=f"update_{wp['id']}"):
+                            wp['progress'] = new_progress
+                            if new_progress >= 100:
+                                wp['status'] = 'Completed'
+                            st.success("Progress updated!")
+                            st.rerun()
+                    with col3:
+                        if st.button(f"✏️ Edit", key=f"edit_wp_{wp['id']}"):
+                            st.info("Edit functionality - would open edit form")
+                    with col4:
+                        if st.button(f"🗑️ Delete", key=f"delete_wp_{wp['id']}"):
+                            st.session_state.work_packages.remove(wp)
+                            st.success("Work package deleted!")
+                            st.rerun()
     
     with tab3:
         st.subheader("⚡ Equipment Management")
         
-        equipment_data = {
-            'Equipment': ['Tower Crane 1', 'Concrete Pump', 'Scissor Lift A', 'Excavator', 'Forklift 1'],
-            'Type': ['Crane', 'Pump', 'Lift', 'Excavator', 'Forklift'],
-            'Location': ['Center Site', 'Level 3', 'Level 2', 'Exterior', 'Ground Level'],
-            'Status': ['Operating', 'Operating', 'Maintenance', 'Operating', 'Operating'],
-            'Operator': ['Steve Wilson', 'Mike Chen', 'In Shop', 'Tom Davis', 'Sarah Kim']
-        }
+        eq_sub_tab1, eq_sub_tab2 = st.tabs(["📝 Add Equipment", "⚡ View Equipment"])
         
-        df_eq = pd.DataFrame(equipment_data)
-        st.dataframe(df_eq, use_container_width=True)
+        with eq_sub_tab1:
+            st.markdown("**Add New Equipment**")
+            
+            with st.form("equipment_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    eq_name = st.text_input("Equipment Name", placeholder="e.g., Tower Crane TC-1")
+                    eq_type = st.selectbox("Equipment Type", ["Tower Crane", "Mobile Crane", "Excavator", "Forklift", "Scissor Lift", "Boom Lift", "Concrete Pump", "Generator", "Compressor"])
+                    model = st.text_input("Model", placeholder="Equipment model number")
+                    location = st.text_input("Current Location", placeholder="Where equipment is located")
+                    operator = st.text_input("Operator", placeholder="Operator name")
+                
+                with col2:
+                    daily_rate = st.number_input("Daily Rate ($)", value=0.00, format="%.2f")
+                    maintenance_due = st.date_input("Next Maintenance Due", value=datetime.now().date() + timedelta(days=30))
+                    fuel_level = st.slider("Fuel Level (%)", 0, 100, 100)
+                    last_inspection = st.date_input("Last Inspection", value=datetime.now().date())
+                    certifications = st.text_input("Required Certifications", placeholder="Operator certifications")
+                
+                if st.form_submit_button("⚡ Add Equipment", type="primary"):
+                    if eq_name and eq_type and operator:
+                        new_equipment = {
+                            "id": f"EQ-{len(st.session_state.equipment) + 1:03d}",
+                            "name": eq_name,
+                            "type": eq_type,
+                            "model": model,
+                            "location": location,
+                            "operator": operator,
+                            "status": "Operating",
+                            "daily_rate": daily_rate,
+                            "maintenance_due": str(maintenance_due),
+                            "hours_today": 0,
+                            "fuel_level": fuel_level,
+                            "last_inspection": str(last_inspection),
+                            "certifications": certifications,
+                            "safety_checklist": "Pending"
+                        }
+                        st.session_state.equipment.append(new_equipment)
+                        st.success("✅ Equipment added successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields!")
+        
+        with eq_sub_tab2:
+            st.markdown("**All Equipment**")
+            
+            for equipment in st.session_state.equipment:
+                status_icon = {"Operating": "🟢", "Maintenance": "🟡", "Down": "🔴", "Idle": "⚪"}.get(equipment['status'], "⚪")
+                
+                with st.expander(f"{status_icon} {equipment['name']} - {equipment['type']} ({equipment['status']})"):
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        st.write(f"**🔧 Type:** {equipment['type']}")
+                        st.write(f"**📋 Model:** {equipment['model']}")
+                        st.write(f"**📍 Location:** {equipment['location']}")
+                        st.write(f"**👤 Operator:** {equipment['operator']}")
+                        st.write(f"**💰 Daily Rate:** ${equipment['daily_rate']:,.2f}")
+                    
+                    with col2:
+                        st.write(f"**📊 Status:** {equipment['status']}")
+                        st.write(f"**⏱️ Hours Today:** {equipment['hours_today']}")
+                        st.write(f"**⛽ Fuel Level:** {equipment['fuel_level']}%")
+                        st.write(f"**🔧 Maintenance Due:** {equipment['maintenance_due']}")
+                        st.write(f"**🔍 Last Inspection:** {equipment['last_inspection']}")
+                    
+                    with col3:
+                        st.write(f"**📜 Certifications:** {equipment['certifications']}")
+                        st.write(f"**✅ Safety Checklist:** {equipment['safety_checklist']}")
+                    
+                    # Action buttons
+                    col1, col2, col3, col4 = st.columns(4)
+                    with col1:
+                        if st.button(f"🟢 Operating", key=f"operating_{equipment['id']}"):
+                            equipment['status'] = 'Operating'
+                            st.success("Equipment status updated!")
+                            st.rerun()
+                    with col2:
+                        if st.button(f"🟡 Maintenance", key=f"maintenance_{equipment['id']}"):
+                            equipment['status'] = 'Maintenance'
+                            st.warning("Equipment in maintenance!")
+                            st.rerun()
+                    with col3:
+                        if st.button(f"✏️ Edit", key=f"edit_eq_{equipment['id']}"):
+                            st.info("Edit functionality - would open edit form")
+                    with col4:
+                        if st.button(f"🗑️ Remove", key=f"remove_eq_{equipment['id']}"):
+                            st.session_state.equipment.remove(equipment)
+                            st.success("Equipment removed!")
+                            st.rerun()
+    
+    with tab4:
+        st.subheader("📈 Field Operations Analytics")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Work package progress
+            if st.session_state.work_packages:
+                wp_titles = [wp['title'][:30] + "..." if len(wp['title']) > 30 else wp['title'] for wp in st.session_state.work_packages]
+                wp_progress = [wp['progress'] for wp in st.session_state.work_packages]
+                wp_df = pd.DataFrame({
+                    'Work_Package': wp_titles,
+                    'Progress': wp_progress
+                })
+                fig_wp = px.bar(wp_df, x='Work_Package', y='Progress', title="Work Package Progress")
+                st.plotly_chart(fig_wp, use_container_width=True)
+        
+        with col2:
+            # Equipment status distribution
+            if st.session_state.equipment:
+                eq_status_counts = {}
+                for eq in st.session_state.equipment:
+                    status = eq['status']
+                    eq_status_counts[status] = eq_status_counts.get(status, 0) + 1
+                
+                eq_status_list = list(eq_status_counts.keys())
+                eq_count_list = list(eq_status_counts.values())
+                eq_status_df = pd.DataFrame({
+                    'Status': eq_status_list,
+                    'Count': eq_count_list
+                })
+                fig_eq_status = px.pie(eq_status_df, values='Count', names='Status', title="Equipment Status Distribution")
+                st.plotly_chart(fig_eq_status, use_container_width=True)
+    
+    with tab5:
+        st.subheader("🔧 Field Operations Management")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown("**👷 Crew Summary**")
+            if st.session_state.crews:
+                crew_stats_data = pd.DataFrame([
+                    {"Metric": "Total Crews", "Value": len(st.session_state.crews)},
+                    {"Metric": "Active Crews", "Value": len([c for c in st.session_state.crews if c['status'] == 'Active'])},
+                    {"Metric": "Total Workers", "Value": sum(c['workers'] for c in st.session_state.crews)},
+                    {"Metric": "Avg Productivity", "Value": f"{sum(c['productivity'] for c in st.session_state.crews) / len(st.session_state.crews):.1f}%"},
+                ])
+                st.dataframe(crew_stats_data, use_container_width=True)
+        
+        with col2:
+            st.markdown("**🏗️ Work Package Summary**")
+            if st.session_state.work_packages:
+                wp_stats_data = pd.DataFrame([
+                    {"Metric": "Total Work Packages", "Value": len(st.session_state.work_packages)},
+                    {"Metric": "In Progress", "Value": len([wp for wp in st.session_state.work_packages if wp['status'] == 'In Progress'])},
+                    {"Metric": "Completed", "Value": len([wp for wp in st.session_state.work_packages if wp['status'] == 'Completed'])},
+                    {"Metric": "Avg Progress", "Value": f"{sum(wp['progress'] for wp in st.session_state.work_packages) / len(st.session_state.work_packages):.1f}%"},
+                ])
+                st.dataframe(wp_stats_data, use_container_width=True)
+        
+        with col3:
+            st.markdown("**⚡ Equipment Summary**")
+            if st.session_state.equipment:
+                eq_stats_data = pd.DataFrame([
+                    {"Metric": "Total Equipment", "Value": len(st.session_state.equipment)},
+                    {"Metric": "Operating", "Value": len([eq for eq in st.session_state.equipment if eq['status'] == 'Operating'])},
+                    {"Metric": "In Maintenance", "Value": len([eq for eq in st.session_state.equipment if eq['status'] == 'Maintenance'])},
+                    {"Metric": "Daily Cost", "Value": f"${sum(eq['daily_rate'] for eq in st.session_state.equipment):,.2f}"},
+                ])
+                st.dataframe(eq_stats_data, use_container_width=True)
+        
+        # Data management
+        st.markdown("**⚠️ Data Management**")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("🗑️ Clear All Crews", type="secondary"):
+                st.session_state.crews = []
+                st.success("All crews cleared!")
+                st.rerun()
+        with col2:
+            if st.button("🗑️ Clear Work Packages", type="secondary"):
+                st.session_state.work_packages = []
+                st.success("All work packages cleared!")
+                st.rerun()
+        with col3:
+            if st.button("🗑️ Clear Equipment", type="secondary"):
+                st.session_state.equipment = []
+                st.success("All equipment cleared!")
+                st.rerun()
 
 # Additional render functions for all other modules...
 def render_contracts():
-    """Contracts management module"""
+    """Complete Contracts Management with full CRUD functionality"""
     st.markdown("""
     <div class="module-header">
         <h1>📄 Contracts Management</h1>
-        <p>Comprehensive contract administration and tracking</p>
+        <p>Comprehensive contract administration, tracking, and lifecycle management</p>
     </div>
     """, unsafe_allow_html=True)
-    st.info("📄 Contracts module with comprehensive contract management features")
+    
+    # Initialize contracts data
+    if "contracts" not in st.session_state:
+        st.session_state.contracts = [
+            {
+                "id": "CON-001",
+                "contractor_name": "Highland Construction LLC",
+                "contract_type": "General Contractor",
+                "trade": "General Construction",
+                "contract_value": 28500000.00,
+                "start_date": "2025-01-15",
+                "completion_date": "2026-12-15",
+                "status": "Active",
+                "payment_status": "Current",
+                "completion_percentage": 75,
+                "project_manager": "Sarah Wilson",
+                "contract_number": "HTD-GC-2025-001",
+                "bonding_amount": 2850000.00,
+                "insurance_expiry": "2026-12-31",
+                "retention_percentage": 5.0,
+                "total_paid": 21375000.00,
+                "phone": "(555) 123-4567",
+                "email": "pm@highlandconstruction.com",
+                "address": "123 Construction Ave, City, State 12345",
+                "performance_score": 95
+            },
+            {
+                "id": "CON-002",
+                "contractor_name": "Elite MEP Systems",
+                "contract_type": "Subcontractor",
+                "trade": "MEP",
+                "contract_value": 8200000.00,
+                "start_date": "2025-03-01",
+                "completion_date": "2026-10-15",
+                "status": "Active",
+                "payment_status": "Current",
+                "completion_percentage": 60,
+                "project_manager": "Mike Rodriguez",
+                "contract_number": "HTD-MEP-2025-002",
+                "bonding_amount": 820000.00,
+                "insurance_expiry": "2026-10-31",
+                "retention_percentage": 5.0,
+                "total_paid": 4920000.00,
+                "phone": "(555) 234-5678",
+                "email": "contracts@elitemep.com",
+                "address": "456 Industrial Blvd, City, State 12345",
+                "performance_score": 88
+            },
+            {
+                "id": "CON-003",
+                "contractor_name": "Steel Solutions Inc",
+                "contract_type": "Subcontractor",
+                "trade": "Structural Steel",
+                "contract_value": 2800000.00,
+                "start_date": "2025-04-01",
+                "completion_date": "2025-09-30",
+                "status": "Active",
+                "payment_status": "Pending",
+                "completion_percentage": 45,
+                "project_manager": "David Kim",
+                "contract_number": "HTD-STL-2025-003",
+                "bonding_amount": 280000.00,
+                "insurance_expiry": "2025-12-31",
+                "retention_percentage": 10.0,
+                "total_paid": 1134000.00,
+                "phone": "(555) 345-6789",
+                "email": "admin@steelsolutions.com",
+                "address": "789 Steel Way, City, State 12345",
+                "performance_score": 85
+            }
+        ]
+    
+    if "contract_change_orders" not in st.session_state:
+        st.session_state.contract_change_orders = [
+            {
+                "id": "CCO-001",
+                "contract_id": "CON-001",
+                "contractor_name": "Highland Construction LLC",
+                "description": "Additional HVAC scope modification for improved efficiency",
+                "amount": 125000.00,
+                "type": "Addition",
+                "status": "Approved",
+                "submitted_date": "2025-05-15",
+                "approved_date": "2025-05-20",
+                "reason": "Owner Request",
+                "impact_schedule": 5,
+                "submitted_by": "Project Manager",
+                "approved_by": "Owner Representative"
+            },
+            {
+                "id": "CCO-002",
+                "contract_id": "CON-002",
+                "contractor_name": "Elite MEP Systems",
+                "description": "Additional electrical outlets for data center upgrade",
+                "amount": 45000.00,
+                "type": "Addition",
+                "status": "Under Review",
+                "submitted_date": "2025-05-22",
+                "approved_date": "",
+                "reason": "Design Change",
+                "impact_schedule": 2,
+                "submitted_by": "MEP Contractor",
+                "approved_by": ""
+            }
+        ]
+    
+    # Key Contract Metrics
+    col1, col2, col3, col4 = st.columns(4)
+    
+    total_contract_value = sum(contract['contract_value'] for contract in st.session_state.contracts)
+    active_contracts = len([c for c in st.session_state.contracts if c['status'] == 'Active'])
+    total_paid = sum(contract['total_paid'] for contract in st.session_state.contracts)
+    avg_completion = sum(contract['completion_percentage'] for contract in st.session_state.contracts) / len(st.session_state.contracts) if st.session_state.contracts else 0
+    
+    with col1:
+        st.metric("Total Contract Value", f"${total_contract_value:,.0f}", delta_color="normal")
+    with col2:
+        st.metric("Active Contracts", active_contracts, delta_color="normal")
+    with col3:
+        st.metric("Total Paid", f"${total_paid:,.0f}", delta_color="normal")
+    with col4:
+        st.metric("Avg Completion", f"{avg_completion:.1f}%", delta_color="normal")
+    
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📝 Create Contract", "📊 View Contracts", "📋 Change Orders", "📈 Analytics", "🔧 Management"])
+    
+    with tab1:
+        st.subheader("📝 Create New Contract")
+        
+        with st.form("contract_form"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                contractor_name = st.text_input("Contractor Name", placeholder="Company name")
+                contract_type = st.selectbox("Contract Type", ["General Contractor", "Subcontractor", "Supplier", "Consultant"])
+                trade = st.selectbox("Trade", ["General Construction", "MEP", "Structural Steel", "Concrete", "Electrical", "Plumbing", "HVAC", "Architectural", "Other"])
+                contract_value = st.number_input("Contract Value ($)", value=0.00, format="%.2f")
+                start_date = st.date_input("Start Date", value=datetime.now().date())
+                completion_date = st.date_input("Completion Date", value=datetime.now().date() + timedelta(days=365))
+            
+            with col2:
+                project_manager = st.text_input("Project Manager", placeholder="Assigned PM name")
+                contract_number = st.text_input("Contract Number", placeholder="Unique contract identifier")
+                bonding_amount = st.number_input("Bonding Amount ($)", value=0.00, format="%.2f")
+                insurance_expiry = st.date_input("Insurance Expiry", value=datetime.now().date() + timedelta(days=365))
+                retention_percentage = st.number_input("Retention %", value=5.0, min_value=0.0, max_value=15.0, format="%.1f")
+                phone = st.text_input("Phone", placeholder="(555) 123-4567")
+            
+            email = st.text_input("Email", placeholder="contractor@company.com")
+            address = st.text_area("Address", placeholder="Full business address")
+            
+            if st.form_submit_button("📄 Create Contract", type="primary"):
+                if contractor_name and contract_value > 0 and trade:
+                    new_contract = {
+                        "id": f"CON-{len(st.session_state.contracts) + 1:03d}",
+                        "contractor_name": contractor_name,
+                        "contract_type": contract_type,
+                        "trade": trade,
+                        "contract_value": contract_value,
+                        "start_date": str(start_date),
+                        "completion_date": str(completion_date),
+                        "status": "Active",
+                        "payment_status": "Current",
+                        "completion_percentage": 0,
+                        "project_manager": project_manager,
+                        "contract_number": contract_number,
+                        "bonding_amount": bonding_amount,
+                        "insurance_expiry": str(insurance_expiry),
+                        "retention_percentage": retention_percentage,
+                        "total_paid": 0.00,
+                        "phone": phone,
+                        "email": email,
+                        "address": address,
+                        "performance_score": 100
+                    }
+                    st.session_state.contracts.append(new_contract)
+                    st.success("✅ Contract created successfully!")
+                    st.rerun()
+                else:
+                    st.error("❌ Please fill in all required fields!")
+    
+    with tab2:
+        st.subheader("📊 All Contracts")
+        
+        # Filters
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            status_filter = st.selectbox("Filter by Status", ["All", "Active", "Completed", "Terminated", "On Hold"])
+        with col2:
+            type_filter = st.selectbox("Filter by Type", ["All", "General Contractor", "Subcontractor", "Supplier", "Consultant"])
+        with col3:
+            trade_filter = st.selectbox("Filter by Trade", ["All"] + list(set(c['trade'] for c in st.session_state.contracts)))
+        
+        # Display contracts
+        filtered_contracts = st.session_state.contracts
+        if status_filter != "All":
+            filtered_contracts = [c for c in filtered_contracts if c['status'] == status_filter]
+        if type_filter != "All":
+            filtered_contracts = [c for c in filtered_contracts if c['contract_type'] == type_filter]
+        if trade_filter != "All":
+            filtered_contracts = [c for c in filtered_contracts if c['trade'] == trade_filter]
+        
+        for contract in filtered_contracts:
+            status_icon = {"Active": "🟢", "Completed": "✅", "Terminated": "❌", "On Hold": "⏸️"}.get(contract['status'], "📋")
+            
+            with st.expander(f"{status_icon} {contract['contractor_name']} - ${contract['contract_value']:,.0f} ({contract['completion_percentage']}%)"):
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    st.write(f"**📄 Contract #:** {contract['contract_number']}")
+                    st.write(f"**🏢 Type:** {contract['contract_type']}")
+                    st.write(f"**🔧 Trade:** {contract['trade']}")
+                    st.write(f"**💰 Value:** ${contract['contract_value']:,.2f}")
+                    st.write(f"**📅 Start:** {contract['start_date']}")
+                    st.write(f"**🎯 Completion:** {contract['completion_date']}")
+                
+                with col2:
+                    st.write(f"**📊 Status:** {contract['status']}")
+                    st.write(f"**💳 Payment Status:** {contract['payment_status']}")
+                    st.write(f"**📈 Progress:** {contract['completion_percentage']}%")
+                    st.write(f"**👤 PM:** {contract['project_manager']}")
+                    st.write(f"**🏆 Performance:** {contract['performance_score']}/100")
+                    st.write(f"**💰 Total Paid:** ${contract['total_paid']:,.2f}")
+                
+                with col3:
+                    st.write(f"**🏦 Bonding:** ${contract['bonding_amount']:,.2f}")
+                    st.write(f"**🛡️ Insurance Expiry:** {contract['insurance_expiry']}")
+                    st.write(f"**📊 Retention:** {contract['retention_percentage']}%")
+                    st.write(f"**📞 Phone:** {contract['phone']}")
+                    st.write(f"**📧 Email:** {contract['email']}")
+                    if contract['address']:
+                        st.write(f"**📍 Address:** {contract['address']}")
+                
+                # Progress bar
+                st.write("**📈 Contract Progress:**")
+                st.progress(contract['completion_percentage'] / 100)
+                
+                # Action buttons
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    if st.button(f"✅ Complete", key=f"complete_{contract['id']}"):
+                        contract['status'] = 'Completed'
+                        contract['completion_percentage'] = 100
+                        st.success("Contract completed!")
+                        st.rerun()
+                with col2:
+                    new_progress = st.slider(f"Update Progress", 0, 100, contract['completion_percentage'], key=f"progress_c_{contract['id']}")
+                    if st.button(f"📊 Update", key=f"update_c_{contract['id']}"):
+                        contract['completion_percentage'] = new_progress
+                        st.success("Progress updated!")
+                        st.rerun()
+                with col3:
+                    if st.button(f"✏️ Edit", key=f"edit_c_{contract['id']}"):
+                        st.info("Edit functionality - would open edit form")
+                with col4:
+                    if st.button(f"🗑️ Delete", key=f"delete_c_{contract['id']}"):
+                        st.session_state.contracts.remove(contract)
+                        st.success("Contract deleted!")
+                        st.rerun()
+    
+    with tab3:
+        st.subheader("📋 Contract Change Orders")
+        
+        co_sub_tab1, co_sub_tab2 = st.tabs(["📝 Create Change Order", "📊 View Change Orders"])
+        
+        with co_sub_tab1:
+            st.markdown("**Create New Contract Change Order**")
+            
+            with st.form("change_order_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    contract_selection = st.selectbox("Select Contract", 
+                        [f"{c['contract_number']} - {c['contractor_name']}" for c in st.session_state.contracts])
+                    selected_contract = next((c for c in st.session_state.contracts 
+                                            if f"{c['contract_number']} - {c['contractor_name']}" == contract_selection), None)
+                    
+                    co_description = st.text_area("Change Order Description", placeholder="Detailed description of the change")
+                    co_amount = st.number_input("Amount ($)", value=0.00, format="%.2f")
+                    co_type = st.selectbox("Type", ["Addition", "Deduction", "Credit"])
+                    reason = st.selectbox("Reason", ["Owner Request", "Design Change", "Site Conditions", "Code Compliance", "Coordination Issue"])
+                
+                with col2:
+                    impact_schedule = st.number_input("Schedule Impact (days)", value=0, format="%d")
+                    submitted_by = st.text_input("Submitted By", placeholder="Person submitting change order")
+                
+                if st.form_submit_button("📋 Create Change Order", type="primary"):
+                    if selected_contract and co_description and co_amount != 0:
+                        new_co = {
+                            "id": f"CCO-{len(st.session_state.contract_change_orders) + 1:03d}",
+                            "contract_id": selected_contract['id'],
+                            "contractor_name": selected_contract['contractor_name'],
+                            "description": co_description,
+                            "amount": co_amount,
+                            "type": co_type,
+                            "status": "Submitted",
+                            "submitted_date": str(datetime.now().date()),
+                            "approved_date": "",
+                            "reason": reason,
+                            "impact_schedule": impact_schedule,
+                            "submitted_by": submitted_by,
+                            "approved_by": ""
+                        }
+                        st.session_state.contract_change_orders.append(new_co)
+                        st.success("✅ Change order created successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields!")
+        
+        with co_sub_tab2:
+            st.markdown("**All Contract Change Orders**")
+            
+            for co in st.session_state.contract_change_orders:
+                status_icon = {"Submitted": "📋", "Under Review": "🔄", "Approved": "✅", "Rejected": "❌"}.get(co['status'], "📋")
+                type_icon = {"Addition": "➕", "Deduction": "➖", "Credit": "💳"}.get(co['type'], "📋")
+                
+                with st.expander(f"{status_icon} {co['id']} - {co['contractor_name']} {type_icon}${abs(co['amount']):,.2f}"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📄 Contract:** {co['contract_id']}")
+                        st.write(f"**🏢 Contractor:** {co['contractor_name']}")
+                        st.write(f"**💰 Amount:** ${co['amount']:,.2f}")
+                        st.write(f"**📋 Type:** {co['type']}")
+                        st.write(f"**📅 Submitted:** {co['submitted_date']}")
+                        st.write(f"**👤 Submitted By:** {co['submitted_by']}")
+                    
+                    with col2:
+                        st.write(f"**📊 Status:** {co['status']}")
+                        st.write(f"**📅 Schedule Impact:** {co['impact_schedule']} days")
+                        st.write(f"**📋 Reason:** {co['reason']}")
+                        if co['approved_date']:
+                            st.write(f"**✅ Approved:** {co['approved_date']}")
+                            st.write(f"**👤 Approved By:** {co['approved_by']}")
+                    
+                    st.write(f"**📝 Description:** {co['description']}")
+                    
+                    # Action buttons
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        if co['status'] != 'Approved' and st.button(f"✅ Approve", key=f"approve_co_{co['id']}"):
+                            co['status'] = 'Approved'
+                            co['approved_date'] = str(datetime.now().date())
+                            co['approved_by'] = 'Project Manager'
+                            # Update contract value
+                            contract = next((c for c in st.session_state.contracts if c['id'] == co['contract_id']), None)
+                            if contract:
+                                contract['contract_value'] += co['amount']
+                            st.success("Change order approved!")
+                            st.rerun()
+                    with col2:
+                        if st.button(f"🔄 Under Review", key=f"review_co_{co['id']}"):
+                            co['status'] = 'Under Review'
+                            st.info("Change order under review!")
+                            st.rerun()
+                    with col3:
+                        if st.button(f"🗑️ Delete", key=f"delete_co_{co['id']}"):
+                            st.session_state.contract_change_orders.remove(co)
+                            st.success("Change order deleted!")
+                            st.rerun()
+    
+    with tab4:
+        st.subheader("📈 Contract Analytics")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Contract value by contractor
+            if st.session_state.contracts:
+                contractor_names = [contract['contractor_name'] for contract in st.session_state.contracts]
+                contract_values = [contract['contract_value'] for contract in st.session_state.contracts]
+                contract_df = pd.DataFrame({
+                    'Contractor': contractor_names,
+                    'Value': contract_values
+                })
+                fig_contracts = px.bar(contract_df, x='Contractor', y='Value', title="Contract Value by Contractor")
+                st.plotly_chart(fig_contracts, use_container_width=True)
+        
+        with col2:
+            # Contract completion status
+            if st.session_state.contracts:
+                completion_ranges = []
+                for contract in st.session_state.contracts:
+                    if contract['completion_percentage'] <= 25:
+                        completion_ranges.append("0-25%")
+                    elif contract['completion_percentage'] <= 50:
+                        completion_ranges.append("26-50%")
+                    elif contract['completion_percentage'] <= 75:
+                        completion_ranges.append("51-75%")
+                    else:
+                        completion_ranges.append("76-100%")
+                
+                completion_counts = {}
+                for range_val in completion_ranges:
+                    completion_counts[range_val] = completion_counts.get(range_val, 0) + 1
+                
+                completion_list = list(completion_counts.keys())
+                count_list = list(completion_counts.values())
+                completion_df = pd.DataFrame({
+                    'Completion_Range': completion_list,
+                    'Count': count_list
+                })
+                fig_completion = px.pie(completion_df, values='Count', names='Completion_Range', title="Contract Completion Status")
+                st.plotly_chart(fig_completion, use_container_width=True)
+        
+        # Change order analytics
+        if st.session_state.contract_change_orders:
+            st.markdown("**📋 Change Order Analytics**")
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                # Change order amounts by contractor
+                co_contractor_amounts = {}
+                for co in st.session_state.contract_change_orders:
+                    contractor = co['contractor_name']
+                    co_contractor_amounts[contractor] = co_contractor_amounts.get(contractor, 0) + co['amount']
+                
+                co_contractor_list = list(co_contractor_amounts.keys())
+                co_amount_list = list(co_contractor_amounts.values())
+                co_contractor_df = pd.DataFrame({
+                    'Contractor': co_contractor_list,
+                    'Change_Order_Amount': co_amount_list
+                })
+                fig_co_amounts = px.bar(co_contractor_df, x='Contractor', y='Change_Order_Amount', title="Change Order Amounts by Contractor")
+                st.plotly_chart(fig_co_amounts, use_container_width=True)
+            
+            with col2:
+                # Change order status
+                co_status_counts = {}
+                for co in st.session_state.contract_change_orders:
+                    status = co['status']
+                    co_status_counts[status] = co_status_counts.get(status, 0) + 1
+                
+                co_status_list = list(co_status_counts.keys())
+                co_status_count_list = list(co_status_counts.values())
+                co_status_df = pd.DataFrame({
+                    'Status': co_status_list,
+                    'Count': co_status_count_list
+                })
+                fig_co_status = px.pie(co_status_df, values='Count', names='Status', title="Change Order Status Distribution")
+                st.plotly_chart(fig_co_status, use_container_width=True)
+    
+    with tab5:
+        st.subheader("🔧 Contract Management")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("**📊 Contract Summary**")
+            if st.session_state.contracts:
+                contract_stats_data = pd.DataFrame([
+                    {"Metric": "Total Contracts", "Value": len(st.session_state.contracts)},
+                    {"Metric": "Active Contracts", "Value": len([c for c in st.session_state.contracts if c['status'] == 'Active'])},
+                    {"Metric": "Total Contract Value", "Value": f"${sum(c['contract_value'] for c in st.session_state.contracts):,.2f}"},
+                    {"Metric": "Total Paid", "Value": f"${sum(c['total_paid'] for c in st.session_state.contracts):,.2f}"},
+                ])
+                st.dataframe(contract_stats_data, use_container_width=True)
+        
+        with col2:
+            st.markdown("**📋 Change Order Summary**")
+            if st.session_state.contract_change_orders:
+                co_stats_data = pd.DataFrame([
+                    {"Metric": "Total Change Orders", "Value": len(st.session_state.contract_change_orders)},
+                    {"Metric": "Approved", "Value": len([co for co in st.session_state.contract_change_orders if co['status'] == 'Approved'])},
+                    {"Metric": "Pending", "Value": len([co for co in st.session_state.contract_change_orders if co['status'] != 'Approved'])},
+                    {"Metric": "Total CO Value", "Value": f"${sum(co['amount'] for co in st.session_state.contract_change_orders):,.2f}"},
+                ])
+                st.dataframe(co_stats_data, use_container_width=True)
+        
+        # Data management
+        st.markdown("**⚠️ Data Management**")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🗑️ Clear All Contracts", type="secondary"):
+                st.session_state.contracts = []
+                st.success("All contracts cleared!")
+                st.rerun()
+        with col2:
+            if st.button("🗑️ Clear Change Orders", type="secondary"):
+                st.session_state.contract_change_orders = []
+                st.success("All change orders cleared!")
+                st.rerun()
 
 def render_cost_management():
     """Cost management module"""

@@ -1150,7 +1150,7 @@ def render_sidebar():
         # Core Tools Section
         st.markdown('<div class="section-header">⚡ Core Tools</div>', unsafe_allow_html=True)
         
-        if st.button("📊 Dashboard", key="dashboard", use_container_width=True):
+        if st.button("📊 Dashboard", key="btn_dashboard", use_container_width=True):
             st.session_state.current_page = "dashboard"
         
         if st.button("📋 Daily Reports", key="btn_daily_reports", use_container_width=True):
@@ -1159,7 +1159,7 @@ def render_sidebar():
         if st.button("🚚 Deliveries", key="btn_deliveries", use_container_width=True):
             st.session_state.current_page = "deliveries"
         
-        if st.button("🦺 Safety", key="safety", use_container_width=True):
+        if st.button("🦺 Safety", key="btn_safety", use_container_width=True):
             st.session_state.current_page = "safety"
         
         # Project Management Section
@@ -1189,37 +1189,37 @@ def render_sidebar():
         # Advanced Tools Section
         st.markdown('<div class="section-header">🔧 Advanced Tools</div>', unsafe_allow_html=True)
         
-        if st.button("📝 RFIs", key="rfis", use_container_width=True):
+        if st.button("📝 RFIs", key="btn_rfis", use_container_width=True):
             st.session_state.current_page = "rfis"
         
-        if st.button("📤 Submittals", key="submittals", use_container_width=True):
+        if st.button("📤 Submittals", key="btn_submittals", use_container_width=True):
             st.session_state.current_page = "submittals"
         
-        if st.button("📨 Transmittals", key="transmittals", use_container_width=True):
+        if st.button("📨 Transmittals", key="btn_transmittals", use_container_width=True):
             st.session_state.current_page = "transmittals"
         
-        if st.button("📅 Scheduling", key="scheduling", use_container_width=True):
+        if st.button("📅 Scheduling", key="btn_scheduling", use_container_width=True):
             st.session_state.current_page = "scheduling"
         
-        if st.button("🔍 Quality Control", key="quality_control", use_container_width=True):
+        if st.button("🔍 Quality Control", key="btn_quality_control", use_container_width=True):
             st.session_state.current_page = "quality_control"
         
-        if st.button("📸 Progress Photos", key="progress_photos", use_container_width=True):
+        if st.button("📸 Progress Photos", key="btn_progress_photos", use_container_width=True):
             st.session_state.current_page = "progress_photos"
         
-        if st.button("🏭 Subcontractor Management", key="subcontractor_management", use_container_width=True):
+        if st.button("🏭 Subcontractor Management", key="btn_subcontractor_management", use_container_width=True):
             st.session_state.current_page = "subcontractor_management"
         
-        if st.button("🔍 Inspections", key="inspections", use_container_width=True):
+        if st.button("🔍 Inspections", key="btn_inspections", use_container_width=True):
             st.session_state.current_page = "inspections"
         
-        if st.button("⚠️ Issues & Risks", key="issues_risks", use_container_width=True):
+        if st.button("⚠️ Issues & Risks", key="btn_issues_risks", use_container_width=True):
             st.session_state.current_page = "issues_risks"
         
         # Resource Management Section
         st.markdown('<div class="section-header">📦 Resource Management</div>', unsafe_allow_html=True)
         
-        if st.button("📁 Documents", key="documents", use_container_width=True):
+        if st.button("📁 Documents", key="btn_documents", use_container_width=True):
             st.session_state.current_page = "documents"
         
         if st.button("💲 Unit Prices", key="unit_prices", use_container_width=True):

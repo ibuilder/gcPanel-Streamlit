@@ -6913,7 +6913,87 @@ def render_rfis():
                 st.info("Reset functionality ready")
 
 def render_submittals():
-    """Submittals management module"""
+    """Enterprise Submittals Management with robust Python backend"""
+    try:
+        from modules.submittals_backend import submittals_manager
+        render_submittals_enterprise()
+        return
+    except ImportError:
+        st.error("Enterprise Submittals module not available")
+    
+    # Fallback to basic version
+    render_submittals_basic()
+
+def render_submittals_enterprise():
+    """Render enterprise submittals interface"""
+    from modules.submittals_backend import submittals_manager, SubmittalStatus, SubmittalType
+    
+    st.markdown("""
+    <div class="module-header">
+        <h1>📤 Submittals Management</h1>
+        <p>Highland Tower Development - Enterprise document submission and approval workflows</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Display summary metrics
+    metrics = submittals_manager.generate_submittal_metrics()
+    if metrics:
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("📤 Total Submittals", metrics['total_submittals'])
+        with col2:
+            st.metric("⏳ Pending Review", metrics['pending_review'])
+        with col3:
+            st.metric("✅ Approval Rate", f"{metrics['approval_rate']}%")
+        with col4:
+            st.metric("⚠️ Overdue", metrics['overdue_count'])
+    
+    # Display submittals
+    submittals = submittals_manager.get_all_submittals()
+    
+    st.subheader("📋 All Submittals")
+    
+    for submittal in submittals:
+        status_color = {
+            SubmittalStatus.APPROVED: "🟢",
+            SubmittalStatus.UNDER_REVIEW: "🟡", 
+            SubmittalStatus.REVISE_AND_RESUBMIT: "🟠",
+            SubmittalStatus.REJECTED: "🔴"
+        }.get(submittal.status, "⚪")
+        
+        with st.expander(f"{status_color} {submittal.submittal_number} | {submittal.title} | {submittal.status.value}"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.write(f"**📋 Type:** {submittal.submittal_type.value}")
+                st.write(f"**📄 Spec Section:** {submittal.spec_section}")
+                st.write(f"**🏢 Contractor:** {submittal.contractor}")
+                st.write(f"**📅 Required Date:** {submittal.required_date}")
+                if submittal.submitted_date:
+                    st.write(f"**📤 Submitted:** {submittal.submitted_date}")
+            
+            with col2:
+                st.write(f"**📍 Location:** {submittal.location}")
+                st.write(f"**👤 Contact:** {submittal.contact_person}")
+                st.write(f"**📝 Revision:** {submittal.current_revision}")
+                st.write(f"**⏱️ Days in Review:** {submittal.days_in_review}")
+                if submittal.approved_date:
+                    st.write(f"**✅ Approved:** {submittal.approved_date}")
+            
+            if submittal.description:
+                st.write(f"**📝 Description:** {submittal.description}")
+            
+            # Show reviews
+            if submittal.reviews:
+                st.write("**📋 Reviews:**")
+                for review in submittal.reviews:
+                    st.write(f"• {review.reviewer_name} ({review.review_date}): {review.action.value}")
+                    if review.comments:
+                        st.write(f"  *{review.comments}*")
+
+def render_submittals_basic():
+    """Basic Submittals module - fallback version"""
     st.markdown("""
     <div class="module-header">
         <h1>📤 Submittals Management</h1>
@@ -6923,7 +7003,87 @@ def render_submittals():
     st.info("📤 Submittals module with approval workflows and tracking")
 
 def render_transmittals():
-    """Transmittals management module"""
+    """Enterprise Transmittals Management with robust Python backend"""
+    try:
+        from modules.transmittals_backend import transmittals_manager, TransmittalStatus, TransmittalType
+        
+        st.markdown("""
+        <div class="module-header">
+            <h1>📧 Transmittals Management</h1>
+            <p>Highland Tower Development - Document distribution and communication tracking</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Display summary metrics
+        metrics = transmittals_manager.generate_transmittal_metrics()
+        if metrics:
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("📧 Total Transmittals", metrics['total_transmittals'])
+            with col2:
+                st.metric("⏳ Pending Acknowledgment", metrics['pending_acknowledgments'])
+            with col3:
+                st.metric("✅ Acknowledgment Rate", f"{metrics['acknowledgment_rate']}%")
+            with col4:
+                st.metric("📄 Total Documents", metrics['total_documents'])
+        
+        # Display transmittals
+        transmittals = transmittals_manager.get_all_transmittals()
+        
+        st.subheader("📋 All Transmittals")
+        
+        for transmittal in transmittals:
+            status_color = {
+                TransmittalStatus.SENT: "🟡",
+                TransmittalStatus.RECEIVED: "🟠", 
+                TransmittalStatus.ACKNOWLEDGED: "🟢",
+                TransmittalStatus.REJECTED: "🔴"
+            }.get(transmittal.status, "⚪")
+            
+            with st.expander(f"{status_color} {transmittal.transmittal_number} | {transmittal.subject} | {transmittal.status.value}"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write(f"**📋 Type:** {transmittal.transmittal_type.value}")
+                    st.write(f"**📤 From:** {transmittal.sender_name} ({transmittal.sender_company})")
+                    st.write(f"**📮 Method:** {transmittal.delivery_method.value}")
+                    if transmittal.sent_date:
+                        st.write(f"**📅 Sent:** {transmittal.sent_date}")
+                
+                with col2:
+                    st.write(f"**📄 Documents:** {transmittal.total_documents}")
+                    st.write(f"**👥 Recipients:** {len(transmittal.recipients)}")
+                    if transmittal.tracking_number:
+                        st.write(f"**📋 Tracking:** {transmittal.tracking_number}")
+                    if transmittal.reply_by_date:
+                        st.write(f"**⏰ Reply By:** {transmittal.reply_by_date}")
+                
+                if transmittal.message:
+                    st.write(f"**💬 Message:** {transmittal.message}")
+                
+                # Show recipients
+                if transmittal.recipients:
+                    st.write("**👥 Recipients:**")
+                    for recipient in transmittal.recipients:
+                        ack_status = "✅" if recipient.acknowledged_date else "⏳"
+                        st.write(f"• {ack_status} {recipient.name} ({recipient.company}) - {recipient.copy_type}")
+                
+                # Show documents
+                if transmittal.documents:
+                    st.write("**📄 Documents:**")
+                    for doc in transmittal.documents:
+                        st.write(f"• {doc.filename} - {doc.description}")
+        
+        return
+        
+    except ImportError:
+        st.error("Enterprise Transmittals module not available")
+        # Fallback to basic version
+        render_transmittals_basic()
+
+def render_transmittals_basic():
+    """Basic transmittals module - fallback version"""
     st.markdown("""
     <div class="module-header">
         <h1>📨 Transmittals</h1>
@@ -8213,7 +8373,161 @@ def render_quality_control():
                 st.rerun()
 
 def render_progress_photos():
-    """Complete Progress Photos with full CRUD functionality"""
+    """Enterprise Progress Photos Management with robust Python backend"""
+    try:
+        from modules.progress_photos_backend import progress_photos_manager, PhotoStatus, PhotoCategory
+        
+        st.markdown("""
+        <div class="module-header">
+            <h1>📸 Progress Photos Management</h1>
+            <p>Highland Tower Development - Professional photo documentation with approval workflows</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Display summary metrics
+        metrics = progress_photos_manager.generate_photo_metrics()
+        if metrics:
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("📸 Total Photos", metrics['total_photos'])
+            with col2:
+                st.metric("📁 Albums", metrics['total_albums'])
+            with col3:
+                st.metric("✅ Approval Rate", f"{metrics['approval_rate']}%")
+            with col4:
+                st.metric("⏳ Pending Review", metrics['pending_review'])
+        
+        # Create tabs
+        tab1, tab2, tab3 = st.tabs(["📸 All Photos", "📁 Albums", "📊 Analytics"])
+        
+        with tab1:
+            st.subheader("📸 All Progress Photos")
+            
+            # Display photos
+            photos = progress_photos_manager.get_all_photos()
+            
+            for photo in photos:
+                status_color = {
+                    PhotoStatus.APPROVED: "🟢",
+                    PhotoStatus.UNDER_REVIEW: "🟡",
+                    PhotoStatus.REJECTED: "🔴",
+                    PhotoStatus.UPLOADED: "🔵"
+                }.get(photo.status, "⚪")
+                
+                with st.expander(f"{status_color} {photo.photo_number} | {photo.title} | {photo.status.value}"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📋 Category:** {photo.category.value}")
+                        st.write(f"**📍 Location:** {photo.location}")
+                        st.write(f"**🏗️ Work Package:** {photo.work_package}")
+                        st.write(f"**📅 Captured:** {photo.captured_date} at {photo.captured_time}")
+                        st.write(f"**📷 By:** {photo.captured_by}")
+                    
+                    with col2:
+                        st.write(f"**👁️ View Angle:** {photo.view_angle.value}")
+                        st.write(f"**📄 Filename:** {photo.filename}")
+                        st.write(f"**📐 Resolution:** {photo.metadata.resolution}")
+                        st.write(f"**💾 Size:** {photo.metadata.file_size / (1024*1024):.1f} MB")
+                        if photo.approved_date:
+                            st.write(f"**✅ Approved:** {photo.approved_date}")
+                    
+                    if photo.description:
+                        st.write(f"**📝 Description:** {photo.description}")
+                    
+                    if photo.tags:
+                        st.write(f"**🏷️ Tags:** {', '.join(photo.tags)}")
+                    
+                    if photo.drawing_references:
+                        st.write(f"**📐 Drawing References:** {', '.join(photo.drawing_references)}")
+                    
+                    # Show reviews
+                    if photo.reviews:
+                        st.write("**📋 Reviews:**")
+                        for review in photo.reviews:
+                            rating_stars = "⭐" * (review.rating or 0)
+                            st.write(f"• {review.reviewer_name} ({review.review_date}): {review.action} {rating_stars}")
+                            if review.comments:
+                                st.write(f"  *{review.comments}*")
+                    
+                    # Show related items
+                    if photo.related_rfi or photo.related_submittal or photo.related_inspection:
+                        st.write("**🔗 Related Items:**")
+                        if photo.related_rfi:
+                            st.write(f"• RFI: {photo.related_rfi}")
+                        if photo.related_submittal:
+                            st.write(f"• Submittal: {photo.related_submittal}")
+                        if photo.related_inspection:
+                            st.write(f"• Inspection: {photo.related_inspection}")
+        
+        with tab2:
+            st.subheader("📁 Photo Albums")
+            
+            albums = list(progress_photos_manager.albums.values())
+            
+            for album in albums:
+                with st.expander(f"📁 {album.name} | {album.photo_count} photos"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📋 Category:** {album.category.value}")
+                        st.write(f"**🏗️ Work Package:** {album.work_package}")
+                        st.write(f"**📅 Created:** {album.created_date}")
+                        st.write(f"**👤 Created By:** {album.created_by}")
+                    
+                    with col2:
+                        st.write(f"**📸 Photo Count:** {album.photo_count}")
+                        st.write(f"**📅 Date Range:** {album.date_range_start} to {album.date_range_end}")
+                        st.write(f"**👁️ Visibility:** {album.visibility}")
+                    
+                    if album.description:
+                        st.write(f"**📝 Description:** {album.description}")
+                    
+                    if album.tags:
+                        st.write(f"**🏷️ Tags:** {', '.join(album.tags)}")
+                    
+                    # Show photos in album
+                    album_photos = progress_photos_manager.get_photos_by_album(album.album_id)
+                    if album_photos:
+                        st.write("**📸 Photos in Album:**")
+                        for photo in album_photos[:5]:  # Show first 5
+                            st.write(f"• {photo.title} ({photo.captured_date})")
+                        if len(album_photos) > 5:
+                            st.write(f"... and {len(album_photos) - 5} more")
+        
+        with tab3:
+            st.subheader("📊 Photo Documentation Analytics")
+            
+            if metrics:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write("**📊 Status Breakdown:**")
+                    for status, count in metrics['status_breakdown'].items():
+                        st.write(f"• {status}: {count}")
+                    
+                    st.write("**📋 Category Breakdown:**")
+                    for category, count in metrics['category_breakdown'].items():
+                        st.write(f"• {category}: {count}")
+                
+                with col2:
+                    st.write("**📈 Performance Metrics:**")
+                    st.write(f"• **Approval Rate:** {metrics['approval_rate']}%")
+                    st.write(f"• **Average Rating:** {metrics['average_rating']}/5")
+                    st.write(f"• **Total Storage:** {metrics['total_file_size_mb']} MB")
+                    st.write(f"• **Average File Size:** {metrics['average_file_size_mb']} MB")
+                    st.write(f"• **Pending Review:** {metrics['pending_review']}")
+        
+        return
+        
+    except ImportError:
+        st.error("Enterprise Progress Photos module not available")
+        # Fallback to basic version
+        render_progress_photos_basic()
+
+def render_progress_photos_basic():
+    """Basic progress photos module - fallback version"""
     st.markdown("""
     <div class="module-header">
         <h1>📸 Progress Photos</h1>
@@ -9459,7 +9773,166 @@ def render_inspections():
     st.info("🔍 Inspections module with compliance tracking")
 
 def render_issues_risks():
-    """Issues and risks module"""
+    """Enterprise Issues & Risks Management with robust Python backend"""
+    try:
+        from modules.issues_risks_backend import issues_risks_manager, Priority, Status
+        
+        st.markdown("""
+        <div class="module-header">
+            <h1>⚠️ Issues & Risks Management</h1>
+            <p>Highland Tower Development - Comprehensive risk tracking and mitigation management</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Create tabs for Issues and Risks
+        tab1, tab2, tab3 = st.tabs(["📋 Issues", "⚠️ Risks", "📊 Analytics"])
+        
+        with tab1:
+            st.subheader("📋 Project Issues")
+            
+            # Issues metrics
+            issues_metrics = issues_risks_manager.generate_issues_metrics()
+            if issues_metrics:
+                col1, col2, col3, col4 = st.columns(4)
+                
+                with col1:
+                    st.metric("📋 Total Issues", issues_metrics['total_issues'])
+                with col2:
+                    st.metric("🔓 Open Issues", issues_metrics['open_issues'])
+                with col3:
+                    st.metric("🚨 Critical Issues", issues_metrics['critical_issues'])
+                with col4:
+                    st.metric("💰 Cost Impact", f"${issues_metrics['total_cost_impact']:,.0f}")
+            
+            # Display issues
+            issues = issues_risks_manager.get_all_issues()
+            
+            for issue in issues:
+                priority_color = {
+                    Priority.CRITICAL: "🔴",
+                    Priority.HIGH: "🟠",
+                    Priority.MEDIUM: "🟡",
+                    Priority.LOW: "🟢"
+                }.get(issue.priority, "⚪")
+                
+                status_icon = {
+                    Status.OPEN: "🔓",
+                    Status.IN_PROGRESS: "🔄",
+                    Status.RESOLVED: "✅",
+                    Status.CLOSED: "🔒"
+                }.get(issue.status, "⚪")
+                
+                with st.expander(f"{priority_color} {status_icon} {issue.issue_number} | {issue.title} | {issue.priority.value}"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📍 Location:** {issue.location}")
+                        st.write(f"**📦 Work Package:** {issue.work_package}")
+                        st.write(f"**👤 Reported By:** {issue.reported_by}")
+                        st.write(f"**📅 Reported Date:** {issue.reported_date}")
+                        st.write(f"**⏰ Days Open:** {issue.days_open}")
+                    
+                    with col2:
+                        st.write(f"**📊 Status:** {issue.status.value}")
+                        st.write(f"**👥 Assigned To:** {issue.assigned_to}")
+                        st.write(f"**📅 Due Date:** {issue.due_date}")
+                        st.write(f"**💰 Cost Impact:** ${issue.cost_impact:,.0f}")
+                        st.write(f"**📆 Schedule Impact:** {issue.schedule_impact_days} days")
+                    
+                    if issue.description:
+                        st.write(f"**📝 Description:** {issue.description}")
+                    
+                    # Show mitigation actions
+                    if issue.mitigation_actions:
+                        st.write("**⚡ Mitigation Actions:**")
+                        for action in issue.mitigation_actions:
+                            action_status = "✅" if action.status == Status.CLOSED else "🔄"
+                            st.write(f"• {action_status} {action.description} (Due: {action.due_date})")
+        
+        with tab2:
+            st.subheader("⚠️ Project Risks")
+            
+            # Risks metrics
+            risks_metrics = issues_risks_manager.generate_risks_metrics()
+            if risks_metrics:
+                col1, col2, col3, col4 = st.columns(4)
+                
+                with col1:
+                    st.metric("⚠️ Total Risks", risks_metrics['total_risks'])
+                with col2:
+                    st.metric("🔥 High Risk Count", risks_metrics['high_risk_count'])
+                with col3:
+                    st.metric("📊 Avg Risk Score", risks_metrics['average_risk_score'])
+                with col4:
+                    st.metric("👀 Active Monitoring", risks_metrics['active_monitoring'])
+            
+            # Display risks
+            risks = issues_risks_manager.get_all_risks()
+            
+            for risk in risks:
+                risk_level = "🔴" if risk.risk_score >= 3.0 else "🟡" if risk.risk_score >= 2.0 else "🟢"
+                
+                with st.expander(f"{risk_level} {risk.risk_number} | {risk.title} | Score: {risk.risk_score:.1f}"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📊 Probability:** {risk.probability.value}")
+                        st.write(f"**💥 Impact:** {risk.impact.value}")
+                        st.write(f"**🎯 Strategy:** {risk.response_strategy}")
+                        st.write(f"**👤 Risk Owner:** {risk.risk_owner}")
+                        st.write(f"**📅 Next Review:** {risk.next_review_date}")
+                    
+                    with col2:
+                        st.write(f"**📊 Status:** {risk.status.value}")
+                        st.write(f"**💰 Potential Cost:** ${risk.potential_cost_impact:,.0f}")
+                        st.write(f"**📆 Potential Schedule:** {risk.potential_schedule_impact} days")
+                        st.write(f"**🔄 Monitoring:** {risk.monitoring_frequency}")
+                        st.write(f"**📈 Risk Score:** {risk.risk_score:.2f}")
+                    
+                    if risk.description:
+                        st.write(f"**📝 Description:** {risk.description}")
+                    
+                    if risk.early_warning_signs:
+                        st.write("**🚨 Early Warning Signs:**")
+                        for sign in risk.early_warning_signs:
+                            st.write(f"• {sign}")
+        
+        with tab3:
+            st.subheader("📊 Issues & Risks Analytics")
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.write("**📋 Issues Summary:**")
+                if issues_metrics:
+                    for key, value in issues_metrics.items():
+                        if isinstance(value, dict):
+                            st.write(f"**{key.replace('_', ' ').title()}:**")
+                            for k, v in value.items():
+                                st.write(f"  • {k}: {v}")
+                        else:
+                            st.write(f"• **{key.replace('_', ' ').title()}:** {value}")
+            
+            with col2:
+                st.write("**⚠️ Risks Summary:**")
+                if risks_metrics:
+                    for key, value in risks_metrics.items():
+                        if isinstance(value, dict):
+                            st.write(f"**{key.replace('_', ' ').title()}:**")
+                            for k, v in value.items():
+                                st.write(f"  • {k}: {v}")
+                        else:
+                            st.write(f"• **{key.replace('_', ' ').title()}:** {value}")
+        
+        return
+        
+    except ImportError:
+        st.error("Enterprise Issues & Risks module not available")
+        # Fallback to basic version
+        render_issues_risks_basic()
+
+def render_issues_risks_basic():
+    """Basic issues and risks module - fallback version"""
     st.markdown("""
     <div class="module-header">
         <h1>⚠️ Issues & Risks</h1>

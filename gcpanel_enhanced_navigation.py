@@ -23,429 +23,324 @@ def configure_page():
     )
 
 def apply_styling():
-    """Apply professional glassmorphism styling for Highland Tower Development"""
+    """Apply clean, professional styling based on gcpanel.co design language"""
     st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     
-    /* Global Styling */
+    /* Global Reset and Base Styling */
     * {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        box-sizing: border-box;
     }
     
-    /* Main App Background with Gradient */
+    /* Main App Styling */
     .main {
-        padding-top: 0rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        position: relative;
+        background-color: #fafbfc;
+        padding: 0;
     }
     
-    .main::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="1" fill="rgba(255,255,255,0.05)"/><circle cx="40" cy="60" r="0.5" fill="rgba(255,255,255,0.08)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-        pointer-events: none;
-        z-index: -1;
-    }
-    
-    /* Sidebar Glassmorphism */
+    /* Sidebar Clean Professional Style */
     .css-1d391kg {
-        background: rgba(22, 27, 34, 0.85) !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background-color: #1a1f36 !important;
+        border-right: 1px solid #e1e5e9 !important;
         padding-top: 1rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
     }
     
-    /* Sidebar Content */
     .css-1d391kg .css-1v0mbdj {
-        color: rgba(255, 255, 255, 0.95) !important;
+        color: #ffffff !important;
     }
     
-    /* User Profile Glassmorphism */
+    /* User Profile Section */
     .user-profile {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 20px;
-        border-radius: 16px;
-        margin-bottom: 24px;
-        text-align: center;
-        color: white;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
-    }
-    
-    .user-profile:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-    }
-    
-    /* Project Header Glassmorphism */
-    .project-header {
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
         padding: 16px;
-        border-radius: 12px;
-        margin-bottom: 24px;
+        border-radius: 8px;
+        margin-bottom: 20px;
         text-align: center;
         color: white;
-        font-weight: 600;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    }
+    
+    /* Project Header */
+    .project-header {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        text-align: center;
+        color: white;
+        font-weight: 500;
+        font-size: 14px;
     }
     
     /* Section Headers */
     .section-header {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 13px;
+        color: #9ca3af;
+        font-size: 11px;
         font-weight: 600;
-        margin: 24px 0 12px 0;
-        padding: 0 12px;
+        margin: 20px 0 8px 0;
+        padding: 0 16px;
         text-transform: uppercase;
-        letter-spacing: 1.2px;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        letter-spacing: 0.5px;
     }
     
-    /* Navigation Buttons Glassmorphism */
+    /* Navigation Buttons Clean Style */
     .stButton > button {
         width: 100% !important;
-        margin-bottom: 8px !important;
-        background: rgba(255, 255, 255, 0.1) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-        color: rgba(255, 255, 255, 0.95) !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-radius: 12px !important;
-        padding: 12px 16px !important;
+        margin-bottom: 4px !important;
+        background-color: transparent !important;
+        color: #d1d5db !important;
+        border: none !important;
+        border-radius: 6px !important;
+        padding: 10px 16px !important;
         font-weight: 500 !important;
         font-size: 14px !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        text-align: left !important;
+        transition: all 0.15s ease !important;
         cursor: pointer !important;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+        box-shadow: none !important;
     }
     
     .stButton > button:hover {
-        background: rgba(255, 255, 255, 0.2) !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+        transform: none !important;
     }
     
-    .stButton > button:active {
-        transform: translateY(0px) !important;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+    .stButton > button:focus {
+        background-color: #4f46e5 !important;
+        color: #ffffff !important;
+        box-shadow: none !important;
     }
     
-    /* Content Area Glassmorphism */
+    /* Content Area Clean Styling */
     .block-container {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         margin: 20px;
-        padding: 30px;
+        padding: 24px;
+        max-width: none !important;
     }
     
-    /* Module Headers Glassmorphism */
+    /* Module Headers Clean Style */
     .module-header {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: white;
-        padding: 24px;
-        border-radius: 16px;
-        margin-bottom: 28px;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        color: #1e293b;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 24px;
         text-align: center;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
     
     .module-header h1 {
-        margin: 0;
-        font-weight: 700;
-        font-size: 28px;
-        margin-bottom: 8px;
+        margin: 0 0 8px 0;
+        font-weight: 600;
+        font-size: 24px;
+        color: #1e293b;
     }
     
     .module-header p {
         margin: 0;
-        opacity: 0.9;
-        font-size: 16px;
+        color: #64748b;
+        font-size: 14px;
         font-weight: 400;
     }
     
-    /* Metric Cards Glassmorphism */
-    .metric-card {
-        background: rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        padding: 24px;
-        border-radius: 16px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        margin-bottom: 16px;
-        transition: all 0.3s ease;
-    }
-    
-    .metric-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-        background: rgba(255, 255, 255, 0.12);
-    }
-    
-    /* Streamlit Metric Styling */
+    /* Metric Cards Professional Style */
     [data-testid="metric-container"] {
-        background: rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        padding: 20px;
-        border-radius: 16px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        padding: 16px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        transition: box-shadow 0.15s ease;
     }
     
     [data-testid="metric-container"]:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-        background: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
     }
     
     [data-testid="metric-container"] > label {
-        color: rgba(255, 255, 255, 0.8) !important;
+        color: #64748b !important;
         font-weight: 500 !important;
-        font-size: 14px !important;
+        font-size: 12px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
     }
     
     [data-testid="metric-container"] > div {
-        color: white !important;
+        color: #1e293b !important;
         font-weight: 700 !important;
-        font-size: 28px !important;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        font-size: 24px !important;
     }
     
-    /* Tabs Glassmorphism */
+    /* Tabs Clean Styling */
     .stTabs [data-baseweb="tab-list"] {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 8px;
+        background-color: #f1f5f9;
+        border-radius: 6px;
+        padding: 4px;
         margin-bottom: 20px;
+        gap: 2px;
     }
     
     .stTabs [data-baseweb="tab"] {
-        background: transparent;
-        border-radius: 8px;
-        color: rgba(255, 255, 255, 0.8);
+        background-color: transparent;
+        border-radius: 4px;
+        color: #64748b;
         font-weight: 500;
-        transition: all 0.3s ease;
+        font-size: 14px;
+        padding: 8px 16px;
+        transition: all 0.15s ease;
     }
     
     .stTabs [aria-selected="true"] {
-        background: rgba(255, 255, 255, 0.15) !important;
-        color: white !important;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff !important;
+        color: #1e293b !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     
-    /* Input Fields Glassmorphism */
+    /* Form Elements Clean Styling */
     .stTextInput > div > div > input {
-        background: rgba(255, 255, 255, 0.08) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 12px !important;
-        color: white !important;
-        font-weight: 500 !important;
+        background-color: #ffffff !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 6px !important;
+        color: #1f2937 !important;
+        font-size: 14px !important;
+        padding: 10px 12px !important;
     }
     
-    .stTextInput > div > div > input::placeholder {
-        color: rgba(255, 255, 255, 0.5) !important;
+    .stTextInput > div > div > input:focus {
+        border-color: #4f46e5 !important;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1) !important;
     }
     
     .stSelectbox > div > div {
-        background: rgba(255, 255, 255, 0.08) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 12px !important;
-        color: white !important;
+        background-color: #ffffff !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 6px !important;
+        color: #1f2937 !important;
     }
     
     .stTextArea > div > div > textarea {
-        background: rgba(255, 255, 255, 0.08) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 12px !important;
-        color: white !important;
-        font-weight: 500 !important;
+        background-color: #ffffff !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 6px !important;
+        color: #1f2937 !important;
+        font-size: 14px !important;
     }
     
-    /* Expander Glassmorphism */
+    /* Expander Clean Styling */
     .streamlit-expanderHeader {
-        background: rgba(255, 255, 255, 0.08) !important;
-        backdrop-filter: blur(15px) !important;
-        -webkit-backdrop-filter: blur(15px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-radius: 12px !important;
-        color: white !important;
+        background-color: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 6px !important;
+        color: #1e293b !important;
         font-weight: 500 !important;
-        margin-bottom: 8px !important;
     }
     
     .streamlit-expanderContent {
-        background: rgba(255, 255, 255, 0.05) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 12px !important;
-        padding: 20px !important;
-        margin-bottom: 16px !important;
-    }
-    
-    /* Success/Error Messages */
-    .stSuccess {
-        background: rgba(34, 197, 94, 0.15) !important;
-        backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(34, 197, 94, 0.3) !important;
-        border-radius: 12px !important;
-        color: #86efac !important;
-    }
-    
-    .stError {
-        background: rgba(239, 68, 68, 0.15) !important;
-        backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(239, 68, 68, 0.3) !important;
-        border-radius: 12px !important;
-        color: #fca5a5 !important;
-    }
-    
-    .stInfo {
-        background: rgba(59, 130, 246, 0.15) !important;
-        backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(59, 130, 246, 0.3) !important;
-        border-radius: 12px !important;
-        color: #93c5fd !important;
-    }
-    
-    /* Dataframe Styling */
-    .stDataFrame {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        overflow: hidden;
-    }
-    
-    /* Charts Container */
-    .js-plotly-plot {
-        background: rgba(255, 255, 255, 0.05) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 16px !important;
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-top: none !important;
+        border-radius: 0 0 6px 6px !important;
         padding: 16px !important;
     }
     
-    /* Form Styling */
-    .stForm {
-        background: rgba(255, 255, 255, 0.05) !important;
-        backdrop-filter: blur(15px) !important;
-        -webkit-backdrop-filter: blur(15px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-radius: 16px !important;
-        padding: 24px !important;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+    /* Alert Messages */
+    .stSuccess {
+        background-color: #f0fdf4 !important;
+        border: 1px solid #bbf7d0 !important;
+        border-radius: 6px !important;
+        color: #166534 !important;
     }
     
-    /* Text and Labels */
-    .stMarkdown, .stText {
-        color: rgba(255, 255, 255, 0.9) !important;
+    .stError {
+        background-color: #fef2f2 !important;
+        border: 1px solid #fecaca !important;
+        border-radius: 6px !important;
+        color: #dc2626 !important;
+    }
+    
+    .stInfo {
+        background-color: #eff6ff !important;
+        border: 1px solid #bfdbfe !important;
+        border-radius: 6px !important;
+        color: #1d4ed8 !important;
+    }
+    
+    /* Dataframe Clean Styling */
+    .stDataFrame {
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    
+    /* Form Clean Styling */
+    .stForm {
+        background-color: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 8px !important;
+        padding: 20px !important;
+        margin-bottom: 20px !important;
+    }
+    
+    /* Button Primary Style */
+    .stButton > button[kind="primary"] {
+        background-color: #4f46e5 !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-radius: 6px !important;
+        font-weight: 500 !important;
+        padding: 10px 20px !important;
+        transition: background-color 0.15s ease !important;
+    }
+    
+    .stButton > button[kind="primary"]:hover {
+        background-color: #4338ca !important;
+    }
+    
+    /* Text Styling */
+    .stMarkdown {
+        color: #374151;
     }
     
     .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
-        color: white !important;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        color: #1f2937;
+        font-weight: 600;
     }
     
-    /* Logout Button Glassmorphism */
-    .logout-btn {
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        background: rgba(239, 68, 68, 0.2) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(239, 68, 68, 0.3) !important;
-        color: white !important;
-        border-radius: 25px !important;
-        padding: 12px 24px !important;
-        font-weight: 500 !important;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
-        transition: all 0.3s ease !important;
+    /* Charts Clean Background */
+    .js-plotly-plot {
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 8px !important;
+        padding: 16px !important;
     }
     
-    .logout-btn:hover {
-        background: rgba(239, 68, 68, 0.3) !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4) !important;
-    }
-    
-    /* Hide Streamlit elements */
+    /* Hide Streamlit Elements */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    .stDeployButton {display:none;}
+    .stDeployButton {display: none;}
     
-    /* Scrollbar Styling */
+    /* Scrollbar Clean Styling */
     ::-webkit-scrollbar {
-        width: 8px;
+        width: 6px;
     }
     
     ::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 4px;
+        background: #f1f5f9;
     }
     
     ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 4px;
+        background: #cbd5e1;
+        border-radius: 3px;
     }
     
     ::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.3);
-    }
-    
-    /* Animation for loading */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .main > div {
-        animation: fadeInUp 0.6s ease-out;
+        background: #94a3b8;
     }
     
     </style>

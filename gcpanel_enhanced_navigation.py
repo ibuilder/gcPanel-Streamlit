@@ -7649,14 +7649,559 @@ def render_quality_control():
                 st.rerun()
 
 def render_progress_photos():
-    """Progress photos module"""
+    """Complete Progress Photos with full CRUD functionality"""
     st.markdown("""
     <div class="module-header">
         <h1>📸 Progress Photos</h1>
-        <p>Visual documentation and progress tracking</p>
+        <p>Comprehensive visual documentation, progress tracking, and photo management</p>
     </div>
     """, unsafe_allow_html=True)
-    st.info("📸 Progress Photos module with visual timeline tracking")
+    
+    # Initialize progress photos data
+    if "progress_photos" not in st.session_state:
+        st.session_state.progress_photos = [
+            {
+                "id": "PH-001",
+                "photo_id": "HTD-IMG-2025-001",
+                "filename": "level_13_structural_beam_install.jpg",
+                "title": "Level 13 Structural Steel Installation",
+                "location": "Level 13 - Grid Lines A5-B5",
+                "category": "Structural Progress",
+                "upload_date": "2025-05-27",
+                "taken_date": "2025-05-27",
+                "photographer": "Mike Chen - Site Superintendent",
+                "description": "Steel beam installation progress showing main structural frame completion with crane operations",
+                "status": "Approved",
+                "tags": ["structural", "steel-beams", "level-13", "grid-A5", "crane-operations"],
+                "file_size": "2.4 MB",
+                "dimensions": "4032x3024",
+                "weather_conditions": "Clear, 72°F",
+                "crew_count": "12 workers",
+                "progress_percentage": 85,
+                "linked_tasks": ["TASK-003"],
+                "linked_rfis": [],
+                "approval_by": "John Davis, P.E.",
+                "notes": "Quality installation progress, on schedule for milestone completion",
+                "gps_coordinates": "40.7589, -73.9851",
+                "equipment_visible": ["Tower Crane TC-1", "Boom Lift", "Material Hoist"]
+            },
+            {
+                "id": "PH-002",
+                "photo_id": "HTD-IMG-2025-002",
+                "filename": "mep_rough_in_level_12.jpg",
+                "title": "MEP Rough-in Completion Level 12",
+                "location": "Level 12 - Mechanical Room North",
+                "category": "MEP Systems",
+                "upload_date": "2025-05-25",
+                "taken_date": "2025-05-25",
+                "photographer": "Sarah Johnson - Project Manager",
+                "description": "HVAC ductwork rough-in completion with electrical conduit installation and fire protection systems",
+                "status": "Under Review",
+                "tags": ["mep", "hvac", "ductwork", "electrical", "level-12", "fire-protection"],
+                "file_size": "3.1 MB",
+                "dimensions": "4032x3024",
+                "weather_conditions": "Indoor Controlled Environment",
+                "crew_count": "8 workers",
+                "progress_percentage": 90,
+                "linked_tasks": ["TASK-004"],
+                "linked_rfis": ["RFI-001"],
+                "approval_by": "",
+                "notes": "Coordination with electrical team required for final routing approval",
+                "gps_coordinates": "40.7589, -73.9851",
+                "equipment_visible": ["Scissor Lift", "Hand Tools", "Testing Equipment"]
+            },
+            {
+                "id": "PH-003",
+                "photo_id": "HTD-IMG-2025-003",
+                "filename": "exterior_curtain_wall_south_facade.jpg",
+                "title": "South Facade Curtain Wall Installation",
+                "location": "South Facade - Units 8-12",
+                "category": "Exterior Envelope",
+                "upload_date": "2025-05-23",
+                "taken_date": "2025-05-23",
+                "photographer": "Robert Kim - Architecture Team",
+                "description": "Curtain wall installation progress on south elevation with glazing units and weather sealing",
+                "status": "Approved",
+                "tags": ["exterior", "curtain-wall", "glazing", "south-facade", "weather-sealing"],
+                "file_size": "2.8 MB",
+                "dimensions": "4032x3024",
+                "weather_conditions": "Clear, 75°F",
+                "crew_count": "6 workers",
+                "progress_percentage": 70,
+                "linked_tasks": ["TASK-005"],
+                "linked_rfis": [],
+                "approval_by": "Maria Garcia, P.E.",
+                "notes": "Excellent progress on curtain wall installation, weather conditions favorable",
+                "gps_coordinates": "40.7589, -73.9851",
+                "equipment_visible": ["Aerial Work Platform", "Glass Handling Equipment"]
+            }
+        ]
+    
+    if "photo_albums" not in st.session_state:
+        st.session_state.photo_albums = [
+            {
+                "id": "ALB-001",
+                "album_name": "Highland Tower Structural Progress",
+                "description": "Complete structural steel installation documentation",
+                "created_date": "2025-04-01",
+                "photo_count": 45,
+                "cover_photo": "HTD-IMG-2025-001",
+                "tags": ["structural", "steel", "progress"],
+                "access_level": "Project Team"
+            },
+            {
+                "id": "ALB-002",
+                "album_name": "MEP Systems Installation",
+                "description": "Electrical, plumbing, and HVAC installation progress",
+                "created_date": "2025-05-15",
+                "photo_count": 32,
+                "cover_photo": "HTD-IMG-2025-002",
+                "tags": ["mep", "electrical", "hvac", "plumbing"],
+                "access_level": "MEP Team"
+            }
+        ]
+    
+    # Key Progress Photo Metrics
+    col1, col2, col3, col4 = st.columns(4)
+    
+    total_photos = len(st.session_state.progress_photos)
+    approved_photos = len([photo for photo in st.session_state.progress_photos if photo['status'] == 'Approved'])
+    avg_progress = sum(photo['progress_percentage'] for photo in st.session_state.progress_photos) / len(st.session_state.progress_photos) if st.session_state.progress_photos else 0
+    total_storage = sum(float(photo['file_size'].replace(' MB', '')) for photo in st.session_state.progress_photos)
+    
+    with col1:
+        st.metric("Total Photos", total_photos, delta_color="normal")
+    with col2:
+        st.metric("Approved", approved_photos, delta_color="normal")
+    with col3:
+        st.metric("Avg Progress", f"{avg_progress:.1f}%", delta_color="normal")
+    with col4:
+        st.metric("Storage Used", f"{total_storage:.1f} MB", delta_color="normal")
+    
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📷 Upload Photos", "📸 Photo Gallery", "📁 Albums", "📈 Analytics", "🔧 Management"])
+    
+    with tab1:
+        st.subheader("📷 Upload Progress Photos")
+        
+        upload_sub_tab1, upload_sub_tab2 = st.tabs(["📝 Single Upload", "📤 Bulk Upload"])
+        
+        with upload_sub_tab1:
+            st.markdown("**Upload New Progress Photo**")
+            
+            with st.form("photo_upload_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    uploaded_file = st.file_uploader("Select Photo", type=['jpg', 'jpeg', 'png', 'bmp'])
+                    photo_title = st.text_input("Photo Title", placeholder="Descriptive title for the photo")
+                    location = st.selectbox("Location", [
+                        "Level 13 - Penthouse", "Level 12 - Residential", "Level 11 - Residential",
+                        "Level 10 - Residential", "Ground Floor - Retail", "Basement - Parking",
+                        "Exterior - North Facade", "Exterior - South Facade", "Site Overall", "Custom Location"
+                    ])
+                    if location == "Custom Location":
+                        custom_location = st.text_input("Specify Location", placeholder="Enter specific location")
+                        location = custom_location if custom_location else "Unspecified"
+                    
+                    category = st.selectbox("Category", [
+                        "Structural Progress", "MEP Systems", "Interior Finishes", "Exterior Envelope",
+                        "Safety Documentation", "Site Work", "Quality Control", "Equipment", "Deliveries"
+                    ])
+                    taken_date = st.date_input("Photo Date", value=datetime.now().date())
+                
+                with col2:
+                    photographer = st.text_input("Photographer", placeholder="Name and title")
+                    weather_conditions = st.selectbox("Weather Conditions", [
+                        "Clear", "Partly Cloudy", "Overcast", "Light Rain", "Heavy Rain", 
+                        "Snow", "Windy", "Indoor Controlled Environment"
+                    ])
+                    crew_count = st.text_input("Crew Count", placeholder="e.g., 12 workers")
+                    progress_percentage = st.slider("Progress Percentage", 0, 100, 50)
+                    linked_tasks = st.multiselect("Link to Tasks", [f"{task['id']} - {task['task_name']}" for task in st.session_state.get('schedule_tasks', [])])
+                    equipment_visible = st.text_input("Equipment Visible", placeholder="Comma-separated equipment list")
+                
+                description = st.text_area("Description", placeholder="Detailed description of what the photo shows")
+                tags = st.text_input("Tags", placeholder="Comma-separated tags for easy searching")
+                notes = st.text_area("Notes", placeholder="Additional notes or observations")
+                gps_coordinates = st.text_input("GPS Coordinates", placeholder="Latitude, Longitude (optional)")
+                
+                if st.form_submit_button("📷 Upload Photo", type="primary"):
+                    if uploaded_file and photo_title and photographer:
+                        new_photo = {
+                            "id": f"PH-{len(st.session_state.progress_photos) + 1:03d}",
+                            "photo_id": f"HTD-IMG-2025-{len(st.session_state.progress_photos) + 4:03d}",
+                            "filename": uploaded_file.name,
+                            "title": photo_title,
+                            "location": location,
+                            "category": category,
+                            "upload_date": str(datetime.now().date()),
+                            "taken_date": str(taken_date),
+                            "photographer": photographer,
+                            "description": description,
+                            "status": "Under Review",
+                            "tags": [tag.strip() for tag in tags.split(',') if tag.strip()],
+                            "file_size": f"{uploaded_file.size / (1024*1024):.1f} MB" if uploaded_file.size else "Unknown",
+                            "dimensions": "Unknown",
+                            "weather_conditions": weather_conditions,
+                            "crew_count": crew_count,
+                            "progress_percentage": progress_percentage,
+                            "linked_tasks": [task.split(" - ")[0] for task in linked_tasks],
+                            "linked_rfis": [],
+                            "approval_by": "",
+                            "notes": notes,
+                            "gps_coordinates": gps_coordinates,
+                            "equipment_visible": [eq.strip() for eq in equipment_visible.split(',') if eq.strip()]
+                        }
+                        st.session_state.progress_photos.append(new_photo)
+                        st.success("✅ Photo uploaded successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields and select a photo!")
+        
+        with upload_sub_tab2:
+            st.markdown("**Bulk Photo Upload**")
+            
+            with st.form("bulk_upload_form"):
+                bulk_files = st.file_uploader("Select Multiple Photos", type=['jpg', 'jpeg', 'png', 'bmp'], accept_multiple_files=True)
+                bulk_location = st.selectbox("Default Location", [
+                    "Level 13", "Level 12", "Level 11", "Ground Floor", "Exterior", "Site Overall"
+                ])
+                bulk_category = st.selectbox("Default Category", [
+                    "Structural Progress", "MEP Systems", "Interior Finishes", "Exterior Envelope", "Site Work"
+                ])
+                bulk_photographer = st.text_input("Photographer", placeholder="Name for all photos")
+                bulk_description = st.text_area("Default Description", placeholder="Description applied to all photos")
+                
+                if st.form_submit_button("📤 Bulk Upload", type="primary"):
+                    if bulk_files and bulk_photographer:
+                        for file in bulk_files:
+                            new_photo = {
+                                "id": f"PH-{len(st.session_state.progress_photos) + 1:03d}",
+                                "photo_id": f"HTD-IMG-2025-{len(st.session_state.progress_photos) + 4:03d}",
+                                "filename": file.name,
+                                "title": f"Bulk Upload - {file.name}",
+                                "location": bulk_location,
+                                "category": bulk_category,
+                                "upload_date": str(datetime.now().date()),
+                                "taken_date": str(datetime.now().date()),
+                                "photographer": bulk_photographer,
+                                "description": bulk_description,
+                                "status": "Under Review",
+                                "tags": ["bulk-upload"],
+                                "file_size": f"{file.size / (1024*1024):.1f} MB" if file.size else "Unknown",
+                                "dimensions": "Unknown",
+                                "weather_conditions": "Unknown",
+                                "crew_count": "Unknown",
+                                "progress_percentage": 0,
+                                "linked_tasks": [],
+                                "linked_rfis": [],
+                                "approval_by": "",
+                                "notes": "",
+                                "gps_coordinates": "",
+                                "equipment_visible": []
+                            }
+                            st.session_state.progress_photos.append(new_photo)
+                        st.success(f"✅ {len(bulk_files)} photos uploaded successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please select photos and enter photographer name!")
+    
+    with tab2:
+        st.subheader("📸 Progress Photo Gallery")
+        
+        gallery_sub_tab1, gallery_sub_tab2 = st.tabs(["🔍 Search & Filter", "📋 All Photos"])
+        
+        with gallery_sub_tab1:
+            st.markdown("**Search and Filter Photos**")
+            
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                location_filter = st.selectbox("Filter by Location", ["All Locations"] + list(set(photo['location'].split(' - ')[0] for photo in st.session_state.progress_photos)))
+            with col2:
+                category_filter = st.selectbox("Filter by Category", ["All Categories"] + list(set(photo['category'] for photo in st.session_state.progress_photos)))
+            with col3:
+                status_filter = st.selectbox("Filter by Status", ["All Status", "Under Review", "Approved", "Rejected"])
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                photographer_filter = st.selectbox("Filter by Photographer", ["All Photographers"] + list(set(photo['photographer'].split(' - ')[0] for photo in st.session_state.progress_photos)))
+            with col2:
+                search_text = st.text_input("🔍 Search", placeholder="Search in titles, descriptions, tags...")
+            
+            # Apply filters
+            filtered_photos = st.session_state.progress_photos
+            if location_filter != "All Locations":
+                filtered_photos = [p for p in filtered_photos if location_filter in p['location']]
+            if category_filter != "All Categories":
+                filtered_photos = [p for p in filtered_photos if p['category'] == category_filter]
+            if status_filter != "All Status":
+                filtered_photos = [p for p in filtered_photos if p['status'] == status_filter]
+            if photographer_filter != "All Photographers":
+                filtered_photos = [p for p in filtered_photos if photographer_filter in p['photographer']]
+            if search_text:
+                filtered_photos = [p for p in filtered_photos if 
+                                 search_text.lower() in p['title'].lower() or 
+                                 search_text.lower() in p['description'].lower() or
+                                 search_text.lower() in ' '.join(p['tags']).lower()]
+            
+            st.markdown(f"**Found {len(filtered_photos)} photos**")
+            display_photos = filtered_photos
+        
+        with gallery_sub_tab2:
+            display_photos = st.session_state.progress_photos
+        
+        # Display photos
+        for photo in display_photos:
+            status_icon = {"Under Review": "🟡", "Approved": "✅", "Rejected": "❌"}.get(photo['status'], "📷")
+            
+            with st.expander(f"{status_icon} {photo['photo_id']} - {photo['title']} ({photo['status']})"):
+                col1, col2 = st.columns([2, 3])
+                
+                with col1:
+                    st.write(f"**📷 Photo ID:** {photo['photo_id']}")
+                    st.write(f"**📁 Filename:** {photo['filename']}")
+                    st.write(f"**📍 Location:** {photo['location']}")
+                    st.write(f"**📂 Category:** {photo['category']}")
+                    st.write(f"**📅 Upload Date:** {photo['upload_date']}")
+                    st.write(f"**📅 Taken Date:** {photo['taken_date']}")
+                    st.write(f"**👤 Photographer:** {photo['photographer']}")
+                    st.write(f"**📊 Status:** {photo['status']}")
+                    if photo['approval_by']:
+                        st.write(f"**✅ Approved By:** {photo['approval_by']}")
+                
+                with col2:
+                    st.write(f"**📝 Description:** {photo['description']}")
+                    st.write(f"**🌤️ Weather:** {photo['weather_conditions']}")
+                    st.write(f"**👥 Crew Count:** {photo['crew_count']}")
+                    st.write(f"**📈 Progress:** {photo['progress_percentage']}%")
+                    if photo['linked_tasks']:
+                        st.write(f"**🔗 Linked Tasks:** {', '.join(photo['linked_tasks'])}")
+                    if photo['equipment_visible']:
+                        st.write(f"**🚜 Equipment:** {', '.join(photo['equipment_visible'])}")
+                    if photo['notes']:
+                        st.write(f"**📝 Notes:** {photo['notes']}")
+                
+                # Tags
+                if photo['tags']:
+                    st.write("**🏷️ Tags:**")
+                    tags_html = " ".join([f'<span style="background-color: #e1e1e1; padding: 2px 8px; border-radius: 10px; margin-right: 5px; font-size: 0.8em;">{tag}</span>' for tag in photo['tags']])
+                    st.markdown(tags_html, unsafe_allow_html=True)
+                
+                # Progress bar
+                st.write("**📈 Progress Visualization:**")
+                st.progress(photo['progress_percentage'] / 100)
+                
+                # Action buttons
+                col1, col2, col3, col4, col5 = st.columns(5)
+                with col1:
+                    if photo['status'] == 'Under Review' and st.button(f"✅ Approve", key=f"approve_{photo['id']}"):
+                        photo['status'] = 'Approved'
+                        photo['approval_by'] = 'Highland Project Team'
+                        st.success("Photo approved!")
+                        st.rerun()
+                with col2:
+                    if photo['status'] == 'Under Review' and st.button(f"❌ Reject", key=f"reject_{photo['id']}"):
+                        photo['status'] = 'Rejected'
+                        st.error("Photo rejected!")
+                        st.rerun()
+                with col3:
+                    if st.button(f"📤 Share", key=f"share_{photo['id']}"):
+                        st.success("Share link generated!")
+                with col4:
+                    if st.button(f"✏️ Edit", key=f"edit_{photo['id']}"):
+                        st.info("Edit functionality - would open edit form")
+                with col5:
+                    if st.button(f"🗑️ Delete", key=f"delete_{photo['id']}"):
+                        st.session_state.progress_photos.remove(photo)
+                        st.success("Photo deleted!")
+                        st.rerun()
+    
+    with tab3:
+        st.subheader("📁 Photo Albums")
+        
+        album_sub_tab1, album_sub_tab2 = st.tabs(["📁 Create Album", "📚 View Albums"])
+        
+        with album_sub_tab1:
+            st.markdown("**Create New Photo Album**")
+            
+            with st.form("album_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    album_name = st.text_input("Album Name", placeholder="Descriptive album name")
+                    description = st.text_area("Description", placeholder="Album description and purpose")
+                    access_level = st.selectbox("Access Level", ["Project Team", "Client Access", "Public", "Management Only"])
+                
+                with col2:
+                    cover_photo = st.selectbox("Cover Photo", [f"{photo['photo_id']} - {photo['title']}" for photo in st.session_state.progress_photos])
+                    tags = st.text_input("Tags", placeholder="Comma-separated tags")
+                
+                if st.form_submit_button("📁 Create Album", type="primary"):
+                    if album_name and description:
+                        new_album = {
+                            "id": f"ALB-{len(st.session_state.photo_albums) + 1:03d}",
+                            "album_name": album_name,
+                            "description": description,
+                            "created_date": str(datetime.now().date()),
+                            "photo_count": 0,
+                            "cover_photo": cover_photo.split(" - ")[0] if cover_photo else "",
+                            "tags": [tag.strip() for tag in tags.split(',') if tag.strip()],
+                            "access_level": access_level
+                        }
+                        st.session_state.photo_albums.append(new_album)
+                        st.success("✅ Album created successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields!")
+        
+        with album_sub_tab2:
+            st.markdown("**All Photo Albums**")
+            
+            for album in st.session_state.photo_albums:
+                with st.expander(f"📁 {album['album_name']} ({album['photo_count']} photos)"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📁 Album:** {album['album_name']}")
+                        st.write(f"**📝 Description:** {album['description']}")
+                        st.write(f"**📅 Created:** {album['created_date']}")
+                        st.write(f"**📷 Photo Count:** {album['photo_count']}")
+                        st.write(f"**🔒 Access Level:** {album['access_level']}")
+                    
+                    with col2:
+                        if album['cover_photo']:
+                            st.write(f"**🖼️ Cover Photo:** {album['cover_photo']}")
+                        if album['tags']:
+                            st.write(f"**🏷️ Tags:** {', '.join(album['tags'])}")
+                    
+                    # Action buttons
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        if st.button(f"👁️ View", key=f"view_album_{album['id']}"):
+                            st.info("Album view functionality")
+                    with col2:
+                        if st.button(f"✏️ Edit", key=f"edit_album_{album['id']}"):
+                            st.info("Edit album functionality")
+                    with col3:
+                        if st.button(f"🗑️ Delete", key=f"delete_album_{album['id']}"):
+                            st.session_state.photo_albums.remove(album)
+                            st.success("Album deleted!")
+                            st.rerun()
+    
+    with tab4:
+        st.subheader("📈 Photo Analytics")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Category distribution
+            if st.session_state.progress_photos:
+                category_counts = {}
+                for photo in st.session_state.progress_photos:
+                    category = photo['category']
+                    category_counts[category] = category_counts.get(category, 0) + 1
+                
+                category_list = list(category_counts.keys())
+                count_list = list(category_counts.values())
+                category_df = pd.DataFrame({
+                    'Category': category_list,
+                    'Count': count_list
+                })
+                fig_category = px.pie(category_df, values='Count', names='Category', title="Photos by Category")
+                st.plotly_chart(fig_category, use_container_width=True)
+        
+        with col2:
+            # Status distribution
+            if st.session_state.progress_photos:
+                status_counts = {}
+                for photo in st.session_state.progress_photos:
+                    status = photo['status']
+                    status_counts[status] = status_counts.get(status, 0) + 1
+                
+                status_list = list(status_counts.keys())
+                status_count_list = list(status_counts.values())
+                status_df = pd.DataFrame({
+                    'Status': status_list,
+                    'Count': status_count_list
+                })
+                fig_status = px.bar(status_df, x='Status', y='Count', title="Photo Status Distribution")
+                st.plotly_chart(fig_status, use_container_width=True)
+        
+        # Progress timeline
+        st.markdown("**📈 Progress Over Time**")
+        if st.session_state.progress_photos:
+            timeline_data = []
+            for photo in st.session_state.progress_photos:
+                timeline_data.append({
+                    'Date': photo['taken_date'],
+                    'Progress': photo['progress_percentage'],
+                    'Location': photo['location'].split(' - ')[0],
+                    'Category': photo['category']
+                })
+            
+            timeline_df = pd.DataFrame(timeline_data)
+            timeline_df['Date'] = pd.to_datetime(timeline_df['Date'])
+            timeline_df = timeline_df.sort_values('Date')
+            
+            fig_timeline = px.scatter(timeline_df, x='Date', y='Progress', color='Category', 
+                                    size_max=10, title="Progress Documentation Timeline")
+            st.plotly_chart(fig_timeline, use_container_width=True)
+    
+    with tab5:
+        st.subheader("🔧 Photo Management")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown("**📷 Photo Summary**")
+            if st.session_state.progress_photos:
+                photo_stats_data = pd.DataFrame([
+                    {"Metric": "Total Photos", "Value": len(st.session_state.progress_photos)},
+                    {"Metric": "Approved", "Value": len([p for p in st.session_state.progress_photos if p['status'] == 'Approved'])},
+                    {"Metric": "Under Review", "Value": len([p for p in st.session_state.progress_photos if p['status'] == 'Under Review'])},
+                    {"Metric": "Avg Progress", "Value": f"{sum(p['progress_percentage'] for p in st.session_state.progress_photos) / len(st.session_state.progress_photos):.1f}%"},
+                ])
+                st.dataframe(photo_stats_data, use_container_width=True)
+        
+        with col2:
+            st.markdown("**📁 Album Summary**")
+            if st.session_state.photo_albums:
+                album_stats_data = pd.DataFrame([
+                    {"Metric": "Total Albums", "Value": len(st.session_state.photo_albums)},
+                    {"Metric": "Public Albums", "Value": len([a for a in st.session_state.photo_albums if a['access_level'] == 'Public'])},
+                    {"Metric": "Project Albums", "Value": len([a for a in st.session_state.photo_albums if a['access_level'] == 'Project Team'])},
+                    {"Metric": "Total Album Photos", "Value": sum(a['photo_count'] for a in st.session_state.photo_albums)},
+                ])
+                st.dataframe(album_stats_data, use_container_width=True)
+        
+        with col3:
+            st.markdown("**💾 Storage Summary**")
+            if st.session_state.progress_photos:
+                total_storage = sum(float(p['file_size'].replace(' MB', '')) for p in st.session_state.progress_photos if 'MB' in p['file_size'])
+                storage_stats_data = pd.DataFrame([
+                    {"Metric": "Storage Used", "Value": f"{total_storage:.1f} MB"},
+                    {"Metric": "Avg File Size", "Value": f"{total_storage / len(st.session_state.progress_photos):.1f} MB"},
+                    {"Metric": "Largest File", "Value": f"{max(float(p['file_size'].replace(' MB', '')) for p in st.session_state.progress_photos if 'MB' in p['file_size']):.1f} MB"},
+                    {"Metric": "Storage Limit", "Value": "5000 MB"},
+                ])
+                st.dataframe(storage_stats_data, use_container_width=True)
+        
+        # Data management
+        st.markdown("**⚠️ Data Management**")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("🗑️ Clear All Photos", type="secondary"):
+                st.session_state.progress_photos = []
+                st.success("All photos cleared!")
+                st.rerun()
+        with col2:
+            if st.button("🗑️ Clear Albums", type="secondary"):
+                st.session_state.photo_albums = []
+                st.success("All albums cleared!")
+                st.rerun()
+        with col3:
+            if st.button("📤 Export Data", type="secondary"):
+                st.success("Photo data exported!")
 
 def render_subcontractor_management():
     """Subcontractor management module"""

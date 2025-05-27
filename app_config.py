@@ -29,6 +29,7 @@ MENU_OPTIONS = [
     "📝 Contracts", 
     "💰 Cost Management",
     "🏗️ PreConstruction",
+    "🏢 BIM Collaboration",
     "📈 Analytics",
     "❓ RFIs",
     "📦 Submittals",
@@ -36,14 +37,27 @@ MENU_OPTIONS = [
     "📝 Daily Reports",
     "🚧 Field Operations",
     "📄 Documents",
-    "🏢 BIM",
+    "🏗️ Subcontractor Management",
+    "📸 Progress Photos",
+    "🔍 Inspections",
+    "⚠️ Issues & Risks",
+    "📊 Performance Snapshot",
+    "💼 Companies Database",
+    "✅ Prequalifications",
+    "📋 Budget Management",
+    "📑 Schedule of Values",
+    "📄 File Explorer",
+    "📈 Reports Generation",
+    "👥 User Profiles",
+    "🔧 General Conditions",
+    "🏷️ Cost Codes",
     "✅ Closeout",
-    "👥 Collaboration",  # New collaboration module
+    "👥 Collaboration",
     "🤖 AI Assistant",
     "📱 Mobile Companion",
     "🔄 Integrations",
     "⚙️ Settings",
-    "👨‍💻 Admin"  # Admin section at the end
+    "👨‍💻 Admin"
 ]
 
 # Mapping from display names (with icons) to internal module names
@@ -56,6 +70,7 @@ MENU_MAP = {
     "📝 Contracts": "Contracts", 
     "💰 Cost Management": "Cost Management",
     "🏗️ PreConstruction": "PreConstruction",
+    "🏢 BIM Collaboration": "BIM",
     "📈 Analytics": "Analytics",
     "❓ RFIs": "RFIs",
     "📦 Submittals": "Submittals",
@@ -63,14 +78,27 @@ MENU_MAP = {
     "📝 Daily Reports": "Daily Reports",
     "🚧 Field Operations": "Field Operations",
     "📄 Documents": "Documents",
-    "🏢 BIM": "BIM",
+    "🏗️ Subcontractor Management": "Subcontractor Management",
+    "📸 Progress Photos": "Progress Photos",
+    "🔍 Inspections": "Inspections",
+    "⚠️ Issues & Risks": "Issues & Risks",
+    "📊 Performance Snapshot": "Performance Snapshot",
+    "💼 Companies Database": "Companies Database",
+    "✅ Prequalifications": "Prequalifications",
+    "📋 Budget Management": "Budget Management",
+    "📑 Schedule of Values": "Schedule of Values",
+    "📄 File Explorer": "File Explorer",
+    "📈 Reports Generation": "Reports Generation",
+    "👥 User Profiles": "User Profiles",
+    "🔧 General Conditions": "General Conditions",
+    "🏷️ Cost Codes": "Cost Codes",
     "✅ Closeout": "Closeout",
     "👥 Collaboration": "Collaboration",
     "🤖 AI Assistant": "AI Assistant",
     "📱 Mobile Companion": "Mobile Companion",
     "🔄 Integrations": "Integrations",
     "⚙️ Settings": "Settings",
-    "👨‍💻 Admin": "Admin"  # Admin section
+    "👨‍💻 Admin": "Admin"
 }
 
 # ============================================================================

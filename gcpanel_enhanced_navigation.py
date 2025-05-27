@@ -68,7 +68,14 @@ def apply_styling():
     
     /* === ENTERPRISE SIDEBAR === */
     
-    .css-1d391kg {
+    /* Primary sidebar container - multiple selectors for compatibility */
+    .css-1d391kg, 
+    .css-6qob1r,
+    .css-1lcbmhc,
+    .css-1cypcdb,
+    [data-testid="stSidebar"],
+    .stSidebar,
+    section[data-testid="stSidebar"] > div {
         background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%) !important;
         border-right: 2px solid #4a5568 !important;
         box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25) !important;
@@ -76,9 +83,20 @@ def apply_styling():
         width: 280px !important;
     }
     
-    .css-1d391kg .css-1v0mbdj {
+    /* Sidebar content styling */
+    .css-1d391kg .css-1v0mbdj,
+    .css-6qob1r .css-1v0mbdj,
+    [data-testid="stSidebar"] .css-1v0mbdj,
+    section[data-testid="stSidebar"] * {
         color: #f8fafc !important;
-        padding: 0 !important;
+    }
+    
+    /* Force dark background on all sidebar elements */
+    [data-testid="stSidebar"] > div:first-child,
+    section[data-testid="stSidebar"] > div:first-child,
+    .css-1d391kg > div,
+    .css-6qob1r > div {
+        background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%) !important;
     }
     
     /* Premium Header in Sidebar */
@@ -171,7 +189,8 @@ def apply_styling():
     }
     
     /* Enterprise Navigation Buttons */
-    .stButton > button {
+    [data-testid="stSidebar"] .stButton > button,
+    section[data-testid="stSidebar"] .stButton > button {
         width: calc(100% - 40px) !important;
         margin: 0 20px 6px 20px !important;
         background: transparent !important;
@@ -199,7 +218,8 @@ def apply_styling():
         z-index: 0;
     }
     
-    .stButton > button:hover {
+    [data-testid="stSidebar"] .stButton > button:hover,
+    section[data-testid="stSidebar"] .stButton > button:hover {
         background: rgba(59, 130, 246, 0.1) !important;
         color: #ffffff !important;
         border-color: rgba(59, 130, 246, 0.3) !important;

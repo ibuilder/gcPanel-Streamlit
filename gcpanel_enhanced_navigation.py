@@ -1153,10 +1153,10 @@ def render_sidebar():
         if st.button("📊 Dashboard", key="dashboard", use_container_width=True):
             st.session_state.current_page = "dashboard"
         
-        if st.button("📋 Daily Reports", key="daily_reports", use_container_width=True):
+        if st.button("📋 Daily Reports", key="btn_daily_reports", use_container_width=True):
             st.session_state.current_page = "daily_reports"
         
-        if st.button("🚚 Deliveries", key="deliveries", use_container_width=True):
+        if st.button("🚚 Deliveries", key="btn_deliveries", use_container_width=True):
             st.session_state.current_page = "deliveries"
         
         if st.button("🦺 Safety", key="safety", use_container_width=True):
@@ -1174,7 +1174,7 @@ def render_sidebar():
         if st.button("👷 Field Operations", key="field_operations", use_container_width=True):
             st.session_state.current_page = "field_operations"
         
-        if st.button("📄 Contracts", key="contracts", use_container_width=True):
+        if st.button("📄 Contracts", key="btn_contracts", use_container_width=True):
             st.session_state.current_page = "contracts"
         
         if st.button("💰 Cost Management", key="cost_management", use_container_width=True):
@@ -1249,11 +1249,57 @@ def render_sidebar():
             st.session_state.current_page = "login"
 
 def initialize_session_state():
-    """Initialize session state"""
+    """Initialize session state with all required data structures"""
     if "current_page" not in st.session_state:
         st.session_state.current_page = "dashboard"
     if "authenticated" not in st.session_state:
         st.session_state.authenticated = True  # Skip login for demo
+    
+    # Initialize all module data structures
+    if "daily_reports" not in st.session_state or not isinstance(st.session_state.daily_reports, list):
+        st.session_state.daily_reports = []
+    
+    if "deliveries" not in st.session_state or not isinstance(st.session_state.deliveries, list):
+        st.session_state.deliveries = []
+    
+    if "safety_incidents" not in st.session_state or not isinstance(st.session_state.safety_incidents, list):
+        st.session_state.safety_incidents = []
+    
+    if "safety_training" not in st.session_state or not isinstance(st.session_state.safety_training, list):
+        st.session_state.safety_training = []
+    
+    if "rfis" not in st.session_state or not isinstance(st.session_state.rfis, list):
+        st.session_state.rfis = []
+    
+    if "submittals" not in st.session_state or not isinstance(st.session_state.submittals, list):
+        st.session_state.submittals = []
+    
+    if "transmittals" not in st.session_state or not isinstance(st.session_state.transmittals, list):
+        st.session_state.transmittals = []
+    
+    if "contracts" not in st.session_state or not isinstance(st.session_state.contracts, list):
+        st.session_state.contracts = []
+    
+    if "cost_items" not in st.session_state or not isinstance(st.session_state.cost_items, list):
+        st.session_state.cost_items = []
+    
+    if "budget_items" not in st.session_state or not isinstance(st.session_state.budget_items, list):
+        st.session_state.budget_items = []
+    
+    if "quality_inspections" not in st.session_state or not isinstance(st.session_state.quality_inspections, list):
+        st.session_state.quality_inspections = []
+    
+    if "progress_photos" not in st.session_state or not isinstance(st.session_state.progress_photos, list):
+        st.session_state.progress_photos = []
+    
+    if "subcontractors" not in st.session_state or not isinstance(st.session_state.subcontractors, list):
+        st.session_state.subcontractors = []
+    
+    if "documents" not in st.session_state or not isinstance(st.session_state.documents, list):
+        st.session_state.documents = []
+    
+    if "tasks" not in st.session_state or not isinstance(st.session_state.tasks, list):
+        st.session_state.tasks = []
 
 def render_dashboard():
     """Enhanced dashboard with comprehensive metrics"""

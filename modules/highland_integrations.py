@@ -63,7 +63,16 @@ def render_highland_integrations():
 def initialize_integration_data():
     """Initialize Highland Tower integration data"""
     
+    # Import the backend manager
+    from modules.highland_integrations_backend import highland_integration_manager
+    
     if "highland_integrations" not in st.session_state:
+        # Load integrations from backend manager
+        integrations = highland_integration_manager.get_all_integrations()
+        st.session_state.highland_integrations = [integration.to_dict() for integration in integrations]
+    
+    # Legacy fallback data (keeping for compatibility)
+    if not st.session_state.highland_integrations:
         st.session_state.highland_integrations = [
             {
                 "integration_id": "INT-001",

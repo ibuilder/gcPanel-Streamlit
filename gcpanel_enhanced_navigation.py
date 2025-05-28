@@ -7248,7 +7248,315 @@ def render_transmittals_basic():
     st.info("📨 Transmittals module for document distribution")
 
 def render_scheduling():
-    """Complete Project Scheduling with full CRUD functionality"""
+    """Enterprise Project Scheduling with full CRUD functionality"""
+    try:
+        from modules.scheduling_backend import scheduling_manager, TaskStatus, TaskType, TaskPriority
+        
+        st.markdown("""
+        <div class="module-header">
+            <h1>📅 Project Scheduling</h1>
+            <p>Highland Tower Development - Comprehensive task management and milestone tracking</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Display summary metrics
+        metrics = scheduling_manager.generate_schedule_metrics()
+        if metrics:
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("📋 Total Tasks", metrics['total_tasks'])
+            with col2:
+                st.metric("📊 Avg Progress", f"{metrics['average_progress']}%")
+            with col3:
+                st.metric("⚠️ Overdue Tasks", metrics['overdue_tasks'])
+            with col4:
+                st.metric("⏰ On-Time Performance", f"{metrics['on_time_performance']}%")
+        
+        # Create tabs
+        tab1, tab2, tab3, tab4 = st.tabs(["📋 All Tasks", "➕ Create New", "✏️ Edit Tasks", "📊 Analytics"])
+        
+        with tab1:
+            st.subheader("📋 All Schedule Tasks")
+            
+            # Display tasks
+            tasks = scheduling_manager.get_all_tasks()
+            
+            for task in tasks:
+                status_color = {
+                    TaskStatus.COMPLETED: "🟢",
+                    TaskStatus.IN_PROGRESS: "🟡",
+                    TaskStatus.NOT_STARTED: "🔵",
+                    TaskStatus.ON_HOLD: "🟠",
+                    TaskStatus.CANCELLED: "🔴"
+                }.get(task.status, "⚪")
+                
+                priority_icon = {
+                    TaskPriority.CRITICAL: "🚨",
+                    TaskPriority.HIGH: "🔴",
+                    TaskPriority.MEDIUM: "🟡",
+                    TaskPriority.LOW: "🟢"
+                }.get(task.priority, "⚪")
+                
+                overdue_indicator = "⚠️ OVERDUE" if task.is_overdue() else ""
+                
+                with st.expander(f"{status_color} {priority_icon} {task.task_number} | {task.task_name} | {task.percent_complete:.0f}% {overdue_indicator}"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📅 Planned:** {task.planned_start_date} to {task.planned_end_date}")
+                        if task.actual_start_date:
+                            st.write(f"**🎯 Actual Start:** {task.actual_start_date}")
+                        if task.actual_end_date:
+                            st.write(f"**✅ Actual End:** {task.actual_end_date}")
+                        st.write(f"**📦 Phase:** {task.phase}")
+                        st.write(f"**📍 Location:** {task.location}")
+                    
+                    with col2:
+                        st.write(f"**👤 Assigned To:** {task.assigned_to}")
+                        st.write(f"**⏱️ Duration:** {task.duration_days} days")
+                        st.write(f"**💰 Budget:** ${task.budgeted_cost:,.0f}")
+                        st.write(f"**💸 Actual:** ${task.actual_cost:,.0f}")
+                        if task.cost_variance != 0:
+                            variance_color = "🟢" if task.cost_variance < 0 else "🔴"
+                            st.write(f"**📊 Variance:** {variance_color} ${task.cost_variance:,.0f}")
+                    
+                    if task.description:
+                        st.write(f"**📝 Description:** {task.description}")
+                    
+                    # Progress bar
+                    st.progress(task.percent_complete / 100.0)
+                    st.write(f"**Progress:** {task.percent_complete:.1f}% complete")
+                    
+                    # Quick actions
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        new_progress = st.number_input(f"Update Progress %", 
+                                                     min_value=0.0, max_value=100.0, 
+                                                     value=task.percent_complete,
+                                                     step=5.0,
+                                                     key=f"progress_{task.task_id}")
+                        if st.button(f"📊 Update", key=f"btn_update_progress_{task.task_id}"):
+                            if scheduling_manager.update_task_progress(task.task_id, new_progress):
+                                st.success("Progress updated!")
+                                st.rerun()
+                    
+                    with col2:
+                        if st.button(f"▶️ Start Task", key=f"btn_start_{task.task_id}"):
+                            if scheduling_manager.update_task_progress(task.task_id, max(1.0, task.percent_complete)):
+                                st.success("Task started!")
+                                st.rerun()
+                    
+                    with col3:
+                        if st.button(f"✅ Complete", key=f"btn_complete_{task.task_id}"):
+                            if scheduling_manager.update_task_progress(task.task_id, 100.0):
+                                st.success("Task completed!")
+                                st.rerun()
+        
+        with tab2:
+            st.subheader("➕ Create New Task")
+            
+            with st.form("create_task_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    task_name = st.text_input("📝 Task Name*", placeholder="Enter task name")
+                    description = st.text_area("📋 Description", placeholder="Detailed task description")
+                    task_type = st.selectbox("📋 Task Type*", options=["Construction", "Inspection", "Delivery", "Milestone", "Planning", "Review"])
+                    priority = st.selectbox("🚨 Priority*", options=["Low", "Medium", "High", "Critical"])
+                    phase = st.text_input("📦 Phase*", placeholder="e.g., Foundation, Structure")
+                
+                with col2:
+                    work_package = st.text_input("📦 Work Package*", value="Highland Tower Development")
+                    location = st.text_input("📍 Location*", placeholder="e.g., Level 12 - North Wing")
+                    assigned_to = st.text_input("👤 Assigned To*", placeholder="Person or crew responsible")
+                    duration_days = st.number_input("⏱️ Duration (days)*", min_value=1, step=1, value=1)
+                    budgeted_cost = st.number_input("💰 Budgeted Cost*", min_value=0.0, step=100.0)
+                
+                # Schedule dates
+                st.write("**📅 Schedule**")
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    planned_start = st.date_input("📅 Planned Start Date*")
+                
+                with col2:
+                    # Calculate end date based on duration
+                    planned_end = planned_start + timedelta(days=duration_days-1)
+                    st.date_input("📅 Planned End Date", value=planned_end, disabled=True)
+                
+                # Additional details
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    notes = st.text_area("📝 Notes", placeholder="Additional notes or comments")
+                    constraints = st.text_area("⚠️ Constraints", placeholder="Any constraints or limitations")
+                
+                with col2:
+                    risks = st.text_area("⚠️ Risks", placeholder="Potential risks or issues")
+                
+                submit_task = st.form_submit_button("🆕 Create Task", use_container_width=True)
+                
+                if submit_task:
+                    if not task_name or not task_type or not phase or not assigned_to:
+                        st.error("Please fill in all required fields marked with *")
+                    else:
+                        task_data = {
+                            "task_name": task_name,
+                            "description": description,
+                            "task_type": task_type,
+                            "priority": priority,
+                            "project_name": "Highland Tower Development",
+                            "phase": phase,
+                            "work_package": work_package,
+                            "location": location,
+                            "planned_start_date": planned_start.strftime('%Y-%m-%d'),
+                            "planned_end_date": planned_end.strftime('%Y-%m-%d'),
+                            "duration_days": duration_days,
+                            "assigned_to": assigned_to,
+                            "budgeted_cost": budgeted_cost,
+                            "notes": notes,
+                            "constraints": constraints,
+                            "risks": risks,
+                            "created_by": "Current User",
+                            "last_updated_by": "Current User"
+                        }
+                        
+                        task_id = scheduling_manager.create_task(task_data)
+                        st.success(f"✅ Task created successfully! ID: {task_id}")
+                        st.rerun()
+        
+        with tab3:
+            st.subheader("✏️ Edit Tasks")
+            
+            tasks = scheduling_manager.get_all_tasks()
+            if tasks:
+                task_options = [f"{t.task_number} - {t.task_name}" for t in tasks]
+                selected_task_index = st.selectbox("Select Task to Edit", range(len(task_options)), format_func=lambda x: task_options[x])
+                selected_task = tasks[selected_task_index]
+                
+                with st.form("edit_task_form"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        edit_name = st.text_input("📝 Task Name*", value=selected_task.task_name)
+                        edit_description = st.text_area("📋 Description", value=selected_task.description)
+                        edit_assigned = st.text_input("👤 Assigned To*", value=selected_task.assigned_to)
+                        edit_budget = st.number_input("💰 Budget", value=float(selected_task.budgeted_cost), step=100.0)
+                    
+                    with col2:
+                        edit_location = st.text_input("📍 Location", value=selected_task.location)
+                        edit_notes = st.text_area("📝 Notes", value=selected_task.notes)
+                        edit_constraints = st.text_area("⚠️ Constraints", value=selected_task.constraints)
+                        edit_risks = st.text_area("⚠️ Risks", value=selected_task.risks)
+                    
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        update_task = st.form_submit_button("✏️ Update Task", use_container_width=True)
+                    
+                    with col2:
+                        if st.form_submit_button("🗑️ Delete Task", use_container_width=True):
+                            if selected_task.task_id in scheduling_manager.tasks:
+                                del scheduling_manager.tasks[selected_task.task_id]
+                                st.success("✅ Task deleted successfully!")
+                                st.rerun()
+                    
+                    with col3:
+                        if st.form_submit_button("📋 Duplicate Task", use_container_width=True):
+                            # Create a duplicate with modified name
+                            task_data = {
+                                "task_name": f"Copy of {selected_task.task_name}",
+                                "description": selected_task.description,
+                                "task_type": selected_task.task_type.value,
+                                "priority": selected_task.priority.value,
+                                "project_name": selected_task.project_name,
+                                "phase": selected_task.phase,
+                                "work_package": selected_task.work_package,
+                                "location": selected_task.location,
+                                "planned_start_date": selected_task.planned_start_date,
+                                "planned_end_date": selected_task.planned_end_date,
+                                "duration_days": selected_task.duration_days,
+                                "assigned_to": selected_task.assigned_to,
+                                "budgeted_cost": selected_task.budgeted_cost,
+                                "notes": selected_task.notes,
+                                "constraints": selected_task.constraints,
+                                "risks": selected_task.risks,
+                                "created_by": "Current User",
+                                "last_updated_by": "Current User"
+                            }
+                            task_id = scheduling_manager.create_task(task_data)
+                            st.success(f"✅ Task duplicated! ID: {task_id}")
+                            st.rerun()
+                    
+                    if update_task:
+                        # Update the selected task
+                        selected_task.task_name = edit_name
+                        selected_task.description = edit_description
+                        selected_task.assigned_to = edit_assigned
+                        selected_task.budgeted_cost = edit_budget
+                        selected_task.location = edit_location
+                        selected_task.notes = edit_notes
+                        selected_task.constraints = edit_constraints
+                        selected_task.risks = edit_risks
+                        selected_task.last_updated_by = "Current User"
+                        selected_task.updated_at = datetime.now().isoformat()
+                        
+                        st.success("✅ Task updated successfully!")
+                        st.rerun()
+            else:
+                st.info("No tasks available to edit. Create some tasks first.")
+        
+        with tab4:
+            st.subheader("📊 Schedule Analytics")
+            
+            if metrics:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write("**📊 Task Status:**")
+                    for status, count in metrics['status_breakdown'].items():
+                        status_icon = {
+                            "Completed": "🟢",
+                            "In Progress": "🟡",
+                            "Not Started": "🔵",
+                            "On Hold": "🟠",
+                            "Cancelled": "🔴"
+                        }.get(status, "⚪")
+                        st.write(f"• {status_icon} {status}: {count}")
+                    
+                    st.write("**🚨 Priority Distribution:**")
+                    for priority, count in metrics['priority_breakdown'].items():
+                        priority_icon = {
+                            "Critical": "🚨",
+                            "High": "🔴",
+                            "Medium": "🟡",
+                            "Low": "🟢"
+                        }.get(priority, "⚪")
+                        st.write(f"• {priority_icon} {priority}: {count}")
+                
+                with col2:
+                    st.write("**📈 Performance Metrics:**")
+                    st.write(f"• **Completion Rate:** {metrics['completion_rate']}%")
+                    st.write(f"• **On-Time Performance:** {metrics['on_time_performance']}%")
+                    st.write(f"• **Average Progress:** {metrics['average_progress']}%")
+                    st.write(f"• **Overdue Tasks:** {metrics['overdue_tasks']}")
+                    
+                    st.write("**💰 Cost Performance:**")
+                    st.write(f"• **Total Budget:** ${metrics['total_budgeted_cost']:,.0f}")
+                    st.write(f"• **Total Actual:** ${metrics['total_actual_cost']:,.0f}")
+                    variance_color = "🟢" if metrics['cost_variance'] <= 0 else "🔴"
+                    st.write(f"• **Cost Variance:** {variance_color} ${metrics['cost_variance']:,.0f}")
+        
+        return
+        
+    except ImportError:
+        st.error("Enterprise Scheduling module not available")
+        render_scheduling_basic()
+
+def render_scheduling_basic():
+    """Basic scheduling module - fallback version"""
     st.markdown("""
     <div class="module-header">
         <h1>📅 Project Scheduling</h1>
@@ -11411,6 +11719,415 @@ def render_unit_prices_basic():
     </div>
     """, unsafe_allow_html=True)
     st.info("💲 Unit Prices module with cost database and estimation tools")
+
+def render_material_management():
+    """Enterprise Material Management with full CRUD functionality"""
+    try:
+        from modules.material_management_backend import material_manager, MaterialStatus, MaterialCategory, UnitType
+        
+        st.markdown("""
+        <div class="module-header">
+            <h1>📦 Material Management</h1>
+            <p>Highland Tower Development - Comprehensive inventory tracking and supply chain management</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Display summary metrics
+        metrics = material_manager.generate_material_metrics()
+        if metrics:
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("📦 Total Materials", metrics['total_materials'])
+            with col2:
+                st.metric("💰 Total Cost", f"${metrics['total_project_cost']:,.0f}")
+            with col3:
+                st.metric("⚠️ Low Stock", metrics['low_stock_materials'])
+            with col4:
+                st.metric("📊 Usage Rate", f"{metrics['average_usage_rate']}%")
+        
+        # Create tabs
+        tab1, tab2, tab3, tab4 = st.tabs(["📦 All Materials", "➕ Add New", "✏️ Manage", "📊 Analytics"])
+        
+        with tab1:
+            st.subheader("📦 All Materials Inventory")
+            
+            # Filter options
+            col1, col2 = st.columns(2)
+            with col1:
+                status_filter = st.selectbox("Filter by Status", ["All"] + [status.value for status in MaterialStatus])
+            with col2:
+                category_filter = st.selectbox("Filter by Category", ["All"] + [cat.value for cat in MaterialCategory])
+            
+            # Get filtered materials
+            materials = material_manager.get_all_materials()
+            
+            if status_filter != "All":
+                materials = [m for m in materials if m.status.value == status_filter]
+            if category_filter != "All":
+                materials = [m for m in materials if m.category.value == category_filter]
+            
+            # Display materials
+            for material in materials:
+                status_color = {
+                    MaterialStatus.DELIVERED: "🟢",
+                    MaterialStatus.ORDERED: "🟡",
+                    MaterialStatus.IN_TRANSIT: "🟠",
+                    MaterialStatus.INSTALLED: "🔵",
+                    MaterialStatus.PLANNED: "⚪"
+                }.get(material.status, "⚪")
+                
+                low_stock_warning = "⚠️ LOW STOCK" if material.is_low_stock() else ""
+                
+                with st.expander(f"{status_color} {material.material_code} | {material.name} | {material.quantity_remaining:.1f} {material.unit_type.value} {low_stock_warning}"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📂 Category:** {material.category.value}")
+                        st.write(f"**📏 Unit:** {material.unit_type.value}")
+                        st.write(f"**📦 Ordered:** {material.quantity_ordered:.1f}")
+                        st.write(f"**📥 Delivered:** {material.quantity_delivered:.1f}")
+                        st.write(f"**🔧 Used:** {material.quantity_used:.1f}")
+                        st.write(f"**📊 Remaining:** {material.quantity_remaining:.1f}")
+                    
+                    with col2:
+                        st.write(f"**🏢 Supplier:** {material.supplier_name}")
+                        st.write(f"**💰 Unit Cost:** ${material.unit_cost:.2f}")
+                        st.write(f"**💸 Total Cost:** ${material.total_cost:,.2f}")
+                        st.write(f"**📍 Location:** {material.current_location}")
+                        st.write(f"**📅 Required:** {material.required_date}")
+                    
+                    if material.description:
+                        st.write(f"**📝 Description:** {material.description}")
+                    
+                    if material.specification:
+                        st.write(f"**📋 Specification:** {material.specification}")
+                    
+                    # Usage and waste metrics
+                    usage_rate = material.calculate_usage_rate()
+                    waste_rate = material.calculate_waste_percentage()
+                    
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("Usage Rate", f"{usage_rate:.1f}%")
+                    with col2:
+                        st.metric("Waste Rate", f"{waste_rate:.1f}%")
+                    with col3:
+                        if material.is_low_stock():
+                            st.error("⚠️ Low Stock Alert")
+                        else:
+                            st.success("✅ Stock OK")
+                    
+                    # Quick actions
+                    st.write("---")
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        if st.button(f"📥 Add Delivery", key=f"btn_delivery_{material.material_id}"):
+                            st.session_state[f"show_delivery_{material.material_id}"] = True
+                    
+                    with col2:
+                        if st.button(f"🔧 Record Usage", key=f"btn_usage_{material.material_id}"):
+                            st.session_state[f"show_usage_{material.material_id}"] = True
+                    
+                    with col3:
+                        new_status = st.selectbox(f"Update Status", 
+                                                [status.value for status in MaterialStatus],
+                                                index=[status.value for status in MaterialStatus].index(material.status.value),
+                                                key=f"status_{material.material_id}")
+                        if st.button(f"📊 Update", key=f"btn_status_{material.material_id}"):
+                            if material_manager.update_material_status(material.material_id, MaterialStatus(new_status)):
+                                st.success("Status updated!")
+                                st.rerun()
+                    
+                    # Delivery form
+                    if st.session_state.get(f"show_delivery_{material.material_id}", False):
+                        with st.form(f"delivery_form_{material.material_id}"):
+                            st.write("**📥 Add Delivery Record**")
+                            del_date = st.date_input("Delivery Date")
+                            del_qty = st.number_input("Quantity Delivered", min_value=0.1, step=0.1)
+                            del_ticket = st.text_input("Delivery Ticket")
+                            del_received = st.text_input("Received By")
+                            del_notes = st.text_area("Condition Notes")
+                            
+                            if st.form_submit_button("📥 Add Delivery"):
+                                delivery_data = {
+                                    "delivery_date": del_date.strftime('%Y-%m-%d'),
+                                    "quantity_delivered": del_qty,
+                                    "delivery_ticket": del_ticket,
+                                    "received_by": del_received,
+                                    "condition_notes": del_notes,
+                                    "photos_attached": []
+                                }
+                                if material_manager.add_delivery(material.material_id, delivery_data):
+                                    st.success("Delivery recorded!")
+                                    st.session_state[f"show_delivery_{material.material_id}"] = False
+                                    st.rerun()
+                    
+                    # Usage form
+                    if st.session_state.get(f"show_usage_{material.material_id}", False):
+                        with st.form(f"usage_form_{material.material_id}"):
+                            st.write("**🔧 Record Material Usage**")
+                            use_date = st.date_input("Usage Date")
+                            use_qty = st.number_input("Quantity Used", min_value=0.1, step=0.1, max_value=float(material.quantity_remaining))
+                            use_location = st.text_input("Location Used")
+                            use_by = st.text_input("Used By")
+                            use_work_order = st.text_input("Work Order")
+                            use_notes = st.text_area("Usage Notes")
+                            
+                            if st.form_submit_button("🔧 Record Usage"):
+                                usage_data = {
+                                    "usage_date": use_date.strftime('%Y-%m-%d'),
+                                    "quantity_used": use_qty,
+                                    "location_used": use_location,
+                                    "used_by": use_by,
+                                    "work_order": use_work_order,
+                                    "notes": use_notes
+                                }
+                                if material_manager.add_usage(material.material_id, usage_data):
+                                    st.success("Usage recorded!")
+                                    st.session_state[f"show_usage_{material.material_id}"] = False
+                                    st.rerun()
+        
+        with tab2:
+            st.subheader("➕ Add New Material")
+            
+            with st.form("create_material_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    name = st.text_input("📝 Material Name*", placeholder="Enter material name")
+                    description = st.text_area("📋 Description", placeholder="Detailed description")
+                    category = st.selectbox("📂 Category*", options=[cat.value for cat in MaterialCategory])
+                    unit_type = st.selectbox("📏 Unit Type*", options=[unit.value for unit in UnitType])
+                    quantity_ordered = st.number_input("📦 Quantity Ordered*", min_value=0.1, step=0.1)
+                
+                with col2:
+                    supplier_name = st.text_input("🏢 Supplier Name*", placeholder="Supplier or vendor")
+                    supplier_contact = st.text_input("📞 Supplier Contact", placeholder="Contact information")
+                    unit_cost = st.number_input("💰 Unit Cost*", min_value=0.01, step=0.01)
+                    required_date = st.date_input("📅 Required Date*")
+                    minimum_stock = st.number_input("📊 Minimum Stock Level", min_value=0.0, step=0.1, value=10.0)
+                
+                # Specifications
+                st.write("**📋 Specifications**")
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    specification = st.text_area("📝 Specification", placeholder="Technical specifications")
+                    grade_quality = st.text_input("🏅 Grade/Quality", placeholder="Grade or quality level")
+                
+                with col2:
+                    size_dimensions = st.text_input("📐 Size/Dimensions", placeholder="Size or dimensions")
+                    manufacturer = st.text_input("🏭 Manufacturer", placeholder="Manufacturer name")
+                
+                with col3:
+                    model_part_number = st.text_input("🔢 Model/Part Number", placeholder="Model or part number")
+                    color_finish = st.text_input("🎨 Color/Finish", placeholder="Color or finish")
+                
+                # Location and project details
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    storage_location = st.text_input("📍 Storage Location", placeholder="Where will this be stored?")
+                    work_package = st.text_input("📦 Work Package", value="Highland Tower Development")
+                    phase = st.text_input("📊 Phase", placeholder="Construction phase")
+                
+                with col2:
+                    drawing_reference = st.text_input("📐 Drawing Reference", placeholder="Related drawings")
+                    purchase_order = st.text_input("📄 Purchase Order", placeholder="PO number")
+                    procurement_notes = st.text_area("📝 Procurement Notes", placeholder="Additional notes")
+                
+                submit_material = st.form_submit_button("🆕 Add Material", use_container_width=True)
+                
+                if submit_material:
+                    if not name or not category or not supplier_name or not unit_cost:
+                        st.error("Please fill in all required fields marked with *")
+                    else:
+                        material_data = {
+                            "name": name,
+                            "description": description,
+                            "category": category,
+                            "specification": specification,
+                            "grade_quality": grade_quality,
+                            "size_dimensions": size_dimensions,
+                            "color_finish": color_finish,
+                            "manufacturer": manufacturer,
+                            "model_part_number": model_part_number,
+                            "unit_type": unit_type,
+                            "quantity_ordered": quantity_ordered,
+                            "minimum_stock_level": minimum_stock,
+                            "storage_location": storage_location,
+                            "delivery_location": storage_location,
+                            "current_location": "Not yet delivered",
+                            "supplier_name": supplier_name,
+                            "supplier_contact": supplier_contact,
+                            "purchase_order": purchase_order,
+                            "unit_cost": unit_cost,
+                            "total_cost": unit_cost * quantity_ordered,
+                            "required_date": required_date.strftime('%Y-%m-%d'),
+                            "certifications_required": [],
+                            "project_name": "Highland Tower Development",
+                            "work_package": work_package,
+                            "phase": phase,
+                            "drawing_reference": drawing_reference,
+                            "procurement_notes": procurement_notes,
+                            "quality_notes": "",
+                            "storage_requirements": "",
+                            "requested_by": "Current User",
+                            "created_by": "Current User"
+                        }
+                        
+                        material_id = material_manager.create_material(material_data)
+                        st.success(f"✅ Material added successfully! ID: {material_id}")
+                        st.rerun()
+        
+        with tab3:
+            st.subheader("✏️ Manage Materials")
+            
+            materials = material_manager.get_all_materials()
+            if materials:
+                material_options = [f"{m.material_code} - {m.name}" for m in materials]
+                selected_index = st.selectbox("Select Material to Manage", range(len(material_options)), format_func=lambda x: material_options[x])
+                selected_material = materials[selected_index]
+                
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    if st.button("✏️ Edit Material", use_container_width=True):
+                        st.session_state.show_edit_form = True
+                
+                with col2:
+                    if st.button("🗑️ Delete Material", use_container_width=True):
+                        if selected_material.material_id in material_manager.materials:
+                            del material_manager.materials[selected_material.material_id]
+                            st.success("✅ Material deleted successfully!")
+                            st.rerun()
+                
+                with col3:
+                    if st.button("📋 Duplicate Material", use_container_width=True):
+                        # Create duplicate with modified name
+                        material_data = {
+                            "name": f"Copy of {selected_material.name}",
+                            "description": selected_material.description,
+                            "category": selected_material.category.value,
+                            "specification": selected_material.specification,
+                            "grade_quality": selected_material.grade_quality,
+                            "size_dimensions": selected_material.size_dimensions,
+                            "color_finish": selected_material.color_finish,
+                            "manufacturer": selected_material.manufacturer,
+                            "model_part_number": selected_material.model_part_number,
+                            "unit_type": selected_material.unit_type.value,
+                            "quantity_ordered": selected_material.quantity_ordered,
+                            "minimum_stock_level": selected_material.minimum_stock_level,
+                            "storage_location": selected_material.storage_location,
+                            "delivery_location": selected_material.delivery_location,
+                            "current_location": "Not yet delivered",
+                            "supplier_name": selected_material.supplier_name,
+                            "supplier_contact": selected_material.supplier_contact,
+                            "purchase_order": f"Copy-{selected_material.purchase_order}",
+                            "unit_cost": selected_material.unit_cost,
+                            "total_cost": selected_material.unit_cost * selected_material.quantity_ordered,
+                            "required_date": selected_material.required_date,
+                            "certifications_required": selected_material.certifications_required,
+                            "project_name": selected_material.project_name,
+                            "work_package": selected_material.work_package,
+                            "phase": selected_material.phase,
+                            "drawing_reference": selected_material.drawing_reference,
+                            "procurement_notes": selected_material.procurement_notes,
+                            "quality_notes": selected_material.quality_notes,
+                            "storage_requirements": selected_material.storage_requirements,
+                            "requested_by": "Current User",
+                            "created_by": "Current User"
+                        }
+                        material_id = material_manager.create_material(material_data)
+                        st.success(f"✅ Material duplicated! ID: {material_id}")
+                        st.rerun()
+                
+                # Edit form
+                if st.session_state.get('show_edit_form', False):
+                    with st.form("edit_material_form"):
+                        st.write("**✏️ Edit Material Details**")
+                        
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            edit_name = st.text_input("📝 Name", value=selected_material.name)
+                            edit_description = st.text_area("📋 Description", value=selected_material.description)
+                            edit_supplier = st.text_input("🏢 Supplier", value=selected_material.supplier_name)
+                            edit_cost = st.number_input("💰 Unit Cost", value=float(selected_material.unit_cost), step=0.01)
+                        
+                        with col2:
+                            edit_location = st.text_input("📍 Current Location", value=selected_material.current_location)
+                            edit_min_stock = st.number_input("📊 Min Stock", value=float(selected_material.minimum_stock_level), step=0.1)
+                            edit_notes = st.text_area("📝 Notes", value=selected_material.procurement_notes)
+                        
+                        if st.form_submit_button("✏️ Update Material"):
+                            # Update the material
+                            selected_material.name = edit_name
+                            selected_material.description = edit_description
+                            selected_material.supplier_name = edit_supplier
+                            selected_material.unit_cost = edit_cost
+                            selected_material.total_cost = edit_cost * selected_material.quantity_ordered
+                            selected_material.current_location = edit_location
+                            selected_material.minimum_stock_level = edit_min_stock
+                            selected_material.procurement_notes = edit_notes
+                            selected_material.updated_at = datetime.now().isoformat()
+                            
+                            st.success("✅ Material updated successfully!")
+                            st.session_state.show_edit_form = False
+                            st.rerun()
+            else:
+                st.info("No materials available. Add some materials first.")
+        
+        with tab4:
+            st.subheader("📊 Material Analytics")
+            
+            if metrics:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write("**📊 Status Distribution:**")
+                    for status, count in metrics['status_breakdown'].items():
+                        status_icon = {
+                            "Delivered": "🟢",
+                            "Ordered": "🟡",
+                            "In Transit": "🟠",
+                            "Installed": "🔵",
+                            "Planned": "⚪"
+                        }.get(status, "⚪")
+                        st.write(f"• {status_icon} {status}: {count}")
+                    
+                    st.write("**📂 Category Distribution:**")
+                    for category, count in metrics['category_breakdown'].items():
+                        if count > 0:
+                            st.write(f"• {category}: {count}")
+                
+                with col2:
+                    st.write("**📈 Performance Metrics:**")
+                    st.write(f"• **Total Project Cost:** ${metrics['total_project_cost']:,.0f}")
+                    st.write(f"• **Average Usage Rate:** {metrics['average_usage_rate']}%")
+                    st.write(f"• **Average Waste:** {metrics['average_waste_percentage']}%")
+                    st.write(f"• **Low Stock Alerts:** {metrics['low_stock_materials']}")
+                    st.write(f"• **Pending Deliveries:** {metrics['pending_deliveries']}")
+                    
+                    # Low stock materials
+                    low_stock = material_manager.get_low_stock_materials()
+                    if low_stock:
+                        st.write("**⚠️ Low Stock Materials:**")
+                        for material in low_stock[:5]:
+                            st.write(f"• {material.name}: {material.quantity_remaining:.1f} {material.unit_type.value}")
+        
+        return
+        
+    except ImportError:
+        st.error("Enterprise Material Management module not available")
+        render_material_management_basic()
+
+def render_material_management_basic():
+    """Basic material management module - fallback version"""
+    st.title("📦 Material Management")
+    st.info("📦 Material management module for inventory tracking")
 
 def render_analytics():
     """Analytics module"""

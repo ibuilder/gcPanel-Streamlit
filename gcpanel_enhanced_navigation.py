@@ -5214,14 +5214,511 @@ def render_cost_management_basic():
                 st.rerun()
 
 def render_bim():
-    """Complete BIM Management with full CRUD functionality"""
-    st.markdown("""
-    <div class="module-header">
-        <h1>🏢 Building Information Modeling</h1>
-        <p>Advanced 3D coordination, model management, and clash detection</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
+    """Enterprise BIM Management with full CRUD functionality"""
+    try:
+        from modules.bim_backend import bim_manager, ModelType, ModelStatus, ClashSeverity, ClashStatus
+        
+        st.markdown("""
+        <div class="module-header">
+            <h1>🏗️ BIM Management</h1>
+            <p>Highland Tower Development - 3D coordination, clash detection, and model management</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Display summary metrics
+        metrics = bim_manager.generate_bim_metrics()
+        if metrics:
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("📊 Total Models", metrics['total_models'])
+            with col2:
+                st.metric("⚠️ Open Clashes", metrics['open_clashes'])
+            with col3:
+                st.metric("✅ Resolved Clashes", metrics['resolved_clashes'])
+            with col4:
+                st.metric("📈 Resolution Rate", f"{metrics['clash_resolution_rate']}%")
+        
+        # Create tabs
+        tab1, tab2, tab3, tab4 = st.tabs(["🏗️ BIM Models", "⚠️ Clash Detection", "➕ Create", "⚙️ Manage"])
+        
+        with tab1:
+            st.subheader("🏗️ Highland Tower Development - BIM Models")
+            
+            # Filter options
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                discipline_filter = st.selectbox("Filter by Discipline", 
+                    ["All"] + list(set(model.discipline for model in bim_manager.get_all_models())))
+            with col2:
+                status_filter = st.selectbox("Filter by Status", 
+                    ["All"] + [status.value for status in ModelStatus])
+            with col3:
+                type_filter = st.selectbox("Filter by Type", 
+                    ["All"] + [mtype.value for mtype in ModelType])
+            
+            # Get filtered models
+            models = bim_manager.get_all_models()
+            
+            if discipline_filter != "All":
+                models = [m for m in models if m.discipline == discipline_filter]
+            if status_filter != "All":
+                models = [m for m in models if m.status.value == status_filter]
+            if type_filter != "All":
+                models = [m for m in models if m.model_type.value == type_filter]
+            
+            # Display models
+            for model in models:
+                status_color = {
+                    ModelStatus.CURRENT: "🟢",
+                    ModelStatus.APPROVED: "🟢",
+                    ModelStatus.IN_REVIEW: "🟡",
+                    ModelStatus.DRAFT: "🟡",
+                    ModelStatus.SUPERSEDED: "🟠",
+                    ModelStatus.ARCHIVED: "⚫"
+                }.get(model.status, "⚪")
+                
+                federated_indicator = "🔗 FEDERATED" if model.federated_model else "📄 STANDALONE"
+                clash_indicator = "✅ CLASH CHECKED" if model.clash_detection_run else "❌ NO CLASH CHECK"
+                
+                with st.expander(f"{status_color} {model.model_code} | {model.model_name} | {federated_indicator}"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**🏗️ Type:** {model.model_type.value}")
+                        st.write(f"**👥 Discipline:** {model.discipline}")
+                        st.write(f"**📋 Status:** {model.status.value}")
+                        st.write(f"**📊 Version:** {model.version} ({model.revision})")
+                        st.write(f"**📅 Last Modified:** {model.last_modified}")
+                        st.write(f"**👤 Created By:** {model.created_by}")
+                    
+                    with col2:
+                        st.write(f"**📄 File:** {model.file_name}")
+                        st.write(f"**📦 Format:** {model.file_format}")
+                        if model.file_size > 0:
+                            st.write(f"**📊 Size:** {model.file_size / 1024 / 1024:.1f} MB")
+                        st.write(f"**🏢 Level Range:** {model.level_range}")
+                        st.write(f"**📍 Building Section:** {model.building_section}")
+                        st.write(f"**⚙️ Phase:** {model.project_phase}")
+                    
+                    if model.description:
+                        st.write(f"**📝 Description:** {model.description}")
+                    
+                    if model.review_comments:
+                        st.write(f"**💬 Review Comments:** {model.review_comments}")
+                    
+                    # Coordination status
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.write(f"**{clash_indicator}**")
+                    with col2:
+                        st.write(f"**📐 Coordinate System:** {model.coordinate_system}")
+                    
+                    # Change log
+                    if model.change_log:
+                        st.write("**📋 Recent Changes:**")
+                        for change in model.change_log[:3]:  # Show last 3 changes
+                            st.write(f"• {change}")
+                    
+                    # Workflow tracking
+                    st.write(f"**🎯 Current Stage:** {model.workflow_stage}")
+                    st.write(f"**📅 Next Milestone:** {model.next_milestone}")
+                    st.write(f"**👤 Assigned To:** {model.assigned_to}")
+                    
+                    # Quick actions
+                    col1, col2, col3, col4 = st.columns(4)
+                    
+                    with col1:
+                        if st.button(f"📥 Download", key=f"btn_download_{model.model_id}"):
+                            st.success(f"Downloading {model.file_format} model...")
+                    
+                    with col2:
+                        if st.button(f"👁️ View 3D", key=f"btn_view_{model.model_id}"):
+                            st.success("Opening 3D viewer...")
+                    
+                    with col3:
+                        if st.button(f"🔍 Clash Check", key=f"btn_clash_{model.model_id}"):
+                            st.success("Running clash detection...")
+                    
+                    with col4:
+                        if model.status == ModelStatus.IN_REVIEW and st.button(f"✅ Approve", key=f"btn_approve_{model.model_id}"):
+                            if bim_manager.update_model_status(model.model_id, ModelStatus.APPROVED):
+                                st.success("Model approved!")
+                                st.rerun()
+        
+        with tab2:
+            st.subheader("⚠️ Clash Detection Results")
+            
+            # Clash summary
+            open_clashes = bim_manager.get_open_clashes()
+            critical_clashes = bim_manager.get_clashes_by_severity(ClashSeverity.CRITICAL)
+            high_clashes = bim_manager.get_clashes_by_severity(ClashSeverity.HIGH)
+            
+            if critical_clashes:
+                st.error(f"🚨 {len(critical_clashes)} CRITICAL CLASHES require immediate attention!")
+            
+            if high_clashes:
+                st.warning(f"⚠️ {len(high_clashes)} HIGH PRIORITY clashes need resolution")
+            
+            if not open_clashes:
+                st.success("🎉 No open clashes - all coordination issues resolved!")
+            
+            # Filter options
+            col1, col2 = st.columns(2)
+            with col1:
+                severity_filter = st.selectbox("Filter by Severity", 
+                    ["All"] + [sev.value for sev in ClashSeverity])
+            with col2:
+                status_clash_filter = st.selectbox("Filter by Status", 
+                    ["All"] + [stat.value for stat in ClashStatus])
+            
+            # Get filtered clashes
+            clashes = bim_manager.get_all_clashes()
+            
+            if severity_filter != "All":
+                clashes = [c for c in clashes if c.severity.value == severity_filter]
+            if status_clash_filter != "All":
+                clashes = [c for c in clashes if c.status.value == status_clash_filter]
+            
+            # Display clashes
+            for clash in clashes:
+                severity_color = {
+                    ClashSeverity.CRITICAL: "🔴",
+                    ClashSeverity.HIGH: "🟠",
+                    ClashSeverity.MEDIUM: "🟡", 
+                    ClashSeverity.LOW: "🟢",
+                    ClashSeverity.INFORMATION: "🔵"
+                }.get(clash.severity, "⚪")
+                
+                status_indicator = {
+                    ClashStatus.OPEN: "🔴 OPEN",
+                    ClashStatus.IN_PROGRESS: "🟡 IN PROGRESS", 
+                    ClashStatus.RESOLVED: "🟢 RESOLVED",
+                    ClashStatus.ACCEPTED: "🔵 ACCEPTED",
+                    ClashStatus.CLOSED: "⚫ CLOSED"
+                }.get(clash.status, "⚪ UNKNOWN")
+                
+                with st.expander(f"{severity_color} {clash.clash_code} | {clash.clash_name} | {status_indicator}"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**⚠️ Severity:** {clash.severity.value}")
+                        st.write(f"**📋 Type:** {clash.clash_type}")
+                        st.write(f"**🏢 Location:** {clash.building_level} - {clash.zone}")
+                        st.write(f"**📅 Detected:** {clash.detected_date}")
+                        st.write(f"**🎯 Target Resolution:** {clash.target_resolution}")
+                        st.write(f"**👤 Assigned To:** {clash.assigned_to}")
+                    
+                    with col2:
+                        st.write(f"**🔄 Discipline Conflict:** {clash.discipline_conflict}")
+                        st.write(f"**📊 Priority:** {clash.priority}")
+                        if clash.estimated_cost > 0:
+                            st.write(f"**💰 Estimated Cost:** ${clash.estimated_cost:,.0f}")
+                        if clash.resolved_date:
+                            st.write(f"**✅ Resolved:** {clash.resolved_date}")
+                        st.write(f"**📏 Coordinates:** X:{clash.coordinates['x']:.1f}, Y:{clash.coordinates['y']:.1f}, Z:{clash.coordinates['z']:.1f}")
+                    
+                    # Model and element details
+                    st.write(f"**🏗️ Conflict Details:**")
+                    st.write(f"• **Model A:** {clash.model_a} - {clash.element_a}")
+                    st.write(f"• **Model B:** {clash.model_b} - {clash.element_b}")
+                    
+                    # Resolution information
+                    if clash.resolution_method:
+                        st.write(f"**🔧 Resolution Method:** {clash.resolution_method}")
+                    
+                    if clash.resolution_notes:
+                        st.write(f"**📝 Resolution Notes:** {clash.resolution_notes}")
+                    
+                    # Related items
+                    if clash.related_rfis:
+                        st.write(f"**📋 Related RFIs:** {', '.join(clash.related_rfis)}")
+                    
+                    # Documentation
+                    if clash.markup_files:
+                        st.write(f"**📎 Markup Files:** {len(clash.markup_files)} files available")
+                    
+                    # Quick actions
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        if clash.status != ClashStatus.RESOLVED and st.button(f"✅ Mark Resolved", key=f"resolve_clash_{clash.clash_id}"):
+                            resolution_notes = f"Resolved via coordination meeting on {datetime.now().strftime('%Y-%m-%d')}"
+                            if bim_manager.resolve_clash(clash.clash_id, resolution_notes):
+                                st.success("Clash marked as resolved!")
+                                st.rerun()
+                    
+                    with col2:
+                        if st.button(f"📸 View Screenshot", key=f"screenshot_{clash.clash_id}"):
+                            st.success("Opening clash screenshot...")
+                    
+                    with col3:
+                        if st.button(f"📋 Create RFI", key=f"create_rfi_{clash.clash_id}"):
+                            st.success("Creating RFI from clash...")
+        
+        with tab3:
+            st.subheader("➕ Create BIM Items")
+            
+            create_tab1, create_tab2 = st.tabs(["🏗️ Create BIM Model", "⚠️ Create Clash"])
+            
+            with create_tab1:
+                st.write("**🏗️ Create New BIM Model**")
+                
+                with st.form("create_model_form"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        model_name = st.text_input("📝 Model Name*", placeholder="Highland Tower - Architectural Model")
+                        model_type = st.selectbox("🏗️ Model Type*", options=[mtype.value for mtype in ModelType])
+                        discipline = st.text_input("👥 Discipline*", placeholder="e.g., Architecture, Structural")
+                        version = st.text_input("📊 Version*", value="1.0")
+                        revision = st.text_input("📋 Revision*", value="Rev-01")
+                        status = st.selectbox("📊 Status*", options=[status.value for status in ModelStatus])
+                    
+                    with col2:
+                        file_name = st.text_input("📄 File Name*", placeholder="Highland_Tower_Arch_Rev01.rvt")
+                        file_format = st.selectbox("📦 Format*", options=["RVT", "IFC", "DWG", "NWD", "SKP"])
+                        project_phase = st.text_input("⚙️ Project Phase*", value="Design Development")
+                        level_range = st.text_input("🏢 Level Range*", placeholder="Level B1 to Penthouse")
+                        building_section = st.text_input("📍 Building Section*", value="Full Building")
+                        coordinate_system = st.text_input("📐 Coordinate System", value="Shared Site Coordinates")
+                    
+                    description = st.text_area("📝 Description*", placeholder="Detailed description of the BIM model")
+                    created_by = st.text_input("👤 Created By*", placeholder="Name - Title")
+                    assigned_to = st.text_input("👤 Assigned To*", placeholder="Team or individual responsible")
+                    workflow_stage = st.text_input("🎯 Workflow Stage", value="Design Development")
+                    next_milestone = st.text_input("📅 Next Milestone", placeholder="100% DD Set - Date")
+                    
+                    if st.form_submit_button("🏗️ Create BIM Model", use_container_width=True):
+                        if not model_name or not discipline or not file_name or not description:
+                            st.error("Please fill in all required fields marked with *")
+                        else:
+                            model_data = {
+                                "model_name": model_name,
+                                "model_type": model_type,
+                                "discipline": discipline,
+                                "version": version,
+                                "revision": revision,
+                                "status": status,
+                                "file_name": file_name,
+                                "file_path": f"/bim/models/{discipline.lower()}/{file_name}",
+                                "file_size": 0,  # Would be set when file is uploaded
+                                "file_format": file_format,
+                                "project_phase": project_phase,
+                                "level_range": level_range,
+                                "building_section": building_section,
+                                "created_by": created_by,
+                                "reviewed_by": None,
+                                "approved_by": None,
+                                "review_date": None,
+                                "approval_date": None,
+                                "coordinate_system": coordinate_system,
+                                "description": description,
+                                "review_comments": "",
+                                "workflow_stage": workflow_stage,
+                                "next_milestone": next_milestone,
+                                "assigned_to": assigned_to
+                            }
+                            
+                            model_id = bim_manager.create_bim_model(model_data)
+                            st.success(f"✅ BIM model created successfully! ID: {model_id}")
+                            st.rerun()
+            
+            with create_tab2:
+                st.write("**⚠️ Create Clash Detection Result**")
+                
+                with st.form("create_clash_form"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        clash_name = st.text_input("📝 Clash Name*", placeholder="HVAC Duct vs Structural Beam")
+                        clash_type = st.selectbox("📋 Clash Type*", options=["Hard Clash", "Soft Clash", "Clearance"])
+                        severity = st.selectbox("⚠️ Severity*", options=[sev.value for sev in ClashSeverity])
+                        building_level = st.text_input("🏢 Building Level*", placeholder="Level 12")
+                        zone = st.text_input("📍 Zone*", placeholder="Office Area - Zone B")
+                        discipline_conflict = st.text_input("🔄 Discipline Conflict*", placeholder="Mechanical vs Structural")
+                    
+                    with col2:
+                        model_a = st.text_input("🏗️ Model A*", placeholder="HTD-MECH-001")
+                        model_b = st.text_input("🏗️ Model B*", placeholder="HTD-STRUC-001")
+                        element_a = st.text_input("📐 Element A*", placeholder="24x18 Supply Duct")
+                        element_b = st.text_input("📐 Element B*", placeholder="W24x68 Steel Beam")
+                        assigned_to = st.text_input("👤 Assigned To*", placeholder="Engineer Name")
+                        priority = st.number_input("📊 Priority", min_value=1, max_value=5, value=3)
+                    
+                    # Coordinates
+                    st.write("**📏 Clash Coordinates**")
+                    coord_col1, coord_col2, coord_col3 = st.columns(3)
+                    with coord_col1:
+                        coord_x = st.number_input("X", value=0.0, step=0.1)
+                    with coord_col2:
+                        coord_y = st.number_input("Y", value=0.0, step=0.1)
+                    with coord_col3:
+                        coord_z = st.number_input("Z", value=0.0, step=0.1)
+                    
+                    target_resolution = st.date_input("📅 Target Resolution Date*")
+                    resolution_method = st.text_input("🔧 Proposed Resolution Method", placeholder="Reroute ductwork around beam")
+                    estimated_cost = st.number_input("💰 Estimated Resolution Cost", min_value=0.0, step=100.0)
+                    screenshot_path = st.text_input("📸 Screenshot Path", placeholder="/bim/clashes/screenshots/clash-xxx.png")
+                    
+                    if st.form_submit_button("⚠️ Create Clash", use_container_width=True):
+                        if not clash_name or not model_a or not model_b or not assigned_to:
+                            st.error("Please fill in all required fields marked with *")
+                        else:
+                            clash_data = {
+                                "clash_name": clash_name,
+                                "model_a": model_a,
+                                "model_b": model_b,
+                                "element_a": element_a,
+                                "element_b": element_b,
+                                "clash_type": clash_type,
+                                "severity": severity,
+                                "discipline_conflict": discipline_conflict,
+                                "building_level": building_level,
+                                "zone": zone,
+                                "coordinates": {"x": coord_x, "y": coord_y, "z": coord_z},
+                                "assigned_to": assigned_to,
+                                "priority": priority,
+                                "resolution_method": resolution_method,
+                                "resolution_notes": "",
+                                "estimated_cost": estimated_cost,
+                                "target_resolution": target_resolution.strftime('%Y-%m-%d'),
+                                "screenshot_path": screenshot_path if screenshot_path else "/bim/clashes/screenshots/default.png",
+                                "created_by": "Current User"
+                            }
+                            
+                            clash_id = bim_manager.create_clash_detection(clash_data)
+                            st.success(f"✅ Clash detection result created! ID: {clash_id}")
+                            st.rerun()
+        
+        with tab4:
+            st.subheader("⚙️ Manage BIM Assets")
+            
+            manage_tab1, manage_tab2 = st.tabs(["🏗️ Manage Models", "⚠️ Manage Clashes"])
+            
+            with manage_tab1:
+                models_list = bim_manager.get_all_models()
+                if models_list:
+                    model_options = [f"{m.model_code} - {m.model_name}" for m in models_list]
+                    selected_model_index = st.selectbox("Select Model to Manage", range(len(model_options)), format_func=lambda x: model_options[x])
+                    selected_model = models_list[selected_model_index]
+                    
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        if st.button("✏️ Edit Model", use_container_width=True):
+                            st.session_state.show_edit_model_form = True
+                    
+                    with col2:
+                        if st.button("🗑️ Archive Model", use_container_width=True):
+                            if bim_manager.update_model_status(selected_model.model_id, ModelStatus.ARCHIVED):
+                                st.success("✅ Model archived!")
+                                st.rerun()
+                    
+                    with col3:
+                        if st.button("📋 Duplicate Model", use_container_width=True):
+                            # Create duplicate with modified name
+                            model_data = {
+                                "model_name": f"Copy of {selected_model.model_name}",
+                                "model_type": selected_model.model_type.value,
+                                "discipline": selected_model.discipline,
+                                "version": "1.0",
+                                "revision": "Rev-01",
+                                "status": ModelStatus.DRAFT.value,
+                                "file_name": f"Copy_{selected_model.file_name}",
+                                "file_path": f"/bim/models/{selected_model.discipline.lower()}/Copy_{selected_model.file_name}",
+                                "file_size": 0,
+                                "file_format": selected_model.file_format,
+                                "project_phase": selected_model.project_phase,
+                                "level_range": selected_model.level_range,
+                                "building_section": selected_model.building_section,
+                                "created_by": "Current User",
+                                "reviewed_by": None,
+                                "approved_by": None,
+                                "review_date": None,
+                                "approval_date": None,
+                                "coordinate_system": selected_model.coordinate_system,
+                                "description": f"Copy of {selected_model.description}",
+                                "review_comments": "",
+                                "workflow_stage": selected_model.workflow_stage,
+                                "next_milestone": selected_model.next_milestone,
+                                "assigned_to": selected_model.assigned_to
+                            }
+                            model_id = bim_manager.create_bim_model(model_data)
+                            st.success(f"✅ Model duplicated! ID: {model_id}")
+                            st.rerun()
+                    
+                    # Edit form
+                    if st.session_state.get('show_edit_model_form', False):
+                        with st.form("edit_model_form"):
+                            st.write("**✏️ Edit Model Details**")
+                            
+                            col1, col2 = st.columns(2)
+                            
+                            with col1:
+                                edit_name = st.text_input("📝 Name", value=selected_model.model_name)
+                                edit_version = st.text_input("📊 Version", value=selected_model.version)
+                                edit_revision = st.text_input("📋 Revision", value=selected_model.revision)
+                                edit_phase = st.text_input("⚙️ Phase", value=selected_model.project_phase)
+                            
+                            with col2:
+                                edit_workflow = st.text_input("🎯 Workflow Stage", value=selected_model.workflow_stage)
+                                edit_milestone = st.text_input("📅 Next Milestone", value=selected_model.next_milestone)
+                                edit_assigned = st.text_input("👤 Assigned To", value=selected_model.assigned_to)
+                                edit_description = st.text_area("📝 Description", value=selected_model.description)
+                            
+                            if st.form_submit_button("✏️ Update Model"):
+                                selected_model.model_name = edit_name
+                                selected_model.version = edit_version
+                                selected_model.revision = edit_revision
+                                selected_model.project_phase = edit_phase
+                                selected_model.workflow_stage = edit_workflow
+                                selected_model.next_milestone = edit_milestone
+                                selected_model.assigned_to = edit_assigned
+                                selected_model.description = edit_description
+                                selected_model.last_modified = datetime.now().strftime('%Y-%m-%d')
+                                
+                                st.success("✅ Model updated!")
+                                st.session_state.show_edit_model_form = False
+                                st.rerun()
+                else:
+                    st.info("No models available. Create some BIM models first.")
+            
+            with manage_tab2:
+                clashes_list = list(bim_manager.clashes.values())
+                if clashes_list:
+                    clash_options = [f"{c.clash_code} - {c.clash_name}" for c in clashes_list]
+                    selected_clash_index = st.selectbox("Select Clash to Manage", range(len(clash_options)), format_func=lambda x: clash_options[x])
+                    selected_clash = clashes_list[selected_clash_index]
+                    
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        if selected_clash.status != ClashStatus.RESOLVED and st.button("✅ Resolve Clash", use_container_width=True):
+                            resolution_notes = f"Resolved via coordination on {datetime.now().strftime('%Y-%m-%d')}"
+                            if bim_manager.resolve_clash(selected_clash.clash_id, resolution_notes):
+                                st.success("✅ Clash resolved!")
+                                st.rerun()
+                    
+                    with col2:
+                        if st.button("✏️ Edit Clash", use_container_width=True):
+                            st.session_state.show_edit_clash_form = True
+                    
+                    with col3:
+                        if st.button("🗑️ Delete Clash", use_container_width=True):
+                            if selected_clash.clash_id in bim_manager.clashes:
+                                del bim_manager.clashes[selected_clash.clash_id]
+                                st.success("✅ Clash deleted!")
+                                st.rerun()
+                else:
+                    st.info("No clashes available. Run clash detection first.")
+        
+        return
+        
+    except ImportError:
+        st.error("Enterprise BIM Management module not available")
+        st.info("🏗️ BIM Management with 3D model coordination and clash detection")
+
     # Initialize BIM data
     if "bim_models" not in st.session_state:
         st.session_state.bim_models = [

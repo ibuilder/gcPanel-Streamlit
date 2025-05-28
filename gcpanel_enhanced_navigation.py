@@ -1234,6 +1234,9 @@ def render_sidebar():
         if st.button("📈 Performance Snapshot", key="performance_snapshot", use_container_width=True):
             st.session_state.current_page = "performance_snapshot"
         
+        if st.button("🔗 System Integration", key="system_integration", use_container_width=True):
+            st.session_state.current_page = "system_integration"
+        
         if st.button("🤖 AI Assistant", key="ai_assistant", use_container_width=True):
             st.session_state.current_page = "ai_assistant"
         
@@ -1242,6 +1245,9 @@ def render_sidebar():
         
         if st.button("📖 Quick Start Guide", key="quick_start", use_container_width=True):
             st.session_state.current_page = "quick_start"
+        
+        if st.button("⚙️ Settings", key="settings", use_container_width=True):
+            st.session_state.current_page = "settings"
         
         # Logout Button
         st.markdown("<br><br>", unsafe_allow_html=True)

@@ -15849,6 +15849,8 @@ def main():
         render_performance_snapshot()
     elif page == "ai_assistant":
         render_ai_assistant()
+    elif page == "settings":
+        render_settings()
     elif page == "quick_start":
         render_quick_start()
     else:

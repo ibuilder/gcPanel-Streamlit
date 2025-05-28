@@ -9763,7 +9763,168 @@ def render_subcontractor_management():
                 st.rerun()
 
 def render_inspections():
-    """Inspections module"""
+    """Enterprise Inspections Management with robust Python backend"""
+    try:
+        from modules.inspections_backend import inspections_manager, InspectionStatus, InspectionType, DefectSeverity
+        
+        st.markdown("""
+        <div class="module-header">
+            <h1>🔍 Inspections Management</h1>
+            <p>Highland Tower Development - Comprehensive inspection tracking with compliance workflows</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Display summary metrics
+        metrics = inspections_manager.generate_inspection_metrics()
+        if metrics:
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("🔍 Total Inspections", metrics['total_inspections'])
+            with col2:
+                st.metric("✅ Pass Rate", f"{metrics['pass_rate']}%")
+            with col3:
+                st.metric("🚨 Critical Defects", metrics['critical_defects'])
+            with col4:
+                st.metric("⏳ Pending", metrics['pending_inspections'])
+        
+        # Create tabs
+        tab1, tab2, tab3 = st.tabs(["📋 All Inspections", "🚨 Defects", "📊 Analytics"])
+        
+        with tab1:
+            st.subheader("📋 All Inspections")
+            
+            # Display inspections
+            inspections = inspections_manager.get_all_inspections()
+            
+            for inspection in inspections:
+                status_color = {
+                    InspectionStatus.PASSED: "🟢",
+                    InspectionStatus.FAILED: "🔴",
+                    InspectionStatus.SCHEDULED: "🟡",
+                    InspectionStatus.IN_PROGRESS: "🔵",
+                    InspectionStatus.CONDITIONAL: "🟠"
+                }.get(inspection.status, "⚪")
+                
+                with st.expander(f"{status_color} {inspection.inspection_number} | {inspection.inspection_type.value} | {inspection.status.value}"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📍 Location:** {inspection.location}")
+                        st.write(f"**🏗️ Work Package:** {inspection.work_package}")
+                        st.write(f"**📅 Scheduled:** {inspection.scheduled_date} at {inspection.scheduled_time}")
+                        st.write(f"**👤 Inspector:** {inspection.inspector_name}")
+                        st.write(f"**🏢 Company:** {inspection.inspector_company}")
+                    
+                    with col2:
+                        st.write(f"**📋 Type:** {inspection.inspector_type.value}")
+                        st.write(f"**📄 Permit:** {inspection.permit_number or 'N/A'}")
+                        if inspection.actual_date:
+                            st.write(f"**✅ Completed:** {inspection.actual_date}")
+                        st.write(f"**🚨 Defects Found:** {len(inspection.defects_found)}")
+                        st.write(f"**📊 Result:** {inspection.overall_result}")
+                    
+                    if inspection.scope_description:
+                        st.write(f"**📝 Scope:** {inspection.scope_description}")
+                    
+                    # Show checklist items
+                    if inspection.checklist_items:
+                        st.write("**📋 Checklist Items:**")
+                        for item in inspection.checklist_items:
+                            status_icon = "✅" if item.status == "Pass" else "❌" if item.status == "Fail" else "➖"
+                            st.write(f"• {status_icon} {item.description} - {item.status}")
+                    
+                    # Show defects
+                    if inspection.defects_found:
+                        st.write("**🚨 Defects Found:**")
+                        for defect in inspection.defects_found:
+                            severity_color = {
+                                DefectSeverity.CRITICAL: "🔴",
+                                DefectSeverity.MAJOR: "🟠",
+                                DefectSeverity.MODERATE: "🟡",
+                                DefectSeverity.MINOR: "🟢"
+                            }.get(defect.severity, "⚪")
+                            
+                            resolve_status = "✅" if defect.is_resolved else "⏳"
+                            st.write(f"• {severity_color} {resolve_status} {defect.description} ({defect.severity.value})")
+                            st.write(f"  📍 {defect.location} | 👤 {defect.responsible_party} | ⏰ Due: {defect.due_date}")
+        
+        with tab2:
+            st.subheader("🚨 Defects Management")
+            
+            # Collect all defects
+            all_defects = []
+            for inspection in inspections:
+                for defect in inspection.defects_found:
+                    all_defects.append((inspection, defect))
+            
+            if all_defects:
+                st.write(f"**Total Defects:** {len(all_defects)}")
+                
+                for inspection, defect in all_defects:
+                    severity_color = {
+                        DefectSeverity.CRITICAL: "🔴",
+                        DefectSeverity.MAJOR: "🟠",
+                        DefectSeverity.MODERATE: "🟡",
+                        DefectSeverity.MINOR: "🟢"
+                    }.get(defect.severity, "⚪")
+                    
+                    resolve_status = "✅ Resolved" if defect.is_resolved else "⏳ Open"
+                    
+                    with st.expander(f"{severity_color} {defect.defect_id} | {defect.description} | {resolve_status}"):
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            st.write(f"**🔍 Inspection:** {inspection.inspection_number}")
+                            st.write(f"**📍 Location:** {defect.location}")
+                            st.write(f"**🚨 Severity:** {defect.severity.value}")
+                            st.write(f"**👤 Responsible:** {defect.responsible_party}")
+                        
+                        with col2:
+                            st.write(f"**📅 Due Date:** {defect.due_date}")
+                            st.write(f"**📋 Code Reference:** {defect.code_reference or 'N/A'}")
+                            if defect.resolved_date:
+                                st.write(f"**✅ Resolved:** {defect.resolved_date}")
+                        
+                        st.write(f"**⚡ Corrective Action:** {defect.corrective_action}")
+                        
+                        if defect.resolution_notes:
+                            st.write(f"**📝 Resolution Notes:** {defect.resolution_notes}")
+            else:
+                st.info("No defects found in current inspections")
+        
+        with tab3:
+            st.subheader("📊 Inspection Analytics")
+            
+            if metrics:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write("**📊 Status Breakdown:**")
+                    for status, count in metrics['status_breakdown'].items():
+                        st.write(f"• {status}: {count}")
+                    
+                    st.write("**📋 Type Breakdown:**")
+                    for insp_type, count in metrics['type_breakdown'].items():
+                        st.write(f"• {insp_type}: {count}")
+                
+                with col2:
+                    st.write("**📈 Performance Metrics:**")
+                    st.write(f"• **Pass Rate:** {metrics['pass_rate']}%")
+                    st.write(f"• **Total Defects:** {metrics['total_defects']}")
+                    st.write(f"• **Resolved Defects:** {metrics['resolved_defects']}")
+                    st.write(f"• **Resolution Rate:** {metrics['defect_resolution_rate']}%")
+                    st.write(f"• **Critical Defects:** {metrics['critical_defects']}")
+        
+        return
+        
+    except ImportError:
+        st.error("Enterprise Inspections module not available")
+        # Fallback to basic version
+        render_inspections_basic()
+
+def render_inspections_basic():
+    """Basic inspections module - fallback version"""
     st.markdown("""
     <div class="module-header">
         <h1>🔍 Inspections</h1>
@@ -10598,7 +10759,222 @@ def render_documents():
                 st.rerun()
 
 def render_unit_prices():
-    """Unit prices module"""
+    """Enterprise Unit Prices Management with robust Python backend"""
+    try:
+        from modules.unit_prices_backend import unit_prices_manager, PriceCategory, UnitType, PriceStatus
+        
+        st.markdown("""
+        <div class="module-header">
+            <h1>💰 Unit Prices Management</h1>
+            <p>Highland Tower Development - Comprehensive unit pricing and cost estimation system</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Display summary metrics
+        metrics = unit_prices_manager.generate_price_metrics()
+        if metrics:
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("💰 Total Unit Prices", metrics['total_unit_prices'])
+            with col2:
+                st.metric("✅ Active Prices", metrics['active_prices'])
+            with col3:
+                st.metric("🏢 Total Vendors", metrics['total_vendors'])
+            with col4:
+                st.metric("⭐ Avg Quality", f"{metrics['average_quality_rating']}/5")
+        
+        # Create tabs
+        tab1, tab2, tab3, tab4 = st.tabs(["💰 All Prices", "📊 By Category", "📈 Price Trends", "📋 Analytics"])
+        
+        with tab1:
+            st.subheader("💰 All Unit Prices")
+            
+            # Search functionality
+            search_term = st.text_input("🔍 Search prices by description or item code")
+            
+            if search_term:
+                prices = unit_prices_manager.search_prices(search_term)
+                st.write(f"Found {len(prices)} matching prices")
+            else:
+                prices = unit_prices_manager.get_all_unit_prices()
+            
+            # Display prices
+            for price in prices:
+                status_color = {
+                    PriceStatus.ACTIVE: "🟢",
+                    PriceStatus.PENDING_APPROVAL: "🟡",
+                    PriceStatus.INACTIVE: "🔴",
+                    PriceStatus.EXPIRED: "⚫"
+                }.get(price.status, "⚪")
+                
+                trend_icon = {
+                    "Increasing": "📈",
+                    "Decreasing": "📉", 
+                    "Stable": "➡️"
+                }.get(price.price_trend, "➡️")
+                
+                with st.expander(f"{status_color} {price.item_code} | {price.description} | ${price.total_price:.2f}/{price.unit_type.value}"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📋 Category:** {price.category.value}")
+                        st.write(f"**💰 Total Price:** ${price.total_price:.2f} per {price.unit_type.value}")
+                        st.write(f"**🏢 Vendor:** {price.vendor_name}")
+                        st.write(f"**📅 Effective:** {price.effective_date}")
+                        if price.expiration_date:
+                            st.write(f"**⏰ Expires:** {price.expiration_date}")
+                    
+                    with col2:
+                        st.write(f"**📊 Status:** {price.status.value}")
+                        st.write(f"**📈 Trend:** {trend_icon} {price.price_trend}")
+                        st.write(f"**⭐ Quality:** {price.quality_rating}/5")
+                        st.write(f"**🔧 Reliability:** {price.reliability_score}/5")
+                        st.write(f"**📞 Contact:** {price.vendor_contact}")
+                    
+                    # Price breakdown
+                    if price.labor_cost > 0 or price.material_cost > 0 or price.equipment_cost > 0:
+                        st.write("**💵 Price Breakdown:**")
+                        if price.labor_cost > 0:
+                            st.write(f"• Labor: ${price.labor_cost:.2f}")
+                        if price.material_cost > 0:
+                            st.write(f"• Material: ${price.material_cost:.2f}")
+                        if price.equipment_cost > 0:
+                            st.write(f"• Equipment: ${price.equipment_cost:.2f}")
+                        if price.overhead_percentage > 0:
+                            st.write(f"• Overhead: {price.overhead_percentage}%")
+                        if price.profit_percentage > 0:
+                            st.write(f"• Profit: {price.profit_percentage}%")
+                    
+                    if price.specification:
+                        st.write(f"**📝 Specification:** {price.specification}")
+                    
+                    if price.pricing_notes:
+                        st.write(f"**📋 Notes:** {price.pricing_notes}")
+                    
+                    # Price history
+                    if price.price_history:
+                        st.write("**📈 Price History:**")
+                        for history in price.price_history[-3:]:  # Show last 3 entries
+                            st.write(f"• {history.date}: ${history.price:.2f} - {history.notes}")
+        
+        with tab2:
+            st.subheader("📊 Prices by Category")
+            
+            # Category selector
+            selected_category = st.selectbox(
+                "Select Category",
+                options=[cat.value for cat in PriceCategory],
+                index=0
+            )
+            
+            category_enum = PriceCategory(selected_category)
+            category_prices = unit_prices_manager.get_prices_by_category(category_enum)
+            
+            st.write(f"**{selected_category} Prices:** {len(category_prices)} items")
+            
+            for price in category_prices:
+                status_color = {
+                    PriceStatus.ACTIVE: "🟢",
+                    PriceStatus.PENDING_APPROVAL: "🟡",
+                    PriceStatus.INACTIVE: "🔴",
+                    PriceStatus.EXPIRED: "⚫"
+                }.get(price.status, "⚪")
+                
+                col1, col2, col3 = st.columns([3, 2, 1])
+                
+                with col1:
+                    st.write(f"{status_color} **{price.description}**")
+                    st.write(f"*{price.vendor_name}*")
+                
+                with col2:
+                    st.write(f"**${price.total_price:.2f}**/{price.unit_type.value}")
+                    st.write(f"Quality: {price.quality_rating}/5")
+                
+                with col3:
+                    st.write(f"**{price.status.value}**")
+                    st.write(f"{price.price_trend}")
+        
+        with tab3:
+            st.subheader("📈 Price Trends Analysis")
+            
+            if metrics:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write("**📊 Price Trends:**")
+                    for trend, count in metrics['price_trends'].items():
+                        trend_icon = {
+                            "Increasing": "📈",
+                            "Decreasing": "📉",
+                            "Stable": "➡️"
+                        }.get(trend, "➡️")
+                        st.write(f"• {trend_icon} {trend}: {count} prices")
+                
+                with col2:
+                    st.write("**📋 Status Distribution:**")
+                    for status, count in metrics['status_breakdown'].items():
+                        status_color = {
+                            "Active": "🟢",
+                            "Pending Approval": "🟡",
+                            "Inactive": "🔴",
+                            "Expired": "⚫"
+                        }.get(status, "⚪")
+                        st.write(f"• {status_color} {status}: {count}")
+            
+            # Show price trends for key items
+            st.write("**📈 Key Price Movements:**")
+            
+            increasing_prices = [p for p in unit_prices_manager.get_all_unit_prices() if p.price_trend == "Increasing"]
+            if increasing_prices:
+                st.write("**📈 Increasing Prices:**")
+                for price in increasing_prices[:5]:  # Show top 5
+                    st.write(f"• {price.description} - ${price.total_price:.2f}/{price.unit_type.value}")
+            
+            decreasing_prices = [p for p in unit_prices_manager.get_all_unit_prices() if p.price_trend == "Decreasing"]
+            if decreasing_prices:
+                st.write("**📉 Decreasing Prices:**")
+                for price in decreasing_prices[:5]:  # Show top 5
+                    st.write(f"• {price.description} - ${price.total_price:.2f}/{price.unit_type.value}")
+        
+        with tab4:
+            st.subheader("📋 Unit Prices Analytics")
+            
+            if metrics:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write("**📊 Category Breakdown:**")
+                    for category, count in metrics['category_breakdown'].items():
+                        st.write(f"• {category}: {count}")
+                    
+                    st.write("**📈 Performance Metrics:**")
+                    st.write(f"• **Average Quality Rating:** {metrics['average_quality_rating']}/5")
+                    st.write(f"• **Average Reliability Score:** {metrics['average_reliability_score']}/5")
+                
+                with col2:
+                    st.write("**🏢 Vendor Analysis:**")
+                    st.write(f"• **Total Vendors:** {metrics['total_vendors']}")
+                    
+                    # Top vendors by number of items
+                    vendor_counts = {}
+                    for price in unit_prices_manager.get_all_unit_prices():
+                        vendor_counts[price.vendor_name] = vendor_counts.get(price.vendor_name, 0) + 1
+                    
+                    sorted_vendors = sorted(vendor_counts.items(), key=lambda x: x[1], reverse=True)
+                    st.write("**Top Vendors:**")
+                    for vendor, count in sorted_vendors[:5]:
+                        st.write(f"• {vendor}: {count} items")
+        
+        return
+        
+    except ImportError:
+        st.error("Enterprise Unit Prices module not available")
+        # Fallback to basic version
+        render_unit_prices_basic()
+
+def render_unit_prices_basic():
+    """Basic unit prices module - fallback version"""
     st.markdown("""
     <div class="module-header">
         <h1>💲 Unit Prices</h1>

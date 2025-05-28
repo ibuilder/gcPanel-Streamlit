@@ -1225,6 +1225,9 @@ def render_sidebar():
         if st.button("💲 Unit Prices", key="unit_prices", use_container_width=True):
             st.session_state.current_page = "unit_prices"
         
+        if st.button("💳 AIA G702/G703 Billing", key="aia_billing", use_container_width=True):
+            st.session_state.current_page = "aia_billing"
+        
         # Analytics & AI Section
         st.markdown('<div class="section-header">🤖 Analytics & AI</div>', unsafe_allow_html=True)
         
@@ -15443,6 +15446,22 @@ def render_settings():
         
         if st.button("🔒 Save Security Settings", use_container_width=True):
             st.success("✅ Security settings saved successfully!")
+
+def render_aia_billing():
+    """Highland Tower Development - AIA G702/G703 Billing System"""
+    try:
+        from modules.aia_billing_system import render_aia_billing_system
+        render_aia_billing_system()
+    except ImportError:
+        st.error("AIA Billing module not available")
+
+def render_system_integration():
+    """Highland Tower Development - System Integration Dashboard"""
+    try:
+        from modules.highland_system_integration import render_highland_system_integration
+        render_highland_system_integration()
+    except ImportError:
+        st.error("System Integration module not available")
 
 def render_integrations():
     """Enterprise Integrations and API Management"""

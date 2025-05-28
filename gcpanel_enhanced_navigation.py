@@ -2383,6 +2383,8 @@ def render_safety():
                     type_df['Count'] = type_df['Count'].astype(int)
                     fig_types = px.pie(type_df, values='Count', names='Type', title="Incident Types Distribution")
                     st.plotly_chart(fig_types, use_container_width=True)
+                else:
+                    st.info("No incident type data available for visualization")
                 
                 # Severity Distribution
                 severity_counts = {}
@@ -4765,13 +4767,18 @@ def render_contracts():
                 st.rerun()
 
 def render_cost_management():
-    """Enterprise Cost Management with robust Python backend"""
+    """Enterprise Cost Management with full CRUD functionality"""
     try:
-        from modules.cost_management_ui import render_cost_management_enterprise
-        render_cost_management_enterprise()
+        from modules.highland_cost_management_full import render_highland_cost_management
+        render_highland_cost_management()
         return
     except ImportError:
-        st.error("Enterprise Cost Management module not available")
+        try:
+            from modules.cost_management_ui import render_cost_management_enterprise
+            render_cost_management_enterprise()
+            return
+        except ImportError:
+            st.error("Enterprise Cost Management module not available")
     
     # Fallback to basic version
     render_cost_management_basic()
@@ -6541,12 +6548,15 @@ def render_closeout():
                     due_date = st.date_input("📅 Due Date*")
                     priority = st.selectbox("📊 Priority*", options=["Critical", "High", "Medium", "Low"])
                 
+                description = st.text_area("📝 Description", placeholder="Document description and requirements")
+                warranty_period = st.text_input("🛡️ Warranty Period (optional)", placeholder="e.g., 1 Year, 2 Years")
+                
                 if st.form_submit_button("📄 Create Document"):
                     if title and document_type and discipline and responsible_party:
                         doc_data = {
                             "title": title,
                             "document_type": document_type,
-                            "description": f"Closeout document for {discipline}",
+                            "description": description or f"Closeout document for {discipline}",
                             "discipline": discipline,
                             "trade": discipline,
                             "system": f"{discipline} Systems",
@@ -6560,13 +6570,15 @@ def render_closeout():
                             "responsible_party": responsible_party,
                             "submitted_by": "Current User",
                             "due_date": due_date.strftime('%Y-%m-%d'),
-                            "warranty_period": None,
+                            "warranty_period": warranty_period if warranty_period else None,
                             "warranty_start_date": None,
                             "warranty_end_date": None
                         }
                         document_id = closeout_manager.create_closeout_document(doc_data)
                         st.success(f"✅ Document created! ID: {document_id}")
                         st.rerun()
+                    else:
+                        st.error("❌ Please fill in all required fields!")
         
         with tab4:
             st.subheader("⚙️ Manage Closeout Items")

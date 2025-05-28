@@ -10101,7 +10101,7 @@ def render_issues_risks():
         """, unsafe_allow_html=True)
         
         # Create tabs for Issues and Risks
-        tab1, tab2, tab3 = st.tabs(["📋 Issues", "⚠️ Risks", "📊 Analytics"])
+        tab1, tab2, tab3, tab4 = st.tabs(["📋 Issues", "⚠️ Risks", "➕ Create New", "📊 Analytics"])
         
         with tab1:
             st.subheader("📋 Project Issues")
@@ -10214,6 +10214,131 @@ def render_issues_risks():
                             st.write(f"• {sign}")
         
         with tab3:
+            st.subheader("➕ Create New Issue or Risk")
+            
+            # Create sub-tabs for Issues and Risks creation
+            create_tab1, create_tab2 = st.tabs(["📋 New Issue", "⚠️ New Risk"])
+            
+            with create_tab1:
+                st.write("**Create New Issue**")
+                
+                with st.form("create_issue_form"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        issue_title = st.text_input("📝 Issue Title*", placeholder="Enter issue title")
+                        issue_description = st.text_area("📋 Description*", placeholder="Detailed description of the issue")
+                        issue_type = st.selectbox("📋 Issue Type*", options=["Technical Issue", "Schedule Issue", "Quality Issue", "Safety Issue", "Coordination Issue", "Resource Issue", "External Issue"])
+                        priority = st.selectbox("🚨 Priority*", options=["Low", "Medium", "High", "Critical"])
+                    
+                    with col2:
+                        location = st.text_input("📍 Location*", placeholder="e.g., Level 12 - Mechanical Room")
+                        work_package = st.text_input("📦 Work Package*", value="Highland Tower Development")
+                        reported_by = st.text_input("👤 Reported By*", value="John Smith - Project Manager")
+                        assigned_to = st.text_input("👥 Assigned To*", placeholder="Person responsible for resolution")
+                    
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        due_date = st.date_input("📅 Due Date*")
+                        cost_impact = st.number_input("💰 Cost Impact ($)", min_value=0.0, step=100.0)
+                    
+                    with col2:
+                        schedule_impact = st.number_input("📆 Schedule Impact (days)", min_value=0, step=1)
+                        impact_description = st.text_area("📝 Impact Description", placeholder="Describe the impact")
+                    
+                    submit_issue = st.form_submit_button("🆕 Create Issue", use_container_width=True)
+                    
+                    if submit_issue:
+                        if not issue_title or not issue_description or not issue_type or not location:
+                            st.error("Please fill in all required fields marked with *")
+                        else:
+                            issue_data = {
+                                "title": issue_title,
+                                "description": issue_description,
+                                "issue_type": issue_type,
+                                "priority": priority,
+                                "project_name": "Highland Tower Development",
+                                "location": location,
+                                "work_package": work_package,
+                                "reported_by": reported_by,
+                                "assigned_to": assigned_to,
+                                "reported_date": datetime.now().strftime('%Y-%m-%d'),
+                                "due_date": due_date.strftime('%Y-%m-%d'),
+                                "resolved_date": None,
+                                "cost_impact": cost_impact,
+                                "schedule_impact_days": schedule_impact,
+                                "description_impact": impact_description,
+                                "resolution_description": ""
+                            }
+                            
+                            issue_id = issues_risks_manager.create_issue(issue_data)
+                            st.success(f"✅ Issue created successfully! ID: {issue_id}")
+                            st.rerun()
+            
+            with create_tab2:
+                st.write("**Create New Risk**")
+                
+                with st.form("create_risk_form"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        risk_title = st.text_input("📝 Risk Title*", placeholder="Enter risk title")
+                        risk_description = st.text_area("📋 Description*", placeholder="Detailed description of the risk")
+                        risk_type = st.selectbox("⚠️ Risk Type*", options=["Schedule Risk", "Cost Risk", "Quality Risk", "Safety Risk", "Technical Risk", "Regulatory Risk", "Weather Risk", "Supply Chain Risk"])
+                        probability = st.selectbox("📊 Probability*", options=["Very Low (10%)", "Low (25%)", "Medium (50%)", "High (75%)", "Very High (90%)"])
+                    
+                    with col2:
+                        impact = st.selectbox("💥 Impact*", options=["Minimal", "Minor", "Moderate", "Major", "Severe"])
+                        risk_priority = st.selectbox("🚨 Priority*", options=["Low", "Medium", "High", "Critical"])
+                        category = st.text_input("📂 Category*", placeholder="e.g., External Factors")
+                        triggers = st.text_area("🎯 Triggers", placeholder="What could trigger this risk?")
+                    
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        risk_owner = st.text_input("👤 Risk Owner*", placeholder="Person responsible for monitoring")
+                        response_strategy = st.selectbox("🎯 Response Strategy*", options=["Avoid", "Mitigate", "Transfer", "Accept"])
+                    
+                    with col2:
+                        potential_cost = st.number_input("💰 Potential Cost Impact ($)", min_value=0.0, step=1000.0)
+                        potential_schedule = st.number_input("📆 Potential Schedule Impact (days)", min_value=0, step=1)
+                    
+                    contingency_plan = st.text_area("📋 Contingency Plan", placeholder="What will you do if this risk occurs?")
+                    
+                    submit_risk = st.form_submit_button("🆕 Create Risk", use_container_width=True)
+                    
+                    if submit_risk:
+                        if not risk_title or not risk_description or not risk_type or not risk_owner:
+                            st.error("Please fill in all required fields marked with *")
+                        else:
+                            risk_data = {
+                                "title": risk_title,
+                                "description": risk_description,
+                                "risk_type": risk_type,
+                                "probability": probability,
+                                "impact": impact,
+                                "priority": risk_priority,
+                                "project_name": "Highland Tower Development",
+                                "category": category,
+                                "triggers": triggers,
+                                "identified_by": "Current User",
+                                "risk_owner": risk_owner,
+                                "identified_date": datetime.now().strftime('%Y-%m-%d'),
+                                "review_date": datetime.now().strftime('%Y-%m-%d'),
+                                "last_updated": datetime.now().strftime('%Y-%m-%d'),
+                                "potential_cost_impact": potential_cost,
+                                "potential_schedule_impact": potential_schedule,
+                                "likelihood_percentage": 50,  # Default
+                                "response_strategy": response_strategy,
+                                "contingency_plan": contingency_plan,
+                                "early_warning_signs": [],
+                                "monitoring_frequency": "Monthly"
+                            }
+                            
+                            risk_id = issues_risks_manager.create_risk(risk_data)
+                            st.success(f"✅ Risk created successfully! ID: {risk_id}")
+                            st.rerun()
+        
+        with tab4:
             st.subheader("📊 Issues & Risks Analytics")
             
             col1, col2 = st.columns(2)
@@ -10940,7 +11065,7 @@ def render_unit_prices():
                 st.metric("⭐ Avg Quality", f"{metrics['average_quality_rating']}/5")
         
         # Create tabs
-        tab1, tab2, tab3, tab4 = st.tabs(["💰 All Prices", "📊 By Category", "📈 Price Trends", "📋 Analytics"])
+        tab1, tab2, tab3, tab4 = st.tabs(["💰 All Prices", "➕ Create New", "✏️ Edit", "📊 Analytics"])
         
         with tab1:
             st.subheader("💰 All Unit Prices")
@@ -11014,7 +11139,156 @@ def render_unit_prices():
                             st.write(f"• {history.date}: ${history.price:.2f} - {history.notes}")
         
         with tab2:
-            st.subheader("📊 Prices by Category")
+            st.subheader("➕ Create New Unit Price")
+            
+            with st.form("create_unit_price_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    item_code = st.text_input("📝 Item Code*", placeholder="e.g., CONC-4000-CY")
+                    description = st.text_input("📋 Description*", placeholder="Enter detailed description")
+                    category = st.selectbox("📂 Category*", options=["Labor", "Material", "Equipment", "Subcontractor", "Overhead"])
+                    unit_type = st.selectbox("📏 Unit Type*", options=["SF", "LF", "CY", "EA", "LS", "HR", "TON", "GAL"])
+                    base_price = st.number_input("💰 Base Price*", min_value=0.01, step=0.01)
+                
+                with col2:
+                    vendor_name = st.text_input("🏢 Vendor Name*", placeholder="Enter vendor name")
+                    vendor_contact = st.text_input("📞 Vendor Contact", placeholder="Contact information")
+                    effective_date = st.date_input("📅 Effective Date*")
+                    expiration_date = st.date_input("⏰ Expiration Date")
+                    price_source = st.selectbox("📊 Price Source*", options=["Vendor Quote", "Historical Data", "Market Analysis", "Subcontractor Bid", "Catalog Price"])
+                
+                # Cost breakdown
+                st.write("**💵 Cost Breakdown**")
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    labor_cost = st.number_input("👥 Labor Cost", min_value=0.0, step=0.01)
+                    material_cost = st.number_input("🧱 Material Cost", min_value=0.0, step=0.01)
+                
+                with col2:
+                    equipment_cost = st.number_input("🚜 Equipment Cost", min_value=0.0, step=0.01)
+                    overhead_percentage = st.number_input("📊 Overhead %", min_value=0.0, max_value=100.0, step=0.1)
+                
+                with col3:
+                    profit_percentage = st.number_input("💹 Profit %", min_value=0.0, max_value=100.0, step=0.1)
+                    quality_rating = st.number_input("⭐ Quality Rating", min_value=1.0, max_value=5.0, step=0.1, value=4.0)
+                
+                # Additional details
+                col1, col2 = st.columns(2)
+                with col1:
+                    specification = st.text_area("📝 Specification", placeholder="Technical specifications")
+                    minimum_quantity = st.number_input("📦 Minimum Quantity", min_value=1, step=1, value=1)
+                
+                with col2:
+                    pricing_notes = st.text_area("📋 Pricing Notes", placeholder="Additional notes")
+                    delivery_time_days = st.number_input("🚚 Delivery Time (days)", min_value=0, step=1, value=7)
+                
+                submit_price = st.form_submit_button("🆕 Create Unit Price", use_container_width=True)
+                
+                if submit_price:
+                    if not item_code or not description or not category or not vendor_name:
+                        st.error("Please fill in all required fields marked with *")
+                    else:
+                        price_data = {
+                            "item_code": item_code,
+                            "description": description,
+                            "category": category,
+                            "unit_type": unit_type,
+                            "base_price": base_price,
+                            "labor_cost": labor_cost,
+                            "material_cost": material_cost,
+                            "equipment_cost": equipment_cost,
+                            "overhead_percentage": overhead_percentage,
+                            "profit_percentage": profit_percentage,
+                            "specification": specification,
+                            "vendor_name": vendor_name,
+                            "vendor_contact": vendor_contact,
+                            "effective_date": effective_date.strftime('%Y-%m-%d'),
+                            "expiration_date": expiration_date.strftime('%Y-%m-%d') if expiration_date else None,
+                            "price_source": price_source,
+                            "location_factor": 1.0,
+                            "minimum_quantity": minimum_quantity,
+                            "delivery_time_days": delivery_time_days,
+                            "payment_terms": "Net 30",
+                            "quality_rating": quality_rating,
+                            "reliability_score": 4.0,
+                            "past_performance": "New vendor",
+                            "price_history": [],
+                            "last_updated": datetime.now().strftime('%Y-%m-%d'),
+                            "price_trend": "Stable",
+                            "project_name": "Highland Tower Development",
+                            "work_package": "General",
+                            "pricing_notes": pricing_notes,
+                            "special_conditions": "",
+                            "created_by": "Current User"
+                        }
+                        
+                        price_id = unit_prices_manager.create_unit_price(price_data)
+                        st.success(f"✅ Unit price created successfully! ID: {price_id}")
+                        st.rerun()
+        
+        with tab3:
+            st.subheader("✏️ Edit Unit Price")
+            
+            # Select price to edit
+            prices = unit_prices_manager.get_all_unit_prices()
+            if prices:
+                price_options = [f"{p.item_code} - {p.description}" for p in prices]
+                selected_price_index = st.selectbox("Select Unit Price to Edit", range(len(price_options)), format_func=lambda x: price_options[x])
+                selected_price = prices[selected_price_index]
+                
+                with st.form("edit_unit_price_form"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        edit_description = st.text_input("📋 Description*", value=selected_price.description)
+                        edit_base_price = st.number_input("💰 Base Price*", value=float(selected_price.base_price), min_value=0.01, step=0.01)
+                        edit_vendor_name = st.text_input("🏢 Vendor Name*", value=selected_price.vendor_name)
+                        edit_quality_rating = st.number_input("⭐ Quality Rating", value=float(selected_price.quality_rating), min_value=1.0, max_value=5.0, step=0.1)
+                    
+                    with col2:
+                        edit_vendor_contact = st.text_input("📞 Vendor Contact", value=selected_price.vendor_contact)
+                        edit_overhead = st.number_input("📊 Overhead %", value=float(selected_price.overhead_percentage), min_value=0.0, max_value=100.0, step=0.1)
+                        edit_profit = st.number_input("💹 Profit %", value=float(selected_price.profit_percentage), min_value=0.0, max_value=100.0, step=0.1)
+                        edit_notes = st.text_area("📋 Pricing Notes", value=selected_price.pricing_notes)
+                    
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        update_price = st.form_submit_button("✏️ Update Price", use_container_width=True)
+                    
+                    with col2:
+                        if st.form_submit_button("🗑️ Delete Price", use_container_width=True):
+                            if selected_price.price_id in unit_prices_manager.unit_prices:
+                                del unit_prices_manager.unit_prices[selected_price.price_id]
+                                st.success("✅ Unit price deleted successfully!")
+                                st.rerun()
+                    
+                    with col3:
+                        if st.form_submit_button("💰 Update Total Price", use_container_width=True):
+                            new_total = st.number_input("New Total Price", min_value=0.01, step=0.01)
+                            if unit_prices_manager.update_price(selected_price.price_id, new_total, "Manual price update"):
+                                st.success("✅ Price updated successfully!")
+                                st.rerun()
+                    
+                    if update_price:
+                        # Update the selected price
+                        selected_price.description = edit_description
+                        selected_price.base_price = edit_base_price
+                        selected_price.vendor_name = edit_vendor_name
+                        selected_price.vendor_contact = edit_vendor_contact
+                        selected_price.overhead_percentage = edit_overhead
+                        selected_price.profit_percentage = edit_profit
+                        selected_price.quality_rating = edit_quality_rating
+                        selected_price.pricing_notes = edit_notes
+                        selected_price.total_price = selected_price.calculate_total_price()
+                        selected_price.updated_at = datetime.now().isoformat()
+                        
+                        st.success("✅ Unit price updated successfully!")
+                        st.rerun()
+            else:
+                st.info("No unit prices available to edit. Create some prices first.")
             
             # Category selector
             selected_category = st.selectbox(

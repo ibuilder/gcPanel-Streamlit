@@ -2378,9 +2378,11 @@ def render_safety():
                     inc_type = incident['type']
                     type_counts[inc_type] = type_counts.get(inc_type, 0) + 1
                 
-                type_df = pd.DataFrame(list(type_counts.items()), columns=['Type', 'Count'])
-                fig_types = px.pie(type_df, values='Count', names='Type', title="Incident Types Distribution")
-                st.plotly_chart(fig_types, use_container_width=True)
+                if type_counts:
+                    type_df = pd.DataFrame(list(type_counts.items()), columns=['Type', 'Count'])
+                    type_df['Count'] = type_df['Count'].astype(int)
+                    fig_types = px.pie(type_df, values='Count', names='Type', title="Incident Types Distribution")
+                    st.plotly_chart(fig_types, use_container_width=True)
                 
                 # Severity Distribution
                 severity_counts = {}
@@ -2388,9 +2390,13 @@ def render_safety():
                     severity = incident['severity']
                     severity_counts[severity] = severity_counts.get(severity, 0) + 1
                 
-                severity_df = pd.DataFrame(list(severity_counts.items()), columns=['Severity', 'Count'])
-                fig_severity = px.bar(severity_df, x='Severity', y='Count', title="Incident Severity Distribution")
-                st.plotly_chart(fig_severity, use_container_width=True)
+                if severity_counts:
+                    severity_df = pd.DataFrame(list(severity_counts.items()), columns=['Severity', 'Count'])
+                    severity_df['Count'] = severity_df['Count'].astype(int)
+                    fig_severity = px.bar(severity_df, x='Severity', y='Count', title="Incident Severity Distribution")
+                    st.plotly_chart(fig_severity, use_container_width=True)
+                else:
+                    st.info("No severity data available for visualization")
             
             with col2:
                 # Monthly Trends (simulated data)
@@ -14456,7 +14462,7 @@ def render_analytics():
                                 "file_path": None,
                                 "file_format": file_format,
                                 "automated": automated,
-                                "next_generation": next_generation.strftime('%Y-%m-%d') if automated else None,
+                                "next_generation": next_generation.strftime('%Y-%m-%d') if automated and next_generation else None,
                                 "notes": notes,
                                 "parameters": params
                             }

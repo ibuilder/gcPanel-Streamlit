@@ -15849,6 +15849,9 @@ def main():
         render_performance_snapshot()
     elif page == "ai_assistant":
         render_ai_assistant()
+    elif page == "integrations":
+        from modules.highland_integrations import render_highland_integrations
+        render_highland_integrations()
     elif page == "settings":
         render_settings()
     elif page == "quick_start":

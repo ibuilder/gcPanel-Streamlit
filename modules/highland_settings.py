@@ -23,11 +23,12 @@ def render_highland_settings():
     initialize_highland_settings()
     
     # Main settings tabs
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "🏗️ Project Configuration",
         "📋 Module Controls", 
         "👥 User Management",
-        "🔗 Integration Settings",
+        "🔗 System Integrations",
+        "📊 Advanced Features",
         "🎨 Display Preferences"
     ])
     
@@ -41,13 +42,116 @@ def render_highland_settings():
         render_user_management()
     
     with tab4:
-        render_integration_settings()
+        render_system_integrations()
     
     with tab5:
+        render_advanced_features()
+    
+    with tab6:
         render_display_preferences()
 
 def initialize_highland_settings():
     """Initialize Highland Tower Development settings data"""
+    
+    # Initialize integration settings
+    if "highland_integrations" not in st.session_state:
+        st.session_state.highland_integrations = [
+            {
+                "integration_id": "INT-001",
+                "name": "3D BIM Viewer",
+                "type": "Advanced Feature",
+                "status": "✅ Active",
+                "description": "Interactive 3D model visualization with clash detection",
+                "dependencies": ["Three.js", "Web-GL"],
+                "last_sync": "2024-05-28 14:30:00",
+                "sync_frequency": "Real-time",
+                "data_sources": ["BIM Models", "Clash Detection", "Progress Tracking"],
+                "enabled": True
+            },
+            {
+                "integration_id": "INT-002", 
+                "name": "PDF Document Viewer",
+                "type": "Advanced Feature",
+                "status": "✅ Active",
+                "description": "Professional drawing markup and annotation system",
+                "dependencies": ["PDF.js", "Canvas API"],
+                "last_sync": "2024-05-28 13:45:00",
+                "sync_frequency": "Real-time",
+                "data_sources": ["Document Management", "Drawing Sets", "Markups"],
+                "enabled": True
+            },
+            {
+                "integration_id": "INT-003",
+                "name": "Report Generation Center", 
+                "type": "Advanced Feature",
+                "status": "✅ Active",
+                "description": "Executive reporting with automated distribution",
+                "dependencies": ["ReportLab", "OpenPyXL", "Plotly"],
+                "last_sync": "2024-05-28 15:00:00",
+                "sync_frequency": "Scheduled",
+                "data_sources": ["All Modules", "Analytics", "Performance Metrics"],
+                "enabled": True
+            },
+            {
+                "integration_id": "INT-004",
+                "name": "Mobile Field Operations",
+                "type": "Advanced Feature", 
+                "status": "✅ Active",
+                "description": "Touch-optimized interfaces for field crews",
+                "dependencies": ["Responsive CSS", "GPS API", "Camera API"],
+                "last_sync": "2024-05-28 14:15:00",
+                "sync_frequency": "Real-time",
+                "data_sources": ["Daily Reports", "Safety", "Progress Photos"],
+                "enabled": True
+            },
+            {
+                "integration_id": "INT-005",
+                "name": "Highland Tower Core Relations",
+                "type": "System Integration",
+                "status": "✅ Active",
+                "description": "Python relational framework connecting all modules",
+                "dependencies": ["Core Framework", "Session State"],
+                "last_sync": "2024-05-28 15:30:00",
+                "sync_frequency": "Continuous",
+                "data_sources": ["All 25 Modules", "Highland Tower Data"],
+                "enabled": True
+            }
+        ]
+    
+    # Initialize advanced features
+    if "highland_advanced_features" not in st.session_state:
+        st.session_state.highland_advanced_features = [
+            {
+                "feature_id": "ADV-001",
+                "name": "AIA G702/G703 Professional Billing",
+                "category": "Financial",
+                "status": "✅ Operational",
+                "usage_count": 45,
+                "last_used": "2024-05-28",
+                "performance": "Excellent",
+                "integration_level": "Deep"
+            },
+            {
+                "feature_id": "ADV-002",
+                "name": "Real-time Cost Synchronization", 
+                "category": "Cost Management",
+                "status": "✅ Operational",
+                "usage_count": 234,
+                "last_used": "2024-05-28",
+                "performance": "Excellent", 
+                "integration_level": "Deep"
+            },
+            {
+                "feature_id": "ADV-003",
+                "name": "Highland Tower Data Framework",
+                "category": "Data Integration",
+                "status": "✅ Operational",
+                "usage_count": 1250,
+                "last_used": "2024-05-28",
+                "performance": "Excellent",
+                "integration_level": "Core"
+            }
+        ]
     
     # Project Configuration
     if "highland_project_config" not in st.session_state:

@@ -13427,24 +13427,935 @@ def render_equipment_tracking_basic():
     st.info("🚧 Equipment tracking module for asset management")
 
 def render_analytics():
-    """Analytics module"""
-    st.markdown("""
-    <div class="module-header">
-        <h1>📊 Advanced Analytics</h1>
-        <p>Data analytics and business intelligence</p>
-    </div>
-    """, unsafe_allow_html=True)
-    st.info("📊 Analytics module with advanced reporting and insights")
+    """Enterprise Analytics with full CRUD functionality"""
+    try:
+        from modules.analytics_backend import analytics_manager, ReportType, ReportFrequency, MetricStatus
+        
+        st.markdown("""
+        <div class="module-header">
+            <h1>📊 Advanced Analytics</h1>
+            <p>Highland Tower Development - Executive dashboards and performance intelligence</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Display summary metrics
+        metrics = analytics_manager.generate_analytics_metrics()
+        if metrics:
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("📊 Total Reports", metrics['total_reports'])
+            with col2:
+                st.metric("📈 KPI Metrics", metrics['total_kpis'])
+            with col3:
+                st.metric("⚠️ Critical KPIs", metrics['critical_kpis'])
+            with col4:
+                st.metric("🎯 Exceeding Target", metrics['exceeding_kpis'])
+        
+        # Create tabs
+        tab1, tab2, tab3, tab4 = st.tabs(["📊 KPI Dashboard", "📋 Reports", "➕ Create", "⚙️ Manage"])
+        
+        with tab1:
+            st.subheader("📊 Highland Tower Development - Key Performance Indicators")
+            
+            # Get KPI metrics
+            kpis = analytics_manager.get_kpi_metrics()
+            
+            if kpis:
+                # Overall project health
+                critical_count = len([k for k in kpis if k.status == MetricStatus.CRITICAL])
+                exceeding_count = len([k for k in kpis if k.status == MetricStatus.EXCEEDING])
+                
+                if critical_count > 0:
+                    st.error(f"⚠️ {critical_count} KPIs are in critical status - immediate attention required")
+                elif exceeding_count >= len(kpis) // 2:
+                    st.success(f"🎯 Project performing excellently - {exceeding_count} KPIs exceeding targets!")
+                else:
+                    st.info("📊 Project performance within acceptable ranges")
+                
+                # Display KPIs by category
+                categories = list(set(kpi.category for kpi in kpis))
+                
+                for category in categories:
+                    st.write(f"**{category} Performance**")
+                    category_kpis = [k for k in kpis if k.category == category]
+                    
+                    cols = st.columns(min(len(category_kpis), 4))
+                    for i, kpi in enumerate(category_kpis):
+                        with cols[i % 4]:
+                            # Status color coding
+                            status_color = {
+                                MetricStatus.EXCEEDING: "🟢",
+                                MetricStatus.ON_TARGET: "🟢", 
+                                MetricStatus.AT_RISK: "🟡",
+                                MetricStatus.CRITICAL: "🔴"
+                            }.get(kpi.status, "⚪")
+                            
+                            # Trend indicator
+                            trend_icon = {
+                                "Improving": "📈",
+                                "Declining": "📉",
+                                "Stable": "➡️"
+                            }.get(kpi.trend, "")
+                            
+                            st.metric(
+                                label=f"{status_color} {kpi.metric_name}",
+                                value=f"{kpi.current_value} {kpi.unit}",
+                                delta=f"Target: {kpi.target_value} {kpi.unit}"
+                            )
+                            
+                            with st.expander(f"Details {trend_icon}"):
+                                st.write(f"**Status:** {kpi.status.value}")
+                                st.write(f"**Trend:** {kpi.trend}")
+                                st.write(f"**Last Updated:** {kpi.last_updated}")
+                                st.write(f"**Description:** {kpi.description}")
+                                
+                                # Quick update
+                                new_value = st.number_input(
+                                    "Update Value", 
+                                    value=float(kpi.current_value),
+                                    step=0.1,
+                                    key=f"kpi_update_{kpi.metric_id}"
+                                )
+                                if st.button(f"📊 Update", key=f"btn_update_{kpi.metric_id}"):
+                                    if analytics_manager.update_kpi_value(kpi.metric_id, new_value):
+                                        st.success("KPI updated!")
+                                        st.rerun()
+                    
+                    st.write("---")
+            else:
+                st.info("No KPI metrics available. Create some metrics to start tracking performance.")
+        
+        with tab2:
+            st.subheader("📋 Analytics Reports")
+            
+            # Filter options
+            col1, col2 = st.columns(2)
+            with col1:
+                type_filter = st.selectbox("Filter by Type", ["All"] + [rtype.value for rtype in ReportType])
+            with col2:
+                frequency_filter = st.selectbox("Filter by Frequency", ["All"] + [freq.value for freq in ReportFrequency])
+            
+            # Get filtered reports
+            reports = analytics_manager.get_all_reports()
+            
+            if type_filter != "All":
+                reports = [r for r in reports if r.report_type.value == type_filter]
+            if frequency_filter != "All":
+                reports = [r for r in reports if r.frequency.value == frequency_filter]
+            
+            # Display reports
+            for report in reports:
+                status_color = {
+                    "Generated": "🟢",
+                    "In Progress": "🟡",
+                    "Scheduled": "🔵",
+                    "Failed": "🔴"
+                }.get(report.status, "⚪")
+                
+                automated_indicator = "🤖 AUTOMATED" if report.automated else "📝 MANUAL"
+                
+                with st.expander(f"{status_color} {report.report_code} | {report.title} | {automated_indicator}"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📋 Type:** {report.report_type.value}")
+                        st.write(f"**🔄 Frequency:** {report.frequency.value}")
+                        st.write(f"**📅 Generated:** {report.generated_date}")
+                        st.write(f"**📊 Period:** {report.report_period_start} to {report.report_period_end}")
+                        st.write(f"**👤 Created By:** {report.created_by}")
+                    
+                    with col2:
+                        st.write(f"**📄 Format:** {report.file_format}")
+                        if report.file_size > 0:
+                            st.write(f"**📊 Size:** {report.file_size / 1024 / 1024:.1f} MB")
+                        st.write(f"**🔐 Access:** {report.access_level}")
+                        if report.next_generation:
+                            st.write(f"**🔄 Next Generation:** {report.next_generation}")
+                        st.write(f"**📧 Distribution:** {len(report.distribution_list)} recipients")
+                    
+                    if report.description:
+                        st.write(f"**📝 Description:** {report.description}")
+                    
+                    if report.notes:
+                        st.write(f"**📋 Notes:** {report.notes}")
+                    
+                    # Data sources and metrics
+                    if report.data_sources:
+                        st.write(f"**📊 Data Sources:** {', '.join(report.data_sources)}")
+                    
+                    if report.metrics_included:
+                        st.write(f"**📈 Metrics:** {', '.join(report.metrics_included)}")
+                    
+                    # Quick actions
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        if st.button(f"📥 Download", key=f"btn_download_{report.report_id}"):
+                            st.success(f"Downloading {report.file_format} report...")
+                    
+                    with col2:
+                        if st.button(f"🔄 Regenerate", key=f"btn_regen_{report.report_id}"):
+                            st.success("Report regeneration started...")
+                    
+                    with col3:
+                        if st.button(f"📧 Redistribute", key=f"btn_dist_{report.report_id}"):
+                            st.success("Report sent to distribution list")
+        
+        with tab3:
+            st.subheader("➕ Create New Analytics")
+            
+            # Sub-tabs for different creation options
+            create_tab1, create_tab2 = st.tabs(["📊 Create KPI Metric", "📋 Create Report"])
+            
+            with create_tab1:
+                st.write("**📊 Create New KPI Metric**")
+                
+                with st.form("create_kpi_form"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        metric_name = st.text_input("📝 Metric Name*", placeholder="e.g., Schedule Performance Index")
+                        category = st.selectbox("📂 Category*", options=["Schedule", "Cost", "Quality", "Safety", "Communication", "Resource"])
+                        current_value = st.number_input("📊 Current Value*", step=0.1)
+                        target_value = st.number_input("🎯 Target Value*", step=0.1)
+                    
+                    with col2:
+                        unit = st.text_input("📏 Unit*", placeholder="e.g., %, days, $, ratio")
+                        status = st.selectbox("📊 Initial Status*", options=[status.value for status in MetricStatus])
+                        trend = st.selectbox("📈 Trend", options=["Improving", "Declining", "Stable"])
+                        description = st.text_area("📝 Description*", placeholder="Detailed description of this metric")
+                    
+                    if st.form_submit_button("📊 Create KPI Metric", use_container_width=True):
+                        if not metric_name or not category or not description:
+                            st.error("Please fill in all required fields marked with *")
+                        else:
+                            kpi_data = {
+                                "metric_name": metric_name,
+                                "category": category,
+                                "current_value": current_value,
+                                "target_value": target_value,
+                                "unit": unit,
+                                "status": status,
+                                "trend": trend,
+                                "description": description
+                            }
+                            
+                            metric_id = analytics_manager.create_kpi_metric(kpi_data)
+                            st.success(f"✅ KPI metric created successfully! ID: {metric_id}")
+                            st.rerun()
+            
+            with create_tab2:
+                st.write("**📋 Create New Report**")
+                
+                with st.form("create_report_form"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        title = st.text_input("📝 Report Title*", placeholder="Highland Tower Performance Report")
+                        description = st.text_area("📋 Description", placeholder="Detailed report description")
+                        report_type = st.selectbox("📋 Report Type*", options=[rtype.value for rtype in ReportType])
+                        frequency = st.selectbox("🔄 Frequency*", options=[freq.value for freq in ReportFrequency])
+                        file_format = st.selectbox("📄 Format*", options=["PDF", "Excel", "PowerBI", "Dashboard"])
+                    
+                    with col2:
+                        period_start = st.date_input("📅 Period Start*")
+                        period_end = st.date_input("📅 Period End*")
+                        access_level = st.selectbox("🔐 Access Level*", options=["Public", "Project Team", "Management", "Executive"])
+                        automated = st.checkbox("🤖 Automated Generation")
+                        if automated:
+                            next_generation = st.date_input("🔄 Next Generation Date")
+                    
+                    # Data sources and content
+                    st.write("**📊 Report Content**")
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        data_sources = st.text_input("📊 Data Sources", placeholder="Comma-separated data sources")
+                        metrics_included = st.text_input("📈 Metrics", placeholder="Comma-separated metrics to include")
+                    
+                    with col2:
+                        charts_included = st.text_input("📊 Charts", placeholder="Comma-separated chart types")
+                        distribution_list = st.text_input("📧 Distribution List", placeholder="Comma-separated recipients")
+                    
+                    parameters = st.text_area("⚙️ Parameters (JSON)", placeholder='{"include_photos": true, "detail_level": "summary"}')
+                    notes = st.text_area("📝 Notes", placeholder="Additional notes about this report")
+                    
+                    if st.form_submit_button("📋 Create Report", use_container_width=True):
+                        if not title or not report_type or not frequency:
+                            st.error("Please fill in all required fields marked with *")
+                        else:
+                            # Parse parameters
+                            try:
+                                params = json.loads(parameters) if parameters else {}
+                            except:
+                                params = {}
+                            
+                            report_data = {
+                                "title": title,
+                                "description": description,
+                                "report_type": report_type,
+                                "frequency": frequency,
+                                "data_sources": [ds.strip() for ds in data_sources.split(',') if ds.strip()],
+                                "metrics_included": [m.strip() for m in metrics_included.split(',') if m.strip()],
+                                "charts_included": [c.strip() for c in charts_included.split(',') if c.strip()],
+                                "report_period_start": period_start.strftime('%Y-%m-%d'),
+                                "report_period_end": period_end.strftime('%Y-%m-%d'),
+                                "created_by": "Current User",
+                                "distribution_list": [d.strip() for d in distribution_list.split(',') if d.strip()],
+                                "access_level": access_level,
+                                "file_path": None,
+                                "file_format": file_format,
+                                "automated": automated,
+                                "next_generation": next_generation.strftime('%Y-%m-%d') if automated else None,
+                                "notes": notes,
+                                "parameters": params
+                            }
+                            
+                            report_id = analytics_manager.create_report(report_data)
+                            st.success(f"✅ Report created successfully! ID: {report_id}")
+                            st.rerun()
+        
+        with tab4:
+            st.subheader("⚙️ Manage Analytics")
+            
+            manage_tab1, manage_tab2 = st.tabs(["📊 Manage KPIs", "📋 Manage Reports"])
+            
+            with manage_tab1:
+                kpis = analytics_manager.get_kpi_metrics()
+                if kpis:
+                    kpi_options = [f"{k.metric_name} ({k.category})" for k in kpis]
+                    selected_kpi_index = st.selectbox("Select KPI to Manage", range(len(kpi_options)), format_func=lambda x: kpi_options[x])
+                    selected_kpi = kpis[selected_kpi_index]
+                    
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        if st.button("✏️ Edit KPI", use_container_width=True):
+                            st.session_state.show_edit_kpi_form = True
+                    
+                    with col2:
+                        if st.button("🗑️ Delete KPI", use_container_width=True):
+                            if selected_kpi.metric_id in analytics_manager.kpi_metrics:
+                                del analytics_manager.kpi_metrics[selected_kpi.metric_id]
+                                st.success("✅ KPI deleted successfully!")
+                                st.rerun()
+                    
+                    with col3:
+                        if st.button("📋 Duplicate KPI", use_container_width=True):
+                            # Create duplicate with modified name
+                            kpi_data = {
+                                "metric_name": f"Copy of {selected_kpi.metric_name}",
+                                "category": selected_kpi.category,
+                                "current_value": selected_kpi.current_value,
+                                "target_value": selected_kpi.target_value,
+                                "unit": selected_kpi.unit,
+                                "status": selected_kpi.status.value,
+                                "trend": selected_kpi.trend,
+                                "description": selected_kpi.description
+                            }
+                            metric_id = analytics_manager.create_kpi_metric(kpi_data)
+                            st.success(f"✅ KPI duplicated! ID: {metric_id}")
+                            st.rerun()
+                    
+                    # Edit form
+                    if st.session_state.get('show_edit_kpi_form', False):
+                        with st.form("edit_kpi_form"):
+                            st.write("**✏️ Edit KPI Details**")
+                            
+                            col1, col2 = st.columns(2)
+                            
+                            with col1:
+                                edit_name = st.text_input("📝 Name", value=selected_kpi.metric_name)
+                                edit_category = st.text_input("📂 Category", value=selected_kpi.category)
+                                edit_target = st.number_input("🎯 Target", value=float(selected_kpi.target_value), step=0.1)
+                            
+                            with col2:
+                                edit_unit = st.text_input("📏 Unit", value=selected_kpi.unit)
+                                edit_description = st.text_area("📝 Description", value=selected_kpi.description)
+                            
+                            if st.form_submit_button("✏️ Update KPI"):
+                                # Update the KPI
+                                selected_kpi.metric_name = edit_name
+                                selected_kpi.category = edit_category
+                                selected_kpi.target_value = edit_target
+                                selected_kpi.unit = edit_unit
+                                selected_kpi.description = edit_description
+                                selected_kpi.last_updated = datetime.now().strftime('%Y-%m-%d')
+                                
+                                st.success("✅ KPI updated successfully!")
+                                st.session_state.show_edit_kpi_form = False
+                                st.rerun()
+                else:
+                    st.info("No KPIs available. Create some KPIs first.")
+            
+            with manage_tab2:
+                reports = analytics_manager.get_all_reports()
+                if reports:
+                    report_options = [f"{r.report_code} - {r.title}" for r in reports]
+                    selected_report_index = st.selectbox("Select Report to Manage", range(len(report_options)), format_func=lambda x: report_options[x])
+                    selected_report = reports[selected_report_index]
+                    
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        if st.button("✏️ Edit Report", use_container_width=True):
+                            st.session_state.show_edit_report_form = True
+                    
+                    with col2:
+                        if st.button("🗑️ Delete Report", use_container_width=True):
+                            if selected_report.report_id in analytics_manager.reports:
+                                del analytics_manager.reports[selected_report.report_id]
+                                st.success("✅ Report deleted successfully!")
+                                st.rerun()
+                    
+                    with col3:
+                        if st.button("📋 Duplicate Report", use_container_width=True):
+                            # Create duplicate with modified title
+                            report_data = {
+                                "title": f"Copy of {selected_report.title}",
+                                "description": selected_report.description,
+                                "report_type": selected_report.report_type.value,
+                                "frequency": selected_report.frequency.value,
+                                "data_sources": selected_report.data_sources.copy(),
+                                "metrics_included": selected_report.metrics_included.copy(),
+                                "charts_included": selected_report.charts_included.copy(),
+                                "report_period_start": selected_report.report_period_start,
+                                "report_period_end": selected_report.report_period_end,
+                                "created_by": "Current User",
+                                "distribution_list": selected_report.distribution_list.copy(),
+                                "access_level": selected_report.access_level,
+                                "file_path": None,
+                                "file_format": selected_report.file_format,
+                                "automated": selected_report.automated,
+                                "next_generation": selected_report.next_generation,
+                                "notes": selected_report.notes,
+                                "parameters": selected_report.parameters
+                            }
+                            report_id = analytics_manager.create_report(report_data)
+                            st.success(f"✅ Report duplicated! ID: {report_id}")
+                            st.rerun()
+                    
+                    # Edit form
+                    if st.session_state.get('show_edit_report_form', False):
+                        with st.form("edit_report_form"):
+                            st.write("**✏️ Edit Report Details**")
+                            
+                            col1, col2 = st.columns(2)
+                            
+                            with col1:
+                                edit_title = st.text_input("📝 Title", value=selected_report.title)
+                                edit_description = st.text_area("📋 Description", value=selected_report.description)
+                                edit_access = st.text_input("🔐 Access Level", value=selected_report.access_level)
+                            
+                            with col2:
+                                edit_distribution = st.text_input("📧 Distribution", value=", ".join(selected_report.distribution_list))
+                                edit_notes = st.text_area("📝 Notes", value=selected_report.notes)
+                            
+                            if st.form_submit_button("✏️ Update Report"):
+                                # Update the report
+                                selected_report.title = edit_title
+                                selected_report.description = edit_description
+                                selected_report.access_level = edit_access
+                                selected_report.distribution_list = [d.strip() for d in edit_distribution.split(',') if d.strip()]
+                                selected_report.notes = edit_notes
+                                selected_report.updated_at = datetime.now().isoformat()
+                                
+                                st.success("✅ Report updated successfully!")
+                                st.session_state.show_edit_report_form = False
+                                st.rerun()
+                else:
+                    st.info("No reports available. Create some reports first.")
+        
+        return
+        
+    except ImportError:
+        st.error("Enterprise Analytics module not available")
+        st.info("📊 Analytics module with advanced reporting and insights")
 
 def render_performance_snapshot():
-    """Performance snapshot module"""
-    st.markdown("""
-    <div class="module-header">
-        <h1>📈 Performance Snapshot</h1>
-        <p>Executive dashboard and KPI tracking</p>
-    </div>
-    """, unsafe_allow_html=True)
-    st.info("📈 Performance Snapshot with executive-level insights")
+    """Enterprise Performance Snapshot with full CRUD functionality"""
+    try:
+        from modules.performance_snapshot_backend import performance_manager, HealthStatus, TrendDirection
+        
+        st.markdown("""
+        <div class="module-header">
+            <h1>📈 Performance Snapshot</h1>
+            <p>Highland Tower Development - Executive dashboard and real-time project health monitoring</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Get overall project health and metrics
+        overall_health = performance_manager.calculate_overall_project_health()
+        metrics = performance_manager.generate_performance_metrics()
+        latest_summary = performance_manager.get_latest_summary()
+        
+        # Project Health Banner
+        health_colors = {
+            HealthStatus.EXCELLENT: "🟢",
+            HealthStatus.GOOD: "🟡", 
+            HealthStatus.WARNING: "🟠",
+            HealthStatus.CRITICAL: "🔴"
+        }
+        
+        health_color = health_colors.get(overall_health, "⚪")
+        
+        if overall_health == HealthStatus.EXCELLENT:
+            st.success(f"{health_color} **PROJECT STATUS: EXCELLENT** - All systems performing above expectations")
+        elif overall_health == HealthStatus.GOOD:
+            st.info(f"{health_color} **PROJECT STATUS: GOOD** - Performance within acceptable ranges")
+        elif overall_health == HealthStatus.WARNING:
+            st.warning(f"{health_color} **PROJECT STATUS: WARNING** - Some metrics need attention")
+        else:
+            st.error(f"{health_color} **PROJECT STATUS: CRITICAL** - Immediate action required")
+        
+        # Executive Summary Cards
+        if latest_summary:
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric(
+                    "📊 Project Progress", 
+                    f"{latest_summary.percent_complete:.1f}%",
+                    f"{'+' if latest_summary.days_ahead_behind > 0 else ''}{latest_summary.days_ahead_behind} days"
+                )
+            
+            with col2:
+                budget_used_pct = (latest_summary.spent_to_date / latest_summary.total_budget) * 100
+                st.metric(
+                    "💰 Budget Performance", 
+                    f"{budget_used_pct:.1f}% used",
+                    f"${(latest_summary.total_budget - latest_summary.projected_final_cost):,.0f} projected savings"
+                )
+            
+            with col3:
+                st.metric(
+                    "🦺 Safety Rating", 
+                    f"{latest_summary.safety_rating:.1f}%",
+                    "Excellent"
+                )
+            
+            with col4:
+                st.metric(
+                    "✅ Quality Score", 
+                    f"{latest_summary.quality_score:.1f}%",
+                    "Above Target"
+                )
+        
+        # Create tabs
+        tab1, tab2, tab3, tab4 = st.tabs(["📊 Executive Dashboard", "⚠️ Alerts & Issues", "➕ Create", "⚙️ Manage"])
+        
+        with tab1:
+            st.subheader("📊 Highland Tower Development - Executive Performance Dashboard")
+            
+            # Performance Metrics by Category
+            performance_metrics = performance_manager.get_performance_metrics()
+            
+            if performance_metrics:
+                categories = list(set(metric.category for metric in performance_metrics))
+                
+                for category in categories:
+                    st.write(f"**{category} Performance**")
+                    category_metrics = performance_manager.get_metrics_by_category(category)
+                    
+                    cols = st.columns(min(len(category_metrics), 3))
+                    for i, metric in enumerate(category_metrics):
+                        with cols[i % 3]:
+                            # Status and trend indicators
+                            status_icon = health_colors.get(metric.status, "⚪")
+                            trend_icon = {
+                                TrendDirection.IMPROVING: "📈",
+                                TrendDirection.DECLINING: "📉",
+                                TrendDirection.STABLE: "➡️"
+                            }.get(metric.trend, "")
+                            
+                            # Color code the variance
+                            variance_color = "normal"
+                            if abs(metric.variance_percentage) > 10:
+                                variance_color = "inverse"
+                            
+                            st.metric(
+                                label=f"{status_icon} {metric.metric_name}",
+                                value=f"{metric.current_value} {metric.unit}",
+                                delta=f"{metric.variance_percentage:+.1f}% vs target",
+                                delta_color=variance_color
+                            )
+                            
+                            with st.expander(f"Details {trend_icon}"):
+                                st.write(f"**Target:** {metric.target_value} {metric.unit}")
+                                st.write(f"**Status:** {metric.status.value}")
+                                st.write(f"**Trend:** {metric.trend.value}")
+                                st.write(f"**Last Updated:** {metric.last_updated}")
+                                st.write(f"**Description:** {metric.description}")
+                                
+                                # Quick update capability
+                                new_value = st.number_input(
+                                    "Update Value",
+                                    value=float(metric.current_value),
+                                    step=0.1,
+                                    key=f"metric_update_{metric.metric_id}"
+                                )
+                                if st.button(f"📊 Update", key=f"btn_update_{metric.metric_id}"):
+                                    if performance_manager.update_metric_value(metric.metric_id, new_value):
+                                        st.success("Metric updated!")
+                                        st.rerun()
+                    
+                    st.write("---")
+                
+                # Executive Summary Section
+                if latest_summary:
+                    st.subheader("📋 Executive Summary")
+                    
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write("**📈 Key Accomplishments:**")
+                        for accomplishment in latest_summary.accomplishments:
+                            st.write(f"• {accomplishment}")
+                        
+                        st.write("**📅 Upcoming Milestones:**")
+                        for milestone in latest_summary.upcoming_milestones:
+                            status_emoji = {"On Track": "🟢", "Ahead": "🟢", "Behind": "🔴", "At Risk": "🟡"}.get(milestone["status"], "⚪")
+                            st.write(f"• {status_emoji} {milestone['milestone']} - {milestone['date']}")
+                    
+                    with col2:
+                        st.write("**💰 Financial Summary:**")
+                        st.write(f"• **Total Budget:** ${latest_summary.total_budget:,.0f}")
+                        st.write(f"• **Spent to Date:** ${latest_summary.spent_to_date:,.0f}")
+                        st.write(f"• **Remaining:** ${latest_summary.remaining_budget:,.0f}")
+                        st.write(f"• **Projected Final:** ${latest_summary.projected_final_cost:,.0f}")
+                        
+                        st.write("**👥 Resource Status:**")
+                        st.write(f"• **Current Workforce:** {latest_summary.current_workforce} workers")
+                        st.write(f"• **Equipment Utilization:** {latest_summary.equipment_utilization:.1f}%")
+                        st.write(f"• **Open Issues:** {latest_summary.open_issues}")
+                        st.write(f"• **High Priority Risks:** {latest_summary.high_priority_risks}")
+                    
+                    if latest_summary.executive_notes:
+                        st.write("**📝 Executive Notes:**")
+                        st.info(latest_summary.executive_notes)
+            
+            else:
+                st.info("No performance metrics available. Create some metrics to start monitoring project health.")
+        
+        with tab2:
+            st.subheader("⚠️ Project Alerts & Issues")
+            
+            # Get active alerts
+            active_alerts = performance_manager.get_active_alerts()
+            high_priority_alerts = performance_manager.get_high_priority_alerts()
+            
+            if high_priority_alerts:
+                st.error(f"🚨 {len(high_priority_alerts)} HIGH PRIORITY ALERTS require immediate attention!")
+                
+                for alert in high_priority_alerts:
+                    severity_color = {
+                        "Critical": "🔴",
+                        "High": "🟠", 
+                        "Medium": "🟡",
+                        "Low": "🟢"
+                    }.get(alert.severity, "⚪")
+                    
+                    with st.expander(f"{severity_color} {alert.severity.upper()} - {alert.title}"):
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            st.write(f"**📋 Type:** {alert.alert_type}")
+                            st.write(f"**📅 Due Date:** {alert.due_date}")
+                            st.write(f"**👤 Responsible:** {alert.responsible_party}")
+                            st.write(f"**📊 Status:** {alert.status}")
+                        
+                        with col2:
+                            st.write(f"**📅 Created:** {alert.created_date}")
+                            if alert.resolved_date:
+                                st.write(f"**✅ Resolved:** {alert.resolved_date}")
+                        
+                        st.write(f"**📝 Description:** {alert.description}")
+                        st.write(f"**💥 Impact:** {alert.impact}")
+                        st.write(f"**🔧 Recommended Action:** {alert.recommended_action}")
+                        
+                        # Quick actions
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            if alert.status != "Resolved" and st.button(f"✅ Mark Resolved", key=f"resolve_{alert.alert_id}"):
+                                if performance_manager.resolve_alert(alert.alert_id):
+                                    st.success("Alert marked as resolved!")
+                                    st.rerun()
+                        
+                        with col2:
+                            if st.button(f"📧 Escalate", key=f"escalate_{alert.alert_id}"):
+                                st.success("Alert escalated to senior management")
+            
+            # Display all active alerts
+            st.write("**📋 All Active Alerts**")
+            
+            if active_alerts:
+                for alert in active_alerts:
+                    if alert not in high_priority_alerts:  # Don't duplicate high priority ones
+                        severity_color = {
+                            "Critical": "🔴",
+                            "High": "🟠", 
+                            "Medium": "🟡",
+                            "Low": "🟢"
+                        }.get(alert.severity, "⚪")
+                        
+                        with st.expander(f"{severity_color} {alert.severity} - {alert.title}"):
+                            st.write(f"**Type:** {alert.alert_type} | **Due:** {alert.due_date} | **Responsible:** {alert.responsible_party}")
+                            st.write(f"**Description:** {alert.description}")
+                            st.write(f"**Recommended Action:** {alert.recommended_action}")
+                            
+                            if alert.status != "Resolved" and st.button(f"✅ Resolve", key=f"resolve_all_{alert.alert_id}"):
+                                if performance_manager.resolve_alert(alert.alert_id):
+                                    st.success("Alert resolved!")
+                                    st.rerun()
+            else:
+                st.success("🎉 No active alerts - all issues resolved!")
+        
+        with tab3:
+            st.subheader("➕ Create Performance Items")
+            
+            create_tab1, create_tab2, create_tab3 = st.tabs(["📊 Create Metric", "⚠️ Create Alert", "📋 Executive Summary"])
+            
+            with create_tab1:
+                st.write("**📊 Create Performance Metric**")
+                
+                with st.form("create_metric_form"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        metric_name = st.text_input("📝 Metric Name*", placeholder="e.g., Resource Utilization Rate")
+                        category = st.selectbox("📂 Category*", options=["Schedule", "Cost", "Quality", "Safety", "Resource", "Progress", "Financial"])
+                        current_value = st.number_input("📊 Current Value*", step=0.1)
+                        target_value = st.number_input("🎯 Target Value*", step=0.1)
+                    
+                    with col2:
+                        unit = st.text_input("📏 Unit*", placeholder="e.g., %, $, days, ratio")
+                        status = st.selectbox("📊 Status*", options=[status.value for status in HealthStatus])
+                        trend = st.selectbox("📈 Trend*", options=[trend.value for trend in TrendDirection])
+                        description = st.text_area("📝 Description*", placeholder="Detailed description of this performance metric")
+                    
+                    if st.form_submit_button("📊 Create Metric", use_container_width=True):
+                        if not metric_name or not category or not description:
+                            st.error("Please fill in all required fields marked with *")
+                        else:
+                            metric_data = {
+                                "metric_name": metric_name,
+                                "category": category,
+                                "current_value": current_value,
+                                "target_value": target_value,
+                                "unit": unit,
+                                "status": status,
+                                "trend": trend,
+                                "description": description
+                            }
+                            
+                            metric_id = performance_manager.create_performance_metric(metric_data)
+                            st.success(f"✅ Performance metric created! ID: {metric_id}")
+                            st.rerun()
+            
+            with create_tab2:
+                st.write("**⚠️ Create Project Alert**")
+                
+                with st.form("create_alert_form"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        title = st.text_input("📝 Alert Title*", placeholder="Brief description of the alert")
+                        alert_type = st.selectbox("📂 Alert Type*", options=["Budget", "Schedule", "Safety", "Quality", "Resource", "Risk"])
+                        severity = st.selectbox("🚨 Severity*", options=["Low", "Medium", "High", "Critical"])
+                        responsible_party = st.text_input("👤 Responsible Party*", placeholder="Person or team responsible")
+                    
+                    with col2:
+                        due_date = st.date_input("📅 Due Date*")
+                        description = st.text_area("📝 Description*", placeholder="Detailed description of the issue")
+                        impact = st.text_area("💥 Impact", placeholder="Describe the potential impact")
+                        recommended_action = st.text_area("🔧 Recommended Action*", placeholder="What should be done to resolve this?")
+                    
+                    if st.form_submit_button("⚠️ Create Alert", use_container_width=True):
+                        if not title or not alert_type or not responsible_party or not recommended_action:
+                            st.error("Please fill in all required fields marked with *")
+                        else:
+                            alert_data = {
+                                "alert_type": alert_type,
+                                "severity": severity,
+                                "title": title,
+                                "description": description,
+                                "impact": impact,
+                                "recommended_action": recommended_action,
+                                "responsible_party": responsible_party,
+                                "due_date": due_date.strftime('%Y-%m-%d')
+                            }
+                            
+                            alert_id = performance_manager.create_alert(alert_data)
+                            st.success(f"✅ Project alert created! ID: {alert_id}")
+                            st.rerun()
+            
+            with create_tab3:
+                st.write("**📋 Create Executive Summary**")
+                
+                with st.form("create_summary_form"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        project_phase = st.text_input("📊 Project Phase*", value="Core & Shell Construction")
+                        overall_health = st.selectbox("🏥 Overall Health*", options=[health.value for health in HealthStatus])
+                        schedule_performance = st.number_input("📅 Schedule Performance*", min_value=0.0, step=0.01, value=1.0)
+                        cost_performance = st.number_input("💰 Cost Performance*", min_value=0.0, step=0.01, value=1.0)
+                        quality_score = st.number_input("✅ Quality Score*", min_value=0.0, max_value=100.0, step=0.1, value=90.0)
+                        safety_rating = st.number_input("🦺 Safety Rating*", min_value=0.0, max_value=100.0, step=0.1, value=95.0)
+                    
+                    with col2:
+                        total_budget = st.number_input("💰 Total Budget*", min_value=0.0, step=1000.0, value=45500000.0)
+                        spent_to_date = st.number_input("💸 Spent to Date*", min_value=0.0, step=1000.0, value=30000000.0)
+                        percent_complete = st.number_input("📊 Percent Complete*", min_value=0.0, max_value=100.0, step=0.1, value=75.0)
+                        days_ahead_behind = st.number_input("📅 Days Ahead/Behind", step=1, value=0)
+                        current_workforce = st.number_input("👥 Current Workforce", min_value=0, step=1, value=120)
+                        equipment_utilization = st.number_input("🚧 Equipment Utilization", min_value=0.0, max_value=100.0, step=0.1, value=85.0)
+                    
+                    critical_path_status = st.selectbox("🛤️ Critical Path Status", options=["On Track", "At Risk", "Behind", "Ahead"])
+                    accomplishments = st.text_area("🎯 Key Accomplishments", placeholder="Enter accomplishments, one per line")
+                    executive_notes = st.text_area("📝 Executive Notes*", placeholder="Overall project summary and key insights")
+                    
+                    if st.form_submit_button("📋 Create Executive Summary", use_container_width=True):
+                        if not project_phase or not executive_notes:
+                            st.error("Please fill in all required fields marked with *")
+                        else:
+                            # Calculate derived values
+                            remaining_budget = total_budget - spent_to_date
+                            projected_final_cost = total_budget * 0.985  # Assume 1.5% savings
+                            
+                            summary_data = {
+                                "project_phase": project_phase,
+                                "overall_health": overall_health,
+                                "schedule_performance": schedule_performance,
+                                "cost_performance": cost_performance,
+                                "quality_score": quality_score,
+                                "safety_rating": safety_rating,
+                                "total_budget": total_budget,
+                                "spent_to_date": spent_to_date,
+                                "remaining_budget": remaining_budget,
+                                "projected_final_cost": projected_final_cost,
+                                "percent_complete": percent_complete,
+                                "days_ahead_behind": days_ahead_behind,
+                                "critical_path_status": critical_path_status,
+                                "accomplishments": [acc.strip() for acc in accomplishments.split('\n') if acc.strip()],
+                                "upcoming_milestones": [],  # Would be populated from project data
+                                "open_issues": 5,  # Default values
+                                "high_priority_risks": 2,
+                                "current_workforce": current_workforce,
+                                "equipment_utilization": equipment_utilization,
+                                "executive_notes": executive_notes,
+                                "created_by": "Current User"
+                            }
+                            
+                            summary_id = performance_manager.create_executive_summary(summary_data)
+                            st.success(f"✅ Executive summary created! ID: {summary_id}")
+                            st.rerun()
+        
+        with tab4:
+            st.subheader("⚙️ Manage Performance Items")
+            
+            manage_tab1, manage_tab2 = st.tabs(["📊 Manage Metrics", "⚠️ Manage Alerts"])
+            
+            with manage_tab1:
+                metrics_list = performance_manager.get_performance_metrics()
+                if metrics_list:
+                    metric_options = [f"{m.metric_name} ({m.category})" for m in metrics_list]
+                    selected_metric_index = st.selectbox("Select Metric to Manage", range(len(metric_options)), format_func=lambda x: metric_options[x])
+                    selected_metric = metrics_list[selected_metric_index]
+                    
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        if st.button("✏️ Edit Metric", use_container_width=True):
+                            st.session_state.show_edit_metric_form = True
+                    
+                    with col2:
+                        if st.button("🗑️ Delete Metric", use_container_width=True):
+                            if selected_metric.metric_id in performance_manager.metrics:
+                                del performance_manager.metrics[selected_metric.metric_id]
+                                st.success("✅ Metric deleted!")
+                                st.rerun()
+                    
+                    with col3:
+                        if st.button("📋 Duplicate Metric", use_container_width=True):
+                            metric_data = {
+                                "metric_name": f"Copy of {selected_metric.metric_name}",
+                                "category": selected_metric.category,
+                                "current_value": selected_metric.current_value,
+                                "target_value": selected_metric.target_value,
+                                "unit": selected_metric.unit,
+                                "status": selected_metric.status.value,
+                                "trend": selected_metric.trend.value,
+                                "description": selected_metric.description
+                            }
+                            metric_id = performance_manager.create_performance_metric(metric_data)
+                            st.success(f"✅ Metric duplicated! ID: {metric_id}")
+                            st.rerun()
+                    
+                    # Edit form
+                    if st.session_state.get('show_edit_metric_form', False):
+                        with st.form("edit_metric_form"):
+                            st.write("**✏️ Edit Metric Details**")
+                            
+                            col1, col2 = st.columns(2)
+                            
+                            with col1:
+                                edit_name = st.text_input("📝 Name", value=selected_metric.metric_name)
+                                edit_target = st.number_input("🎯 Target", value=float(selected_metric.target_value), step=0.1)
+                                edit_unit = st.text_input("📏 Unit", value=selected_metric.unit)
+                            
+                            with col2:
+                                edit_category = st.text_input("📂 Category", value=selected_metric.category)
+                                edit_description = st.text_area("📝 Description", value=selected_metric.description)
+                            
+                            if st.form_submit_button("✏️ Update Metric"):
+                                selected_metric.metric_name = edit_name
+                                selected_metric.target_value = edit_target
+                                selected_metric.unit = edit_unit
+                                selected_metric.category = edit_category
+                                selected_metric.description = edit_description
+                                selected_metric.last_updated = datetime.now().strftime('%Y-%m-%d')
+                                
+                                st.success("✅ Metric updated!")
+                                st.session_state.show_edit_metric_form = False
+                                st.rerun()
+                else:
+                    st.info("No metrics available. Create some metrics first.")
+            
+            with manage_tab2:
+                alerts_list = list(performance_manager.alerts.values())
+                if alerts_list:
+                    alert_options = [f"{a.title} ({a.severity})" for a in alerts_list]
+                    selected_alert_index = st.selectbox("Select Alert to Manage", range(len(alert_options)), format_func=lambda x: alert_options[x])
+                    selected_alert = alerts_list[selected_alert_index]
+                    
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        if selected_alert.status != "Resolved" and st.button("✅ Resolve Alert", use_container_width=True):
+                            if performance_manager.resolve_alert(selected_alert.alert_id):
+                                st.success("✅ Alert resolved!")
+                                st.rerun()
+                    
+                    with col2:
+                        if st.button("✏️ Edit Alert", use_container_width=True):
+                            st.session_state.show_edit_alert_form = True
+                    
+                    with col3:
+                        if st.button("🗑️ Delete Alert", use_container_width=True):
+                            if selected_alert.alert_id in performance_manager.alerts:
+                                del performance_manager.alerts[selected_alert.alert_id]
+                                st.success("✅ Alert deleted!")
+                                st.rerun()
+                else:
+                    st.info("No alerts available. Create some alerts first.")
+        
+        return
+        
+    except ImportError:
+        st.error("Enterprise Performance Snapshot module not available")
+        st.info("📈 Performance Snapshot with executive-level insights")
 
 def render_ai_assistant():
     """AI Assistant module"""

@@ -1249,6 +1249,9 @@ def render_sidebar():
         if st.button("📖 Quick Start Guide", key="quick_start", use_container_width=True):
             st.session_state.current_page = "quick_start"
         
+        if st.button("🔗 Integrations", key="integrations", use_container_width=True):
+            st.session_state.current_page = "integrations"
+        
         if st.button("⚙️ Settings", key="settings", use_container_width=True):
             st.session_state.current_page = "settings"
         

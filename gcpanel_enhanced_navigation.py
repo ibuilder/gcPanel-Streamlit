@@ -9545,7 +9545,474 @@ def render_progress_photos_basic():
                 st.success("Photo data exported!")
 
 def render_subcontractor_management():
-    """Complete Subcontractor Management with full CRUD functionality"""
+    """Enterprise Subcontractor Management with full CRUD functionality"""
+    try:
+        from modules.subcontractor_management_backend import subcontractor_manager, SubcontractorStatus, TradeCategory, PerformanceRating
+        
+        st.markdown("""
+        <div class="module-header">
+            <h1>🏗️ Subcontractor Management</h1>
+            <p>Highland Tower Development - Comprehensive vendor tracking and performance management</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Display summary metrics
+        metrics = subcontractor_manager.generate_subcontractor_metrics()
+        if metrics:
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("🏗️ Total Subcontractors", metrics['total_subcontractors'])
+            with col2:
+                st.metric("💰 Contract Value", f"${metrics['total_contract_value']:,.0f}")
+            with col3:
+                st.metric("⚠️ Need Review", metrics['needing_performance_review'])
+            with col4:
+                st.metric("📊 Avg Quality Score", f"{metrics['average_quality_score']:.1f}")
+        
+        # Create tabs
+        tab1, tab2, tab3, tab4 = st.tabs(["🏗️ All Subcontractors", "➕ Add New", "✏️ Manage", "📊 Analytics"])
+        
+        with tab1:
+            st.subheader("🏗️ Subcontractor Directory")
+            
+            # Filter options
+            col1, col2 = st.columns(2)
+            with col1:
+                status_filter = st.selectbox("Filter by Status", ["All"] + [status.value for status in SubcontractorStatus])
+            with col2:
+                trade_filter = st.selectbox("Filter by Trade", ["All"] + [trade.value for trade in TradeCategory])
+            
+            # Get filtered subcontractors
+            subcontractors = subcontractor_manager.get_all_subcontractors()
+            
+            if status_filter != "All":
+                subcontractors = [s for s in subcontractors if s.status.value == status_filter]
+            if trade_filter != "All":
+                subcontractors = [s for s in subcontractors if s.trade_category.value == trade_filter]
+            
+            # Display subcontractors
+            for subcontractor in subcontractors:
+                status_color = {
+                    SubcontractorStatus.ON_SITE: "🟢",
+                    SubcontractorStatus.ACTIVE: "🟢",
+                    SubcontractorStatus.AWARDED: "🟡",
+                    SubcontractorStatus.BIDDING: "🔵",
+                    SubcontractorStatus.PREQUALIFIED: "⚪",
+                    SubcontractorStatus.COMPLETED: "🟢",
+                    SubcontractorStatus.TERMINATED: "🔴"
+                }.get(subcontractor.status, "⚪")
+                
+                review_warning = "📋 REVIEW NEEDED" if subcontractor.needs_performance_review() else ""
+                insurance_warning = "🛡️ INSURANCE CHECK" if not subcontractor.is_insurance_current() else ""
+                
+                with st.expander(f"{status_color} {subcontractor.company_code} | {subcontractor.company_name} | {subcontractor.trade_category.value} {review_warning} {insurance_warning}"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**🏢 Trade:** {subcontractor.trade_category.value}")
+                        st.write(f"**👤 Contact:** {subcontractor.primary_contact}")
+                        st.write(f"**📞 Phone:** {subcontractor.contact_phone}")
+                        st.write(f"**📧 Email:** {subcontractor.contact_email}")
+                        st.write(f"**📍 Address:** {subcontractor.office_address}")
+                        st.write(f"**🏗️ Experience:** {subcontractor.years_in_business} years")
+                    
+                    with col2:
+                        st.write(f"**💰 Contract Value:** ${subcontractor.contract_value:,.0f}")
+                        st.write(f"**💸 Total Paid:** ${subcontractor.total_paid:,.0f}")
+                        st.write(f"**⏳ Pending:** ${subcontractor.amount_pending:,.0f}")
+                        st.write(f"**📊 Overall Rating:** {subcontractor.overall_rating.value}")
+                        st.write(f"**👥 Crew Size:** {subcontractor.crew_size}")
+                        if subcontractor.contract_start_date:
+                            st.write(f"**📅 Contract:** {subcontractor.contract_start_date} to {subcontractor.contract_end_date}")
+                    
+                    if subcontractor.scope_of_work:
+                        st.write(f"**🔧 Scope of Work:** {subcontractor.scope_of_work}")
+                    
+                    # Performance metrics
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("Quality Score", f"{subcontractor.quality_score:.1f}")
+                    with col2:
+                        st.metric("Schedule Performance", f"{subcontractor.schedule_performance:.1f}")
+                    with col3:
+                        st.metric("Safety Score", f"{subcontractor.safety_score:.1f}")
+                    
+                    # Status indicators
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        if subcontractor.needs_performance_review():
+                            st.warning("📋 Review Needed")
+                        else:
+                            st.success("✅ Review Current")
+                    with col2:
+                        if subcontractor.is_insurance_current():
+                            st.success("🛡️ Insurance Current")
+                        else:
+                            st.error("⚠️ Insurance Check Required")
+                    with col3:
+                        if subcontractor.safety_orientation_complete:
+                            st.success("✅ Safety Orientation")
+                        else:
+                            st.warning("⚠️ Orientation Needed")
+                    
+                    # Recent performance reviews
+                    if subcontractor.performance_reviews:
+                        st.write("**📋 Recent Reviews:**")
+                        for review in subcontractor.performance_reviews[-2:]:
+                            rating_icon = {
+                                PerformanceRating.EXCELLENT: "⭐⭐⭐⭐⭐",
+                                PerformanceRating.GOOD: "⭐⭐⭐⭐",
+                                PerformanceRating.SATISFACTORY: "⭐⭐⭐",
+                                PerformanceRating.NEEDS_IMPROVEMENT: "⭐⭐",
+                                PerformanceRating.UNSATISFACTORY: "⭐"
+                            }.get(review.overall_rating, "")
+                            st.write(f"• {rating_icon} {review.reviewer} ({review.review_date}): {review.comments}")
+                    
+                    # Quick actions
+                    st.write("---")
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        if st.button(f"📋 Add Review", key=f"btn_review_{subcontractor.subcontractor_id}"):
+                            st.session_state[f"show_review_{subcontractor.subcontractor_id}"] = True
+                    
+                    with col2:
+                        if st.button(f"💰 Add Payment", key=f"btn_payment_{subcontractor.subcontractor_id}"):
+                            st.session_state[f"show_payment_{subcontractor.subcontractor_id}"] = True
+                    
+                    with col3:
+                        new_status = st.selectbox(f"Update Status", 
+                                                [status.value for status in SubcontractorStatus],
+                                                index=[status.value for status in SubcontractorStatus].index(subcontractor.status.value),
+                                                key=f"status_{subcontractor.subcontractor_id}")
+                        if st.button(f"📊 Update", key=f"btn_status_{subcontractor.subcontractor_id}"):
+                            subcontractor.status = SubcontractorStatus(new_status)
+                            st.success("Status updated!")
+                            st.rerun()
+                    
+                    # Performance review form
+                    if st.session_state.get(f"show_review_{subcontractor.subcontractor_id}", False):
+                        with st.form(f"review_form_{subcontractor.subcontractor_id}"):
+                            st.write("**📋 Add Performance Review**")
+                            col1, col2 = st.columns(2)
+                            
+                            with col1:
+                                reviewer = st.text_input("Reviewer Name")
+                                quality_rating = st.selectbox("Quality Rating", [rating.value for rating in PerformanceRating])
+                                schedule_rating = st.selectbox("Schedule Rating", [rating.value for rating in PerformanceRating])
+                                safety_rating = st.selectbox("Safety Rating", [rating.value for rating in PerformanceRating])
+                            
+                            with col2:
+                                communication_rating = st.selectbox("Communication Rating", [rating.value for rating in PerformanceRating])
+                                overall_rating = st.selectbox("Overall Rating", [rating.value for rating in PerformanceRating])
+                                comments = st.text_area("Comments")
+                                recommendations = st.text_area("Recommendations")
+                            
+                            if st.form_submit_button("📋 Submit Review"):
+                                review_data = {
+                                    "review_date": datetime.now().strftime('%Y-%m-%d'),
+                                    "reviewer": reviewer,
+                                    "quality_rating": quality_rating,
+                                    "schedule_rating": schedule_rating,
+                                    "safety_rating": safety_rating,
+                                    "communication_rating": communication_rating,
+                                    "overall_rating": overall_rating,
+                                    "comments": comments,
+                                    "recommendations": recommendations
+                                }
+                                if subcontractor_manager.add_performance_review(subcontractor.subcontractor_id, review_data):
+                                    st.success("Review added!")
+                                    st.session_state[f"show_review_{subcontractor.subcontractor_id}"] = False
+                                    st.rerun()
+                    
+                    # Payment form
+                    if st.session_state.get(f"show_payment_{subcontractor.subcontractor_id}", False):
+                        with st.form(f"payment_form_{subcontractor.subcontractor_id}"):
+                            st.write("**💰 Add Payment Record**")
+                            col1, col2 = st.columns(2)
+                            
+                            with col1:
+                                invoice_number = st.text_input("Invoice Number")
+                                invoice_date = st.date_input("Invoice Date")
+                                amount = st.number_input("Amount", min_value=0.0, step=100.0)
+                            
+                            with col2:
+                                payment_status = st.selectbox("Status", ["Pending", "Approved", "Paid", "Disputed"])
+                                payment_date = st.date_input("Payment Date (if paid)")
+                                notes = st.text_area("Payment Notes")
+                            
+                            if st.form_submit_button("💰 Add Payment"):
+                                payment_data = {
+                                    "invoice_number": invoice_number,
+                                    "invoice_date": invoice_date.strftime('%Y-%m-%d'),
+                                    "amount": amount,
+                                    "payment_date": payment_date.strftime('%Y-%m-%d') if payment_status == "Paid" else None,
+                                    "status": payment_status,
+                                    "notes": notes
+                                }
+                                if subcontractor_manager.add_payment_record(subcontractor.subcontractor_id, payment_data):
+                                    st.success("Payment record added!")
+                                    st.session_state[f"show_payment_{subcontractor.subcontractor_id}"] = False
+                                    st.rerun()
+        
+        with tab2:
+            st.subheader("➕ Add New Subcontractor")
+            
+            with st.form("create_subcontractor_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    company_name = st.text_input("🏢 Company Name*", placeholder="Enter company name")
+                    trade_category = st.selectbox("🔧 Trade Category*", options=[trade.value for trade in TradeCategory])
+                    primary_contact = st.text_input("👤 Primary Contact*", placeholder="Contact person name")
+                    contact_email = st.text_input("📧 Email*", placeholder="contact@company.com")
+                    contact_phone = st.text_input("📞 Phone*", placeholder="555-123-4567")
+                
+                with col2:
+                    office_address = st.text_input("📍 Office Address*", placeholder="Full business address")
+                    business_license = st.text_input("📄 Business License", placeholder="License number")
+                    tax_id = st.text_input("🆔 Tax ID", placeholder="Tax identification number")
+                    years_in_business = st.number_input("🏗️ Years in Business", min_value=0, step=1, value=5)
+                    website = st.text_input("🌐 Website", placeholder="www.company.com")
+                
+                # Contract details (if applicable)
+                st.write("**📋 Contract Information (if awarded)**")
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    contract_value = st.number_input("💰 Contract Value", min_value=0.0, step=1000.0)
+                    contract_start = st.date_input("📅 Contract Start Date")
+                    scope_of_work = st.text_area("🔧 Scope of Work", placeholder="Detailed description of work scope")
+                
+                with col2:
+                    contract_end = st.date_input("📅 Contract End Date")
+                    work_areas = st.text_input("📍 Work Areas", placeholder="Comma-separated work locations")
+                    current_phase = st.text_input("📊 Current Phase", placeholder="Current project phase")
+                
+                # Performance and personnel
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    project_manager = st.text_input("👤 Project Manager", placeholder="PM name")
+                    superintendent = st.text_input("👷 Superintendent", placeholder="Superintendent name")
+                    overall_rating = st.selectbox("📊 Initial Rating", options=[rating.value for rating in PerformanceRating], index=2)
+                
+                with col2:
+                    quality_score = st.number_input("📋 Quality Score", min_value=0.0, max_value=100.0, step=0.1, value=85.0)
+                    schedule_performance = st.number_input("⏰ Schedule Performance", min_value=0.0, max_value=100.0, step=0.1, value=85.0)
+                    safety_score = st.number_input("🦺 Safety Score", min_value=0.0, max_value=100.0, step=0.1, value=85.0)
+                
+                # Additional details
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    certifications = st.text_input("📜 Certifications", placeholder="Comma-separated certifications")
+                    prequalification_notes = st.text_area("📝 Prequalification Notes", placeholder="Notes from prequalification process")
+                
+                with col2:
+                    performance_notes = st.text_area("📊 Performance Notes", placeholder="Performance observations")
+                    contract_notes = st.text_area("📋 Contract Notes", placeholder="Contract-specific notes")
+                
+                submit_subcontractor = st.form_submit_button("🆕 Add Subcontractor", use_container_width=True)
+                
+                if submit_subcontractor:
+                    if not company_name or not trade_category or not primary_contact or not contact_email:
+                        st.error("Please fill in all required fields marked with *")
+                    else:
+                        subcontractor_data = {
+                            "company_name": company_name,
+                            "trade_category": trade_category,
+                            "primary_contact": primary_contact,
+                            "contact_email": contact_email,
+                            "contact_phone": contact_phone,
+                            "office_address": office_address,
+                            "business_license": business_license,
+                            "tax_id": tax_id,
+                            "duns_number": None,
+                            "website": website if website else None,
+                            "years_in_business": years_in_business,
+                            "contract_value": contract_value,
+                            "contract_start_date": contract_start.strftime('%Y-%m-%d'),
+                            "contract_end_date": contract_end.strftime('%Y-%m-%d'),
+                            "scope_of_work": scope_of_work,
+                            "project_name": "Highland Tower Development",
+                            "work_areas": [area.strip() for area in work_areas.split(',') if area.strip()],
+                            "current_phase": current_phase,
+                            "quality_score": quality_score,
+                            "schedule_performance": schedule_performance,
+                            "safety_score": safety_score,
+                            "overall_rating": overall_rating,
+                            "bond_amount": 0.0,
+                            "bond_expiry": None,
+                            "project_manager": project_manager,
+                            "superintendent": superintendent,
+                            "safety_officer": None,
+                            "certifications": [cert.strip() for cert in certifications.split(',') if cert.strip()],
+                            "prequalification_notes": prequalification_notes,
+                            "performance_notes": performance_notes,
+                            "contract_notes": contract_notes,
+                            "prequalified_by": "Current User",
+                            "created_by": "Current User",
+                            "last_updated_by": "Current User"
+                        }
+                        
+                        subcontractor_id = subcontractor_manager.create_subcontractor(subcontractor_data)
+                        st.success(f"✅ Subcontractor added successfully! ID: {subcontractor_id}")
+                        st.rerun()
+        
+        with tab3:
+            st.subheader("✏️ Manage Subcontractors")
+            
+            subcontractors = subcontractor_manager.get_all_subcontractors()
+            if subcontractors:
+                subcontractor_options = [f"{s.company_code} - {s.company_name}" for s in subcontractors]
+                selected_index = st.selectbox("Select Subcontractor to Manage", range(len(subcontractor_options)), format_func=lambda x: subcontractor_options[x])
+                selected_subcontractor = subcontractors[selected_index]
+                
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    if st.button("✏️ Edit Subcontractor", use_container_width=True):
+                        st.session_state.show_edit_subcontractor_form = True
+                
+                with col2:
+                    if st.button("🗑️ Delete Subcontractor", use_container_width=True):
+                        if selected_subcontractor.subcontractor_id in subcontractor_manager.subcontractors:
+                            del subcontractor_manager.subcontractors[selected_subcontractor.subcontractor_id]
+                            st.success("✅ Subcontractor deleted successfully!")
+                            st.rerun()
+                
+                with col3:
+                    if st.button("📋 Duplicate Subcontractor", use_container_width=True):
+                        # Create duplicate with modified name
+                        subcontractor_data = {
+                            "company_name": f"Copy of {selected_subcontractor.company_name}",
+                            "trade_category": selected_subcontractor.trade_category.value,
+                            "primary_contact": selected_subcontractor.primary_contact,
+                            "contact_email": f"copy.{selected_subcontractor.contact_email}",
+                            "contact_phone": selected_subcontractor.contact_phone,
+                            "office_address": selected_subcontractor.office_address,
+                            "business_license": f"COPY-{selected_subcontractor.business_license}",
+                            "tax_id": f"COPY-{selected_subcontractor.tax_id}",
+                            "duns_number": selected_subcontractor.duns_number,
+                            "website": selected_subcontractor.website,
+                            "years_in_business": selected_subcontractor.years_in_business,
+                            "contract_value": 0.0,  # New contract
+                            "contract_start_date": datetime.now().strftime('%Y-%m-%d'),
+                            "contract_end_date": (datetime.now() + timedelta(days=365)).strftime('%Y-%m-%d'),
+                            "scope_of_work": selected_subcontractor.scope_of_work,
+                            "project_name": selected_subcontractor.project_name,
+                            "work_areas": selected_subcontractor.work_areas.copy(),
+                            "current_phase": "Planning",
+                            "quality_score": selected_subcontractor.quality_score,
+                            "schedule_performance": selected_subcontractor.schedule_performance,
+                            "safety_score": selected_subcontractor.safety_score,
+                            "overall_rating": selected_subcontractor.overall_rating.value,
+                            "bond_amount": 0.0,
+                            "bond_expiry": None,
+                            "project_manager": selected_subcontractor.project_manager,
+                            "superintendent": selected_subcontractor.superintendent,
+                            "safety_officer": selected_subcontractor.safety_officer,
+                            "certifications": selected_subcontractor.certifications.copy(),
+                            "prequalification_notes": selected_subcontractor.prequalification_notes,
+                            "performance_notes": "Duplicated from existing subcontractor",
+                            "contract_notes": "New contract - terms to be negotiated",
+                            "prequalified_by": "Current User",
+                            "created_by": "Current User",
+                            "last_updated_by": "Current User"
+                        }
+                        subcontractor_id = subcontractor_manager.create_subcontractor(subcontractor_data)
+                        st.success(f"✅ Subcontractor duplicated! ID: {subcontractor_id}")
+                        st.rerun()
+                
+                # Edit form
+                if st.session_state.get('show_edit_subcontractor_form', False):
+                    with st.form("edit_subcontractor_form"):
+                        st.write("**✏️ Edit Subcontractor Details**")
+                        
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            edit_name = st.text_input("🏢 Company Name", value=selected_subcontractor.company_name)
+                            edit_contact = st.text_input("👤 Primary Contact", value=selected_subcontractor.primary_contact)
+                            edit_email = st.text_input("📧 Email", value=selected_subcontractor.contact_email)
+                            edit_phone = st.text_input("📞 Phone", value=selected_subcontractor.contact_phone)
+                        
+                        with col2:
+                            edit_address = st.text_input("📍 Address", value=selected_subcontractor.office_address)
+                            edit_contract_value = st.number_input("💰 Contract Value", value=float(selected_subcontractor.contract_value), step=1000.0)
+                            edit_scope = st.text_area("🔧 Scope", value=selected_subcontractor.scope_of_work)
+                            edit_notes = st.text_area("📝 Notes", value=selected_subcontractor.performance_notes)
+                        
+                        if st.form_submit_button("✏️ Update Subcontractor"):
+                            # Update the subcontractor
+                            selected_subcontractor.company_name = edit_name
+                            selected_subcontractor.primary_contact = edit_contact
+                            selected_subcontractor.contact_email = edit_email
+                            selected_subcontractor.contact_phone = edit_phone
+                            selected_subcontractor.office_address = edit_address
+                            selected_subcontractor.contract_value = edit_contract_value
+                            selected_subcontractor.scope_of_work = edit_scope
+                            selected_subcontractor.performance_notes = edit_notes
+                            selected_subcontractor.last_updated_by = "Current User"
+                            selected_subcontractor.updated_at = datetime.now().isoformat()
+                            
+                            st.success("✅ Subcontractor updated successfully!")
+                            st.session_state.show_edit_subcontractor_form = False
+                            st.rerun()
+            else:
+                st.info("No subcontractors available. Add some subcontractors first.")
+        
+        with tab4:
+            st.subheader("📊 Subcontractor Analytics")
+            
+            if metrics:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write("**📊 Status Distribution:**")
+                    for status, count in metrics['status_breakdown'].items():
+                        status_icon = {
+                            "On Site": "🟢",
+                            "Active": "🟢",
+                            "Awarded": "🟡",
+                            "Bidding": "🔵",
+                            "Prequalified": "⚪",
+                            "Completed": "🟢",
+                            "Terminated": "🔴"
+                        }.get(status, "⚪")
+                        st.write(f"• {status_icon} {status}: {count}")
+                    
+                    st.write("**🔧 Trade Distribution:**")
+                    for trade, count in metrics['trade_breakdown'].items():
+                        if count > 0:
+                            st.write(f"• {trade}: {count}")
+                
+                with col2:
+                    st.write("**📈 Performance Metrics:**")
+                    st.write(f"• **Total Contract Value:** ${metrics['total_contract_value']:,.0f}")
+                    st.write(f"• **Total Paid:** ${metrics['total_paid']:,.0f}")
+                    st.write(f"• **Total Pending:** ${metrics['total_pending']:,.0f}")
+                    st.write(f"• **Average Quality Score:** {metrics['average_quality_score']:.1f}")
+                    st.write(f"• **Average Schedule Performance:** {metrics['average_schedule_performance']:.1f}")
+                    st.write(f"• **Average Safety Score:** {metrics['average_safety_score']:.1f}")
+                    
+                    # Issues needing attention
+                    if metrics['needing_performance_review'] > 0:
+                        st.write(f"**📋 Need Performance Review:** {metrics['needing_performance_review']}")
+                    
+                    if metrics['insurance_expiring_soon'] > 0:
+                        st.write(f"**🛡️ Insurance Expiring Soon:** {metrics['insurance_expiring_soon']}")
+        
+        return
+        
+    except ImportError:
+        st.error("Enterprise Subcontractor Management module not available")
+        render_subcontractor_management_basic()
+
+def render_subcontractor_management_basic():
+    """Basic subcontractor management module - fallback version"""
     st.markdown("""
     <div class="module-header">
         <h1>🏭 Subcontractor Management</h1>
@@ -10691,7 +11158,401 @@ def render_issues_risks_basic():
     st.info("⚠️ Issues & Risks module with comprehensive risk management")
 
 def render_documents():
-    """Complete Document Management with full CRUD functionality"""
+    """Enterprise Document Management with full CRUD functionality"""
+    try:
+        from modules.document_management_backend import document_manager, DocumentStatus, DocumentCategory, AccessLevel
+        
+        st.markdown("""
+        <div class="module-header">
+            <h1>📄 Document Management</h1>
+            <p>Highland Tower Development - Comprehensive document control and version management</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Display summary metrics
+        metrics = document_manager.generate_document_metrics()
+        if metrics:
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("📄 Total Documents", metrics['total_documents'])
+            with col2:
+                st.metric("💾 Storage Used", f"{metrics['total_file_size_mb']:.1f} MB")
+            with col3:
+                st.metric("📋 Needs Review", metrics['documents_needing_review'])
+            with col4:
+                st.metric("✅ Approved", metrics['approved_documents'])
+        
+        # Create tabs
+        tab1, tab2, tab3, tab4 = st.tabs(["📄 All Documents", "➕ Upload New", "✏️ Manage", "📊 Analytics"])
+        
+        with tab1:
+            st.subheader("📄 Document Library")
+            
+            # Search and filter options
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                search_query = st.text_input("🔍 Search Documents", placeholder="Search by title, description, or keywords")
+            with col2:
+                status_filter = st.selectbox("Filter by Status", ["All"] + [status.value for status in DocumentStatus])
+            with col3:
+                category_filter = st.selectbox("Filter by Category", ["All"] + [cat.value for cat in DocumentCategory])
+            
+            # Get filtered documents
+            if search_query:
+                documents = document_manager.search_documents(search_query)
+            else:
+                documents = document_manager.get_all_documents()
+            
+            if status_filter != "All":
+                documents = [d for d in documents if d.status.value == status_filter]
+            if category_filter != "All":
+                documents = [d for d in documents if d.category.value == category_filter]
+            
+            # Display documents
+            for document in documents:
+                status_color = {
+                    DocumentStatus.APPROVED: "🟢",
+                    DocumentStatus.UNDER_REVIEW: "🟡",
+                    DocumentStatus.DRAFT: "🔵",
+                    DocumentStatus.SUPERSEDED: "🟠",
+                    DocumentStatus.ARCHIVED: "⚪"
+                }.get(document.status, "⚪")
+                
+                checkout_indicator = f"🔒 CHECKED OUT by {document.checked_out_by}" if document.is_checked_out() else ""
+                expiry_warning = "⚠️ EXPIRED" if document.is_expired() else ""
+                review_needed = "📋 REVIEW NEEDED" if document.needs_review() else ""
+                
+                with st.expander(f"{status_color} {document.document_number} | {document.title} | {document.current_version} {checkout_indicator} {expiry_warning} {review_needed}"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📂 Category:** {document.category.value}")
+                        st.write(f"**📋 Discipline:** {document.discipline}")
+                        st.write(f"**📄 File:** {document.filename}")
+                        st.write(f"**📊 Size:** {document.file_size / 1024 / 1024:.1f} MB")
+                        st.write(f"**🔐 Access:** {document.access_level.value}")
+                        if document.drawing_number:
+                            st.write(f"**📐 Drawing #:** {document.drawing_number}")
+                    
+                    with col2:
+                        st.write(f"**👤 Created By:** {document.created_by}")
+                        st.write(f"**📅 Created:** {document.created_date}")
+                        st.write(f"**📅 Modified:** {document.modified_date}")
+                        if document.approved_by:
+                            st.write(f"**✅ Approved By:** {document.approved_by}")
+                            st.write(f"**📅 Approved:** {document.approval_date}")
+                        if document.expiry_date:
+                            st.write(f"**⏰ Expires:** {document.expiry_date}")
+                    
+                    if document.description:
+                        st.write(f"**📝 Description:** {document.description}")
+                    
+                    if document.keywords:
+                        st.write(f"**🏷️ Keywords:** {', '.join(document.keywords)}")
+                    
+                    # Document status indicators
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        if document.is_checked_out():
+                            st.error(f"🔒 Checked out by {document.checked_out_by}")
+                        else:
+                            st.success("✅ Available")
+                    with col2:
+                        if document.needs_review():
+                            st.warning("📋 Needs Review")
+                        elif document.status == DocumentStatus.APPROVED:
+                            st.success("✅ Approved")
+                        else:
+                            st.info(f"📄 {document.status.value}")
+                    with col3:
+                        if document.is_expired():
+                            st.error("⚠️ Expired")
+                        else:
+                            st.success("📅 Current")
+                    
+                    # Version history
+                    if document.version_history:
+                        st.write("**📊 Version History:**")
+                        for version in document.version_history[-3:]:  # Show last 3 versions
+                            st.write(f"• {version.version_number} - {version.upload_date} by {version.uploaded_by}")
+                    
+                    # Reviews
+                    if document.reviews:
+                        st.write("**📋 Reviews:**")
+                        for review in document.reviews[-2:]:  # Show last 2 reviews
+                            review_icon = {"Approved": "✅", "Rejected": "❌", "Needs Changes": "⚠️"}.get(review.status, "📋")
+                            st.write(f"• {review_icon} {review.reviewer_name} ({review.review_date}): {review.comments}")
+                    
+                    # Quick actions
+                    st.write("---")
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        if not document.is_checked_out():
+                            if st.button(f"🔓 Check Out", key=f"btn_checkout_{document.document_id}"):
+                                if document_manager.checkout_document(document.document_id, "Current User"):
+                                    st.success("Document checked out!")
+                                    st.rerun()
+                        else:
+                            if st.button(f"🔒 Check In", key=f"btn_checkin_{document.document_id}"):
+                                if document_manager.checkin_document(document.document_id):
+                                    st.success("Document checked in!")
+                                    st.rerun()
+                    
+                    with col2:
+                        if st.button(f"📋 Add Review", key=f"btn_review_{document.document_id}"):
+                            st.session_state[f"show_review_{document.document_id}"] = True
+                    
+                    with col3:
+                        new_status = st.selectbox(f"Update Status", 
+                                                [status.value for status in DocumentStatus],
+                                                index=[status.value for status in DocumentStatus].index(document.status.value),
+                                                key=f"status_{document.document_id}")
+                        if st.button(f"📊 Update", key=f"btn_status_{document.document_id}"):
+                            document.status = DocumentStatus(new_status)
+                            st.success("Status updated!")
+                            st.rerun()
+                    
+                    # Review form
+                    if st.session_state.get(f"show_review_{document.document_id}", False):
+                        with st.form(f"review_form_{document.document_id}"):
+                            st.write("**📋 Add Document Review**")
+                            reviewer_name = st.text_input("Reviewer Name")
+                            review_status = st.selectbox("Review Status", ["Approved", "Rejected", "Needs Changes"])
+                            review_comments = st.text_area("Comments")
+                            markup_file = st.text_input("Markup File (optional)")
+                            
+                            if st.form_submit_button("📋 Submit Review"):
+                                review_data = {
+                                    "reviewer_name": reviewer_name,
+                                    "review_date": datetime.now().strftime('%Y-%m-%d'),
+                                    "status": review_status,
+                                    "comments": review_comments,
+                                    "markup_file": markup_file if markup_file else None
+                                }
+                                if document_manager.add_review(document.document_id, review_data):
+                                    st.success("Review added!")
+                                    st.session_state[f"show_review_{document.document_id}"] = False
+                                    st.rerun()
+        
+        with tab2:
+            st.subheader("➕ Upload New Document")
+            
+            with st.form("create_document_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    title = st.text_input("📝 Document Title*", placeholder="Enter document title")
+                    description = st.text_area("📋 Description", placeholder="Detailed description")
+                    category = st.selectbox("📂 Category*", options=[cat.value for cat in DocumentCategory])
+                    discipline = st.text_input("📋 Discipline*", placeholder="e.g., Architecture, Structural")
+                    work_package = st.text_input("📦 Work Package", value="Highland Tower Development")
+                
+                with col2:
+                    filename = st.text_input("📄 Filename*", placeholder="document.pdf")
+                    file_type = st.selectbox("📄 File Type*", options=["PDF", "DWG", "DOC", "XLS", "IMG", "ZIP"])
+                    file_size = st.number_input("📊 File Size (MB)", min_value=0.1, step=0.1, value=1.0)
+                    access_level = st.selectbox("🔐 Access Level*", options=[level.value for level in AccessLevel])
+                    drawing_number = st.text_input("📐 Drawing Number", placeholder="A-301, S-201, etc.")
+                
+                # Additional details
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    requires_approval = st.checkbox("📋 Requires Approval", value=True)
+                    password_protected = st.checkbox("🔒 Password Protected")
+                    keywords = st.text_input("🏷️ Keywords", placeholder="Comma-separated keywords")
+                
+                with col2:
+                    expiry_date = st.date_input("⏰ Expiry Date (optional)")
+                    distribution_list = st.text_input("📧 Distribution List", placeholder="Comma-separated recipients")
+                    related_docs = st.text_input("🔗 Related Documents", placeholder="Document IDs, comma-separated")
+                
+                notes = st.text_area("📝 Notes", placeholder="Additional notes about this document")
+                
+                # File upload simulation
+                uploaded_file = st.file_uploader("📁 Select File", type=['pdf', 'dwg', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'png', 'zip'])
+                
+                submit_document = st.form_submit_button("📁 Upload Document", use_container_width=True)
+                
+                if submit_document:
+                    if not title or not category or not discipline or not filename:
+                        st.error("Please fill in all required fields marked with *")
+                    else:
+                        document_data = {
+                            "title": title,
+                            "description": description,
+                            "category": category,
+                            "filename": filename,
+                            "file_type": file_type,
+                            "file_size": int(file_size * 1024 * 1024),  # Convert MB to bytes
+                            "file_path": f"/project/{category.lower().replace(' ', '_')}/",
+                            "project_name": "Highland Tower Development",
+                            "discipline": discipline,
+                            "work_package": work_package,
+                            "drawing_number": drawing_number if drawing_number else None,
+                            "access_level": access_level,
+                            "password_protected": password_protected,
+                            "requires_approval": requires_approval,
+                            "keywords": [kw.strip() for kw in keywords.split(',') if kw.strip()],
+                            "related_documents": [doc.strip() for doc in related_docs.split(',') if doc.strip()],
+                            "expiry_date": expiry_date.strftime('%Y-%m-%d') if expiry_date else None,
+                            "notes": notes,
+                            "review_comments": "",
+                            "distribution_list": [dist.strip() for dist in distribution_list.split(',') if dist.strip()],
+                            "created_by": "Current User",
+                            "last_modified_by": "Current User"
+                        }
+                        
+                        document_id = document_manager.create_document(document_data)
+                        st.success(f"✅ Document uploaded successfully! ID: {document_id}")
+                        st.rerun()
+        
+        with tab3:
+            st.subheader("✏️ Manage Documents")
+            
+            documents = document_manager.get_all_documents()
+            if documents:
+                document_options = [f"{d.document_number} - {d.title}" for d in documents]
+                selected_index = st.selectbox("Select Document to Manage", range(len(document_options)), format_func=lambda x: document_options[x])
+                selected_document = documents[selected_index]
+                
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    if st.button("✏️ Edit Document", use_container_width=True):
+                        st.session_state.show_edit_document_form = True
+                
+                with col2:
+                    if st.button("🗑️ Delete Document", use_container_width=True):
+                        if selected_document.document_id in document_manager.documents:
+                            del document_manager.documents[selected_document.document_id]
+                            st.success("✅ Document deleted successfully!")
+                            st.rerun()
+                
+                with col3:
+                    if st.button("📋 Duplicate Document", use_container_width=True):
+                        # Create duplicate with modified title
+                        document_data = {
+                            "title": f"Copy of {selected_document.title}",
+                            "description": selected_document.description,
+                            "category": selected_document.category.value,
+                            "filename": f"COPY_{selected_document.filename}",
+                            "file_type": selected_document.file_type,
+                            "file_size": selected_document.file_size,
+                            "file_path": selected_document.file_path,
+                            "project_name": selected_document.project_name,
+                            "discipline": selected_document.discipline,
+                            "work_package": selected_document.work_package,
+                            "drawing_number": f"COPY-{selected_document.drawing_number}" if selected_document.drawing_number else None,
+                            "access_level": selected_document.access_level.value,
+                            "password_protected": selected_document.password_protected,
+                            "requires_approval": selected_document.requires_approval,
+                            "keywords": selected_document.keywords.copy(),
+                            "related_documents": selected_document.related_documents.copy(),
+                            "expiry_date": selected_document.expiry_date,
+                            "notes": selected_document.notes,
+                            "review_comments": "",
+                            "distribution_list": selected_document.distribution_list.copy(),
+                            "created_by": "Current User",
+                            "last_modified_by": "Current User"
+                        }
+                        document_id = document_manager.create_document(document_data)
+                        st.success(f"✅ Document duplicated! ID: {document_id}")
+                        st.rerun()
+                
+                # Edit form
+                if st.session_state.get('show_edit_document_form', False):
+                    with st.form("edit_document_form"):
+                        st.write("**✏️ Edit Document Details**")
+                        
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            edit_title = st.text_input("📝 Title", value=selected_document.title)
+                            edit_description = st.text_area("📋 Description", value=selected_document.description)
+                            edit_discipline = st.text_input("📋 Discipline", value=selected_document.discipline)
+                            edit_keywords = st.text_input("🏷️ Keywords", value=", ".join(selected_document.keywords))
+                        
+                        with col2:
+                            edit_access = st.selectbox("🔐 Access Level", 
+                                                     options=[level.value for level in AccessLevel],
+                                                     index=[level.value for level in AccessLevel].index(selected_document.access_level.value))
+                            edit_notes = st.text_area("📝 Notes", value=selected_document.notes)
+                            edit_distribution = st.text_input("📧 Distribution", value=", ".join(selected_document.distribution_list))
+                        
+                        if st.form_submit_button("✏️ Update Document"):
+                            # Update the document
+                            selected_document.title = edit_title
+                            selected_document.description = edit_description
+                            selected_document.discipline = edit_discipline
+                            selected_document.keywords = [kw.strip() for kw in edit_keywords.split(',') if kw.strip()]
+                            selected_document.access_level = AccessLevel(edit_access)
+                            selected_document.notes = edit_notes
+                            selected_document.distribution_list = [dist.strip() for dist in edit_distribution.split(',') if dist.strip()]
+                            selected_document.last_modified_by = "Current User"
+                            selected_document.modified_date = datetime.now().strftime('%Y-%m-%d')
+                            
+                            st.success("✅ Document updated successfully!")
+                            st.session_state.show_edit_document_form = False
+                            st.rerun()
+            else:
+                st.info("No documents available. Upload some documents first.")
+        
+        with tab4:
+            st.subheader("📊 Document Analytics")
+            
+            if metrics:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write("**📊 Status Distribution:**")
+                    for status, count in metrics['status_breakdown'].items():
+                        status_icon = {
+                            "Approved": "🟢",
+                            "Under Review": "🟡",
+                            "Draft": "🔵",
+                            "Superseded": "🟠",
+                            "Archived": "⚪"
+                        }.get(status, "⚪")
+                        st.write(f"• {status_icon} {status}: {count}")
+                    
+                    st.write("**📂 Category Distribution:**")
+                    for category, count in metrics['category_breakdown'].items():
+                        if count > 0:
+                            st.write(f"• {category}: {count}")
+                
+                with col2:
+                    st.write("**📈 Performance Metrics:**")
+                    st.write(f"• **Total Storage:** {metrics['total_file_size_mb']:.1f} MB")
+                    st.write(f"• **Average File Size:** {metrics['average_file_size_mb']:.1f} MB")
+                    st.write(f"• **Total Versions:** {metrics['total_versions']}")
+                    st.write(f"• **Documents Needing Review:** {metrics['documents_needing_review']}")
+                    st.write(f"• **Expired Documents:** {metrics['expired_documents']}")
+                    st.write(f"• **Checked Out:** {metrics['checked_out_documents']}")
+                    
+                    # Documents needing attention
+                    review_needed = document_manager.get_documents_needing_review()
+                    if review_needed:
+                        st.write("**📋 Documents Needing Review:**")
+                        for doc in review_needed[:5]:
+                            st.write(f"• {doc.title}")
+                    
+                    expired_docs = document_manager.get_expired_documents()
+                    if expired_docs:
+                        st.write("**⚠️ Expired Documents:**")
+                        for doc in expired_docs[:5]:
+                            st.write(f"• {doc.title}")
+        
+        return
+        
+    except ImportError:
+        st.error("Enterprise Document Management module not available")
+        render_documents_basic()
+
+def render_documents_basic():
+    """Basic document management module - fallback version"""
     st.markdown("""
     <div class="module-header">
         <h1>📁 Document Management</h1>
@@ -12128,6 +12989,442 @@ def render_material_management_basic():
     """Basic material management module - fallback version"""
     st.title("📦 Material Management")
     st.info("📦 Material management module for inventory tracking")
+
+def render_equipment_tracking():
+    """Enterprise Equipment Tracking with full CRUD functionality"""
+    try:
+        from modules.equipment_tracking_backend import equipment_manager, EquipmentStatus, EquipmentCategory, MaintenanceType
+        
+        st.markdown("""
+        <div class="module-header">
+            <h1>🚧 Equipment Tracking</h1>
+            <p>Highland Tower Development - Comprehensive asset management and maintenance tracking</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Display summary metrics
+        metrics = equipment_manager.generate_equipment_metrics()
+        if metrics:
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("🚧 Total Equipment", metrics['total_equipment'])
+            with col2:
+                st.metric("💰 Asset Value", f"${metrics['total_asset_value']:,.0f}")
+            with col3:
+                st.metric("⚠️ Needs Maintenance", metrics['maintenance_needed'])
+            with col4:
+                st.metric("📊 Avg Utilization", f"{metrics['average_utilization']}%")
+        
+        # Create tabs
+        tab1, tab2, tab3, tab4 = st.tabs(["🚧 All Equipment", "➕ Add Equipment", "✏️ Manage", "📊 Analytics"])
+        
+        with tab1:
+            st.subheader("🚧 Equipment Inventory")
+            
+            # Filter options
+            col1, col2 = st.columns(2)
+            with col1:
+                status_filter = st.selectbox("Filter by Status", ["All"] + [status.value for status in EquipmentStatus])
+            with col2:
+                category_filter = st.selectbox("Filter by Category", ["All"] + [cat.value for cat in EquipmentCategory])
+            
+            # Get filtered equipment
+            equipment_list = equipment_manager.get_all_equipment()
+            
+            if status_filter != "All":
+                equipment_list = [eq for eq in equipment_list if eq.status.value == status_filter]
+            if category_filter != "All":
+                equipment_list = [eq for eq in equipment_list if eq.category.value == category_filter]
+            
+            # Display equipment
+            for equipment in equipment_list:
+                status_color = {
+                    EquipmentStatus.ACTIVE: "🟢",
+                    EquipmentStatus.MAINTENANCE: "🟡",
+                    EquipmentStatus.IDLE: "🔵",
+                    EquipmentStatus.OUT_OF_SERVICE: "🔴",
+                    EquipmentStatus.RENTED: "🟠"
+                }.get(equipment.status, "⚪")
+                
+                maintenance_warning = "⚠️ MAINTENANCE DUE" if equipment.needs_maintenance() else ""
+                inspection_warning = "🔍 INSPECTION OVERDUE" if equipment.is_overdue_inspection() else ""
+                
+                with st.expander(f"{status_color} {equipment.equipment_code} | {equipment.name} | {equipment.total_hours:.1f}h {maintenance_warning} {inspection_warning}"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📂 Category:** {equipment.category.value}")
+                        st.write(f"**🏭 Manufacturer:** {equipment.manufacturer}")
+                        st.write(f"**📋 Model:** {equipment.model}")
+                        st.write(f"**🔢 Serial:** {equipment.serial_number}")
+                        st.write(f"**📅 Year:** {equipment.year_manufactured}")
+                        st.write(f"**📍 Location:** {equipment.current_location}")
+                    
+                    with col2:
+                        st.write(f"**👤 Assigned To:** {equipment.assigned_to}")
+                        st.write(f"**💰 Current Value:** ${equipment.current_value:,.0f}")
+                        st.write(f"**⏱️ Total Hours:** {equipment.total_hours:.1f}")
+                        st.write(f"**📊 This Month:** {equipment.hours_this_month:.1f} hours")
+                        if equipment.rental_rate_daily > 0:
+                            st.write(f"**💸 Daily Rate:** ${equipment.rental_rate_daily:.0f}")
+                        st.write(f"**🔧 Ownership:** {equipment.owned_rented}")
+                    
+                    if equipment.description:
+                        st.write(f"**📝 Description:** {equipment.description}")
+                    
+                    # Performance metrics
+                    utilization = equipment.calculate_utilization_rate()
+                    
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("Utilization", f"{utilization:.1f}%")
+                    with col2:
+                        if equipment.needs_maintenance():
+                            st.error("⚠️ Maintenance Due")
+                        else:
+                            st.success("✅ Maintenance OK")
+                    with col3:
+                        if equipment.is_overdue_inspection():
+                            st.error("🔍 Inspection Overdue")
+                        else:
+                            st.success("✅ Inspection OK")
+                    
+                    # Quick actions
+                    st.write("---")
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        if st.button(f"🔧 Add Maintenance", key=f"btn_maint_{equipment.equipment_id}"):
+                            st.session_state[f"show_maintenance_{equipment.equipment_id}"] = True
+                    
+                    with col2:
+                        if st.button(f"⏱️ Record Usage", key=f"btn_usage_{equipment.equipment_id}"):
+                            st.session_state[f"show_usage_{equipment.equipment_id}"] = True
+                    
+                    with col3:
+                        new_status = st.selectbox(f"Update Status", 
+                                                [status.value for status in EquipmentStatus],
+                                                index=[status.value for status in EquipmentStatus].index(equipment.status.value),
+                                                key=f"status_{equipment.equipment_id}")
+                        if st.button(f"📊 Update", key=f"btn_status_{equipment.equipment_id}"):
+                            if equipment_manager.update_equipment_status(equipment.equipment_id, EquipmentStatus(new_status)):
+                                st.success("Status updated!")
+                                st.rerun()
+                    
+                    # Maintenance form
+                    if st.session_state.get(f"show_maintenance_{equipment.equipment_id}", False):
+                        with st.form(f"maintenance_form_{equipment.equipment_id}"):
+                            st.write("**🔧 Add Maintenance Record**")
+                            maint_date = st.date_input("Maintenance Date")
+                            maint_type = st.selectbox("Maintenance Type", [mtype.value for mtype in MaintenanceType])
+                            maint_desc = st.text_area("Description")
+                            performed_by = st.text_input("Performed By")
+                            maint_cost = st.number_input("Cost", min_value=0.0, step=10.0)
+                            parts_replaced = st.text_input("Parts Replaced (comma-separated)")
+                            next_service = st.date_input("Next Service Date")
+                            maint_notes = st.text_area("Notes")
+                            
+                            if st.form_submit_button("🔧 Add Maintenance"):
+                                maintenance_data = {
+                                    "maintenance_date": maint_date.strftime('%Y-%m-%d'),
+                                    "maintenance_type": maint_type,
+                                    "description": maint_desc,
+                                    "performed_by": performed_by,
+                                    "cost": maint_cost,
+                                    "parts_replaced": [part.strip() for part in parts_replaced.split(',') if part.strip()],
+                                    "next_service_date": next_service.strftime('%Y-%m-%d'),
+                                    "notes": maint_notes
+                                }
+                                if equipment_manager.add_maintenance_record(equipment.equipment_id, maintenance_data):
+                                    st.success("Maintenance record added!")
+                                    st.session_state[f"show_maintenance_{equipment.equipment_id}"] = False
+                                    st.rerun()
+                    
+                    # Usage form
+                    if st.session_state.get(f"show_usage_{equipment.equipment_id}", False):
+                        with st.form(f"usage_form_{equipment.equipment_id}"):
+                            st.write("**⏱️ Record Equipment Usage**")
+                            use_start = st.date_input("Start Date")
+                            use_end = st.date_input("End Date")
+                            operator = st.text_input("Operator")
+                            use_location = st.text_input("Location")
+                            project_phase = st.text_input("Project Phase")
+                            hours_used = st.number_input("Hours Used", min_value=0.1, step=0.1)
+                            fuel_consumed = st.number_input("Fuel Consumed (L)", min_value=0.0, step=0.1)
+                            use_notes = st.text_area("Usage Notes")
+                            
+                            if st.form_submit_button("⏱️ Record Usage"):
+                                usage_data = {
+                                    "start_date": use_start.strftime('%Y-%m-%d'),
+                                    "end_date": use_end.strftime('%Y-%m-%d'),
+                                    "operator": operator,
+                                    "location": use_location,
+                                    "project_phase": project_phase,
+                                    "hours_used": hours_used,
+                                    "fuel_consumed": fuel_consumed,
+                                    "notes": use_notes
+                                }
+                                if equipment_manager.add_usage_record(equipment.equipment_id, usage_data):
+                                    st.success("Usage recorded!")
+                                    st.session_state[f"show_usage_{equipment.equipment_id}"] = False
+                                    st.rerun()
+        
+        with tab2:
+            st.subheader("➕ Add New Equipment")
+            
+            with st.form("create_equipment_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    name = st.text_input("📝 Equipment Name*", placeholder="Enter equipment name")
+                    description = st.text_area("📋 Description", placeholder="Detailed description")
+                    category = st.selectbox("📂 Category*", options=[cat.value for cat in EquipmentCategory])
+                    manufacturer = st.text_input("🏭 Manufacturer*", placeholder="Equipment manufacturer")
+                    model = st.text_input("📋 Model*", placeholder="Model number/name")
+                
+                with col2:
+                    serial_number = st.text_input("🔢 Serial Number*", placeholder="Serial number")
+                    year_manufactured = st.number_input("📅 Year Manufactured", min_value=1990, max_value=2030, step=1, value=2023)
+                    owned_rented = st.selectbox("🔧 Ownership*", options=["Owned", "Rented"])
+                    purchase_cost = st.number_input("💰 Purchase/Rental Cost*", min_value=0.0, step=100.0)
+                    current_value = st.number_input("💸 Current Value", min_value=0.0, step=100.0)
+                
+                # Specifications
+                st.write("**📋 Specifications**")
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    capacity = st.text_input("⚖️ Capacity", placeholder="e.g., 20 tons")
+                    weight = st.text_input("🏋️ Weight", placeholder="e.g., 65 tons")
+                
+                with col2:
+                    dimensions = st.text_input("📐 Dimensions", placeholder="L x W x H")
+                    power_rating = st.text_input("⚡ Power Rating", placeholder="e.g., 132 kW")
+                
+                with col3:
+                    fuel_type = st.text_input("⛽ Fuel Type", placeholder="e.g., Diesel, Electric")
+                    fuel_efficiency = st.number_input("📊 Fuel Efficiency (L/hr)", min_value=0.0, step=0.1)
+                
+                # Location and assignment
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    current_location = st.text_input("📍 Current Location*", placeholder="Where is this equipment?")
+                    assigned_to = st.text_input("👤 Assigned To", placeholder="Person or crew assigned")
+                    project_assignment = st.text_input("📋 Project Assignment", value="Highland Tower Development")
+                
+                with col2:
+                    service_interval = st.number_input("🔧 Service Interval (hours)", min_value=1, step=1, value=200)
+                    rental_rate = st.number_input("💰 Daily Rental Rate", min_value=0.0, step=10.0)
+                    acquisition_date = st.date_input("📅 Acquisition Date*")
+                
+                # Additional details
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    certifications = st.text_input("📜 Required Certifications", placeholder="Comma-separated list")
+                    manual_location = st.text_input("📖 Manual Location", placeholder="Where are the manuals?")
+                
+                with col2:
+                    warranty_expiry = st.date_input("🛡️ Warranty Expiry")
+                    insurance_policy = st.text_input("🛡️ Insurance Policy", placeholder="Policy number")
+                
+                notes = st.text_area("📝 Additional Notes", placeholder="Procurement notes, operational details, etc.")
+                
+                submit_equipment = st.form_submit_button("🆕 Add Equipment", use_container_width=True)
+                
+                if submit_equipment:
+                    if not name or not category or not manufacturer or not model or not serial_number:
+                        st.error("Please fill in all required fields marked with *")
+                    else:
+                        equipment_data = {
+                            "name": name,
+                            "description": description,
+                            "category": category,
+                            "manufacturer": manufacturer,
+                            "model": model,
+                            "serial_number": serial_number,
+                            "year_manufactured": year_manufactured,
+                            "capacity": capacity,
+                            "weight": weight,
+                            "dimensions": dimensions,
+                            "power_rating": power_rating,
+                            "fuel_type": fuel_type,
+                            "purchase_cost": purchase_cost,
+                            "current_value": current_value if current_value > 0 else purchase_cost,
+                            "rental_rate_daily": rental_rate,
+                            "depreciation_rate": 15.0,  # Default 15% per year
+                            "current_location": current_location,
+                            "assigned_to": assigned_to,
+                            "project_assignment": project_assignment,
+                            "fuel_efficiency": fuel_efficiency,
+                            "service_interval_hours": service_interval,
+                            "certifications_required": [cert.strip() for cert in certifications.split(',') if cert.strip()],
+                            "manual_location": manual_location,
+                            "warranty_expiry": warranty_expiry.strftime('%Y-%m-%d') if warranty_expiry else None,
+                            "insurance_policy": insurance_policy,
+                            "procurement_notes": notes,
+                            "operational_notes": "",
+                            "safety_notes": "",
+                            "owned_rented": owned_rented,
+                            "acquisition_date": acquisition_date.strftime('%Y-%m-%d'),
+                            "created_by": "Current User",
+                            "updated_by": "Current User"
+                        }
+                        
+                        equipment_id = equipment_manager.create_equipment(equipment_data)
+                        st.success(f"✅ Equipment added successfully! ID: {equipment_id}")
+                        st.rerun()
+        
+        with tab3:
+            st.subheader("✏️ Manage Equipment")
+            
+            equipment_list = equipment_manager.get_all_equipment()
+            if equipment_list:
+                equipment_options = [f"{eq.equipment_code} - {eq.name}" for eq in equipment_list]
+                selected_index = st.selectbox("Select Equipment to Manage", range(len(equipment_options)), format_func=lambda x: equipment_options[x])
+                selected_equipment = equipment_list[selected_index]
+                
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    if st.button("✏️ Edit Equipment", use_container_width=True):
+                        st.session_state.show_edit_equipment_form = True
+                
+                with col2:
+                    if st.button("🗑️ Delete Equipment", use_container_width=True):
+                        if selected_equipment.equipment_id in equipment_manager.equipment:
+                            del equipment_manager.equipment[selected_equipment.equipment_id]
+                            st.success("✅ Equipment deleted successfully!")
+                            st.rerun()
+                
+                with col3:
+                    if st.button("📋 Duplicate Equipment", use_container_width=True):
+                        # Create duplicate with modified name
+                        equipment_data = {
+                            "name": f"Copy of {selected_equipment.name}",
+                            "description": selected_equipment.description,
+                            "category": selected_equipment.category.value,
+                            "manufacturer": selected_equipment.manufacturer,
+                            "model": selected_equipment.model,
+                            "serial_number": f"COPY-{selected_equipment.serial_number}",
+                            "year_manufactured": selected_equipment.year_manufactured,
+                            "capacity": selected_equipment.capacity,
+                            "weight": selected_equipment.weight,
+                            "dimensions": selected_equipment.dimensions,
+                            "power_rating": selected_equipment.power_rating,
+                            "fuel_type": selected_equipment.fuel_type,
+                            "purchase_cost": selected_equipment.purchase_cost,
+                            "current_value": selected_equipment.current_value,
+                            "rental_rate_daily": selected_equipment.rental_rate_daily,
+                            "depreciation_rate": selected_equipment.depreciation_rate,
+                            "current_location": "New Location",
+                            "assigned_to": selected_equipment.assigned_to,
+                            "project_assignment": selected_equipment.project_assignment,
+                            "fuel_efficiency": selected_equipment.fuel_efficiency,
+                            "service_interval_hours": selected_equipment.service_interval_hours,
+                            "certifications_required": selected_equipment.certifications_required,
+                            "manual_location": selected_equipment.manual_location,
+                            "warranty_expiry": selected_equipment.warranty_expiry,
+                            "insurance_policy": f"COPY-{selected_equipment.insurance_policy}",
+                            "procurement_notes": selected_equipment.procurement_notes,
+                            "operational_notes": selected_equipment.operational_notes,
+                            "safety_notes": selected_equipment.safety_notes,
+                            "owned_rented": selected_equipment.owned_rented,
+                            "acquisition_date": datetime.now().strftime('%Y-%m-%d'),
+                            "created_by": "Current User",
+                            "updated_by": "Current User"
+                        }
+                        equipment_id = equipment_manager.create_equipment(equipment_data)
+                        st.success(f"✅ Equipment duplicated! ID: {equipment_id}")
+                        st.rerun()
+                
+                # Edit form
+                if st.session_state.get('show_edit_equipment_form', False):
+                    with st.form("edit_equipment_form"):
+                        st.write("**✏️ Edit Equipment Details**")
+                        
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            edit_name = st.text_input("📝 Name", value=selected_equipment.name)
+                            edit_description = st.text_area("📋 Description", value=selected_equipment.description)
+                            edit_location = st.text_input("📍 Location", value=selected_equipment.current_location)
+                            edit_assigned = st.text_input("👤 Assigned To", value=selected_equipment.assigned_to)
+                        
+                        with col2:
+                            edit_value = st.number_input("💰 Current Value", value=float(selected_equipment.current_value), step=100.0)
+                            edit_rental_rate = st.number_input("💸 Daily Rate", value=float(selected_equipment.rental_rate_daily), step=10.0)
+                            edit_notes = st.text_area("📝 Notes", value=selected_equipment.operational_notes)
+                        
+                        if st.form_submit_button("✏️ Update Equipment"):
+                            # Update the equipment
+                            selected_equipment.name = edit_name
+                            selected_equipment.description = edit_description
+                            selected_equipment.current_location = edit_location
+                            selected_equipment.assigned_to = edit_assigned
+                            selected_equipment.current_value = edit_value
+                            selected_equipment.rental_rate_daily = edit_rental_rate
+                            selected_equipment.operational_notes = edit_notes
+                            selected_equipment.updated_by = "Current User"
+                            selected_equipment.updated_at = datetime.now().isoformat()
+                            
+                            st.success("✅ Equipment updated successfully!")
+                            st.session_state.show_edit_equipment_form = False
+                            st.rerun()
+            else:
+                st.info("No equipment available. Add some equipment first.")
+        
+        with tab4:
+            st.subheader("📊 Equipment Analytics")
+            
+            if metrics:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write("**📊 Status Distribution:**")
+                    for status, count in metrics['status_breakdown'].items():
+                        status_icon = {
+                            "Active": "🟢",
+                            "Under Maintenance": "🟡",
+                            "Idle": "🔵",
+                            "Out of Service": "🔴",
+                            "Rented Out": "🟠"
+                        }.get(status, "⚪")
+                        st.write(f"• {status_icon} {status}: {count}")
+                    
+                    st.write("**📂 Category Distribution:**")
+                    for category, count in metrics['category_breakdown'].items():
+                        if count > 0:
+                            st.write(f"• {category}: {count}")
+                
+                with col2:
+                    st.write("**📈 Performance Metrics:**")
+                    st.write(f"• **Total Asset Value:** ${metrics['total_asset_value']:,.0f}")
+                    st.write(f"• **Monthly Rental Cost:** ${metrics['monthly_rental_cost']:,.0f}")
+                    st.write(f"• **Average Utilization:** {metrics['average_utilization']}%")
+                    st.write(f"• **Hours This Month:** {metrics['total_hours_this_month']:.0f}")
+                    st.write(f"• **Maintenance Needed:** {metrics['maintenance_needed']}")
+                    st.write(f"• **Overdue Inspections:** {metrics['overdue_inspections']}")
+                    
+                    # Equipment needing attention
+                    maintenance_needed = equipment_manager.get_equipment_needing_maintenance()
+                    if maintenance_needed:
+                        st.write("**⚠️ Equipment Needing Maintenance:**")
+                        for eq in maintenance_needed[:5]:
+                            st.write(f"• {eq.name}: Due {eq.next_service_date}")
+        
+        return
+        
+    except ImportError:
+        st.error("Enterprise Equipment Tracking module not available")
+        render_equipment_tracking_basic()
+
+def render_equipment_tracking_basic():
+    """Basic equipment tracking module - fallback version"""
+    st.title("🚧 Equipment Tracking")
+    st.info("🚧 Equipment tracking module for asset management")
 
 def render_analytics():
     """Analytics module"""

@@ -7028,52 +7028,207 @@ def render_transmittals():
             with col4:
                 st.metric("📄 Total Documents", metrics['total_documents'])
         
-        # Display transmittals
-        transmittals = transmittals_manager.get_all_transmittals()
+        # Create tabs
+        tab1, tab2, tab3 = st.tabs(["📧 All Transmittals", "➕ Create New", "📊 Analytics"])
         
-        st.subheader("📋 All Transmittals")
-        
-        for transmittal in transmittals:
-            status_color = {
-                TransmittalStatus.SENT: "🟡",
-                TransmittalStatus.RECEIVED: "🟠", 
-                TransmittalStatus.ACKNOWLEDGED: "🟢",
-                TransmittalStatus.REJECTED: "🔴"
-            }.get(transmittal.status, "⚪")
+        with tab1:
+            st.subheader("📧 All Transmittals")
             
-            with st.expander(f"{status_color} {transmittal.transmittal_number} | {transmittal.subject} | {transmittal.status.value}"):
+            # Display transmittals
+            transmittals = transmittals_manager.get_all_transmittals()
+            
+            for transmittal in transmittals:
+                status_color = {
+                    TransmittalStatus.SENT: "🟡",
+                    TransmittalStatus.RECEIVED: "🟠", 
+                    TransmittalStatus.ACKNOWLEDGED: "🟢",
+                    TransmittalStatus.REJECTED: "🔴"
+                }.get(transmittal.status, "⚪")
+                
+                with st.expander(f"{status_color} {transmittal.transmittal_number} | {transmittal.subject} | {transmittal.status.value}"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**📋 Type:** {transmittal.transmittal_type.value}")
+                        st.write(f"**📤 From:** {transmittal.sender_name} ({transmittal.sender_company})")
+                        st.write(f"**📮 Method:** {transmittal.delivery_method.value}")
+                        if transmittal.sent_date:
+                            st.write(f"**📅 Sent:** {transmittal.sent_date}")
+                    
+                    with col2:
+                        st.write(f"**📄 Documents:** {transmittal.total_documents}")
+                        st.write(f"**👥 Recipients:** {len(transmittal.recipients)}")
+                        if transmittal.tracking_number:
+                            st.write(f"**📋 Tracking:** {transmittal.tracking_number}")
+                        if transmittal.reply_by_date:
+                            st.write(f"**⏰ Reply By:** {transmittal.reply_by_date}")
+                    
+                    if transmittal.message:
+                        st.write(f"**💬 Message:** {transmittal.message}")
+                    
+                    # Show recipients
+                    if transmittal.recipients:
+                        st.write("**👥 Recipients:**")
+                        for recipient in transmittal.recipients:
+                            ack_status = "✅" if recipient.acknowledged_date else "⏳"
+                            st.write(f"• {ack_status} {recipient.name} ({recipient.company}) - {recipient.copy_type}")
+                    
+                    # Show documents
+                    if transmittal.documents:
+                        st.write("**📄 Documents:**")
+                        for doc in transmittal.documents:
+                            st.write(f"• {doc.filename} - {doc.description}")
+                    
+                    # CRUD operations
+                    st.write("---")
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        if st.button(f"📤 Send", key=f"btn_send_{transmittal.transmittal_id}"):
+                            if transmittals_manager.send_transmittal(transmittal.transmittal_id):
+                                st.success("Transmittal sent successfully!")
+                                st.rerun()
+                    
+                    with col2:
+                        if st.button(f"✅ Acknowledge", key=f"btn_ack_{transmittal.transmittal_id}"):
+                            # For demo, acknowledge first recipient
+                            if transmittal.recipients:
+                                first_recipient = transmittal.recipients[0]
+                                if transmittals_manager.acknowledge_transmittal(transmittal.transmittal_id, first_recipient.recipient_id):
+                                    st.success("Transmittal acknowledged!")
+                                    st.rerun()
+                    
+                    with col3:
+                        if st.button(f"🗑️ Delete", key=f"btn_del_{transmittal.transmittal_id}"):
+                            if transmittal.transmittal_id in transmittals_manager.transmittals:
+                                del transmittals_manager.transmittals[transmittal.transmittal_id]
+                                st.success("Transmittal deleted!")
+                                st.rerun()
+        
+        with tab2:
+            st.subheader("➕ Create New Transmittal")
+            
+            with st.form("create_transmittal_form"):
                 col1, col2 = st.columns(2)
                 
                 with col1:
-                    st.write(f"**📋 Type:** {transmittal.transmittal_type.value}")
-                    st.write(f"**📤 From:** {transmittal.sender_name} ({transmittal.sender_company})")
-                    st.write(f"**📮 Method:** {transmittal.delivery_method.value}")
-                    if transmittal.sent_date:
-                        st.write(f"**📅 Sent:** {transmittal.sent_date}")
+                    subject = st.text_input("📝 Subject*", placeholder="Enter transmittal subject")
+                    description = st.text_area("📋 Description", placeholder="Detailed description")
+                    transmittal_type = st.selectbox("📋 Type*", options=[t.value for t in TransmittalType])
+                    delivery_method = st.selectbox("📮 Delivery Method*", options=["Email", "Hand Delivery", "Courier", "Mail", "Digital Platform"])
                 
                 with col2:
-                    st.write(f"**📄 Documents:** {transmittal.total_documents}")
-                    st.write(f"**👥 Recipients:** {len(transmittal.recipients)}")
-                    if transmittal.tracking_number:
-                        st.write(f"**📋 Tracking:** {transmittal.tracking_number}")
-                    if transmittal.reply_by_date:
-                        st.write(f"**⏰ Reply By:** {transmittal.reply_by_date}")
+                    sender_name = st.text_input("👤 Sender Name*", value="John Smith")
+                    sender_company = st.text_input("🏢 Sender Company*", value="Highland Construction Co.")
+                    sender_email = st.text_input("📧 Sender Email*", value="jsmith@highland.com")
+                    sender_phone = st.text_input("📞 Sender Phone", value="(555) 123-4567")
                 
-                if transmittal.message:
-                    st.write(f"**💬 Message:** {transmittal.message}")
+                # Recipients section
+                st.write("**👥 Recipients**")
+                recipient_name = st.text_input("Recipient Name", placeholder="Enter recipient name")
+                recipient_company = st.text_input("Recipient Company", placeholder="Enter company")
+                recipient_email = st.text_input("Recipient Email", placeholder="Enter email")
+                recipient_role = st.text_input("Recipient Role", placeholder="Enter role")
+                copy_type = st.selectbox("Copy Type", options=["TO", "CC", "BCC"])
                 
-                # Show recipients
-                if transmittal.recipients:
-                    st.write("**👥 Recipients:**")
-                    for recipient in transmittal.recipients:
-                        ack_status = "✅" if recipient.acknowledged_date else "⏳"
-                        st.write(f"• {ack_status} {recipient.name} ({recipient.company}) - {recipient.copy_type}")
+                # Message section
+                message = st.text_area("💬 Message", placeholder="Enter message content")
+                special_instructions = st.text_area("📋 Special Instructions", placeholder="Any special instructions")
                 
-                # Show documents
-                if transmittal.documents:
-                    st.write("**📄 Documents:**")
-                    for doc in transmittal.documents:
-                        st.write(f"• {doc.filename} - {doc.description}")
+                # Settings
+                col1, col2 = st.columns(2)
+                with col1:
+                    reply_required = st.checkbox("📮 Reply Required")
+                    acknowledgment_required = st.checkbox("✅ Acknowledgment Required")
+                
+                with col2:
+                    if reply_required:
+                        reply_by_date = st.date_input("⏰ Reply By Date")
+                    else:
+                        reply_by_date = None
+                
+                submitted = st.form_submit_button("🆕 Create Transmittal", use_container_width=True)
+                
+                if submitted:
+                    # Validate required fields
+                    if not subject or not transmittal_type or not sender_name or not sender_company:
+                        st.error("Please fill in all required fields marked with *")
+                    else:
+                        # Create recipient
+                        recipients = []
+                        if recipient_name and recipient_email:
+                            from modules.transmittals_backend import TransmittalRecipient
+                            recipient = TransmittalRecipient(
+                                recipient_id=f"rec-{len(recipients) + 1:03d}",
+                                name=recipient_name,
+                                company=recipient_company,
+                                email=recipient_email,
+                                role=recipient_role,
+                                copy_type=copy_type,
+                                received_date=None,
+                                acknowledged_date=None
+                            )
+                            recipients.append(recipient)
+                        
+                        # Create transmittal data
+                        transmittal_data = {
+                            "subject": subject,
+                            "description": description,
+                            "transmittal_type": transmittal_type,
+                            "delivery_method": delivery_method,
+                            "project_name": "Highland Tower Development",
+                            "project_number": "HTD-2024-001",
+                            "sender_name": sender_name,
+                            "sender_company": sender_company,
+                            "sender_email": sender_email,
+                            "sender_phone": sender_phone,
+                            "recipients": recipients,
+                            "message": message,
+                            "special_instructions": special_instructions,
+                            "reply_required": reply_required,
+                            "reply_by_date": reply_by_date.strftime('%Y-%m-%d') if reply_by_date else None,
+                            "acknowledgment_required": acknowledgment_required,
+                            "created_by": sender_name
+                        }
+                        
+                        # Create transmittal
+                        transmittal_id = transmittals_manager.create_transmittal(transmittal_data)
+                        st.success(f"✅ Transmittal created successfully! ID: {transmittal_id}")
+                        st.rerun()
+        
+        with tab3:
+            st.subheader("📊 Transmittals Analytics")
+            
+            if metrics:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write("**📊 Status Breakdown:**")
+                    for status, count in metrics['status_breakdown'].items():
+                        status_color = {
+                            "Sent": "🟡",
+                            "Received": "🟠",
+                            "Acknowledged": "🟢",
+                            "Rejected": "🔴",
+                            "Draft": "⚪"
+                        }.get(status, "⚪")
+                        st.write(f"• {status_color} {status}: {count}")
+                    
+                    st.write("**📋 Type Breakdown:**")
+                    for trans_type, count in metrics['type_breakdown'].items():
+                        st.write(f"• {trans_type}: {count}")
+                
+                with col2:
+                    st.write("**📈 Performance Metrics:**")
+                    st.write(f"• **Total Transmittals:** {metrics['total_transmittals']}")
+                    st.write(f"• **Acknowledgment Rate:** {metrics['acknowledgment_rate']}%")
+                    st.write(f"• **Pending Acknowledgments:** {metrics['pending_acknowledgments']}")
+                    st.write(f"• **Total Documents:** {metrics['total_documents']}")
+                    st.write(f"• **Avg Documents per Transmittal:** {metrics['avg_documents_per_transmittal']}")
+                    
+                    st.write("**📮 Delivery Methods:**")
+                    for method, count in metrics['delivery_methods'].items():
+                        st.write(f"• {method}: {count}")
         
         return
         

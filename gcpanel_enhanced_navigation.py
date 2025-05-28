@@ -12159,6 +12159,496 @@ def render_ai_assistant():
     """, unsafe_allow_html=True)
     st.info("🤖 AI Assistant with intelligent project insights and recommendations")
 
+def render_settings():
+    """Enterprise Settings and Configuration Management"""
+    st.markdown("""
+    <div class="module-header">
+        <h1>⚙️ Enterprise Settings</h1>
+        <p>Highland Tower Development - System configuration and user management</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Create tabs for different settings categories
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["🏢 Project Settings", "👥 User Management", "🔧 System Config", "📊 Data Export", "🔒 Security"])
+    
+    with tab1:
+        st.subheader("🏢 Project Configuration")
+        
+        with st.form("project_settings_form"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.write("**📋 Project Information**")
+                project_name = st.text_input("Project Name", value="Highland Tower Development")
+                project_value = st.text_input("Project Value", value="$45.5M")
+                project_location = st.text_input("Location", value="Downtown Highland District")
+                start_date = st.date_input("Start Date")
+                completion_date = st.date_input("Completion Date")
+            
+            with col2:
+                st.write("**🏗️ Project Details**")
+                project_size = st.text_input("Size", value="168,500 sq ft")
+                floors = st.text_input("Floors", value="15 stories above ground, 2 below")
+                units = st.text_input("Units", value="120 residential, 8 retail")
+                client = st.text_input("Client", value="Highland Properties LLC")
+                project_manager = st.text_input("Project Manager", value="John Smith")
+            
+            st.write("**📝 Project Description**")
+            project_description = st.text_area("Description", 
+                value="Mixed-use high-rise development featuring luxury residential units and retail spaces in downtown Highland District.")
+            
+            if st.form_submit_button("💾 Save Project Settings", use_container_width=True):
+                st.success("✅ Project settings saved successfully!")
+    
+    with tab2:
+        st.subheader("👥 User Management & Permissions")
+        
+        # Current users table
+        st.write("**Current Project Team**")
+        
+        users_data = [
+            {"Name": "John Smith", "Role": "Project Manager", "Email": "jsmith@gcprime.com", "Access": "Full Access", "Last Login": "2025-05-28"},
+            {"Name": "Sarah Wilson", "Role": "Site Supervisor", "Email": "swilson@gcprime.com", "Access": "Field Operations", "Last Login": "2025-05-28"},
+            {"Name": "Mike Johnson", "Role": "Safety Manager", "Email": "mjohnson@gcprime.com", "Access": "Safety & QC", "Last Login": "2025-05-27"},
+            {"Name": "Lisa Chen", "Role": "Project Engineer", "Email": "lchen@gcprime.com", "Access": "Engineering", "Last Login": "2025-05-28"},
+            {"Name": "Tom Brown", "Role": "Cost Manager", "Email": "tbrown@gcprime.com", "Access": "Cost & Finance", "Last Login": "2025-05-27"}
+        ]
+        
+        for user in users_data:
+            with st.expander(f"👤 {user['Name']} - {user['Role']}"):
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.write(f"**Email:** {user['Email']}")
+                    st.write(f"**Access Level:** {user['Access']}")
+                with col2:
+                    st.write(f"**Last Login:** {user['Last Login']}")
+                    st.write(f"**Status:** Active")
+                with col3:
+                    if st.button(f"✏️ Edit", key=f"edit_user_{user['Name']}"):
+                        st.info("User edit functionality")
+                    if st.button(f"🔒 Deactivate", key=f"deactivate_{user['Name']}"):
+                        st.warning("User deactivation functionality")
+        
+        # Add new user
+        st.write("---")
+        st.write("**➕ Add New User**")
+        
+        with st.form("add_user_form"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                new_user_name = st.text_input("Full Name")
+                new_user_email = st.text_input("Email Address")
+                new_user_role = st.selectbox("Role", [
+                    "Project Manager", "Site Supervisor", "Safety Manager", 
+                    "Project Engineer", "Cost Manager", "Field Worker", "Admin"
+                ])
+            
+            with col2:
+                access_level = st.selectbox("Access Level", [
+                    "Full Access", "Field Operations", "Safety & QC", 
+                    "Engineering", "Cost & Finance", "View Only"
+                ])
+                send_invite = st.checkbox("Send invitation email")
+                temp_password = st.text_input("Temporary Password", type="password")
+            
+            if st.form_submit_button("➕ Add User", use_container_width=True):
+                st.success(f"✅ User {new_user_name} added successfully!")
+    
+    with tab3:
+        st.subheader("🔧 System Configuration")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.write("**⏰ Time & Date Settings**")
+            timezone = st.selectbox("Timezone", ["Pacific Time (PT)", "Mountain Time (MT)", "Central Time (CT)", "Eastern Time (ET)"])
+            date_format = st.selectbox("Date Format", ["MM/DD/YYYY", "DD/MM/YYYY", "YYYY-MM-DD"])
+            time_format = st.selectbox("Time Format", ["12-hour (AM/PM)", "24-hour"])
+            
+            st.write("**🔔 Notification Settings**")
+            email_notifications = st.checkbox("Email Notifications", value=True)
+            sms_notifications = st.checkbox("SMS Notifications")
+            push_notifications = st.checkbox("Push Notifications", value=True)
+        
+        with col2:
+            st.write("**📊 Data Settings**")
+            auto_backup = st.checkbox("Automatic Backups", value=True)
+            backup_frequency = st.selectbox("Backup Frequency", ["Daily", "Weekly", "Monthly"])
+            data_retention = st.selectbox("Data Retention", ["1 Year", "2 Years", "5 Years", "Permanent"])
+            
+            st.write("**🎨 Interface Settings**")
+            default_theme = st.selectbox("Default Theme", ["Light", "Dark", "Auto"])
+            sidebar_width = st.selectbox("Sidebar Width", ["Normal", "Wide", "Narrow"])
+            mobile_optimization = st.checkbox("Mobile Optimization", value=True)
+        
+        if st.button("💾 Save System Settings", use_container_width=True):
+            st.success("✅ System settings saved successfully!")
+    
+    with tab4:
+        st.subheader("📊 Data Export & Reports")
+        
+        st.write("**📥 Export Project Data**")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            export_modules = st.multiselect("Select Modules to Export", [
+                "Daily Reports", "RFIs", "Safety", "Cost Management", 
+                "Scheduling", "Progress Photos", "Material Management", 
+                "Quality Control", "Submittals", "Transmittals"
+            ], default=["Daily Reports", "RFIs", "Safety"])
+            
+            export_format = st.selectbox("Export Format", ["Excel (.xlsx)", "CSV", "PDF Report", "JSON"])
+            date_range = st.selectbox("Date Range", ["Last 30 Days", "Last Quarter", "Year to Date", "All Data", "Custom Range"])
+        
+        with col2:
+            include_photos = st.checkbox("Include Photos", value=True)
+            include_attachments = st.checkbox("Include Attachments")
+            compress_export = st.checkbox("Compress Export", value=True)
+            
+            st.write("**📈 Automated Reports**")
+            weekly_reports = st.checkbox("Weekly Summary Reports", value=True)
+            monthly_reports = st.checkbox("Monthly Progress Reports", value=True)
+            executive_dashboard = st.checkbox("Executive Dashboard", value=True)
+        
+        if st.button("📥 Generate Export", use_container_width=True):
+            st.success("✅ Export generated successfully! Download will begin shortly.")
+        
+        st.write("---")
+        st.write("**📊 Recent Exports**")
+        
+        recent_exports = [
+            {"Date": "2025-05-27", "Type": "Monthly Report", "Size": "15.2 MB", "Status": "Complete"},
+            {"Date": "2025-05-25", "Type": "Safety Data", "Size": "2.8 MB", "Status": "Complete"},
+            {"Date": "2025-05-20", "Type": "Cost Summary", "Size": "8.4 MB", "Status": "Complete"}
+        ]
+        
+        for export in recent_exports:
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.write(f"**{export['Date']}**")
+            with col2:
+                st.write(export['Type'])
+            with col3:
+                st.write(export['Size'])
+            with col4:
+                st.button("📥 Download", key=f"download_{export['Date']}")
+    
+    with tab5:
+        st.subheader("🔒 Security & Compliance")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.write("**🔐 Security Settings**")
+            two_factor_auth = st.checkbox("Two-Factor Authentication", value=True)
+            password_requirements = st.checkbox("Strong Password Requirements", value=True)
+            session_timeout = st.selectbox("Session Timeout", ["15 minutes", "30 minutes", "1 hour", "4 hours"])
+            ip_restrictions = st.checkbox("IP Address Restrictions")
+            
+            st.write("**📋 Compliance**")
+            hipaa_compliance = st.checkbox("HIPAA Compliance")
+            gdpr_compliance = st.checkbox("GDPR Compliance", value=True)
+            audit_logging = st.checkbox("Audit Logging", value=True)
+        
+        with col2:
+            st.write("**🔍 Activity Monitoring**")
+            login_monitoring = st.checkbox("Login Monitoring", value=True)
+            data_access_logs = st.checkbox("Data Access Logs", value=True)
+            failed_login_alerts = st.checkbox("Failed Login Alerts", value=True)
+            
+            st.write("**🚨 Security Alerts**")
+            st.write("• **Last Security Scan:** 2025-05-27 - ✅ No issues found")
+            st.write("• **Failed Login Attempts:** 0 in last 24 hours")
+            st.write("• **Active Sessions:** 5 current users")
+            st.write("• **Data Backup Status:** ✅ Last backup: 2 hours ago")
+        
+        if st.button("🔒 Save Security Settings", use_container_width=True):
+            st.success("✅ Security settings saved successfully!")
+
+def render_integrations():
+    """Enterprise Integrations and API Management"""
+    st.markdown("""
+    <div class="module-header">
+        <h1>🔄 Enterprise Integrations</h1>
+        <p>Highland Tower Development - External system connections and API management</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Create tabs for different integration categories
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["🏗️ Construction Software", "💰 Financial Systems", "📊 Analytics Tools", "🔗 API Management", "📱 Mobile Apps"])
+    
+    with tab1:
+        st.subheader("🏗️ Construction Software Integrations")
+        
+        # Popular construction software integrations
+        integrations = [
+            {
+                "name": "Autodesk Construction Cloud",
+                "description": "BIM collaboration and document management",
+                "status": "Connected",
+                "icon": "🏗️",
+                "features": ["BIM Models", "Document Sync", "Issue Tracking"]
+            },
+            {
+                "name": "Procore",
+                "description": "Project management and field operations",
+                "status": "Available",
+                "icon": "📋",
+                "features": ["Project Data", "RFIs", "Daily Reports"]
+            },
+            {
+                "name": "PlanGrid",
+                "description": "Construction drawings and field management",
+                "status": "Connected",
+                "icon": "📐",
+                "features": ["Drawing Sync", "Field Updates", "Photo Markup"]
+            },
+            {
+                "name": "Fieldwire",
+                "description": "Task management and coordination",
+                "status": "Available",
+                "icon": "📱",
+                "features": ["Task Sync", "Issue Tracking", "Progress Updates"]
+            }
+        ]
+        
+        for integration in integrations:
+            with st.expander(f"{integration['icon']} {integration['name']} - {integration['status']}"):
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    st.write(f"**Description:** {integration['description']}")
+                    st.write(f"**Status:** {integration['status']}")
+                
+                with col2:
+                    st.write("**Features:**")
+                    for feature in integration['features']:
+                        st.write(f"• {feature}")
+                
+                with col3:
+                    if integration['status'] == "Connected":
+                        st.success("✅ Active")
+                        if st.button(f"⚙️ Configure", key=f"config_{integration['name']}"):
+                            st.info("Configuration options...")
+                        if st.button(f"🔄 Sync Now", key=f"sync_{integration['name']}"):
+                            st.success("Synchronization started!")
+                    else:
+                        if st.button(f"🔗 Connect", key=f"connect_{integration['name']}"):
+                            st.success(f"Connected to {integration['name']}!")
+    
+    with tab2:
+        st.subheader("💰 Financial System Integrations")
+        
+        financial_systems = [
+            {
+                "name": "QuickBooks Enterprise",
+                "description": "Accounting and financial management",
+                "status": "Connected",
+                "icon": "💼",
+                "sync_frequency": "Daily"
+            },
+            {
+                "name": "Sage 300 Construction",
+                "description": "Construction-specific accounting",
+                "status": "Available",
+                "icon": "📊",
+                "sync_frequency": "Real-time"
+            },
+            {
+                "name": "Foundation Software",
+                "description": "Construction accounting and project management",
+                "status": "Available",
+                "icon": "🏗️",
+                "sync_frequency": "Hourly"
+            },
+            {
+                "name": "Viewpoint Vista",
+                "description": "Enterprise construction ERP",
+                "status": "Connected",
+                "icon": "🎯",
+                "sync_frequency": "Real-time"
+            }
+        ]
+        
+        for system in financial_systems:
+            with st.expander(f"{system['icon']} {system['name']} - {system['status']}"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write(f"**Description:** {system['description']}")
+                    st.write(f"**Sync Frequency:** {system['sync_frequency']}")
+                    st.write(f"**Last Sync:** 2025-05-28 09:15 AM")
+                
+                with col2:
+                    if system['status'] == "Connected":
+                        st.success("✅ Active Connection")
+                        st.write("**Sync Data:**")
+                        st.write("• Cost codes and budgets")
+                        st.write("• Purchase orders")
+                        st.write("• Invoice processing")
+                        st.write("• Payment tracking")
+                    else:
+                        st.info("⚙️ Available for Connection")
+                        if st.button(f"🔗 Setup Integration", key=f"setup_{system['name']}"):
+                            st.success("Integration setup initiated!")
+    
+    with tab3:
+        st.subheader("📊 Analytics and BI Tools")
+        
+        analytics_tools = [
+            {
+                "name": "Microsoft Power BI",
+                "description": "Business intelligence and analytics",
+                "status": "Connected",
+                "icon": "📊"
+            },
+            {
+                "name": "Tableau",
+                "description": "Data visualization and analytics",
+                "status": "Available",
+                "icon": "📈"
+            },
+            {
+                "name": "Looker Studio",
+                "description": "Google's business intelligence platform",
+                "status": "Connected",
+                "icon": "🔍"
+            }
+        ]
+        
+        for tool in analytics_tools:
+            with st.expander(f"{tool['icon']} {tool['name']} - {tool['status']}"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write(f"**Description:** {tool['description']}")
+                    if tool['status'] == "Connected":
+                        st.write("**Dashboard Links:**")
+                        st.write("• Executive Summary Dashboard")
+                        st.write("• Project Performance Metrics")
+                        st.write("• Cost Analysis Reports")
+                
+                with col2:
+                    if tool['status'] == "Connected":
+                        st.success("✅ Active")
+                        if st.button(f"📊 Open Dashboard", key=f"dash_{tool['name']}"):
+                            st.success("Opening dashboard...")
+                    else:
+                        if st.button(f"🔗 Connect", key=f"connect_analytics_{tool['name']}"):
+                            st.success("Analytics integration connected!")
+    
+    with tab4:
+        st.subheader("🔗 API Management & Custom Integrations")
+        
+        st.write("**🔑 API Keys & Authentication**")
+        
+        api_keys = [
+            {"Service": "Weather API", "Status": "Active", "Expires": "2025-12-31", "Usage": "85%"},
+            {"Service": "Google Maps API", "Status": "Active", "Expires": "2026-06-30", "Usage": "42%"},
+            {"Service": "Email Service", "Status": "Active", "Expires": "2025-09-15", "Usage": "23%"},
+            {"Service": "SMS Gateway", "Status": "Inactive", "Expires": "2025-08-01", "Usage": "0%"}
+        ]
+        
+        for api in api_keys:
+            col1, col2, col3, col4, col5 = st.columns(5)
+            with col1:
+                st.write(f"**{api['Service']}**")
+            with col2:
+                if api['Status'] == "Active":
+                    st.success("🟢 Active")
+                else:
+                    st.error("🔴 Inactive")
+            with col3:
+                st.write(api['Expires'])
+            with col4:
+                st.write(api['Usage'])
+            with col5:
+                st.button("⚙️ Manage", key=f"api_{api['Service']}")
+        
+        st.write("---")
+        st.write("**🔧 Custom Integration Development**")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.write("**Available APIs:**")
+            st.write("• REST API for data access")
+            st.write("• Webhook notifications")
+            st.write("• Real-time data streams")
+            st.write("• Bulk data export/import")
+        
+        with col2:
+            st.write("**Documentation:**")
+            if st.button("📖 API Documentation"):
+                st.info("Opening API documentation...")
+            if st.button("🔧 Developer Tools"):
+                st.info("Opening developer tools...")
+            if st.button("🧪 API Testing"):
+                st.info("Opening API testing interface...")
+    
+    with tab5:
+        st.subheader("📱 Mobile Application Integrations")
+        
+        mobile_apps = [
+            {
+                "name": "gcPanel Mobile",
+                "description": "Native mobile app for field operations",
+                "platform": "iOS & Android",
+                "status": "Active",
+                "version": "2.1.3"
+            },
+            {
+                "name": "Safety Inspector",
+                "description": "Dedicated safety inspection app",
+                "platform": "iOS & Android",
+                "status": "Active",
+                "version": "1.8.2"
+            },
+            {
+                "name": "Time Tracker",
+                "description": "Employee time and attendance tracking",
+                "platform": "iOS & Android",
+                "status": "Development",
+                "version": "Beta 0.9"
+            }
+        ]
+        
+        for app in mobile_apps:
+            with st.expander(f"📱 {app['name']} - {app['status']}"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write(f"**Description:** {app['description']}")
+                    st.write(f"**Platform:** {app['platform']}")
+                    st.write(f"**Version:** {app['version']}")
+                
+                with col2:
+                    if app['status'] == "Active":
+                        st.success("✅ Live in App Stores")
+                        st.write("**Download Links:**")
+                        if st.button("📱 iOS App Store", key=f"ios_{app['name']}"):
+                            st.success("Opening App Store...")
+                        if st.button("🤖 Google Play", key=f"android_{app['name']}"):
+                            st.success("Opening Google Play...")
+                    else:
+                        st.info(f"🔄 {app['status']}")
+        
+        st.write("---")
+        st.write("**📊 Mobile App Analytics**")
+        
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("Active Users", "127", "+12 this week")
+        with col2:
+            st.metric("Daily Reports", "34", "+8 today")
+        with col3:
+            st.metric("Photos Uploaded", "89", "+23 today")
+        with col4:
+            st.metric("Safety Checks", "15", "+3 today")
+
 def render_quick_start():
     """Quick start guide module"""
     st.markdown("""

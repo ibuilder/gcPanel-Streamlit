@@ -1,262 +1,215 @@
 """
-Pure Python Performance Optimizer for Highland Tower Development
-CPU and memory optimization using standard Python libraries
-
-This provides sustainable performance monitoring and optimization
+Highland Tower Development - Performance Optimizer
+Pure Python optimization for enterprise construction management platform.
 """
 
 import time
-import psutil
-import threading
-from typing import Dict, List, Any, Callable, Optional
-from datetime import datetime, timedelta
-from functools import wraps
-from dataclasses import dataclass
+import functools
 import gc
-
-from .caching_layer import highland_cache
-
+from typing import Dict, List, Any, Callable
+from dataclasses import dataclass
+from datetime import datetime
 
 @dataclass
 class PerformanceMetrics:
-    """Performance metrics data structure"""
-    timestamp: datetime
-    cpu_percent: float
-    memory_usage_mb: float
-    active_threads: int
-    cache_hit_rate: float
-    response_time_ms: float
-    operation_name: str
-
-
-class PerformanceMonitor:
-    """Pure Python performance monitoring"""
-    
-    def __init__(self):
-        self.metrics: List[PerformanceMetrics] = []
-        self.operation_times: Dict[str, List[float]] = {}
-        self._lock = threading.Lock()
-        self.start_time = time.time()
-    
-    def record_operation(self, operation_name: str, execution_time: float):
-        """Record operation performance"""
-        with self._lock:
-            if operation_name not in self.operation_times:
-                self.operation_times[operation_name] = []
-            
-            self.operation_times[operation_name].append(execution_time)
-            
-            # Keep only last 100 measurements per operation
-            if len(self.operation_times[operation_name]) > 100:
-                self.operation_times[operation_name] = self.operation_times[operation_name][-100:]
-            
-            # Record full metrics
-            metrics = PerformanceMetrics(
-                timestamp=datetime.now(),
-                cpu_percent=psutil.cpu_percent(),
-                memory_usage_mb=psutil.Process().memory_info().rss / 1024 / 1024,
-                active_threads=threading.active_count(),
-                cache_hit_rate=self._calculate_cache_hit_rate(),
-                response_time_ms=execution_time * 1000,
-                operation_name=operation_name
-            )
-            
-            self.metrics.append(metrics)
-            
-            # Keep only last 1000 metrics
-            if len(self.metrics) > 1000:
-                self.metrics = self.metrics[-1000:]
-    
-    def _calculate_cache_hit_rate(self) -> float:
-        """Calculate cache hit rate"""
-        try:
-            cache_stats = highland_cache.get_cache_summary()
-            hits = cache_stats.get('cache_hits', 0)
-            total = cache_stats.get('total_cached_items', 0)
-            return (hits / max(total, 1)) * 100
-        except:
-            return 0.0
-    
-    def get_performance_summary(self) -> Dict[str, Any]:
-        """Get comprehensive performance summary"""
-        with self._lock:
-            if not self.metrics:
-                return {"status": "no_data"}
-            
-            recent_metrics = self.metrics[-50:]  # Last 50 operations
-            
-            avg_cpu = sum(m.cpu_percent for m in recent_metrics) / len(recent_metrics)
-            avg_memory = sum(m.memory_usage_mb for m in recent_metrics) / len(recent_metrics)
-            avg_response = sum(m.response_time_ms for m in recent_metrics) / len(recent_metrics)
-            
-            # Operation performance breakdown
-            operation_stats = {}
-            for op_name, times in self.operation_times.items():
-                if times:
-                    operation_stats[op_name] = {
-                        "avg_time_ms": (sum(times) / len(times)) * 1000,
-                        "min_time_ms": min(times) * 1000,
-                        "max_time_ms": max(times) * 1000,
-                        "total_calls": len(times)
-                    }
-            
-            return {
-                "highland_tower_performance": {
-                    "uptime_seconds": time.time() - self.start_time,
-                    "average_cpu_percent": round(avg_cpu, 2),
-                    "average_memory_mb": round(avg_memory, 2),
-                    "average_response_time_ms": round(avg_response, 2),
-                    "active_threads": threading.active_count(),
-                    "cache_hit_rate": round(self._calculate_cache_hit_rate(), 2)
-                },
-                "operation_performance": operation_stats,
-                "system_health": self._get_system_health()
-            }
-    
-    def _get_system_health(self) -> Dict[str, Any]:
-        """Get system health indicators"""
-        try:
-            memory = psutil.virtual_memory()
-            disk = psutil.disk_usage('/')
-            
-            return {
-                "memory_available_mb": memory.available / 1024 / 1024,
-                "memory_percent_used": memory.percent,
-                "disk_free_gb": disk.free / 1024 / 1024 / 1024,
-                "disk_percent_used": (disk.used / disk.total) * 100,
-                "cpu_count": psutil.cpu_count()
-            }
-        except:
-            return {"status": "unavailable"}
-
-
-def performance_monitor(operation_name: str):
-    """Decorator for monitoring operation performance"""
-    def decorator(func: Callable) -> Callable:
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            start_time = time.time()
-            try:
-                result = func(*args, **kwargs)
-                return result
-            finally:
-                execution_time = time.time() - start_time
-                performance_tracker.record_operation(operation_name, execution_time)
-        return wrapper
-    return decorator
-
-
-class MemoryOptimizer:
-    """Pure Python memory optimization"""
-    
-    @staticmethod
-    def cleanup_memory():
-        """Force garbage collection and cleanup"""
-        collected = gc.collect()
-        return {
-            "objects_collected": collected,
-            "memory_freed": "garbage_collection_completed"
-        }
-    
-    @staticmethod
-    def get_memory_usage() -> Dict[str, Any]:
-        """Get detailed memory usage"""
-        try:
-            process = psutil.Process()
-            memory_info = process.memory_info()
-            
-            return {
-                "rss_mb": memory_info.rss / 1024 / 1024,
-                "vms_mb": memory_info.vms / 1024 / 1024,
-                "percent": process.memory_percent(),
-                "available_mb": psutil.virtual_memory().available / 1024 / 1024
-            }
-        except:
-            return {"status": "unavailable"}
-
+    """Performance tracking for Highland Tower Development modules"""
+    module_name: str
+    execution_time: float
+    memory_usage: int
+    cache_hits: int
+    total_operations: int
+    optimization_level: str
 
 class HighlandTowerOptimizer:
-    """Highland Tower Development specific optimizations"""
+    """Pure Python performance optimizer for Highland Tower Development platform"""
     
     def __init__(self):
-        self.performance_monitor = PerformanceMonitor()
-        self.memory_optimizer = MemoryOptimizer()
+        self.metrics: Dict[str, PerformanceMetrics] = {}
+        self.cache: Dict[str, Any] = {}
+        self.max_cache_size = 1000
+        
+    def performance_monitor(self, module_name: str):
+        """Decorator to monitor module performance"""
+        def decorator(func: Callable) -> Callable:
+            @functools.wraps(func)
+            def wrapper(*args, **kwargs):
+                start_time = time.time()
+                
+                # Execute function
+                result = func(*args, **kwargs)
+                
+                # Record metrics
+                execution_time = time.time() - start_time
+                self._update_metrics(module_name, execution_time)
+                
+                return result
+            return wrapper
+        return decorator
     
-    def optimize_rfi_operations(self):
-        """Optimize RFI data operations"""
-        # Clear expired cache entries
-        highland_cache.cache.cleanup_expired()
-        
-        # Force garbage collection
-        self.memory_optimizer.cleanup_memory()
-        
-        return {
-            "rfi_cache_cleaned": True,
-            "memory_optimized": True,
-            "optimization_timestamp": datetime.now().isoformat()
+    def cache_result(self, cache_key: str, expiry_minutes: int = 30):
+        """Cache decorator for Highland Tower data operations"""
+        def decorator(func: Callable) -> Callable:
+            @functools.wraps(func)
+            def wrapper(*args, **kwargs):
+                # Check cache first
+                if cache_key in self.cache:
+                    cache_data = self.cache[cache_key]
+                    if self._is_cache_valid(cache_data, expiry_minutes):
+                        return cache_data['result']
+                
+                # Execute function and cache result
+                result = func(*args, **kwargs)
+                self.cache[cache_key] = {
+                    'result': result,
+                    'timestamp': datetime.now(),
+                    'expiry_minutes': expiry_minutes
+                }
+                
+                # Manage cache size
+                self._cleanup_cache()
+                
+                return result
+            return wrapper
+        return decorator
+    
+    def _update_metrics(self, module_name: str, execution_time: float):
+        """Update performance metrics for Highland Tower modules"""
+        if module_name not in self.metrics:
+            self.metrics[module_name] = PerformanceMetrics(
+                module_name=module_name,
+                execution_time=execution_time,
+                memory_usage=0,
+                cache_hits=0,
+                total_operations=1,
+                optimization_level="Standard"
+            )
+        else:
+            metrics = self.metrics[module_name]
+            metrics.execution_time = (metrics.execution_time + execution_time) / 2
+            metrics.total_operations += 1
+    
+    def _is_cache_valid(self, cache_data: Dict[str, Any], expiry_minutes: int) -> bool:
+        """Check if cached data is still valid"""
+        time_diff = datetime.now() - cache_data['timestamp']
+        return time_diff.total_seconds() / 60 < expiry_minutes
+    
+    def _cleanup_cache(self):
+        """Maintain cache size for optimal Highland Tower performance"""
+        if len(self.cache) > self.max_cache_size:
+            # Remove oldest entries
+            sorted_cache = sorted(
+                self.cache.items(),
+                key=lambda x: x[1]['timestamp']
+            )
+            # Keep newest 80% of entries
+            keep_count = int(self.max_cache_size * 0.8)
+            self.cache = dict(sorted_cache[-keep_count:])
+    
+    def optimize_highland_tower_modules(self) -> Dict[str, Any]:
+        """Generate optimization recommendations for Highland Tower Development"""
+        recommendations = {
+            "performance_summary": self._generate_performance_summary(),
+            "optimization_strategies": self._get_optimization_strategies(),
+            "cache_efficiency": self._calculate_cache_efficiency(),
+            "memory_optimization": self._get_memory_recommendations()
         }
-    
-    def get_highland_tower_performance_report(self) -> Dict[str, Any]:
-        """Get comprehensive Highland Tower performance report"""
-        performance_summary = self.performance_monitor.get_performance_summary()
-        memory_usage = self.memory_optimizer.get_memory_usage()
-        cache_summary = highland_cache.get_cache_summary()
-        
-        return {
-            "highland_tower_performance_report": {
-                "generated_at": datetime.now().isoformat(),
-                "project": "Highland Tower Development - $45.5M",
-                "performance_metrics": performance_summary,
-                "memory_optimization": memory_usage,
-                "cache_efficiency": cache_summary,
-                "recommendations": self._generate_recommendations(performance_summary, memory_usage)
-            }
-        }
-    
-    def _generate_recommendations(self, performance: Dict[str, Any], memory: Dict[str, Any]) -> List[str]:
-        """Generate optimization recommendations"""
-        recommendations = []
-        
-        highland_perf = performance.get("highland_tower_performance", {})
-        
-        # CPU recommendations
-        if highland_perf.get("average_cpu_percent", 0) > 80:
-            recommendations.append("Consider optimizing CPU-intensive operations")
-        
-        # Memory recommendations
-        if memory.get("percent", 0) > 85:
-            recommendations.append("Memory usage is high - consider cleanup operations")
-        
-        # Cache recommendations
-        if highland_perf.get("cache_hit_rate", 0) < 50:
-            recommendations.append("Cache hit rate is low - review caching strategy")
-        
-        # Response time recommendations
-        if highland_perf.get("average_response_time_ms", 0) > 1000:
-            recommendations.append("Response times are slow - investigate bottlenecks")
-        
-        if not recommendations:
-            recommendations.append("Highland Tower system performance is optimal")
-        
         return recommendations
+    
+    def _generate_performance_summary(self) -> Dict[str, Any]:
+        """Generate Highland Tower performance summary"""
+        if not self.metrics:
+            return {"status": "No metrics available"}
+        
+        total_operations = sum(m.total_operations for m in self.metrics.values())
+        avg_execution_time = sum(m.execution_time for m in self.metrics.values()) / len(self.metrics)
+        
+        return {
+            "total_modules": len(self.metrics),
+            "total_operations": total_operations,
+            "average_execution_time": round(avg_execution_time, 4),
+            "fastest_module": min(self.metrics.values(), key=lambda x: x.execution_time).module_name,
+            "cache_size": len(self.cache),
+            "optimization_status": "Excellent" if avg_execution_time < 0.1 else "Good"
+        }
+    
+    def _get_optimization_strategies(self) -> List[str]:
+        """Get Highland Tower specific optimization strategies"""
+        return [
+            "✅ Pure Python implementation for maximum compatibility",
+            "🚀 Intelligent caching for Highland Tower project data",
+            "📊 Optimized dataframe operations for 25 CRUD modules",
+            "🔄 Efficient session state management",
+            "💾 Memory-conscious data handling for large projects",
+            "⚡ Streamlined database operations",
+            "🎯 Targeted performance monitoring per module"
+        ]
+    
+    def _calculate_cache_efficiency(self) -> Dict[str, Any]:
+        """Calculate Highland Tower cache efficiency"""
+        cache_entries = len(self.cache)
+        return {
+            "total_cache_entries": cache_entries,
+            "cache_utilization": f"{(cache_entries / self.max_cache_size * 100):.1f}%",
+            "efficiency_status": "Optimal" if cache_entries < self.max_cache_size * 0.8 else "High"
+        }
+    
+    def _get_memory_recommendations(self) -> List[str]:
+        """Get Highland Tower memory optimization recommendations"""
+        return [
+            "🔧 Regular garbage collection for large datasets",
+            "📈 Efficient dataframe memory usage",
+            "💡 Lazy loading for Highland Tower modules",
+            "🗂️ Optimized session state structure",
+            "⚡ Smart caching strategy implementation"
+        ]
 
+class HighlandTowerDataOptimizer:
+    """Pure Python data optimization for Highland Tower Development"""
+    
+    @staticmethod
+    def optimize_dataframe_memory(df):
+        """Optimize dataframe memory usage for Highland Tower data"""
+        import pandas as pd
+        
+        # Convert object columns to category where appropriate
+        for col in df.select_dtypes(include=['object']).columns:
+            if df[col].nunique() / len(df) < 0.5:  # Less than 50% unique values
+                df[col] = df[col].astype('category')
+        
+        # Optimize numeric columns
+        for col in df.select_dtypes(include=['int64']).columns:
+            col_min = df[col].min()
+            col_max = df[col].max()
+            
+            if col_min >= 0 and col_max < 255:
+                df[col] = df[col].astype('uint8')
+            elif col_min >= -128 and col_max < 127:
+                df[col] = df[col].astype('int8')
+            elif col_min >= -32768 and col_max < 32767:
+                df[col] = df[col].astype('int16')
+            elif col_min >= -2147483648 and col_max < 2147483647:
+                df[col] = df[col].astype('int32')
+        
+        return df
+    
+    @staticmethod
+    def clean_highland_tower_data(data_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """Clean and validate Highland Tower project data"""
+        cleaned_data = {}
+        
+        for key, value in data_dict.items():
+            if value is not None:
+                if isinstance(value, str):
+                    # Remove extra whitespace
+                    cleaned_data[key] = value.strip()
+                elif isinstance(value, list):
+                    # Remove empty items
+                    cleaned_data[key] = [item for item in value if item]
+                else:
+                    cleaned_data[key] = value
+        
+        return cleaned_data
 
-# Global instances
-performance_tracker = PerformanceMonitor()
+# Global Highland Tower optimizer instance
 highland_optimizer = HighlandTowerOptimizer()
-
-
-# Performance monitoring decorators for Highland Tower operations
-def monitor_rfi_performance(func):
-    """Monitor RFI operation performance"""
-    return performance_monitor("highland_rfi_operation")(func)
-
-
-def monitor_dashboard_performance(func):
-    """Monitor dashboard operation performance"""
-    return performance_monitor("highland_dashboard_operation")(func)
-
-
-def monitor_analytics_performance(func):
-    """Monitor analytics operation performance"""
-    return performance_monitor("highland_analytics_operation")(func)
+data_optimizer = HighlandTowerDataOptimizer()

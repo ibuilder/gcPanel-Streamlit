@@ -1750,11 +1750,15 @@ def render_daily_reports_basic():
                 materials_delivered = st.text_area("Materials Delivered", height=68,
                     placeholder="List materials and quantities delivered...")
             
+            # File upload section within the form
+            st.markdown("**📎 Attachments (Optional)**")
+            if DATABASE_AVAILABLE:
+                uploaded_files = render_document_upload_section()
+            
             submitted = st.form_submit_button("💾 Save Daily Report", type="primary", use_container_width=True)
             
             if submitted:
                 new_report = {
-                    "id": len(st.session_state.daily_reports) + 1,
                     "date": str(report_date),
                     "weather": weather,
                     "temperature": temperature,
@@ -1765,12 +1769,36 @@ def render_daily_reports_basic():
                     "tomorrow_plan": tomorrow_plan,
                     "safety_incidents": safety_incidents,
                     "inspections": inspections,
-                    "materials_delivered": materials_delivered,
-                    "created_by": "Site Superintendent",
-                    "status": "Active"
+                    "materials_delivered": materials_delivered
                 }
-                st.session_state.daily_reports.insert(0, new_report)
-                st.success("✅ Daily report saved successfully!")
+                
+                # Save to database if available
+                if DATABASE_AVAILABLE:
+                    try:
+                        if save_daily_report(new_report):
+                            st.success("✅ Daily report saved to database successfully!")
+                        else:
+                            st.error("Failed to save to database, saved to session instead")
+                            # Fallback to session storage
+                            new_report["id"] = len(st.session_state.daily_reports) + 1
+                            new_report["created_by"] = "Site Superintendent"
+                            new_report["status"] = "Active"
+                            st.session_state.daily_reports.insert(0, new_report)
+                    except Exception as e:
+                        st.error(f"Database error: {str(e)}")
+                        # Fallback to session storage
+                        new_report["id"] = len(st.session_state.daily_reports) + 1
+                        new_report["created_by"] = "Site Superintendent"
+                        new_report["status"] = "Active"
+                        st.session_state.daily_reports.insert(0, new_report)
+                else:
+                    # Fallback to session storage
+                    new_report["id"] = len(st.session_state.daily_reports) + 1
+                    new_report["created_by"] = "Site Superintendent"
+                    new_report["status"] = "Active"
+                    st.session_state.daily_reports.insert(0, new_report)
+                    st.success("✅ Daily report saved successfully!")
+                
                 st.rerun()
     
     with tab2:

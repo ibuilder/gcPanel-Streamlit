@@ -59,9 +59,78 @@ if 'submittals' not in st.session_state:
     ]
 
 # Main content
-tab1, tab2 = st.tabs(["📝 Create New Submittal", "📊 View Submittals"])
+tab1, tab2 = st.tabs(["📊 Submittals Database", "📝 Create New Submittal"])
 
 with tab1:
+    st.subheader("📊 Submittals Database")
+    
+    if st.session_state.submittals:
+        df = pd.DataFrame(st.session_state.submittals)
+        
+        # Search and filter
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search submittals...", placeholder="Search by title, spec, or ID")
+        with col2:
+            status_filter = st.selectbox("Status", ["All", "Under Review", "Approved", "Rejected", "Resubmit Required"])
+        with col3:
+            discipline_filter = st.selectbox("Discipline", ["All", "Architectural", "Structural", "Mechanical", "Electrical"])
+        
+        # Filter data
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[
+                filtered_df.astype(str).apply(
+                    lambda x: x.str.contains(search_term, case=False, na=False)
+                ).any(axis=1)
+            ]
+        
+        if status_filter != "All":
+            filtered_df = filtered_df[filtered_df['status'] == status_filter]
+            
+        if discipline_filter != "All":
+            filtered_df = filtered_df[filtered_df['discipline'] == discipline_filter]
+        
+        # Display results
+        st.write(f"**Total Submittals:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            # Status color coding
+            def get_status_indicator(status):
+                indicators = {
+                    "Under Review": "🟡",
+                    "Approved": "🟢",
+                    "Rejected": "🔴",
+                    "Resubmit Required": "🟠"
+                }
+                return indicators.get(status, "⚪")
+            
+            # Add status indicators
+            display_df = filtered_df.copy()
+            display_df['Status'] = display_df['status'].apply(lambda x: f"{get_status_indicator(x)} {x}")
+            
+            # Display with column configuration
+            st.dataframe(
+                clean_dataframe_for_display(display_df),
+                column_config={
+                    "id": st.column_config.TextColumn("Submittal ID"),
+                    "title": st.column_config.TextColumn("Title"),
+                    "specification": st.column_config.TextColumn("Spec Section"),
+                    "submittal_date": st.column_config.DateColumn("Submitted"),
+                    "due_date": st.column_config.DateColumn("Due Date"),
+                    "Status": st.column_config.TextColumn("Status"),
+                    "submitted_by": st.column_config.TextColumn("Submitted By"),
+                    "reviewer": st.column_config.TextColumn("Reviewer")
+                },
+                hide_index=True,
+                use_container_width=True
+            )
+        else:
+            st.info("No submittals found matching your criteria.")
+    else:
+        st.info("No submittals available. Create your first submittal in the Create tab!")
+
+with tab2:
     st.subheader("📝 Create New Submittal")
     
     with st.form("submittal_form"):

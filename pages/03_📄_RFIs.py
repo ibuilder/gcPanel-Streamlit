@@ -59,9 +59,77 @@ if 'rfis' not in st.session_state:
     ]
 
 # Main content
-tab1, tab2 = st.tabs(["📝 Create New RFI", "📊 View RFIs"])
+tab1, tab2 = st.tabs(["📊 RFI Database", "📝 Create New RFI"])
 
 with tab1:
+    st.subheader("📊 RFI Database")
+    
+    if st.session_state.rfis:
+        df = pd.DataFrame(st.session_state.rfis)
+        
+        # Search and filter
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search RFIs...", placeholder="Search by title, description, or ID")
+        with col2:
+            status_filter = st.selectbox("Status", ["All", "Open", "In Review", "Answered", "Closed"])
+        with col3:
+            discipline_filter = st.selectbox("Discipline", ["All", "Architectural", "Structural", "Mechanical", "Electrical"])
+        
+        # Filter data
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[
+                filtered_df.astype(str).apply(
+                    lambda x: x.str.contains(search_term, case=False, na=False)
+                ).any(axis=1)
+            ]
+        
+        if status_filter != "All":
+            filtered_df = filtered_df[filtered_df['status'] == status_filter]
+            
+        if discipline_filter != "All":
+            filtered_df = filtered_df[filtered_df['discipline'] == discipline_filter]
+        
+        # Display results
+        st.write(f"**Total RFIs:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            # Priority color coding
+            def get_priority_color(priority):
+                colors = {
+                    "Critical": "🔴",
+                    "High": "🟠", 
+                    "Medium": "🟡",
+                    "Low": "🟢"
+                }
+                return colors.get(priority, "⚪")
+            
+            # Add priority indicators
+            display_df = filtered_df.copy()
+            display_df['Priority'] = display_df['priority'].apply(lambda x: f"{get_priority_color(x)} {x}")
+            
+            # Display with column configuration
+            st.dataframe(
+                clean_dataframe_for_display(display_df),
+                column_config={
+                    "id": st.column_config.TextColumn("RFI ID"),
+                    "title": st.column_config.TextColumn("Title"),
+                    "submittal_date": st.column_config.DateColumn("Submitted"),
+                    "due_date": st.column_config.DateColumn("Due Date"),
+                    "status": st.column_config.SelectboxColumn("Status", 
+                        options=["Open", "In Review", "Answered", "Closed"]),
+                    "Priority": st.column_config.TextColumn("Priority")
+                },
+                hide_index=True,
+                use_container_width=True
+            )
+        else:
+            st.info("No RFIs found matching your criteria.")
+    else:
+        st.info("No RFIs available. Create your first RFI in the Create tab!")
+
+with tab2:
     st.subheader("📝 Create New RFI")
     
     with st.form("rfi_form"):

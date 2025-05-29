@@ -59,9 +59,74 @@ if 'daily_reports' not in st.session_state:
     ]
 
 # Main content
-tab1, tab2 = st.tabs(["📝 Create New Report", "📊 View Reports"])
+tab1, tab2 = st.tabs(["📊 Daily Reports", "📝 Create New Report"])
 
 with tab1:
+    st.subheader("📊 Daily Reports Database")
+    
+    # Load reports from database or session
+    all_reports = []
+    if DATABASE_AVAILABLE:
+        try:
+            db_reports = get_daily_reports()
+            if db_reports:
+                all_reports = db_reports
+            else:
+                all_reports = st.session_state.daily_reports
+        except Exception as e:
+            st.warning(f"Database unavailable, showing session data: {str(e)}")
+            all_reports = st.session_state.daily_reports
+    else:
+        all_reports = st.session_state.daily_reports
+    
+    if all_reports:
+        df = pd.DataFrame(all_reports)
+        
+        # Search and filter
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            search_term = st.text_input("🔍 Search reports...", placeholder="Search by date, weather, or work performed")
+        with col2:
+            status_filter = st.selectbox("Status", ["All", "Active", "Archived"])
+        
+        # Filter data
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[
+                filtered_df.astype(str).apply(
+                    lambda x: x.str.contains(search_term, case=False, na=False)
+                ).any(axis=1)
+            ]
+        
+        if status_filter != "All":
+            filtered_df = filtered_df[filtered_df.get('status', 'Active') == status_filter]
+        
+        # Display results
+        st.write(f"**Total Reports:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            # Clean the dataframe for display
+            display_df = clean_dataframe_for_display(filtered_df)
+            
+            # Display with column configuration
+            st.dataframe(
+                display_df,
+                column_config={
+                    "date": st.column_config.DateColumn("Date"),
+                    "weather": st.column_config.TextColumn("Weather"),
+                    "temperature": st.column_config.NumberColumn("Temperature (°F)"),
+                    "crew_size": st.column_config.NumberColumn("Crew Size"),
+                    "status": st.column_config.SelectboxColumn("Status", options=["Active", "Archived"])
+                },
+                hide_index=True,
+                use_container_width=True
+            )
+        else:
+            st.info("No reports found matching your criteria.")
+    else:
+        st.info("No daily reports available. Create your first report in the Create tab!")
+
+with tab2:
     st.subheader("📝 Create New Daily Report")
     
     with st.form("daily_report_form"):
@@ -148,67 +213,3 @@ with tab1:
             
             st.rerun()
 
-with tab2:
-    st.subheader("📊 Daily Reports Database")
-    
-    # Load reports from database or session
-    all_reports = []
-    if DATABASE_AVAILABLE:
-        try:
-            db_reports = get_daily_reports()
-            if db_reports:
-                all_reports = db_reports
-            else:
-                all_reports = st.session_state.daily_reports
-        except Exception as e:
-            st.warning(f"Database unavailable, showing session data: {str(e)}")
-            all_reports = st.session_state.daily_reports
-    else:
-        all_reports = st.session_state.daily_reports
-    
-    if all_reports:
-        df = pd.DataFrame(all_reports)
-        
-        # Search and filter
-        col1, col2 = st.columns([2, 1])
-        with col1:
-            search_term = st.text_input("🔍 Search reports...", placeholder="Search by date, weather, or work performed")
-        with col2:
-            status_filter = st.selectbox("Status", ["All", "Active", "Archived"])
-        
-        # Filter data
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[
-                filtered_df.astype(str).apply(
-                    lambda x: x.str.contains(search_term, case=False, na=False)
-                ).any(axis=1)
-            ]
-        
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df.get('status', 'Active') == status_filter]
-        
-        # Display results
-        st.write(f"**Total Reports:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            # Clean the dataframe for display
-            display_df = clean_dataframe_for_display(filtered_df)
-            
-            # Display with column configuration
-            st.dataframe(
-                display_df,
-                column_config={
-                    "date": st.column_config.DateColumn("Date"),
-                    "weather": st.column_config.TextColumn("Weather"),
-                    "temperature": st.column_config.NumberColumn("Temperature (°F)"),
-                    "crew_size": st.column_config.NumberColumn("Crew Size"),
-                    "status": st.column_config.SelectboxColumn("Status", options=["Active", "Archived"])
-                },
-                hide_index=True,
-                use_container_width=True
-            )
-        else:
-            st.info("No reports found matching your criteria.")
-    else:
-        st.info("No daily reports available. Create your first report above!")

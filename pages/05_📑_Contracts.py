@@ -57,7 +57,7 @@ if 'contracts' not in st.session_state:
     ]
 
 # Main content
-tab1, tab2 = st.tabs(["📝 Create New Contract", "📊 View Contracts"])
+tab1, tab2 = st.tabs(["📊 Contracts Database", "📝 Create New Contract"])
 
 with tab1:
     st.subheader("📝 Create New Contract")

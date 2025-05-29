@@ -66,8 +66,10 @@ with tab1:
         
         if not filtered_df.empty:
             display_df = filtered_df.copy()
-            display_df['Budget'] = display_df['budgeted_amount'].apply(lambda x: f"${x:,.2f}")
-            display_df['Actual'] = display_df['actual_amount'].apply(lambda x: f"${x:,.2f}")
+            if 'budgeted' in display_df.columns:
+                display_df['Budget'] = display_df['budgeted'].apply(lambda x: f"${x:,.2f}")
+            if 'actual' in display_df.columns:
+                display_df['Actual'] = display_df['actual'].apply(lambda x: f"${x:,.2f}")
             
             st.dataframe(clean_dataframe_for_display(display_df), use_container_width=True, hide_index=True)
     else:

@@ -113,6 +113,26 @@ class CRUDController:
         if not display_columns:
             display_columns = list(df.columns)[:5]
         
+        # Add sort controls
+        sort_col1, sort_col2 = st.columns(2)
+        with sort_col1:
+            sort_by = st.selectbox(
+                "Sort by:",
+                options=display_columns,
+                format_func=lambda x: x.replace('_', ' ').title(),
+                key=f"{key_prefix}_sort_by"
+            )
+        with sort_col2:
+            sort_order = st.selectbox(
+                "Order:",
+                options=["Ascending", "Descending"],
+                key=f"{key_prefix}_sort_order"
+            )
+        
+        # Sort the dataframe
+        ascending = sort_order == "Ascending"
+        df_sorted = df.sort_values(by=sort_by, ascending=ascending)
+        
         # Create table header
         header_cols = st.columns(len(display_columns) + 1)  # +1 for actions column
         for i, col in enumerate(display_columns):
@@ -124,7 +144,7 @@ class CRUDController:
         st.divider()
         
         # Display table rows with inline action buttons
-        for index, row in df.iterrows():
+        for index, row in df_sorted.iterrows():
             row_cols = st.columns(len(display_columns) + 1)
             
             # Display data columns
@@ -198,7 +218,7 @@ class CRUDController:
         if f"{key_prefix}_view_record" in st.session_state:
             st.divider()
             record = st.session_state[f"{key_prefix}_view_record"]
-            self._show_record_details(record)
+            self._show_record_details(record, key_prefix)
             if st.button("Close View", key=f"{key_prefix}_close_view"):
                 del st.session_state[f"{key_prefix}_view_record"]
                 st.rerun()

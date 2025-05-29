@@ -24,9 +24,41 @@ st.markdown("---")
 if 'field_activities' not in st.session_state:
     st.session_state.field_activities = []
 
-tab1, tab2 = st.tabs(["📝 Log Activity", "📊 Operations Log"])
+tab1, tab2 = st.tabs(["📊 Operations Log", "📝 Log Activity"])
 
 with tab1:
+    st.subheader("📊 Field Operations Log")
+    
+    if st.session_state.field_activities:
+        df = pd.DataFrame(st.session_state.field_activities)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search activities...")
+        with col2:
+            crew_filter = st.selectbox("Crew", ["All", "Crew A", "Crew B", "Crew C"])
+        with col3:
+            activity_filter = st.selectbox("Activity", ["All", "Concrete Pour", "Steel Installation", "Electrical Work"])
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[filtered_df.astype(str).apply(
+                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
+        
+        if crew_filter != "All":
+            filtered_df = filtered_df[filtered_df['crew'] == crew_filter]
+            
+        if activity_filter != "All":
+            filtered_df = filtered_df[filtered_df['activity_type'] == activity_filter]
+        
+        st.write(f"**Total Activities:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
+    else:
+        st.info("No field activities logged. Log your first activity in the Log tab!")
+
+with tab2:
     st.subheader("📝 Log Field Activity")
     
     with st.form("field_activity_form"):

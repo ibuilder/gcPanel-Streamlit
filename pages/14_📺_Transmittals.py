@@ -24,9 +24,41 @@ st.markdown("---")
 if 'transmittals' not in st.session_state:
     st.session_state.transmittals = []
 
-tab1, tab2 = st.tabs(["📝 Create Transmittal", "📊 Transmittal Log"])
+tab1, tab2 = st.tabs(["📊 Transmittal Log", "📝 Create Transmittal"])
 
 with tab1:
+    st.subheader("📊 Transmittal Log")
+    
+    if st.session_state.transmittals:
+        df = pd.DataFrame(st.session_state.transmittals)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search transmittals...")
+        with col2:
+            recipient_filter = st.selectbox("Recipient", ["All", "Architect", "Engineer", "Contractor", "Owner"])
+        with col3:
+            status_filter = st.selectbox("Status", ["All", "Sent", "Acknowledged", "Under Review"])
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[filtered_df.astype(str).apply(
+                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
+        
+        if recipient_filter != "All":
+            filtered_df = filtered_df[filtered_df['recipient'] == recipient_filter]
+            
+        if status_filter != "All":
+            filtered_df = filtered_df[filtered_df['status'] == status_filter]
+        
+        st.write(f"**Total Transmittals:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
+    else:
+        st.info("No transmittals sent. Create your first transmittal in the Create tab!")
+
+with tab2:
     st.subheader("📝 Create New Transmittal")
     
     with st.form("transmittal_form"):

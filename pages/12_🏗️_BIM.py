@@ -34,10 +34,42 @@ if 'bim_models' not in st.session_state:
         }
     ]
 
-tab1, tab2, tab3 = st.tabs(["📁 Model Management", "🔍 Model Viewer", "📊 Coordination"])
+tab1, tab2, tab3 = st.tabs(["📊 BIM Models", "📁 Upload Model", "🔍 Model Viewer"])
 
 with tab1:
-    st.subheader("📁 BIM Model Management")
+    st.subheader("📊 BIM Models Database")
+    
+    if st.session_state.bim_models:
+        df = pd.DataFrame(st.session_state.bim_models)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search models...")
+        with col2:
+            discipline_filter = st.selectbox("Discipline", ["All", "Architectural", "Structural", "MEP", "Civil"])
+        with col3:
+            status_filter = st.selectbox("Status", ["All", "Current", "Superseded", "Under Review"])
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[filtered_df.astype(str).apply(
+                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
+        
+        if discipline_filter != "All":
+            filtered_df = filtered_df[filtered_df['discipline'] == discipline_filter]
+            
+        if status_filter != "All":
+            filtered_df = filtered_df[filtered_df['status'] == status_filter]
+        
+        st.write(f"**Total Models:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
+    else:
+        st.info("No BIM models available. Upload your first model in the Upload tab!")
+
+with tab2:
+    st.subheader("📁 Upload BIM Model")
     
     with st.form("bim_model_form"):
         col1, col2 = st.columns(2)

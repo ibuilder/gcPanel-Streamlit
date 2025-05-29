@@ -38,6 +38,42 @@ if 'cost_items' not in st.session_state:
 tab1, tab2, tab3 = st.tabs(["📊 Cost Tracking", "📝 Add Cost Item", "📈 Budget Analysis"])
 
 with tab1:
+    st.subheader("📊 Cost Tracking")
+    
+    if st.session_state.cost_items:
+        df = pd.DataFrame(st.session_state.cost_items)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search cost items...")
+        with col2:
+            category_filter = st.selectbox("Category", ["All", "Labor", "Materials", "Equipment", "Subcontractors"])
+        with col3:
+            status_filter = st.selectbox("Status", ["All", "Planned", "In Progress", "Completed"])
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[filtered_df.astype(str).apply(
+                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
+        
+        if category_filter != "All":
+            filtered_df = filtered_df[filtered_df['category'] == category_filter]
+            
+        if status_filter != "All":
+            filtered_df = filtered_df[filtered_df['status'] == status_filter]
+        
+        st.write(f"**Total Cost Items:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            display_df = filtered_df.copy()
+            display_df['Budget'] = display_df['budgeted_amount'].apply(lambda x: f"${x:,.2f}")
+            display_df['Actual'] = display_df['actual_amount'].apply(lambda x: f"${x:,.2f}")
+            
+            st.dataframe(clean_dataframe_for_display(display_df), use_container_width=True, hide_index=True)
+    else:
+        st.info("No cost items tracked. Add your first cost item in the Add tab!")
+
+with tab2:
     st.subheader("📝 Add Cost Item")
     
     with st.form("cost_form"):

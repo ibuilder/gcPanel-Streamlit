@@ -24,9 +24,41 @@ st.markdown("---")
 if 'closeout_items' not in st.session_state:
     st.session_state.closeout_items = []
 
-tab1, tab2, tab3 = st.tabs(["📋 Closeout Tasks", "📄 Documentation", "✅ Completion Status"])
+tab1, tab2, tab3 = st.tabs(["✅ Closeout Progress", "📋 Create Closeout Task", "📄 Documentation"])
 
 with tab1:
+    st.subheader("✅ Project Closeout Progress")
+    
+    if st.session_state.closeout_items:
+        df = pd.DataFrame(st.session_state.closeout_items)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search closeout items...")
+        with col2:
+            category_filter = st.selectbox("Category", ["All", "Documentation", "Warranties", "Training", "Inspections"])
+        with col3:
+            status_filter = st.selectbox("Status", ["All", "Not Started", "In Progress", "Completed"])
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[filtered_df.astype(str).apply(
+                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
+        
+        if category_filter != "All":
+            filtered_df = filtered_df[filtered_df['category'] == category_filter]
+            
+        if status_filter != "All":
+            filtered_df = filtered_df[filtered_df['status'] == status_filter]
+        
+        st.write(f"**Total Closeout Items:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
+    else:
+        st.info("No closeout items created. Create your first closeout task in the Create tab!")
+
+with tab2:
     st.subheader("📋 Create Closeout Task")
     
     with st.form("closeout_form"):

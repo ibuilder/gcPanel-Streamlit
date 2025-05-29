@@ -11,7 +11,106 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import json
+import hashlib
+import os
 from typing import Dict, List, Any
+
+# Authentication Functions
+def hash_password(password: str) -> str:
+    """Hash password for secure storage"""
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def check_authentication() -> bool:
+    """Check if user is authenticated"""
+    if 'authenticated' not in st.session_state:
+        st.session_state.authenticated = False
+    return st.session_state.authenticated
+
+def authenticate_user(username: str, password: str) -> bool:
+    """Authenticate user with credentials"""
+    # Default users for Highland Tower Development
+    users = {
+        "admin": {
+            "password": hash_password("highland2025"),
+            "role": "Administrator", 
+            "name": "System Administrator"
+        },
+        "manager": {
+            "password": hash_password("manager123"),
+            "role": "Project Manager",
+            "name": "Project Manager"
+        },
+        "engineer": {
+            "password": hash_password("engineer123"),
+            "role": "Engineer",
+            "name": "Site Engineer"
+        }
+    }
+    
+    hashed_input = hash_password(password)
+    
+    if username in users and users[username]["password"] == hashed_input:
+        st.session_state.authenticated = True
+        st.session_state.username = username
+        st.session_state.user_role = users[username]["role"]
+        st.session_state.user_name = users[username]["name"]
+        st.session_state.login_time = datetime.now()
+        return True
+    return False
+
+def logout():
+    """Log out the current user"""
+    for key in ['authenticated', 'username', 'user_role', 'user_name', 'login_time']:
+        if key in st.session_state:
+            del st.session_state[key]
+
+def render_login_page():
+    """Render the login page"""
+    st.markdown("""
+    <div style="text-align: center; padding: 2rem 0;">
+        <h1 style="color: #0066cc; margin-bottom: 0.5rem;">🏗️ Highland Tower Development</h1>
+        <p style="color: #6b7280; font-size: 1.1rem;">Construction Management Platform</p>
+        <p style="color: #9ca3af; font-size: 0.9rem;">$45.5M Mixed-Use Development Project</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    
+    with col2:
+        st.markdown("### 🔐 Access Dashboard")
+        
+        with st.form("login_form", clear_on_submit=False):
+            username = st.text_input("Username", placeholder="Enter your username")
+            password = st.text_input("Password", type="password", placeholder="Enter your password")
+            
+            col_login, col_demo = st.columns(2)
+            
+            with col_login:
+                login_button = st.form_submit_button("Sign In", use_container_width=True, type="primary")
+            
+            with col_demo:
+                demo_button = st.form_submit_button("Demo Access", use_container_width=True)
+            
+            if login_button and username and password:
+                if authenticate_user(username, password):
+                    st.success(f"Welcome to Highland Tower, {st.session_state.user_name}!")
+                    st.rerun()
+                else:
+                    st.error("Invalid username or password")
+                    st.info("Default credentials: admin / highland2025")
+            
+            if demo_button:
+                if authenticate_user("admin", "highland2025"):
+                    st.success("Demo access granted!")
+                    st.rerun()
+        
+        st.markdown("---")
+        st.markdown("""
+        **Highland Tower Development Team Access:**
+        - **Administrator**: admin / highland2025
+        - **Project Manager**: manager / manager123  
+        - **Site Engineer**: engineer / engineer123
+        """)
 
 def configure_page():
     """Configure Streamlit page settings"""
@@ -15875,6 +15974,11 @@ def main():
     """, unsafe_allow_html=True)
     
     initialize_session_state()
+    
+    # Check authentication before showing dashboard
+    if not check_authentication():
+        render_login_page()
+        return
     
     render_sidebar()
     

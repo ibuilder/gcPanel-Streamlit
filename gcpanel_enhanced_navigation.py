@@ -28,32 +28,25 @@ def check_authentication() -> bool:
 
 def authenticate_user(username: str, password: str) -> bool:
     """Authenticate user with credentials"""
-    # Default users for Highland Tower Development
-    users = {
-        "admin": {
-            "password": hash_password("highland2025"),
-            "role": "Administrator", 
-            "name": "System Administrator"
-        },
-        "manager": {
-            "password": hash_password("manager123"),
-            "role": "Project Manager",
-            "name": "Project Manager"
-        },
-        "engineer": {
-            "password": hash_password("engineer123"),
-            "role": "Engineer",
-            "name": "Site Engineer"
-        }
+    # Simple authentication for Highland Tower Development
+    # Using plain text comparison for simplicity
+    valid_users = {
+        "admin": "highland2025",
+        "manager": "manager123", 
+        "engineer": "engineer123"
     }
     
-    hashed_input = hash_password(password)
+    user_roles = {
+        "admin": {"role": "Administrator", "name": "System Administrator"},
+        "manager": {"role": "Project Manager", "name": "Project Manager"},
+        "engineer": {"role": "Engineer", "name": "Site Engineer"}
+    }
     
-    if username in users and users[username]["password"] == hashed_input:
+    if username in valid_users and valid_users[username] == password:
         st.session_state.authenticated = True
         st.session_state.username = username
-        st.session_state.user_role = users[username]["role"]
-        st.session_state.user_name = users[username]["name"]
+        st.session_state.user_role = user_roles[username]["role"]
+        st.session_state.user_name = user_roles[username]["name"]
         st.session_state.login_time = datetime.now()
         return True
     return False

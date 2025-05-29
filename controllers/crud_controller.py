@@ -97,81 +97,87 @@ class CRUDController:
             self._render_card_view(filtered_df, key_prefix)
     
     def _render_table_view(self, df: pd.DataFrame, key_prefix: str):
-        """Render table view with integrated action buttons"""
+        """Render table view with standard Streamlit record selection"""
         if df.empty:
             st.info("No records match your filters.")
             return
         
-        # Configure columns if specified
+        # Configure columns
         column_config = self.display_config.get('column_config', {})
         
-        # Create action buttons for each row
-        for index, row in df.iterrows():
-            with st.container():
-                # Create columns for actions and data
-                action_col, data_col = st.columns([0.15, 0.85])
-                
-                with action_col:
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        if st.button("👁️", key=f"{key_prefix}_view_{index}", help="View Details"):
-                            st.session_state[f"{key_prefix}_selected_record"] = row.to_dict()
-                            st.session_state[f"{key_prefix}_action"] = "view"
-                            st.rerun()
-                    with col2:
-                        if st.button("✏️", key=f"{key_prefix}_edit_{index}", help="Edit Record"):
-                            st.session_state[f"{key_prefix}_selected_record"] = row.to_dict()
-                            st.session_state[f"{key_prefix}_action"] = "edit"
-                            st.rerun()
-                
-                with data_col:
-                    # Display key information from the row
-                    key_fields = self.display_config.get('key_fields', list(df.columns)[:4])
-                    row_data = []
-                    for field in key_fields:
-                        if field in row.index:
-                            value = row[field]
-                            if value is not None and not pd.isna(value):
-                                # Format the field name and value
-                                field_name = field.replace('_', ' ').title()
-                                if isinstance(value, (int, float)) and any(cost_field in field.lower() for cost_field in ['cost', 'value', 'price', 'amount']):
-                                    value = f"${value:,.2f}"
-                                row_data.append(f"**{field_name}:** {value}")
-                    
-                    if row_data:
-                        st.markdown(" | ".join(row_data))
+        # Display the main sortable/filterable table
+        st.dataframe(
+            df,
+            use_container_width=True,
+            hide_index=True,
+            column_config=column_config,
+            key=f"{key_prefix}_main_table"
+        )
+        
+        st.divider()
+        
+        # Record selection and actions
+        st.subheader("Record Actions")
+        
+        if len(df) > 0:
+            # Create record options for selection
+            record_options = []
+            for index, row in df.iterrows():
+                # Create a display label for each record
+                key_fields = self.display_config.get('key_fields', ['id'])
+                if key_fields and len(key_fields) > 0:
+                    first_field = key_fields[0]
+                    if first_field in row.index:
+                        label = f"{row[first_field]}"
+                        if len(key_fields) > 1 and key_fields[1] in row.index:
+                            label += f" - {row[key_fields[1]]}"
                     else:
-                        st.write(f"Record ID: {row.get('id', 'N/A')}")
+                        label = f"Record {index + 1}"
+                else:
+                    label = f"Record {index + 1}"
                 
-                st.divider()
+                record_options.append((label, index))
+            
+            # Record selector
+            col1, col2, col3 = st.columns([0.6, 0.2, 0.2])
+            
+            with col1:
+                selected_option = st.selectbox(
+                    "Select a record:",
+                    options=record_options,
+                    format_func=lambda x: x[0],
+                    key=f"{key_prefix}_record_selector"
+                )
+            
+            if selected_option:
+                selected_index = selected_option[1]
+                selected_record = df.iloc[selected_index].to_dict()
+                
+                with col2:
+                    if st.button("👁️ View Details", key=f"{key_prefix}_view_action"):
+                        st.session_state[f"{key_prefix}_view_record"] = selected_record
+                
+                with col3:
+                    if st.button("✏️ Edit Record", key=f"{key_prefix}_edit_action"):
+                        st.session_state[f"{key_prefix}_edit_record"] = selected_record
         
-        # Handle view/edit actions
-        if st.session_state.get(f"{key_prefix}_action") == "view":
-            selected_record = st.session_state.get(f"{key_prefix}_selected_record")
-            if selected_record:
-                self._show_record_details(selected_record)
-                if st.button("❌ Close", key=f"{key_prefix}_close_view"):
-                    del st.session_state[f"{key_prefix}_action"]
-                    del st.session_state[f"{key_prefix}_selected_record"]
-                    st.rerun()
+        # Display view details
+        if f"{key_prefix}_view_record" in st.session_state:
+            st.divider()
+            record = st.session_state[f"{key_prefix}_view_record"]
+            self._show_record_details(record)
+            if st.button("Close View", key=f"{key_prefix}_close_view"):
+                del st.session_state[f"{key_prefix}_view_record"]
+                st.rerun()
         
-        elif st.session_state.get(f"{key_prefix}_action") == "edit":
-            selected_record = st.session_state.get(f"{key_prefix}_selected_record")
-            if selected_record:
-                self._show_edit_form(selected_record, key_prefix)
-                if st.button("❌ Cancel", key=f"{key_prefix}_cancel_edit"):
-                    del st.session_state[f"{key_prefix}_action"]
-                    del st.session_state[f"{key_prefix}_selected_record"]
-                    st.rerun()
-        
-        # Display full dataframe in expander for reference
-        with st.expander("📊 Complete Data Table", expanded=False):
-            st.dataframe(
-                df,
-                use_container_width=True,
-                hide_index=True,
-                column_config=column_config
-            )
+        # Display edit form
+        if f"{key_prefix}_edit_record" in st.session_state:
+            st.divider()
+            record = st.session_state[f"{key_prefix}_edit_record"]
+            self._show_edit_form(record, key_prefix)
+            if st.button("Cancel Edit", key=f"{key_prefix}_cancel_edit"):
+                del st.session_state[f"{key_prefix}_edit_record"]
+                st.rerun()
     
     def _render_card_view(self, df: pd.DataFrame, key_prefix: str):
         """Render card view with actions"""

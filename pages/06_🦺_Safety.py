@@ -120,7 +120,7 @@ with tab3:
             st.caption("Incidents by Severity")
         
         with col2:
-            type_dist = incidents_df['type'].value_counts()
+            type_dist = incidents_df['incident_type'].value_counts()
             st.bar_chart(type_dist, use_container_width=True)
             st.caption("Incidents by Type")
 

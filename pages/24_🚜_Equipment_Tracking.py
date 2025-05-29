@@ -24,9 +24,41 @@ st.markdown("---")
 if 'equipment' not in st.session_state:
     st.session_state.equipment = []
 
-tab1, tab2, tab3 = st.tabs(["📝 Add Equipment", "🚜 Equipment Fleet", "📊 Utilization"])
+tab1, tab2, tab3 = st.tabs(["🚜 Equipment Fleet", "📝 Add Equipment", "📊 Utilization"])
 
 with tab1:
+    st.subheader("🚜 Equipment Fleet")
+    
+    if st.session_state.equipment:
+        df = pd.DataFrame(st.session_state.equipment)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search equipment...")
+        with col2:
+            type_filter = st.selectbox("Type", ["All", "Excavator", "Crane", "Bulldozer", "Concrete Mixer"])
+        with col3:
+            status_filter = st.selectbox("Status", ["All", "Available", "In Use", "Maintenance", "Out of Service"])
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[filtered_df.astype(str).apply(
+                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
+        
+        if type_filter != "All":
+            filtered_df = filtered_df[filtered_df['type'] == type_filter]
+            
+        if status_filter != "All":
+            filtered_df = filtered_df[filtered_df['status'] == status_filter]
+        
+        st.write(f"**Total Equipment:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
+    else:
+        st.info("No equipment tracked. Add your first equipment in the Add tab!")
+
+with tab2:
     st.subheader("📝 Add Equipment")
     
     with st.form("equipment_form"):

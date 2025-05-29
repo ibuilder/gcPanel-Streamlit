@@ -24,9 +24,41 @@ st.markdown("---")
 if 'materials' not in st.session_state:
     st.session_state.materials = []
 
-tab1, tab2, tab3 = st.tabs(["📝 Add Material", "📦 Inventory", "📊 Usage Tracking"])
+tab1, tab2, tab3 = st.tabs(["📦 Material Inventory", "📝 Add Material", "📊 Usage Tracking"])
 
 with tab1:
+    st.subheader("📦 Material Inventory")
+    
+    if st.session_state.materials:
+        df = pd.DataFrame(st.session_state.materials)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search materials...")
+        with col2:
+            category_filter = st.selectbox("Category", ["All", "Concrete", "Steel", "Lumber", "Electrical"])
+        with col3:
+            status_filter = st.selectbox("Status", ["All", "In Stock", "Low Stock", "Out of Stock"])
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[filtered_df.astype(str).apply(
+                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
+        
+        if category_filter != "All":
+            filtered_df = filtered_df[filtered_df['category'] == category_filter]
+            
+        if status_filter != "All":
+            filtered_df = filtered_df[filtered_df['status'] == status_filter]
+        
+        st.write(f"**Total Materials:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
+    else:
+        st.info("No materials in inventory. Add your first material in the Add tab!")
+
+with tab2:
     st.subheader("📝 Add Material to Inventory")
     
     with st.form("material_form"):

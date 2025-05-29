@@ -24,7 +24,7 @@ apply_highland_tower_styling()
 render_highland_header("🏭 Field Operations", "Highland Tower Development - Daily Field Activity Management")
 
 # Initialize model
-model = FieldOperationsModel()
+model = FieldOperationModel()
 
 # Display configuration
 display_config = {

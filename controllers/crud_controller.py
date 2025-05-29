@@ -129,13 +129,14 @@ class CRUDController:
                     key_fields = self.display_config.get('key_fields', list(df.columns)[:4])
                     row_data = []
                     for field in key_fields:
-                        if field in row.index and pd.notna(row[field]):
+                        if field in row.index:
                             value = row[field]
-                            # Format the field name and value
-                            field_name = field.replace('_', ' ').title()
-                            if isinstance(value, (int, float)) and field.endswith(('cost', 'value', 'price', 'amount')):
-                                value = f"${value:,.2f}"
-                            row_data.append(f"**{field_name}:** {value}")
+                            if value is not None and not pd.isna(value):
+                                # Format the field name and value
+                                field_name = field.replace('_', ' ').title()
+                                if isinstance(value, (int, float)) and any(cost_field in field.lower() for cost_field in ['cost', 'value', 'price', 'amount']):
+                                    value = f"${value:,.2f}"
+                                row_data.append(f"**{field_name}:** {value}")
                     
                     if row_data:
                         st.markdown(" | ".join(row_data))

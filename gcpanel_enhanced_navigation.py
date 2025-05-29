@@ -1365,6 +1365,11 @@ def render_dashboard():
                 'Actual': [12, 28, 48, 65, 68]
             })
             
+            # Clean data to prevent Arrow serialization errors
+            progress_data = progress_data.copy()
+            progress_data['Planned'] = pd.to_numeric(progress_data['Planned'], errors='coerce')
+            progress_data['Actual'] = pd.to_numeric(progress_data['Actual'], errors='coerce')
+            
             fig = go.Figure()
             fig.add_trace(go.Scatter(x=progress_data['Week'], y=progress_data['Planned'], 
                                    mode='lines+markers', name='Planned', line=dict(color='#0066cc')))
@@ -1372,12 +1377,16 @@ def render_dashboard():
                                    mode='lines+markers', name='Actual', line=dict(color='#10b981')))
             
             fig.update_layout(title="Progress vs Planned", xaxis_title="Week", yaxis_title="Progress (%)",
-                            height=400, showlegend=True)
+                            height=400, showlegend=True, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig, use_container_width=True)
         except Exception as e:
-            st.error(f"Chart error: {str(e)}")
-            # Fallback table
-            st.dataframe(progress_data, use_container_width=True)
+            st.warning("Chart display unavailable - showing data table")
+            # Clean data for table display
+            display_data = progress_data.copy()
+            for col in display_data.columns:
+                if display_data[col].dtype == 'object':
+                    display_data[col] = display_data[col].astype(str)
+            st.dataframe(display_data, use_container_width=True)
     
     with col2:
         st.subheader("💰 Cost Breakdown by Phase")
@@ -1388,6 +1397,11 @@ def render_dashboard():
                 'Budget': [9.0, 13.5, 7.2, 4.8, 1.0]
             })
             
+            # Clean data to prevent Arrow serialization errors
+            cost_data = cost_data.copy()
+            cost_data['Spent'] = pd.to_numeric(cost_data['Spent'], errors='coerce')
+            cost_data['Budget'] = pd.to_numeric(cost_data['Budget'], errors='coerce')
+            
             fig = go.Figure()
             fig.add_trace(go.Bar(x=cost_data['Phase'], y=cost_data['Spent'], 
                                name='Spent', marker_color='#ef4444'))
@@ -1395,12 +1409,17 @@ def render_dashboard():
                                name='Budget', marker_color='#0066cc'))
             
             fig.update_layout(title="Cost Analysis by Phase ($M)", xaxis_title="Phase", 
-                            yaxis_title="Cost ($M)", barmode='group', height=400)
+                            yaxis_title="Cost ($M)", barmode='group', height=400,
+                            plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig, use_container_width=True)
         except Exception as e:
-            st.error(f"Chart error: {str(e)}")
-            # Fallback table
-            st.dataframe(cost_data, use_container_width=True)
+            st.warning("Chart display unavailable - showing data table")
+            # Clean data for table display
+            display_data = cost_data.copy()
+            for col in display_data.columns:
+                if display_data[col].dtype == 'object':
+                    display_data[col] = display_data[col].astype(str)
+            st.dataframe(display_data, use_container_width=True)
 
 def render_daily_reports():
     """Enterprise Daily Reports module with robust Python backend"""

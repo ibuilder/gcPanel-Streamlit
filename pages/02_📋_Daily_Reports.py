@@ -1,30 +1,51 @@
 """
 Daily Reports Page - Highland Tower Development
-Refactored using MVC pattern with models, controllers, and helpers
 """
 
 import streamlit as st
-import sys
-import os
+import pandas as pd
+from datetime import datetime
 
-# Add project root to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from models.all_models import DailyReportModel
-from controllers.crud_controller import CRUDController
-from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
-
-# Page configuration
 st.set_page_config(page_title="Daily Reports - gcPanel", page_icon="📋", layout="wide")
 
-# Apply styling
-apply_highland_tower_styling()
+st.title("📋 Daily Reports")
+st.markdown("Highland Tower Development - Daily Progress & Activity Reports")
+st.markdown("---")
 
-# Render header
-render_highland_header("📋 Daily Reports", "Highland Tower Development - Daily Construction Progress Reports")
+# Initialize session state for daily reports
+if 'daily_reports' not in st.session_state:
+    st.session_state.daily_reports = [
+        {
+            "id": "DR-001",
+            "date": "2024-12-15",
+            "weather": "Clear, 45°F",
+            "crew_count": 45,
+            "hours_worked": 360,
+            "activities": "Structural steel installation - Floor 22",
+            "progress": "85% complete on Floor 22 framing",
+            "issues": "None reported",
+            "safety_incidents": 0
+        }
+    ]
 
-# Initialize model
-model = DailyReportModel()
+# Main tabs
+tab1, tab2, tab3 = st.tabs(["📊 Reports Database", "📝 Create Report", "📈 Progress Summary"])
+
+with tab1:
+    st.subheader("📊 Daily Reports Database")
+    if st.session_state.daily_reports:
+        df = pd.DataFrame(st.session_state.daily_reports)
+        st.dataframe(df, use_container_width=True, hide_index=True)
+    else:
+        st.info("No daily reports available")
+
+with tab2:
+    st.subheader("📝 Create Daily Report")
+    st.info("Daily report creation form coming soon")
+
+with tab3:
+    st.subheader("📈 Progress Summary")
+    st.info("Progress analytics coming soon")
 
 # Display configuration
 display_config = {

@@ -1,30 +1,62 @@
 """
 Cost Management Page - Highland Tower Development
-Refactored using MVC pattern with models, controllers, and helpers
 """
 
 import streamlit as st
-import sys
-import os
+import pandas as pd
+from datetime import datetime
 
-# Add project root to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from models.all_models import CostModel
-from controllers.crud_controller import CRUDController
-from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
-
-# Page configuration
 st.set_page_config(page_title="Cost Management - gcPanel", page_icon="💰", layout="wide")
 
-# Apply styling
-apply_highland_tower_styling()
+st.title("💰 Cost Management")
+st.markdown("Highland Tower Development - Project Cost Control & Budget Management")
+st.markdown("---")
 
-# Render header
-render_highland_header("💰 Cost Management", "Highland Tower Development - Project Cost Control & Analysis")
+# Initialize session state for cost data
+if 'cost_items' not in st.session_state:
+    st.session_state.cost_items = [
+        {
+            "id": "COST-001",
+            "category": "Labor",
+            "description": "Structural Steel Installation - Floors 20-25",
+            "budget": 1250000,
+            "actual": 1175000,
+            "committed": 1200000,
+            "variance": 75000,
+            "status": "On Budget",
+            "last_updated": "2024-12-15"
+        },
+        {
+            "id": "COST-002", 
+            "category": "Materials",
+            "description": "Concrete & Rebar - Foundation & Structure",
+            "budget": 850000,
+            "actual": 875000,
+            "committed": 850000,
+            "variance": -25000,
+            "status": "Over Budget",
+            "last_updated": "2024-12-14"
+        }
+    ]
 
-# Initialize model
-model = CostModel()
+# Main tabs
+tab1, tab2, tab3 = st.tabs(["📊 Cost Overview", "📝 Add Cost Item", "📈 Budget Analysis"])
+
+with tab1:
+    st.subheader("📊 Cost Database")
+    if st.session_state.cost_items:
+        df = pd.DataFrame(st.session_state.cost_items)
+        st.dataframe(df, use_container_width=True, hide_index=True)
+    else:
+        st.info("No cost data available")
+
+with tab2:
+    st.subheader("📝 Add New Cost Item")
+    st.info("Cost item creation form coming soon")
+
+with tab3:
+    st.subheader("📈 Budget Analysis")
+    st.info("Budget analysis charts coming soon")
 
 # Display configuration
 display_config = {

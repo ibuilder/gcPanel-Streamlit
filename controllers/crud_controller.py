@@ -105,12 +105,22 @@ class CRUDController:
         # Configure columns
         column_config = self.display_config.get('column_config', {})
         
-        # Display the main sortable/filterable table
+        # Select key columns for display
+        key_fields = self.display_config.get('key_fields', list(df.columns)[:5])
+        display_columns = [col for col in key_fields if col in df.columns]
+        
+        # If no key fields specified or found, use first 5 columns
+        if not display_columns:
+            display_columns = list(df.columns)[:5]
+        
+        # Display only key columns in the table
+        display_df = df[display_columns]
+        
         st.dataframe(
-            df,
+            display_df,
             use_container_width=True,
             hide_index=True,
-            column_config=column_config,
+            column_config={col: column_config.get(col, {}) for col in display_columns},
             key=f"{key_prefix}_main_table"
         )
         

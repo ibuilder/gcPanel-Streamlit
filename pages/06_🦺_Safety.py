@@ -31,23 +31,24 @@ display_config = {
     'title': 'Safety Incidents',
     'item_name': 'Incident',
     'title_field': 'id',
-    'key_fields': ['type', 'severity', 'location'],
-    'detail_fields': ['date', 'status', 'reported_by'],
-    'search_fields': ['description', 'location', 'type', 'reported_by'],
+    'key_fields': ['incident_type', 'severity', 'location', 'date_occurred', 'status'],
+    'detail_fields': ['reported_by', 'description'],
+    'search_fields': ['description', 'location', 'incident_type', 'reported_by'],
     'primary_filter': {
         'field': 'severity',
         'label': 'Severity'
     },
     'secondary_filter': {
-        'field': 'type',
-        'label': 'Type'
+        'field': 'incident_type',
+        'label': 'Incident Type'
     },
     'column_config': {
-        "id": st.column_config.TextColumn("Incident ID"),
-        "date": st.column_config.DateColumn("Date"),
-        "type": st.column_config.TextColumn("Type"),
-        "severity": st.column_config.TextColumn("Severity"),
+        "id": st.column_config.TextColumn("ID"),
+        "incident_type": st.column_config.TextColumn("Type"),
+        "severity": st.column_config.TextColumn("Severity"), 
         "location": st.column_config.TextColumn("Location"),
+        "date_occurred": st.column_config.DateColumn("Date"),
+        "status": st.column_config.TextColumn("Status"),
         "status": st.column_config.TextColumn("Status"),
         "reported_by": st.column_config.TextColumn("Reported By")
     }

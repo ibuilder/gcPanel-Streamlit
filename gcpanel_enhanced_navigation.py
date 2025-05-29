@@ -21,21 +21,24 @@ def clean_dataframe_for_display(df):
     if df is None or df.empty:
         return df
     
-    df_clean = df.copy()
-    
-    # Convert mixed type columns to consistent types
-    for col in df_clean.columns:
-        if df_clean[col].dtype == 'object':
-            # Force all object columns to string to prevent mixed type issues
+    try:
+        df_clean = df.copy()
+        
+        # Convert all columns to string to ensure compatibility
+        for col in df_clean.columns:
             df_clean[col] = df_clean[col].astype(str)
         
-        # Replace infinite values in numeric columns
-        if df_clean[col].dtype in ['float64', 'float32', 'int64', 'int32']:
-            df_clean[col] = df_clean[col].replace([float('inf'), float('-inf')], 0)
-            # Fill NaN values
-            df_clean[col] = df_clean[col].fillna(0)
-    
-    return df_clean
+        # Remove any problematic characters
+        for col in df_clean.columns:
+            df_clean[col] = df_clean[col].str.replace('inf', '0', regex=False)
+            df_clean[col] = df_clean[col].str.replace('-inf', '0', regex=False)
+            df_clean[col] = df_clean[col].str.replace('nan', '', regex=False)
+            df_clean[col] = df_clean[col].str.replace('None', '', regex=False)
+        
+        return df_clean
+    except Exception:
+        # If cleaning fails, return an empty dataframe
+        return pd.DataFrame({'Error': ['Data display temporarily unavailable']})
 
 def hash_password(password: str) -> str:
     """Hash password for secure storage"""
@@ -233,12 +236,24 @@ def apply_styling():
     /* Force scroll for long forms */
     .stForm {
         overflow-y: auto !important;
-        max-height: 85vh !important;
+        max-height: none !important;
     }
     
-    /* Ensure proper page height */
+    /* Ensure proper page height and scrolling */
     .main .block-container {
         min-height: 100vh !important;
+        padding-bottom: 5rem !important;
+    }
+    
+    /* Fix container height issues */
+    .stApp {
+        height: auto !important;
+        min-height: 100vh !important;
+    }
+    
+    /* Ensure content is not cut off */
+    .element-container {
+        height: auto !important;
     }
     
     /* === ENTERPRISE SIDEBAR === */
@@ -1881,10 +1896,10 @@ def render_daily_reports_basic():
         st.markdown("**📊 Database Statistics**")
         if st.session_state.daily_reports:
             stats_data = pd.DataFrame([
-                {"Metric": "Total Reports", "Value": len(st.session_state.daily_reports)},
+                {"Metric": "Total Reports", "Value": str(len(st.session_state.daily_reports))},
                 {"Metric": "Average Crew Size", "Value": f"{sum(r['crew_size'] for r in st.session_state.daily_reports) / len(st.session_state.daily_reports):.1f}"},
-                {"Metric": "Total Safety Incidents", "Value": sum(r['safety_incidents'] for r in st.session_state.daily_reports)},
-                {"Metric": "Reports This Month", "Value": len([r for r in st.session_state.daily_reports if r['date'].startswith('2025-05')])},
+                {"Metric": "Total Safety Incidents", "Value": str(sum(r['safety_incidents'] for r in st.session_state.daily_reports))},
+                {"Metric": "Reports This Month", "Value": str(len([r for r in st.session_state.daily_reports if r['date'].startswith('2025-05')]))},
             ])
             st.dataframe(clean_dataframe_for_display(stats_data), use_container_width=True)
 

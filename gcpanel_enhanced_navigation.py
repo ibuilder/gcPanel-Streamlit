@@ -16,6 +16,33 @@ import os
 from typing import Dict, List, Any
 
 # Authentication Functions
+def clean_dataframe_for_display(df):
+    """Clean DataFrame to prevent Arrow serialization errors"""
+    if df is None or df.empty:
+        return df
+    
+    df_clean = df.copy()
+    
+    # Convert mixed type columns to consistent types
+    for col in df_clean.columns:
+        if df_clean[col].dtype == 'object':
+            # Convert string numbers to numeric where possible
+            try:
+                numeric_series = pd.to_numeric(df_clean[col], errors='coerce')
+                if not numeric_series.isna().all():
+                    df_clean[col] = numeric_series
+                else:
+                    # Ensure all values are strings
+                    df_clean[col] = df_clean[col].astype(str)
+            except:
+                df_clean[col] = df_clean[col].astype(str)
+        
+        # Replace infinite values
+        if df_clean[col].dtype in ['float64', 'float32']:
+            df_clean[col] = df_clean[col].replace([float('inf'), float('-inf')], None)
+    
+    return df_clean
+
 def hash_password(password: str) -> str:
     """Hash password for secure storage"""
     return hashlib.sha256(password.encode()).hexdigest()
@@ -180,6 +207,27 @@ def apply_styling():
         background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         min-height: 100vh;
         padding: 0;
+        overflow-y: auto !important;
+        height: 100vh !important;
+    }
+    
+    /* Main content area scrolling */
+    .main .block-container {
+        padding-top: 2rem !important;
+        padding-bottom: 3rem !important;
+        overflow-y: auto !important;
+        max-height: calc(100vh - 2rem) !important;
+    }
+    
+    /* Ensure forms can scroll */
+    div[data-testid="stForm"] {
+        overflow-y: auto !important;
+        max-height: 80vh !important;
+    }
+    
+    /* Fix for scrollable containers */
+    .stContainer, .element-container {
+        overflow: visible !important;
     }
     
     /* === ENTERPRISE SIDEBAR === */

@@ -116,6 +116,11 @@ if template_available:
 else:
     # Fallback implementation
     st.set_page_config(page_title="RFIs - gcPanel", page_icon="📄", layout="wide")
+# Check authentication
+if not check_authentication():
+    st.error("🔒 Please log in to access this page")
+    st.stop()
+
     st.title("📄 Request for Information (RFI)")
     st.markdown("Highland Tower Development - Design Clarifications & Information Requests")
     st.markdown("---")

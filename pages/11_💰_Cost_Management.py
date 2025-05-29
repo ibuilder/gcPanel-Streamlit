@@ -7,6 +7,11 @@ import pandas as pd
 from datetime import datetime
 
 st.set_page_config(page_title="Cost Management - gcPanel", page_icon="💰", layout="wide")
+# Check authentication
+if not check_authentication():
+    st.error("🔒 Please log in to access this page")
+    st.stop()
+
 
 st.title("💰 Cost Management")
 st.markdown("Highland Tower Development - Project Cost Control & Budget Management")

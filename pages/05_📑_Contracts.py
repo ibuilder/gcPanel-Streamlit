@@ -8,7 +8,9 @@ import sys
 import os
 
 # Add project root to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
+
+from utils.helpers import check_authentication)))
 
 from models.contract_model import ContractModel
 from controllers.crud_controller import CRUDController
@@ -16,6 +18,11 @@ from helpers.ui_helpers import format_currency, render_highland_header, apply_hi
 
 # Page configuration
 st.set_page_config(page_title="Contracts - gcPanel", page_icon="📑", layout="wide")
+# Check authentication
+if not check_authentication():
+    st.error("🔒 Please log in to access this page")
+    st.stop()
+
 
 # Apply styling
 apply_highland_tower_styling()

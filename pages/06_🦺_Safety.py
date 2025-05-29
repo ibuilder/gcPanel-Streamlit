@@ -10,12 +10,18 @@ import os
 # Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from models.safety_model import SafetyModel
+from utils.helpers import check_authentication
+from models.all_models import SafetyModel
 from controllers.crud_controller import CRUDController
 from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, render_status_badge
 
 # Page configuration
 st.set_page_config(page_title="Safety - gcPanel", page_icon="🦺", layout="wide")
+
+# Check authentication
+if not check_authentication():
+    st.error("🔒 Please log in to access this page")
+    st.stop()
 
 # Apply styling
 apply_highland_tower_styling()

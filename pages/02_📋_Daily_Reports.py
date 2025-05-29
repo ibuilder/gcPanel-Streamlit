@@ -7,6 +7,11 @@ import pandas as pd
 from datetime import datetime
 
 st.set_page_config(page_title="Daily Reports - gcPanel", page_icon="📋", layout="wide")
+# Check authentication
+if not check_authentication():
+    st.error("🔒 Please log in to access this page")
+    st.stop()
+
 
 st.title("📋 Daily Reports")
 st.markdown("Highland Tower Development - Daily Progress & Activity Reports")

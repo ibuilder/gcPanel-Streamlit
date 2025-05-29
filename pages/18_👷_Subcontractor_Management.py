@@ -34,7 +34,7 @@ with tab1:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search subcontractors...")
+            search_term = st.text_input("🔍 Search subcontractors...", key="subcontractor_management_search_1")
         with col2:
             trade_filter = st.selectbox("Trade", ["All", "Electrical", "Plumbing", "HVAC", "Flooring"])
         with col3:

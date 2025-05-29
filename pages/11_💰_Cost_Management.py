@@ -45,7 +45,7 @@ with tab1:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search cost items...")
+            search_term = st.text_input("🔍 Search cost items...", key="cost_management_search_1")
         with col2:
             category_filter = st.selectbox("Category", ["All", "Labor", "Materials", "Equipment", "Subcontractors"])
         with col3:
@@ -125,7 +125,7 @@ with tab2:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search cost items...")
+            search_term = st.text_input("🔍 Search cost items...", key="cost_management_search_2")
         with col2:
             category_filter = st.selectbox("Category", ["All", "Labor", "Materials", "Equipment"])
         with col3:

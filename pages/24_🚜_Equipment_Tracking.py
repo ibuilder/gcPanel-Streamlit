@@ -34,7 +34,7 @@ with tab1:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search equipment...")
+            search_term = st.text_input("🔍 Search equipment...", key="equipment_tracking_search_1")
         with col2:
             type_filter = st.selectbox("Type", ["All", "Excavator", "Crane", "Bulldozer", "Concrete Mixer"])
         with col3:

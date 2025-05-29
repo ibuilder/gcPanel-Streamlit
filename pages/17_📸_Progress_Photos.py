@@ -34,7 +34,7 @@ with tab1:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search photos...")
+            search_term = st.text_input("🔍 Search photos...", key="progress_photos_search_1")
         with col2:
             location_filter = st.selectbox("Location", ["All", "Lobby", "Floor 2", "Floor 3", "Roof"])
         with col3:

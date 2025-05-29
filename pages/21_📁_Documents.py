@@ -34,7 +34,7 @@ with tab1:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search documents...")
+            search_term = st.text_input("🔍 Search documents...", key="documents_search_1")
         with col2:
             category_filter = st.selectbox("Category", ["All", "Drawings", "Specifications", "Reports", "Contracts"])
         with col3:

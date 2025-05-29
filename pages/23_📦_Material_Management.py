@@ -34,7 +34,7 @@ with tab1:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search materials...")
+            search_term = st.text_input("🔍 Search materials...", key="material_management_search_1")
         with col2:
             category_filter = st.selectbox("Category", ["All", "Concrete", "Steel", "Lumber", "Electrical"])
         with col3:

@@ -34,7 +34,7 @@ with tab1:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search issues/risks...")
+            search_term = st.text_input("🔍 Search issues/risks...", key="issues_risks_search_1")
         with col2:
             type_filter = st.selectbox("Type", ["All", "Issue", "Risk", "Change Request"])
         with col3:

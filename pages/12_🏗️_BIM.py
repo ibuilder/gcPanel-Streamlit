@@ -44,7 +44,7 @@ with tab1:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search models...")
+            search_term = st.text_input("🔍 Search models...", key="bim_search_1")
         with col2:
             discipline_filter = st.selectbox("Discipline", ["All", "Architectural", "Structural", "MEP", "Civil"])
         with col3:
@@ -139,7 +139,7 @@ with tab3:
         
         col1, col2 = st.columns(2)
         with col1:
-            search_term = st.text_input("🔍 Search models...")
+            search_term = st.text_input("🔍 Search models...", key="bim_search_2")
         with col2:
             discipline_filter = st.selectbox("Discipline", ["All", "Architectural", "Structural", "Mechanical"])
         

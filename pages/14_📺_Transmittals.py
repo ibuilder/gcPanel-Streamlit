@@ -34,7 +34,7 @@ with tab1:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search transmittals...")
+            search_term = st.text_input("🔍 Search transmittals...", key="transmittals_search_1")
         with col2:
             recipient_filter = st.selectbox("Recipient", ["All", "Architect", "Engineer", "Contractor", "Owner"])
         with col3:

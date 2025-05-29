@@ -34,7 +34,7 @@ with tab1:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search closeout items...")
+            search_term = st.text_input("🔍 Search closeout items...", key="closeout_search_1")
         with col2:
             category_filter = st.selectbox("Category", ["All", "Documentation", "Warranties", "Training", "Inspections"])
         with col3:
@@ -125,7 +125,7 @@ with tab3:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search tasks...")
+            search_term = st.text_input("🔍 Search tasks...", key="closeout_search_2")
         with col2:
             category_filter = st.selectbox("Category", ["All", "Documentation", "Inspections", "Testing"])
         with col3:

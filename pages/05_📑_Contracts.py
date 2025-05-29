@@ -68,7 +68,7 @@ with tab1:
         # Search and filter
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search contracts...", placeholder="Search by title, contractor, or ID")
+            search_term = st.text_input("🔍 Search contracts...", placeholder="Search by title, contractor, or ID", key="contracts_search_1")
         with col2:
             status_filter = st.selectbox("Status", ["All", "Draft", "Active", "Completed", "Terminated"])
         with col3:
@@ -179,7 +179,7 @@ with tab2:
         # Search and filter
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search contracts...", placeholder="Search by title, contractor, or ID")
+            search_term = st.text_input("🔍 Search contracts...", placeholder="Search by title, contractor, or ID", key="contracts_search_2")
         with col2:
             status_filter = st.selectbox("Status", ["All", "Draft", "Active", "Completed", "Terminated"])
         with col3:

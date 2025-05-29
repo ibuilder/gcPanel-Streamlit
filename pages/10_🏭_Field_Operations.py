@@ -34,7 +34,7 @@ with tab1:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search activities...")
+            search_term = st.text_input("🔍 Search activities...", key="field_operations_search_1")
         with col2:
             crew_filter = st.selectbox("Crew", ["All", "Crew A", "Crew B", "Crew C"])
         with col3:
@@ -109,7 +109,7 @@ with tab2:
         
         col1, col2 = st.columns(2)
         with col1:
-            search_term = st.text_input("🔍 Search activities...")
+            search_term = st.text_input("🔍 Search activities...", key="field_operations_search_2")
         with col2:
             type_filter = st.selectbox("Activity Type", ["All", "Construction", "Inspection", "Survey"])
         

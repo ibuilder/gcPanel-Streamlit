@@ -34,7 +34,7 @@ with tab1:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search QC records...")
+            search_term = st.text_input("🔍 Search QC records...", key="quality_control_search_1")
         with col2:
             type_filter = st.selectbox("Type", ["All", "Material Test", "Visual Inspection", "Performance Test"])
         with col3:

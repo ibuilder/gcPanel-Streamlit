@@ -85,7 +85,7 @@ with tab1:
         # Search and filter
         col1, col2 = st.columns([2, 1])
         with col1:
-            search_term = st.text_input("🔍 Search reports...", placeholder="Search by date, weather, or work performed")
+            search_term = st.text_input("🔍 Search reports...", placeholder="Search by date, weather, or work performed", key="daily_reports_search_1")
         with col2:
             status_filter = st.selectbox("Status", ["All", "Active", "Archived"])
         

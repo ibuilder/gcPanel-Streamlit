@@ -111,7 +111,7 @@ with tab2:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search tasks...")
+            search_term = st.text_input("🔍 Search tasks...", key="engineering_search_1")
         with col2:
             discipline_filter = st.selectbox("Discipline", ["All", "Structural", "Mechanical", "Electrical"])
         with col3:

@@ -53,7 +53,7 @@ with tab1:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search incidents...")
+            search_term = st.text_input("🔍 Search incidents...", key="safety_search_1")
         with col2:
             severity_filter = st.selectbox("Severity", ["All", "Low", "Medium", "High", "Critical"])
         with col3:
@@ -148,7 +148,7 @@ with tab2:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search incidents...")
+            search_term = st.text_input("🔍 Search incidents...", key="safety_search_2")
         with col2:
             severity_filter = st.selectbox("Severity", ["All", "Low", "Medium", "High", "Critical"])
         with col3:

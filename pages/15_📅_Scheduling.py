@@ -57,7 +57,7 @@ with tab1:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search schedule items...")
+            search_term = st.text_input("🔍 Search schedule items...", key="scheduling_search_1")
         with col2:
             status_filter = st.selectbox("Status", ["All", "Not Started", "In Progress", "Completed", "Delayed"])
         with col3:

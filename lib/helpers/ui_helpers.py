@@ -108,12 +108,23 @@ def apply_highland_tower_styling():
     """, unsafe_allow_html=True)
 
 def render_highland_header(title: str, subtitle: str = ""):
-    """Render Highland Tower Development header"""
+    """Render project header with centralized configuration"""
+    try:
+        from lib.config.project_config import get_project_config
+        config = get_project_config()
+        project_info = f"{config.get('project_name')} - {config.get('project_value')} {config.get('project_type')}"
+        manager_info = f"Project Manager: {config.get('project_manager')}"
+    except:
+        # Fallback if config not available
+        project_info = "Highland Tower Development - $45.5M Mixed-Use Project"
+        manager_info = "Project Manager: Matthew M. Emma"
+    
     st.markdown(f"""
     <div class="highland-header">
         <h1>{title}</h1>
         <p style="margin: 0; opacity: 0.9; font-size: 1.1rem;">{subtitle}</p>
-        <p style="margin: 0.5rem 0 0 0; opacity: 0.8; font-size: 0.9rem;">Highland Tower Development - $45.5M Mixed-Use Project</p>
+        <p style="margin: 0.5rem 0 0 0; opacity: 0.8; font-size: 0.9rem;">{project_info}</p>
+        <p style="margin: 0.25rem 0 0 0; opacity: 0.7; font-size: 0.85rem;">{manager_info}</p>
     </div>
     """, unsafe_allow_html=True)
 

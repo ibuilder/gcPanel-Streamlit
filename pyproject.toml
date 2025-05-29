@@ -33,4 +33,6 @@ dependencies = [
     "fastapi>=0.115.12",
     "uvicorn>=0.34.2",
     "pydantic>=2.11.4",
+    "alembic>=1.16.1",
+    "celery>=5.5.2",
 ]

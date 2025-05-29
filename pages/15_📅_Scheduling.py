@@ -24,7 +24,7 @@ apply_highland_tower_styling()
 render_highland_header("📅 Project Scheduling", "Highland Tower Development - Construction Schedule Management")
 
 # Initialize model
-model = SchedulingModel()
+model = ScheduleModel()
 
 # Display configuration
 display_config = {

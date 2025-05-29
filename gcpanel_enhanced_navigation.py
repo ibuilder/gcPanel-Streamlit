@@ -15859,6 +15859,21 @@ def main():
     """Main application entry point"""
     configure_page()
     apply_styling()
+    
+    # Force page scrolling functionality
+    st.markdown("""
+    <script>
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.overflow = 'auto';
+    setTimeout(() => {
+        const app = document.querySelector('.stApp');
+        if (app) app.style.overflow = 'auto';
+        const main = document.querySelector('.main');
+        if (main) main.style.overflow = 'visible';
+    }, 50);
+    </script>
+    """, unsafe_allow_html=True)
+    
     initialize_session_state()
     
     render_sidebar()

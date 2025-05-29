@@ -24,9 +24,41 @@ st.markdown("---")
 if 'documents' not in st.session_state:
     st.session_state.documents = []
 
-tab1, tab2, tab3 = st.tabs(["📤 Upload Document", "📁 Document Library", "🔍 Search & Filter"])
+tab1, tab2, tab3 = st.tabs(["📁 Document Library", "📤 Upload Document", "🔍 Search & Filter"])
 
 with tab1:
+    st.subheader("📁 Document Library")
+    
+    if st.session_state.documents:
+        df = pd.DataFrame(st.session_state.documents)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search documents...")
+        with col2:
+            category_filter = st.selectbox("Category", ["All", "Drawings", "Specifications", "Reports", "Contracts"])
+        with col3:
+            status_filter = st.selectbox("Status", ["All", "Draft", "Under Review", "Approved", "Archived"])
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[filtered_df.astype(str).apply(
+                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
+        
+        if category_filter != "All":
+            filtered_df = filtered_df[filtered_df['category'] == category_filter]
+            
+        if status_filter != "All":
+            filtered_df = filtered_df[filtered_df['status'] == status_filter]
+        
+        st.write(f"**Total Documents:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
+    else:
+        st.info("No documents uploaded. Upload your first document in the Upload tab!")
+
+with tab2:
     st.subheader("📤 Upload New Document")
     
     with st.form("document_form"):

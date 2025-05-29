@@ -24,9 +24,44 @@ st.markdown("---")
 if 'unit_prices' not in st.session_state:
     st.session_state.unit_prices = []
 
-tab1, tab2, tab3 = st.tabs(["📝 Add Unit Price", "📊 Price Database", "📈 Price Analysis"])
+tab1, tab2, tab3 = st.tabs(["📊 Price Database", "📝 Add Unit Price", "📈 Price Analysis"])
 
 with tab1:
+    st.subheader("📊 Unit Price Database")
+    
+    if st.session_state.unit_prices:
+        df = pd.DataFrame(st.session_state.unit_prices)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search unit prices...")
+        with col2:
+            category_filter = st.selectbox("Category", ["All", "Labor", "Materials", "Equipment", "Subcontractor"])
+        with col3:
+            unit_filter = st.selectbox("Unit", ["All", "SF", "CY", "LF", "EA", "HR"])
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[filtered_df.astype(str).apply(
+                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
+        
+        if category_filter != "All":
+            filtered_df = filtered_df[filtered_df['category'] == category_filter]
+            
+        if unit_filter != "All":
+            filtered_df = filtered_df[filtered_df['unit'] == unit_filter]
+        
+        st.write(f"**Total Unit Prices:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            display_df = filtered_df.copy()
+            display_df['Price'] = display_df['price'].apply(lambda x: f"${x:,.2f}")
+            
+            st.dataframe(clean_dataframe_for_display(display_df), use_container_width=True, hide_index=True)
+    else:
+        st.info("No unit prices available. Add your first unit price in the Add tab!")
+
+with tab2:
     st.subheader("📝 Add Unit Price")
     
     with st.form("unit_price_form"):

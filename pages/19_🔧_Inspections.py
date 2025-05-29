@@ -24,9 +24,41 @@ st.markdown("---")
 if 'inspections' not in st.session_state:
     st.session_state.inspections = []
 
-tab1, tab2, tab3 = st.tabs(["📝 Schedule Inspection", "📊 Inspection Log", "📈 Compliance Tracking"])
+tab1, tab2, tab3 = st.tabs(["📊 Inspection Log", "📝 Schedule Inspection", "📈 Compliance Tracking"])
 
 with tab1:
+    st.subheader("📊 Inspection Log")
+    
+    if st.session_state.inspections:
+        df = pd.DataFrame(st.session_state.inspections)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search inspections...")
+        with col2:
+            type_filter = st.selectbox("Type", ["All", "Building", "Electrical", "Plumbing", "Fire Safety"])
+        with col3:
+            status_filter = st.selectbox("Status", ["All", "Scheduled", "Completed", "Failed", "Rescheduled"])
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[filtered_df.astype(str).apply(
+                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
+        
+        if type_filter != "All":
+            filtered_df = filtered_df[filtered_df['type'] == type_filter]
+            
+        if status_filter != "All":
+            filtered_df = filtered_df[filtered_df['status'] == status_filter]
+        
+        st.write(f"**Total Inspections:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
+    else:
+        st.info("No inspections scheduled. Schedule your first inspection in the Schedule tab!")
+
+with tab2:
     st.subheader("📝 Schedule New Inspection")
     
     with st.form("inspection_form"):

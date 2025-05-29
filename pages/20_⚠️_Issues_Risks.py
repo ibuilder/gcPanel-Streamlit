@@ -24,9 +24,41 @@ st.markdown("---")
 if 'issues_risks' not in st.session_state:
     st.session_state.issues_risks = []
 
-tab1, tab2, tab3 = st.tabs(["📝 Report Issue/Risk", "📊 Issues & Risks Log", "📈 Risk Analysis"])
+tab1, tab2, tab3 = st.tabs(["📊 Issues & Risks Log", "📝 Report Issue/Risk", "📈 Risk Analysis"])
 
 with tab1:
+    st.subheader("📊 Issues & Risks Log")
+    
+    if st.session_state.issues_risks:
+        df = pd.DataFrame(st.session_state.issues_risks)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search issues/risks...")
+        with col2:
+            type_filter = st.selectbox("Type", ["All", "Issue", "Risk", "Change Request"])
+        with col3:
+            priority_filter = st.selectbox("Priority", ["All", "Low", "Medium", "High", "Critical"])
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[filtered_df.astype(str).apply(
+                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
+        
+        if type_filter != "All":
+            filtered_df = filtered_df[filtered_df['type'] == type_filter]
+            
+        if priority_filter != "All":
+            filtered_df = filtered_df[filtered_df['priority'] == priority_filter]
+        
+        st.write(f"**Total Issues/Risks:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
+    else:
+        st.info("No issues or risks reported. Report your first issue/risk in the Report tab!")
+
+with tab2:
     st.subheader("📝 Report New Issue or Risk")
     
     with st.form("issue_risk_form"):

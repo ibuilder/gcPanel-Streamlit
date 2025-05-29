@@ -31,15 +31,15 @@ display_config = {
     'title': 'Field Operations',
     'item_name': 'Field Operations',
     'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
-    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'key_fields': ['date', 'activity_type', 'location', 'status', 'crew_size'] if 'status' in model.schema.get('fields', {}) else ['id'],
     'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
-    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'search_fields': ['activity_description', 'location', 'foreman'] if 'title' in model.schema.get('fields', {}) else ['id'],
     'primary_filter': {
         'field': 'status',
         'label': 'Status'
     } if 'status' in model.schema.get('fields', {}) else None,
     'secondary_filter': {
-        'field': 'type',
+        'field': 'status',
         'label': 'Type'  
     } if 'type' in model.schema.get('fields', {}) else None
 }

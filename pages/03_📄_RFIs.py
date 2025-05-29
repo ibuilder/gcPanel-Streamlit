@@ -71,7 +71,7 @@ display_config = {
     'item_name': 'RFI',
     'session_key': 'rfis',
     'title_field': 'title',
-    'key_fields': ['priority', 'trade', 'status'],
+    'key_fields': ['id', 'title', 'trade', 'status', 'date_submitted'],
     'detail_fields': ['date_submitted', 'assignee', 'due_date'],
     'search_fields': ['title', 'description', 'trade', 'submitted_by'],
     'primary_filter': {
@@ -79,7 +79,7 @@ display_config = {
         'label': 'Status'
     },
     'secondary_filter': {
-        'field': 'priority',
+        'field': 'status',
         'label': 'Priority'
     }
 }

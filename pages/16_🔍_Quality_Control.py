@@ -31,15 +31,15 @@ display_config = {
     'title': 'Quality Control',
     'item_name': 'Quality Control',
     'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
-    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'key_fields': ['inspection_type', 'inspection_date', 'location', 'result', 'status'] if 'status' in model.schema.get('fields', {}) else ['id'],
     'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
-    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'search_fields': ['location', 'inspector', 'inspection_type'] if 'title' in model.schema.get('fields', {}) else ['id'],
     'primary_filter': {
-        'field': 'status',
+        'field': 'result',
         'label': 'Status'
     } if 'status' in model.schema.get('fields', {}) else None,
     'secondary_filter': {
-        'field': 'type',
+        'field': 'result',
         'label': 'Type'  
     } if 'type' in model.schema.get('fields', {}) else None
 }

@@ -31,15 +31,15 @@ display_config = {
     'title': 'Transmittals',
     'item_name': 'Transmittals',
     'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
-    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'key_fields': ['transmittal_number', 'title', 'recipient', 'status', 'date_sent'] if 'status' in model.schema.get('fields', {}) else ['id'],
     'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
-    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'search_fields': ['title', 'recipient', 'transmittal_number', 'sent_by'] if 'title' in model.schema.get('fields', {}) else ['id'],
     'primary_filter': {
         'field': 'status',
         'label': 'Status'
     } if 'status' in model.schema.get('fields', {}) else None,
     'secondary_filter': {
-        'field': 'type',
+        'field': 'status',
         'label': 'Type'  
     } if 'type' in model.schema.get('fields', {}) else None
 }

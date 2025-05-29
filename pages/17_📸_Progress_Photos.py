@@ -31,15 +31,15 @@ display_config = {
     'title': 'Progress Photos',
     'item_name': 'Progress Photos',
     'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
-    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'key_fields': ['photo_date', 'location', 'trade', 'photo_type', 'photographer'] if 'status' in model.schema.get('fields', {}) else ['id'],
     'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
-    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'search_fields': ['location', 'description', 'photographer', 'tags'] if 'title' in model.schema.get('fields', {}) else ['id'],
     'primary_filter': {
-        'field': 'status',
+        'field': 'trade',
         'label': 'Status'
     } if 'status' in model.schema.get('fields', {}) else None,
     'secondary_filter': {
-        'field': 'type',
+        'field': 'trade',
         'label': 'Type'  
     } if 'type' in model.schema.get('fields', {}) else None
 }

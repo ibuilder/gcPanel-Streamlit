@@ -31,15 +31,15 @@ display_config = {
     'title': 'Unit Prices',
     'item_name': 'Unit Prices',
     'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
-    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'key_fields': ['item_code', 'description', 'unit', 'unit_price', 'category'] if 'status' in model.schema.get('fields', {}) else ['id'],
     'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
-    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'search_fields': ['description', 'item_code', 'category'] if 'title' in model.schema.get('fields', {}) else ['id'],
     'primary_filter': {
-        'field': 'status',
+        'field': 'category',
         'label': 'Status'
     } if 'status' in model.schema.get('fields', {}) else None,
     'secondary_filter': {
-        'field': 'type',
+        'field': 'category',
         'label': 'Type'  
     } if 'type' in model.schema.get('fields', {}) else None
 }

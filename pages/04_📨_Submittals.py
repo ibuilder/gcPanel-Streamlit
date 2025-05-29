@@ -31,15 +31,15 @@ display_config = {
     'title': 'Submittals',
     'item_name': 'Submittal',
     'title_field': 'title',
-    'key_fields': ['id', 'spec_section', 'discipline'],
+    'key_fields': ['submittal_number', 'title', 'trade', 'status', 'date_submitted'],
     'detail_fields': ['date_submitted', 'status', 'reviewer'],
-    'search_fields': ['title', 'spec_section', 'discipline', 'submitted_by'],
+    'search_fields': ['title', 'trade', 'submitted_by', 'submittal_number'],
     'primary_filter': {
         'field': 'status',
         'label': 'Status'
     },
     'secondary_filter': {
-        'field': 'discipline',
+        'field': 'status',
         'label': 'Discipline'
     },
     'column_config': {

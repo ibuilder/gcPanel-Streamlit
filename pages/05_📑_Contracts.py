@@ -31,16 +31,16 @@ display_config = {
     'title': 'Contracts',
     'item_name': 'Contract',
     'title_field': 'title',
-    'key_fields': ['id', 'type', 'contractor'],
-    'detail_fields': ['contract_value', 'status', 'start_date', 'end_date'],
-    'search_fields': ['title', 'contractor', 'id', 'type'],
+    'key_fields': ['contract_number', 'contract_name', 'contractor', 'contract_value', 'status'],
+    'detail_fields': ['start_date', 'end_date', 'contract_type'],
+    'search_fields': ['contract_name', 'contractor', 'contract_number', 'contract_type'],
     'primary_filter': {
         'field': 'status',
         'label': 'Status'
     },
     'secondary_filter': {
-        'field': 'type', 
-        'label': 'Type'
+        'field': 'status', 
+        'label': 'Contract Type'
     },
     'formatters': {
         'contract_value': format_currency

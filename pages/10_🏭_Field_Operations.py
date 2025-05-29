@@ -10,7 +10,7 @@ import os
 # Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from models.all_models import FieldOperationsModel
+from models.all_models import FieldOperationModel
 from controllers.crud_controller import CRUDController
 from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
 

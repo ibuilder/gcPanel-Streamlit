@@ -26,6 +26,30 @@ def apply_styling():
     """Enterprise-Grade Design Refinement with Competitive Benchmarking"""
     st.markdown("""
     <style>
+    /* CRITICAL: Fix page scrolling issues */
+    .main .block-container {
+        max-height: none !important;
+        overflow: visible !important;
+        padding-top: 1rem !important;
+        padding-bottom: 5rem !important;
+    }
+    
+    html, body {
+        overflow: auto !important;
+        height: auto !important;
+        scroll-behavior: smooth !important;
+    }
+    
+    .stApp {
+        overflow: auto !important;
+        height: auto !important;
+        min-height: 100vh !important;
+    }
+    
+    section[data-testid="stSidebar"] > div {
+        overflow-y: auto !important;
+        height: 100vh !important;
+    }
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
     
     /* === ENTERPRISE DESIGN SYSTEM === */

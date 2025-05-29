@@ -114,6 +114,33 @@ with tab1:
                 hide_index=True,
                 use_container_width=True
             )
+            
+            # Add enhanced card view with CRUD actions
+            st.markdown("---")
+            st.subheader("📋 Contract Cards with Actions")
+            
+            for idx, row in filtered_df.iterrows():
+                with st.container():
+                    col1, col2, col3 = st.columns([3, 2, 1])
+                    
+                    with col1:
+                        st.write(f"**📋 {row['title']}**")
+                        st.write(f"**ID:** {row['id']} | **Type:** {row['type']}")
+                        st.write(f"**Contractor:** {row['contractor']}")
+                    
+                    with col2:
+                        st.write(f"**Value:** ${row['contract_value']:,.2f}")
+                        st.write(f"**Status:** {row['status']}")
+                        st.write(f"**Period:** {row['start_date']} to {row['end_date']}")
+                    
+                    with col3:
+                        if st.button("👁️ View", key=f"view_contract_{row['id']}", help="View details"):
+                            with st.expander("Contract Details", expanded=True):
+                                st.json(row.to_dict())
+                        if st.button("✏️ Edit", key=f"edit_contract_{row['id']}", help="Edit contract"):
+                            st.info(f"Edit functionality for contract {row['id']} - Feature coming soon!")
+                    
+                    st.markdown("---")
         else:
             st.info("No contracts found matching your criteria.")
     else:

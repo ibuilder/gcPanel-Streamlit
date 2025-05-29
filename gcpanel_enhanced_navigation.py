@@ -19,6 +19,7 @@ from typing import Dict, List, Any
 try:
     from database.connection import save_daily_report, get_daily_reports, authenticate_user, update_user_login
     from modules.file_manager import render_document_upload_section, render_progress_photo_upload
+    from config.environment import display_configuration_status
     DATABASE_AVAILABLE = True
 except ImportError as e:
     print(f"Database modules not available: {e}")

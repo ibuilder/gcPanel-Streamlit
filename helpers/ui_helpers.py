@@ -370,9 +370,9 @@ def render_loading_spinner(message: str = "Loading..."):
         <div style="margin-top: 1rem; color: #6b7280;">{message}</div>
     </div>
     <style>
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
+    @keyframes spin {{
+        0% {{ transform: rotate(0deg); }}
+        100% {{ transform: rotate(360deg); }}
+    }}
     </style>
     """, unsafe_allow_html=True)

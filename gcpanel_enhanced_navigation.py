@@ -15,6 +15,15 @@ import hashlib
 import os
 from typing import Dict, List, Any
 
+# Import database and file management modules
+try:
+    from database.connection import save_daily_report, get_daily_reports, authenticate_user, update_user_login
+    from modules.file_manager import render_document_upload_section, render_progress_photo_upload
+    DATABASE_AVAILABLE = True
+except ImportError as e:
+    print(f"Database modules not available: {e}")
+    DATABASE_AVAILABLE = False
+
 # Authentication Functions
 def clean_dataframe_for_display(df):
     """Clean DataFrame to prevent Arrow serialization errors"""
@@ -50,10 +59,26 @@ def check_authentication() -> bool:
         st.session_state.authenticated = False
     return st.session_state.authenticated
 
-def authenticate_user(username: str, password: str) -> bool:
-    """Authenticate user with credentials"""
-    # Simple authentication for Highland Tower Development
-    # Using plain text comparison for simplicity
+def authenticate_user_app(username: str, password: str) -> bool:
+    """Authenticate user with credentials - integrated database and fallback"""
+    # Try database authentication first
+    if DATABASE_AVAILABLE:
+        try:
+            password_hash = hash_password(password)
+            user = authenticate_user(username, password_hash)
+            if user:
+                st.session_state.authenticated = True
+                st.session_state.username = username
+                st.session_state.user_role = user.get('role', 'user').title()
+                st.session_state.user_name = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
+                st.session_state.login_time = datetime.now()
+                st.session_state.user_id = user['id']
+                update_user_login(user['id'])
+                return True
+        except Exception as e:
+            print(f"Database authentication failed: {e}")
+    
+    # Fallback authentication for demo
     valid_users = {
         "admin": "highland2025",
         "manager": "manager123", 
@@ -72,6 +97,7 @@ def authenticate_user(username: str, password: str) -> bool:
         st.session_state.user_role = user_roles[username]["role"]
         st.session_state.user_name = user_roles[username]["name"]
         st.session_state.login_time = datetime.now()
+        st.session_state.user_id = 1  # Default user ID for fallback
         return True
     return False
 

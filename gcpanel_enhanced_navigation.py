@@ -1390,7 +1390,7 @@ def initialize_session_state():
     if "current_page" not in st.session_state:
         st.session_state.current_page = "dashboard"
     if "authenticated" not in st.session_state:
-        st.session_state.authenticated = True  # Skip login for demo
+        st.session_state.authenticated = False
     
     # Initialize all module data structures
     if "daily_reports" not in st.session_state or not isinstance(st.session_state.daily_reports, list):

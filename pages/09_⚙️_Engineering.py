@@ -24,9 +24,41 @@ st.markdown("---")
 if 'engineering_items' not in st.session_state:
     st.session_state.engineering_items = []
 
-tab1, tab2, tab3 = st.tabs(["📝 Engineering Tasks", "📊 Documentation", "🔧 Analysis"])
+tab1, tab2, tab3 = st.tabs(["📊 Engineering Documentation", "📝 Create Engineering Task", "🔧 Analysis"])
 
 with tab1:
+    st.subheader("📊 Engineering Documentation")
+    
+    if st.session_state.engineering_items:
+        df = pd.DataFrame(st.session_state.engineering_items)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search documentation...")
+        with col2:
+            type_filter = st.selectbox("Type", ["All", "Drawing", "Calculation", "Specification", "Report"])
+        with col3:
+            status_filter = st.selectbox("Status", ["All", "Draft", "Under Review", "Approved", "Superseded"])
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[filtered_df.astype(str).apply(
+                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
+        
+        if type_filter != "All":
+            filtered_df = filtered_df[filtered_df['type'] == type_filter]
+            
+        if status_filter != "All":
+            filtered_df = filtered_df[filtered_df['status'] == status_filter]
+        
+        st.write(f"**Total Documents:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
+    else:
+        st.info("No engineering documentation available. Create your first task in the Create tab!")
+
+with tab2:
     st.subheader("📝 Create Engineering Task")
     
     with st.form("engineering_form"):

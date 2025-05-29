@@ -24,9 +24,38 @@ st.markdown("---")
 if 'deliveries' not in st.session_state:
     st.session_state.deliveries = []
 
-tab1, tab2 = st.tabs(["📝 Log Delivery", "📊 Delivery Records"])
+tab1, tab2 = st.tabs(["📊 Delivery Records", "📝 Log Delivery"])
 
 with tab1:
+    st.subheader("📊 Delivery Records")
+    
+    if st.session_state.deliveries:
+        df = pd.DataFrame(st.session_state.deliveries)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search deliveries...")
+        with col2:
+            material_filter = st.selectbox("Material", ["All", "Concrete", "Steel", "Lumber", "Electrical"])
+        with col3:
+            date_filter = st.date_input("Filter by Date")
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[filtered_df.astype(str).apply(
+                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
+        
+        if material_filter != "All":
+            filtered_df = filtered_df[filtered_df['material_type'] == material_filter]
+        
+        st.write(f"**Total Deliveries:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
+    else:
+        st.info("No deliveries recorded. Log your first delivery in the Log tab!")
+
+with tab2:
     st.subheader("📝 Log New Delivery")
     
     with st.form("delivery_form"):

@@ -35,7 +35,7 @@ if 'cost_items' not in st.session_state:
         }
     ]
 
-tab1, tab2, tab3 = st.tabs(["📝 Add Cost Item", "📊 Cost Tracking", "📈 Budget Analysis"])
+tab1, tab2, tab3 = st.tabs(["📊 Cost Tracking", "📝 Add Cost Item", "📈 Budget Analysis"])
 
 with tab1:
     st.subheader("📝 Add Cost Item")

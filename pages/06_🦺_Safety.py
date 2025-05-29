@@ -43,9 +43,58 @@ if 'safety_incidents' not in st.session_state:
         }
     ]
 
-tab1, tab2, tab3 = st.tabs(["📝 Report Incident", "📊 Incidents", "📋 Safety Metrics"])
+tab1, tab2, tab3 = st.tabs(["📊 Safety Incidents", "📝 Report Incident", "📋 Safety Metrics"])
 
 with tab1:
+    st.subheader("📊 Safety Incidents Database")
+    
+    if st.session_state.safety_incidents:
+        df = pd.DataFrame(st.session_state.safety_incidents)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search incidents...")
+        with col2:
+            severity_filter = st.selectbox("Severity", ["All", "Low", "Medium", "High", "Critical"])
+        with col3:
+            type_filter = st.selectbox("Type", ["All", "Near Miss", "First Aid", "Medical Treatment", "Lost Time"])
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[
+                filtered_df.astype(str).apply(
+                    lambda x: x.str.contains(search_term, case=False, na=False)
+                ).any(axis=1)
+            ]
+        
+        if severity_filter != "All":
+            filtered_df = filtered_df[filtered_df['severity'] == severity_filter]
+            
+        if type_filter != "All":
+            filtered_df = filtered_df[filtered_df['type'] == type_filter]
+        
+        st.write(f"**Total Incidents:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            st.dataframe(
+                clean_dataframe_for_display(filtered_df),
+                column_config={
+                    "id": st.column_config.TextColumn("Incident ID"),
+                    "date": st.column_config.DateColumn("Date"),
+                    "type": st.column_config.TextColumn("Type"),
+                    "severity": st.column_config.TextColumn("Severity"),
+                    "location": st.column_config.TextColumn("Location"),
+                    "status": st.column_config.TextColumn("Status")
+                },
+                hide_index=True,
+                use_container_width=True
+            )
+        else:
+            st.info("No incidents found matching your criteria.")
+    else:
+        st.info("No safety incidents recorded. Report your first incident in the Report tab!")
+
+with tab2:
     st.subheader("📝 Report Safety Incident")
     
     with st.form("safety_incident_form"):

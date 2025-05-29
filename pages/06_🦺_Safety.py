@@ -138,7 +138,7 @@ with st.sidebar:
         recent_incidents = sorted(incidents, key=lambda x: x.get('date', ''), reverse=True)[:3]
         
         for incident in recent_incidents:
-            with st.expander(f"🦺 {incident['id']} - {incident['type']}"):
+            with st.expander(f"🦺 {incident['id']} - {incident['incident_type']}"):
                 st.write(f"**Severity:** {incident['severity']}")
                 st.write(f"**Location:** {incident['location']}")
                 st.write(f"**Status:** {incident['status']}")

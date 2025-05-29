@@ -5,8 +5,16 @@ Daily Reports Page - Highland Tower Development
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+import sys
+import os
+
+# Add project root to path for imports
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from lib.utils.helpers import check_authentication
 
 st.set_page_config(page_title="Daily Reports - gcPanel", page_icon="📋", layout="wide")
+
 # Check authentication
 if not check_authentication():
     st.error("🔒 Please log in to access this page")

@@ -8,6 +8,7 @@ import pandas as pd
 from typing import Dict, List, Any, Optional, Union
 from datetime import datetime, date
 import logging
+from data.highland_tower_data import HIGHLAND_TOWER_DATA
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +97,7 @@ class CRUDController:
             self._render_card_view(filtered_df, key_prefix)
     
     def _render_table_view(self, df: pd.DataFrame, key_prefix: str):
-        """Render table view with column configuration"""
+        """Render table view with column configuration and action buttons"""
         if df.empty:
             st.info("No records match your filters.")
             return
@@ -104,13 +105,41 @@ class CRUDController:
         # Configure columns if specified
         column_config = self.display_config.get('column_config', {})
         
-        # Display the dataframe
-        st.dataframe(
-            df,
-            use_container_width=True,
-            hide_index=True,
-            column_config=column_config
-        )
+        # Create a copy of the dataframe to add action columns
+        display_df = df.copy()
+        
+        # Add action columns
+        for i, row in display_df.iterrows():
+            col1, col2, col3 = st.columns([0.1, 0.1, 0.8])
+            
+            with col1:
+                if st.button("👁️", key=f"{key_prefix}_view_{i}", help="View Details"):
+                    st.session_state[f"{key_prefix}_selected_record"] = row.to_dict()
+                    st.session_state[f"{key_prefix}_action"] = "view"
+                    st.rerun()
+            
+            with col2:
+                if st.button("✏️", key=f"{key_prefix}_edit_{i}", help="Edit Record"):
+                    st.session_state[f"{key_prefix}_selected_record"] = row.to_dict()
+                    st.session_state[f"{key_prefix}_action"] = "edit"
+                    st.rerun()
+            
+            with col3:
+                # Display key fields from the row
+                key_fields = self.display_config.get('key_fields', list(df.columns)[:3])
+                display_text = " | ".join([f"{field}: {row.get(field, 'N/A')}" for field in key_fields])
+                st.write(display_text)
+        
+        st.divider()
+        
+        # Display full dataframe for reference
+        with st.expander("📊 Full Data Table", expanded=False):
+            st.dataframe(
+                df,
+                use_container_width=True,
+                hide_index=True,
+                column_config=column_config
+            )
     
     def _render_card_view(self, df: pd.DataFrame, key_prefix: str):
         """Render card view with actions"""

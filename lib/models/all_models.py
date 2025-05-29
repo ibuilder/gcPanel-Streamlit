@@ -3,7 +3,7 @@ All Model Classes for gcPanel Construction Management Platform
 Complete model definitions for every construction module
 """
 
-from models.base_model import BaseModel
+from lib.models.base_model import BaseModel
 from typing import Dict, Any
 
 # RFI Model

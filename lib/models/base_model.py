@@ -98,7 +98,7 @@ class BaseModel:
     def _get_highland_tower_data(self) -> List[Dict]:
         """Get Highland Tower Development project data"""
         try:
-            from data.highland_tower_data import HIGHLAND_TOWER_DATA
+            from lib.data.highland_tower_data import HIGHLAND_TOWER_DATA
             
             # Map model table names to Highland Tower data keys
             data_mapping = {

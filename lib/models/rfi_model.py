@@ -2,7 +2,7 @@
 RFI Model for gcPanel Construction Management Platform
 """
 
-from models.base_model import BaseModel
+from lib.models.base_model import BaseModel
 
 class RFIModel(BaseModel):
     """RFI model with Highland Tower Development data"""

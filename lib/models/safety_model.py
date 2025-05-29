@@ -2,7 +2,7 @@
 Safety Model for gcPanel Construction Management Platform
 """
 
-from models.base_model import BaseModel
+from lib.models.base_model import BaseModel
 
 class SafetyModel(BaseModel):
     """Safety incident model with Highland Tower Development data"""

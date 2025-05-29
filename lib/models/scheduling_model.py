@@ -2,7 +2,7 @@
 Scheduling Model for gcPanel Construction Management Platform
 """
 
-from models.base_model import BaseModel
+from lib.models.base_model import BaseModel
 
 class SchedulingModel(BaseModel):
     """Project scheduling model with Highland Tower Development data"""

@@ -113,16 +113,39 @@ class CRUDController:
         if not display_columns:
             display_columns = list(df.columns)[:5]
         
-        # Display only key columns in the table
-        display_df = df[display_columns]
+        # Create table header
+        header_cols = st.columns(len(display_columns) + 1)  # +1 for actions column
+        for i, col in enumerate(display_columns):
+            with header_cols[i]:
+                st.write(f"**{col.replace('_', ' ').title()}**")
+        with header_cols[-1]:
+            st.write("**Actions**")
         
-        st.dataframe(
-            display_df,
-            use_container_width=True,
-            hide_index=True,
-            column_config={col: column_config.get(col, {}) for col in display_columns},
-            key=f"{key_prefix}_main_table"
-        )
+        st.divider()
+        
+        # Display table rows with inline action buttons
+        for index, row in df.iterrows():
+            row_cols = st.columns(len(display_columns) + 1)
+            
+            # Display data columns
+            for i, col in enumerate(display_columns):
+                with row_cols[i]:
+                    value = row[col]
+                    if pd.isna(value):
+                        value = ""
+                    st.write(str(value))
+            
+            # Action buttons column
+            with row_cols[-1]:
+                action_cols = st.columns(2)
+                with action_cols[0]:
+                    if st.button("👁️", key=f"{key_prefix}_view_{index}", help="View"):
+                        st.session_state[f"{key_prefix}_view_record"] = row.to_dict()
+                        st.rerun()
+                with action_cols[1]:
+                    if st.button("✏️", key=f"{key_prefix}_edit_{index}", help="Edit"):
+                        st.session_state[f"{key_prefix}_edit_record"] = row.to_dict()
+                        st.rerun()
         
         st.divider()
         

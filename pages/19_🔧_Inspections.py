@@ -1,170 +1,146 @@
 """
-Inspections Management Page - Highland Tower Development
+Inspections Page - Highland Tower Development
+Refactored using MVC pattern with models, controllers, and helpers
 """
 
 import streamlit as st
-import pandas as pd
-from datetime import datetime, date
 import sys
 import os
 
+# Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.helpers import check_authentication, initialize_session_state, clean_dataframe_for_display
 
+from models.all_models import InspectionModel
+from controllers.crud_controller import CRUDController
+from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
+
+# Page configuration
 st.set_page_config(page_title="Inspections - gcPanel", page_icon="🔧", layout="wide")
-initialize_session_state()
 
-if not check_authentication():
-    st.switch_page("app.py")
+# Apply styling
+apply_highland_tower_styling()
 
-st.title("🔧 Inspections Management")
-st.markdown("Highland Tower Development - Inspection Scheduling & Tracking")
-st.markdown("---")
+# Render header
+render_highland_header("🔧 Inspections", "Highland Tower Development - Building Inspections & Compliance")
 
-if 'inspections' not in st.session_state:
-    st.session_state.inspections = []
+# Initialize model
+model = InspectionModel()
 
-tab1, tab2, tab3 = st.tabs(["📊 Inspection Log", "📝 Schedule Inspection", "📈 Compliance Tracking"])
+# Display configuration
+display_config = {
+    'title': 'Inspections',
+    'item_name': 'Inspections',
+    'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
+    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
+    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'primary_filter': {
+        'field': 'status',
+        'label': 'Status'
+    } if 'status' in model.schema.get('fields', {}) else None,
+    'secondary_filter': {
+        'field': 'type',
+        'label': 'Type'  
+    } if 'type' in model.schema.get('fields', {}) else None
+}
+
+# Form configuration - dynamically generate from schema
+form_fields = []
+for field_name, field_config in model.schema.get('fields', {}).items():
+    if field_name == 'id':
+        continue  # Skip ID field in forms
+    
+    field_type = field_config.get('type', 'text')
+    if field_type == 'date':
+        form_fields.append({'key': field_name, 'type': 'date', 'label': field_name.replace('_', ' ').title()})
+    elif field_type == 'number':
+        form_fields.append({'key': field_name, 'type': 'number', 'label': field_name.replace('_', ' ').title(), 'min_value': 0.0})
+    elif field_type == 'boolean':
+        form_fields.append({'key': field_name, 'type': 'select', 'label': field_name.replace('_', ' ').title(), 'options': [True, False]})
+    else:
+        form_fields.append({'key': field_name, 'type': 'text', 'label': field_name.replace('_', ' ').title()})
+
+form_config = {'fields': form_fields}
+
+# Initialize controller
+crud_controller = CRUDController(model, 'inspections', display_config)
+
+# Main content tabs
+tab1, tab2, tab3 = st.tabs(["🔧 Inspections Database", "📝 Create New", "📈 Analytics"])
 
 with tab1:
-    st.subheader("📊 Inspection Log")
-    
-    if st.session_state.inspections:
-        df = pd.DataFrame(st.session_state.inspections)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search inspections...", key="inspections_search_1")
-        with col2:
-            type_filter = st.selectbox("Type", ["All", "Building", "Electrical", "Plumbing", "Fire Safety"])
-        with col3:
-            status_filter = st.selectbox("Status", ["All", "Scheduled", "Completed", "Failed", "Rescheduled"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if type_filter != "All":
-            filtered_df = filtered_df[filtered_df['type'] == type_filter]
-            
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-        
-        st.write(f"**Total Inspections:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No inspections scheduled. Schedule your first inspection in the Schedule tab!")
+    crud_controller.render_data_view('inspections')
 
 with tab2:
-    st.subheader("📝 Schedule New Inspection")
-    
-    with st.form("inspection_form"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            inspection_type = st.selectbox("Inspection Type", 
-                ["Foundation", "Framing", "Electrical Rough-in", "Plumbing Rough-in", "Insulation", "Drywall", "Final"])
-            requested_date = st.date_input("Requested Date")
-            inspector = st.text_input("Inspector", placeholder="Inspector name or agency")
-            contact_person = st.text_input("Site Contact", value=st.session_state.get('user_name', ''))
-        
-        with col2:
-            work_area = st.text_input("Work Area", placeholder="Building area, floor, units")
-            contractor = st.text_input("Contractor", placeholder="Responsible contractor")
-            permit_number = st.text_input("Permit Number", placeholder="Building permit reference")
-            priority = st.selectbox("Priority", ["Normal", "Urgent", "Emergency"])
-        
-        scope_description = st.text_area("Scope Description", placeholder="What work is ready for inspection...")
-        special_requirements = st.text_area("Special Requirements", placeholder="Access requirements, safety notes...")
-        
-        submitted = st.form_submit_button("📅 Schedule Inspection", type="primary", use_container_width=True)
-        
-        if submitted and inspection_type and work_area:
-            new_inspection = {
-                "id": f"INS-{len(st.session_state.inspections) + 1:03d}",
-                "inspection_type": inspection_type,
-                "requested_date": str(requested_date),
-                "inspector": inspector,
-                "contact_person": contact_person,
-                "work_area": work_area,
-                "contractor": contractor,
-                "permit_number": permit_number,
-                "priority": priority,
-                "scope_description": scope_description,
-                "special_requirements": special_requirements,
-                "status": "Scheduled",
-                "result": "Pending",
-                "scheduled_date": str(date.today())
-            }
-            st.session_state.inspections.insert(0, new_inspection)
-            st.success(f"Inspection {new_inspection['id']} scheduled successfully!")
-            st.rerun()
-
-with tab2:
-    st.subheader("📊 Inspection Log")
-    
-    if st.session_state.inspections:
-        df = pd.DataFrame(st.session_state.inspections)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("Search inspections...")
-        with col2:
-            type_filter = st.selectbox("Type", ["All", "Foundation", "Framing", "Electrical Rough-in"])
-        with col3:
-            status_filter = st.selectbox("Status", ["All", "Scheduled", "Completed", "Failed", "Cancelled"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if type_filter != "All":
-            filtered_df = filtered_df[filtered_df['inspection_type'] == type_filter]
-            
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-        
-        st.write(f"**Total Inspections:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No inspections scheduled. Schedule your first inspection above!")
+    crud_controller.render_create_form(form_config)
 
 with tab3:
-    st.subheader("📈 Compliance Tracking")
+    st.subheader("📈 Inspections Analytics")
     
-    if st.session_state.inspections:
-        df = pd.DataFrame(st.session_state.inspections)
+    # Basic metrics
+    total_items = len(model.get_all())
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Total Inspections", total_items)
+    
+    with col2:
+        if 'status' in model.schema.get('fields', {}):
+            active_items = len([item for item in model.get_all() if item.get('status') in ['Active', 'In Progress', 'Open']])
+            st.metric("Active Items", active_items)
+        else:
+            st.metric("Recent Items", min(total_items, 10))
+    
+    with col3:
+        if 'date' in model.schema.get('fields', {}):
+            from datetime import datetime, timedelta
+            recent_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            recent_items = len([item for item in model.get_all() if item.get('date', '') >= recent_date])
+            st.metric("Recent (30 days)", recent_items)
+        else:
+            st.metric("Total Records", total_items)
+    
+    with col4:
+        completion_rate = 100 if total_items == 0 else min(100, (total_items / max(1, total_items)) * 100)
+        st.metric("Completion Rate", f"{completion_rate:.1f}%")
+    
+    # Data visualization
+    if total_items > 0:
+        items_df = model.to_dataframe()
+        if not items_df.empty:
+            st.subheader("Data Analysis")
+            
+            # Show distribution by status if available
+            if 'status' in items_df.columns:
+                status_dist = items_df['status'].value_counts()
+                st.bar_chart(status_dist)
+                st.caption("Distribution by Status")
+            
+            # Show distribution by type if available  
+            elif 'type' in items_df.columns:
+                type_dist = items_df['type'].value_counts()
+                st.bar_chart(type_dist)
+                st.caption("Distribution by Type")
+
+# Sidebar
+with st.sidebar:
+    st.header("Inspections Summary")
+    
+    items = model.get_all()
+    if items:
+        st.metric("Highland Tower Inspections", len(items))
         
-        col1, col2, col3, col4 = st.columns(4)
+        # Show recent items
+        st.subheader("Recent Items")
+        recent_items = items[:3]  # Show first 3 items
         
-        with col1:
-            total_inspections = len(df)
-            st.metric("Total Inspections", total_inspections)
-        
-        with col2:
-            completed = len(df[df['status'] == 'Completed'])
-            st.metric("Completed", completed)
-        
-        with col3:
-            pending = len(df[df['status'] == 'Scheduled'])
-            st.metric("Pending", pending)
-        
-        with col4:
-            failed = len(df[df['status'] == 'Failed'])
-            st.metric("Failed", failed, delta_color="inverse")
-    else:
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.metric("Total Inspections", "0")
-        with col2:
-            st.metric("Completed", "0")
-        with col3:
-            st.metric("Pending", "0")
-        with col4:
-            st.metric("Failed", "0")
+        for item in recent_items:
+            with st.expander(f"🔧 {item.get('id', 'Item')}"):
+                for key, value in list(item.items())[:3]:  # Show first 3 fields
+                    st.write(f"**{key.replace('_', ' ').title()}:** {value}")
+    
+    st.markdown("---")
+    st.write("**Highland Tower Development**")
+    st.write("$45.5M Mixed-Use Project")
+    st.write("Inspections powered by gcPanel")

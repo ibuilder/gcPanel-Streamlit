@@ -1,215 +1,146 @@
 """
 Daily Reports Page - Highland Tower Development
+Refactored using MVC pattern with models, controllers, and helpers
 """
 
 import streamlit as st
-import pandas as pd
-from datetime import datetime, date
 import sys
 import os
 
-# Add parent directory to path for imports
+# Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from utils.helpers import check_authentication, initialize_session_state, clean_dataframe_for_display
+from models.all_models import DailyReportModel
+from controllers.crud_controller import CRUDController
+from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
 
-# Import database modules
-try:
-    from database.connection import save_daily_report, get_daily_reports
-    from modules.file_manager import render_document_upload_section
-    DATABASE_AVAILABLE = True
-except ImportError:
-    DATABASE_AVAILABLE = False
+# Page configuration
+st.set_page_config(page_title="Daily Reports - gcPanel", page_icon="📋", layout="wide")
 
-st.set_page_config(
-    page_title="Daily Reports - gcPanel",
-    page_icon="📋",
-    layout="wide"
-)
+# Apply styling
+apply_highland_tower_styling()
 
-# Initialize session state
-initialize_session_state()
+# Render header
+render_highland_header("📋 Daily Reports", "Highland Tower Development - Daily Construction Progress Reports")
 
-if not check_authentication():
-    st.switch_page("app.py")
+# Initialize model
+model = DailyReportModel()
 
-st.title("📋 Daily Reports")
-st.markdown("Highland Tower Development - Daily Progress Documentation")
-st.markdown("---")
+# Display configuration
+display_config = {
+    'title': 'Daily Reports',
+    'item_name': 'Daily Reports',
+    'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
+    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
+    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'primary_filter': {
+        'field': 'status',
+        'label': 'Status'
+    } if 'status' in model.schema.get('fields', {}) else None,
+    'secondary_filter': {
+        'field': 'type',
+        'label': 'Type'  
+    } if 'type' in model.schema.get('fields', {}) else None
+}
 
-# Initialize daily reports in session state if not exists
-if 'daily_reports' not in st.session_state:
-    st.session_state.daily_reports = [
-        {
-            "id": 1,
-            "date": "2024-12-15",
-            "weather": "Partly Cloudy",
-            "temperature": 45,
-            "wind": "5-10 mph",
-            "crew_size": 24,
-            "work_performed": "Foundation work on Level B2, concrete pour for north wall",
-            "issues_delays": "Delivery of reinforcement bars delayed by 2 hours",
-            "tomorrow_plan": "Continue foundation work, install waterproofing membrane",
-            "safety_incidents": "None reported",
-            "inspections": "Structural inspection passed for columns C1-C8",
-            "materials_delivered": "40 tons rebar, 120 cubic yards concrete",
-            "created_by": "Site Superintendent",
-            "status": "Active"
-        }
-    ]
+# Form configuration - dynamically generate from schema
+form_fields = []
+for field_name, field_config in model.schema.get('fields', {}).items():
+    if field_name == 'id':
+        continue  # Skip ID field in forms
+    
+    field_type = field_config.get('type', 'text')
+    if field_type == 'date':
+        form_fields.append({'key': field_name, 'type': 'date', 'label': field_name.replace('_', ' ').title()})
+    elif field_type == 'number':
+        form_fields.append({'key': field_name, 'type': 'number', 'label': field_name.replace('_', ' ').title(), 'min_value': 0.0})
+    elif field_type == 'boolean':
+        form_fields.append({'key': field_name, 'type': 'select', 'label': field_name.replace('_', ' ').title(), 'options': [True, False]})
+    else:
+        form_fields.append({'key': field_name, 'type': 'text', 'label': field_name.replace('_', ' ').title()})
 
-# Main content
-tab1, tab2 = st.tabs(["📊 Daily Reports", "📝 Create New Report"])
+form_config = {'fields': form_fields}
+
+# Initialize controller
+crud_controller = CRUDController(model, 'daily_reports', display_config)
+
+# Main content tabs
+tab1, tab2, tab3 = st.tabs(["📋 Daily Reports Database", "📝 Create New", "📈 Analytics"])
 
 with tab1:
-    st.subheader("📊 Daily Reports Database")
-    
-    # Load reports from database or session
-    all_reports = []
-    if DATABASE_AVAILABLE:
-        try:
-            db_reports = get_daily_reports()
-            if db_reports:
-                all_reports = db_reports
-            else:
-                all_reports = st.session_state.daily_reports
-        except Exception as e:
-            st.warning(f"Database unavailable, showing session data: {str(e)}")
-            all_reports = st.session_state.daily_reports
-    else:
-        all_reports = st.session_state.daily_reports
-    
-    if all_reports:
-        df = pd.DataFrame(all_reports)
-        
-        # Search and filter
-        col1, col2 = st.columns([2, 1])
-        with col1:
-            search_term = st.text_input("🔍 Search reports...", placeholder="Search by date, weather, or work performed", key="daily_reports_search_1")
-        with col2:
-            status_filter = st.selectbox("Status", ["All", "Active", "Archived"])
-        
-        # Filter data
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[
-                filtered_df.astype(str).apply(
-                    lambda x: x.str.contains(search_term, case=False, na=False)
-                ).any(axis=1)
-            ]
-        
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df.get('status', 'Active') == status_filter]
-        
-        # Display results
-        st.write(f"**Total Reports:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            # Clean the dataframe for display
-            display_df = clean_dataframe_for_display(filtered_df)
-            
-            # Display with column configuration
-            st.dataframe(
-                display_df,
-                column_config={
-                    "date": st.column_config.DateColumn("Date"),
-                    "weather": st.column_config.TextColumn("Weather"),
-                    "temperature": st.column_config.NumberColumn("Temperature (°F)"),
-                    "crew_size": st.column_config.NumberColumn("Crew Size"),
-                    "status": st.column_config.SelectboxColumn("Status", options=["Active", "Archived"])
-                },
-                hide_index=True,
-                use_container_width=True
-            )
-        else:
-            st.info("No reports found matching your criteria.")
-    else:
-        st.info("No daily reports available. Create your first report in the Create tab!")
+    crud_controller.render_data_view('daily_reports')
 
 with tab2:
-    st.subheader("📝 Create New Daily Report")
-    
-    with st.form("daily_report_form"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            report_date = st.date_input("Report Date", value=date.today())
-            weather = st.selectbox("Weather Conditions", 
-                ["Sunny", "Partly Cloudy", "Cloudy", "Light Rain", "Heavy Rain", "Snow", "Windy"])
-            temperature = st.number_input("Temperature (°F)", min_value=-20, max_value=120, value=50)
-            wind = st.text_input("Wind Conditions", placeholder="e.g., 5-10 mph NE")
-            crew_size = st.number_input("Crew Size", min_value=0, max_value=100, value=20)
-        
-        with col2:
-            work_performed = st.text_area("Work Performed Today", height=100,
-                placeholder="Describe the main work activities completed...")
-            issues_delays = st.text_area("Issues & Delays", height=100,
-                placeholder="Report any issues, delays, or problems encountered...")
-            tomorrow_plan = st.text_area("Tomorrow's Plan", height=100,
-                placeholder="Outline planned activities for the next day...")
-        
-        col3, col4 = st.columns(2)
-        with col3:
-            safety_incidents = st.text_area("Safety Incidents", height=68,
-                placeholder="Report any safety incidents or near misses...")
-            inspections = st.text_area("Inspections Completed", height=68,
-                placeholder="List inspections completed today...")
-        
-        with col4:
-            materials_delivered = st.text_area("Materials Delivered", height=68,
-                placeholder="List materials and quantities delivered...")
-        
-        # File upload section within the form
-        st.markdown("**📎 Attachments (Optional)**")
-        if DATABASE_AVAILABLE:
-            try:
-                uploaded_files = render_document_upload_section()
-            except:
-                st.info("File upload functionality temporarily unavailable")
-        
-        submitted = st.form_submit_button("💾 Save Daily Report", type="primary", use_container_width=True)
-        
-        if submitted:
-            new_report = {
-                "date": str(report_date),
-                "weather": weather,
-                "temperature": temperature,
-                "wind": wind,
-                "crew_size": crew_size,
-                "work_performed": work_performed,
-                "issues_delays": issues_delays,
-                "tomorrow_plan": tomorrow_plan,
-                "safety_incidents": safety_incidents,
-                "inspections": inspections,
-                "materials_delivered": materials_delivered
-            }
-            
-            # Save to database if available
-            if DATABASE_AVAILABLE:
-                try:
-                    if save_daily_report(new_report):
-                        st.success("Daily report saved to database successfully!")
-                    else:
-                        st.error("Failed to save to database, saved to session instead")
-                        # Fallback to session storage
-                        new_report["id"] = len(st.session_state.daily_reports) + 1
-                        new_report["created_by"] = "Site Superintendent"
-                        new_report["status"] = "Active"
-                        st.session_state.daily_reports.insert(0, new_report)
-                except Exception as e:
-                    st.error(f"Database error: {str(e)}")
-                    # Fallback to session storage
-                    new_report["id"] = len(st.session_state.daily_reports) + 1
-                    new_report["created_by"] = "Site Superintendent"
-                    new_report["status"] = "Active"
-                    st.session_state.daily_reports.insert(0, new_report)
-            else:
-                # Fallback to session storage
-                new_report["id"] = len(st.session_state.daily_reports) + 1
-                new_report["created_by"] = "Site Superintendent"
-                new_report["status"] = "Active"
-                st.session_state.daily_reports.insert(0, new_report)
-                st.success("Daily report saved successfully!")
-            
-            st.rerun()
+    crud_controller.render_create_form(form_config)
 
+with tab3:
+    st.subheader("📈 Daily Reports Analytics")
+    
+    # Basic metrics
+    total_items = len(model.get_all())
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Total Daily Reports", total_items)
+    
+    with col2:
+        if 'status' in model.schema.get('fields', {}):
+            active_items = len([item for item in model.get_all() if item.get('status') in ['Active', 'In Progress', 'Open']])
+            st.metric("Active Items", active_items)
+        else:
+            st.metric("Recent Items", min(total_items, 10))
+    
+    with col3:
+        if 'date' in model.schema.get('fields', {}):
+            from datetime import datetime, timedelta
+            recent_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            recent_items = len([item for item in model.get_all() if item.get('date', '') >= recent_date])
+            st.metric("Recent (30 days)", recent_items)
+        else:
+            st.metric("Total Records", total_items)
+    
+    with col4:
+        completion_rate = 100 if total_items == 0 else min(100, (total_items / max(1, total_items)) * 100)
+        st.metric("Completion Rate", f"{completion_rate:.1f}%")
+    
+    # Data visualization
+    if total_items > 0:
+        items_df = model.to_dataframe()
+        if not items_df.empty:
+            st.subheader("Data Analysis")
+            
+            # Show distribution by status if available
+            if 'status' in items_df.columns:
+                status_dist = items_df['status'].value_counts()
+                st.bar_chart(status_dist)
+                st.caption("Distribution by Status")
+            
+            # Show distribution by type if available  
+            elif 'type' in items_df.columns:
+                type_dist = items_df['type'].value_counts()
+                st.bar_chart(type_dist)
+                st.caption("Distribution by Type")
+
+# Sidebar
+with st.sidebar:
+    st.header("Daily Reports Summary")
+    
+    items = model.get_all()
+    if items:
+        st.metric("Highland Tower Daily Reports", len(items))
+        
+        # Show recent items
+        st.subheader("Recent Items")
+        recent_items = items[:3]  # Show first 3 items
+        
+        for item in recent_items:
+            with st.expander(f"📋 {item.get('id', 'Item')}"):
+                for key, value in list(item.items())[:3]:  # Show first 3 fields
+                    st.write(f"**{key.replace('_', ' ').title()}:** {value}")
+    
+    st.markdown("---")
+    st.write("**Highland Tower Development**")
+    st.write("$45.5M Mixed-Use Project")
+    st.write("Daily Reports powered by gcPanel")

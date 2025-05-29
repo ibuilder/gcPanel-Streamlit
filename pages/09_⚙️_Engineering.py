@@ -1,153 +1,146 @@
 """
-Engineering Management Page - Highland Tower Development
+Engineering Page - Highland Tower Development
+Refactored using MVC pattern with models, controllers, and helpers
 """
 
 import streamlit as st
-import pandas as pd
-from datetime import datetime, date
 import sys
 import os
 
+# Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.helpers import check_authentication, initialize_session_state, clean_dataframe_for_display
 
+from models.all_models import EngineeringModel
+from controllers.crud_controller import CRUDController
+from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
+
+# Page configuration
 st.set_page_config(page_title="Engineering - gcPanel", page_icon="⚙️", layout="wide")
-initialize_session_state()
 
-if not check_authentication():
-    st.switch_page("app.py")
+# Apply styling
+apply_highland_tower_styling()
 
-st.title("⚙️ Engineering Management")
-st.markdown("Highland Tower Development - Engineering Documentation & Analysis")
-st.markdown("---")
+# Render header
+render_highland_header("⚙️ Engineering", "Highland Tower Development - Engineering Documentation & Analysis")
 
-if 'engineering_items' not in st.session_state:
-    st.session_state.engineering_items = []
+# Initialize model
+model = EngineeringModel()
 
-tab1, tab2, tab3 = st.tabs(["📊 Engineering Documentation", "📝 Create Engineering Task", "🔧 Analysis"])
+# Display configuration
+display_config = {
+    'title': 'Engineering',
+    'item_name': 'Engineering',
+    'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
+    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
+    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'primary_filter': {
+        'field': 'status',
+        'label': 'Status'
+    } if 'status' in model.schema.get('fields', {}) else None,
+    'secondary_filter': {
+        'field': 'type',
+        'label': 'Type'  
+    } if 'type' in model.schema.get('fields', {}) else None
+}
+
+# Form configuration - dynamically generate from schema
+form_fields = []
+for field_name, field_config in model.schema.get('fields', {}).items():
+    if field_name == 'id':
+        continue  # Skip ID field in forms
+    
+    field_type = field_config.get('type', 'text')
+    if field_type == 'date':
+        form_fields.append({'key': field_name, 'type': 'date', 'label': field_name.replace('_', ' ').title()})
+    elif field_type == 'number':
+        form_fields.append({'key': field_name, 'type': 'number', 'label': field_name.replace('_', ' ').title(), 'min_value': 0.0})
+    elif field_type == 'boolean':
+        form_fields.append({'key': field_name, 'type': 'select', 'label': field_name.replace('_', ' ').title(), 'options': [True, False]})
+    else:
+        form_fields.append({'key': field_name, 'type': 'text', 'label': field_name.replace('_', ' ').title()})
+
+form_config = {'fields': form_fields}
+
+# Initialize controller
+crud_controller = CRUDController(model, 'engineering', display_config)
+
+# Main content tabs
+tab1, tab2, tab3 = st.tabs(["⚙️ Engineering Database", "📝 Create New", "📈 Analytics"])
 
 with tab1:
-    st.subheader("📊 Engineering Documentation")
-    
-    if st.session_state.engineering_items:
-        df = pd.DataFrame(st.session_state.engineering_items)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search documentation...", key="engineering_search")
-        with col2:
-            type_filter = st.selectbox("Type", ["All", "Drawing", "Calculation", "Specification", "Report"])
-        with col3:
-            status_filter = st.selectbox("Status", ["All", "Draft", "Under Review", "Approved", "Superseded"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if type_filter != "All":
-            filtered_df = filtered_df[filtered_df['type'] == type_filter]
-            
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-        
-        st.write(f"**Total Documents:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No engineering documentation available. Create your first task in the Create tab!")
+    crud_controller.render_data_view('engineering')
 
 with tab2:
-    st.subheader("📝 Create Engineering Task")
-    
-    with st.form("engineering_form"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            task_title = st.text_input("Task Title", placeholder="Engineering task description")
-            discipline = st.selectbox("Engineering Discipline", 
-                ["Structural", "Mechanical", "Electrical", "Civil", "Geotechnical", "Environmental"])
-            priority = st.selectbox("Priority", ["Low", "Medium", "High", "Critical"])
-            engineer = st.text_input("Assigned Engineer", placeholder="Lead engineer name")
-        
-        with col2:
-            project_phase = st.selectbox("Project Phase", 
-                ["Design Development", "Construction Documents", "Construction Administration", "Closeout"])
-            due_date = st.date_input("Due Date")
-            estimated_hours = st.number_input("Estimated Hours", min_value=0.0, format="%.1f")
-            drawing_numbers = st.text_input("Drawing Numbers", placeholder="Related drawing references")
-        
-        scope = st.text_area("Scope of Work", placeholder="Detailed engineering scope...")
-        requirements = st.text_area("Technical Requirements", placeholder="Specifications and requirements...")
-        
-        submitted = st.form_submit_button("⚙️ Create Task", type="primary", use_container_width=True)
-        
-        if submitted and task_title:
-            new_task = {
-                "id": f"ENG-{len(st.session_state.engineering_items) + 1:03d}",
-                "title": task_title,
-                "discipline": discipline,
-                "priority": priority,
-                "engineer": engineer,
-                "project_phase": project_phase,
-                "due_date": str(due_date),
-                "estimated_hours": estimated_hours,
-                "drawing_numbers": drawing_numbers,
-                "scope": scope,
-                "requirements": requirements,
-                "status": "Planning",
-                "created_date": str(date.today())
-            }
-            st.session_state.engineering_items.insert(0, new_task)
-            st.success(f"Engineering task {new_task['id']} created successfully!")
-            st.rerun()
-
-with tab2:
-    st.subheader("📊 Engineering Documentation")
-    
-    if st.session_state.engineering_items:
-        df = pd.DataFrame(st.session_state.engineering_items)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search tasks...", key="engineering_search_1")
-        with col2:
-            discipline_filter = st.selectbox("Discipline", ["All", "Structural", "Mechanical", "Electrical"])
-        with col3:
-            phase_filter = st.selectbox("Phase", ["All", "Design Development", "Construction Documents"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if discipline_filter != "All":
-            filtered_df = filtered_df[filtered_df['discipline'] == discipline_filter]
-            
-        if phase_filter != "All":
-            filtered_df = filtered_df[filtered_df['project_phase'] == phase_filter]
-        
-        st.write(f"**Total Engineering Items:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No engineering tasks created. Create your first task above!")
+    crud_controller.render_create_form(form_config)
 
 with tab3:
-    st.subheader("🔧 Engineering Analysis")
+    st.subheader("📈 Engineering Analytics")
+    
+    # Basic metrics
+    total_items = len(model.get_all())
     
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.metric("Active Tasks", "16", "2")
+        st.metric("Total Engineering", total_items)
     
     with col2:
-        st.metric("Completed", "28", "4")
+        if 'status' in model.schema.get('fields', {}):
+            active_items = len([item for item in model.get_all() if item.get('status') in ['Active', 'In Progress', 'Open']])
+            st.metric("Active Items", active_items)
+        else:
+            st.metric("Recent Items", min(total_items, 10))
     
     with col3:
-        st.metric("Drawing Revisions", "12", "3")
+        if 'date' in model.schema.get('fields', {}):
+            from datetime import datetime, timedelta
+            recent_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            recent_items = len([item for item in model.get_all() if item.get('date', '') >= recent_date])
+            st.metric("Recent (30 days)", recent_items)
+        else:
+            st.metric("Total Records", total_items)
     
     with col4:
-        st.metric("Design Changes", "8", "1")
+        completion_rate = 100 if total_items == 0 else min(100, (total_items / max(1, total_items)) * 100)
+        st.metric("Completion Rate", f"{completion_rate:.1f}%")
+    
+    # Data visualization
+    if total_items > 0:
+        items_df = model.to_dataframe()
+        if not items_df.empty:
+            st.subheader("Data Analysis")
+            
+            # Show distribution by status if available
+            if 'status' in items_df.columns:
+                status_dist = items_df['status'].value_counts()
+                st.bar_chart(status_dist)
+                st.caption("Distribution by Status")
+            
+            # Show distribution by type if available  
+            elif 'type' in items_df.columns:
+                type_dist = items_df['type'].value_counts()
+                st.bar_chart(type_dist)
+                st.caption("Distribution by Type")
+
+# Sidebar
+with st.sidebar:
+    st.header("Engineering Summary")
+    
+    items = model.get_all()
+    if items:
+        st.metric("Highland Tower Engineering", len(items))
+        
+        # Show recent items
+        st.subheader("Recent Items")
+        recent_items = items[:3]  # Show first 3 items
+        
+        for item in recent_items:
+            with st.expander(f"⚙️ {item.get('id', 'Item')}"):
+                for key, value in list(item.items())[:3]:  # Show first 3 fields
+                    st.write(f"**{key.replace('_', ' ').title()}:** {value}")
+    
+    st.markdown("---")
+    st.write("**Highland Tower Development**")
+    st.write("$45.5M Mixed-Use Project")
+    st.write("Engineering powered by gcPanel")

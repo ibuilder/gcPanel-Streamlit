@@ -1,180 +1,146 @@
 """
-Scheduling Management Page - Highland Tower Development
+Project Scheduling Page - Highland Tower Development
+Refactored using MVC pattern with models, controllers, and helpers
 """
 
 import streamlit as st
-import pandas as pd
-from datetime import datetime, date, timedelta
 import sys
 import os
 
+# Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.helpers import check_authentication, initialize_session_state, clean_dataframe_for_display
 
-st.set_page_config(page_title="Scheduling - gcPanel", page_icon="📅", layout="wide")
-initialize_session_state()
+from models.all_models import SchedulingModel
+from controllers.crud_controller import CRUDController
+from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
 
-if not check_authentication():
-    st.switch_page("app.py")
+# Page configuration
+st.set_page_config(page_title="Project Scheduling - gcPanel", page_icon="📅", layout="wide")
 
-st.title("📅 Project Scheduling")
-st.markdown("Highland Tower Development - Schedule Management & Planning")
-st.markdown("---")
+# Apply styling
+apply_highland_tower_styling()
 
-if 'schedule_items' not in st.session_state:
-    st.session_state.schedule_items = [
-        {
-            "id": "SCH-001",
-            "task_name": "Foundation Excavation",
-            "start_date": "2024-01-15",
-            "end_date": "2024-02-15",
-            "duration": 31,
-            "predecessor": "",
-            "resource": "Excavation Crew",
-            "progress": 100,
-            "status": "Completed"
-        },
-        {
-            "id": "SCH-002",
-            "task_name": "Foundation Pour",
-            "start_date": "2024-02-16",
-            "end_date": "2024-03-30",
-            "duration": 43,
-            "predecessor": "SCH-001",
-            "resource": "Concrete Crew",
-            "progress": 85,
-            "status": "In Progress"
-        }
-    ]
+# Render header
+render_highland_header("📅 Project Scheduling", "Highland Tower Development - Construction Schedule Management")
 
-tab1, tab2, tab3 = st.tabs(["📊 Schedule View", "📝 Add Schedule Item", "📈 Progress Tracking"])
+# Initialize model
+model = SchedulingModel()
+
+# Display configuration
+display_config = {
+    'title': 'Project Scheduling',
+    'item_name': 'Scheduling',
+    'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
+    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
+    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'primary_filter': {
+        'field': 'status',
+        'label': 'Status'
+    } if 'status' in model.schema.get('fields', {}) else None,
+    'secondary_filter': {
+        'field': 'type',
+        'label': 'Type'  
+    } if 'type' in model.schema.get('fields', {}) else None
+}
+
+# Form configuration - dynamically generate from schema
+form_fields = []
+for field_name, field_config in model.schema.get('fields', {}).items():
+    if field_name == 'id':
+        continue  # Skip ID field in forms
+    
+    field_type = field_config.get('type', 'text')
+    if field_type == 'date':
+        form_fields.append({'key': field_name, 'type': 'date', 'label': field_name.replace('_', ' ').title()})
+    elif field_type == 'number':
+        form_fields.append({'key': field_name, 'type': 'number', 'label': field_name.replace('_', ' ').title(), 'min_value': 0.0})
+    elif field_type == 'boolean':
+        form_fields.append({'key': field_name, 'type': 'select', 'label': field_name.replace('_', ' ').title(), 'options': [True, False]})
+    else:
+        form_fields.append({'key': field_name, 'type': 'text', 'label': field_name.replace('_', ' ').title()})
+
+form_config = {'fields': form_fields}
+
+# Initialize controller
+crud_controller = CRUDController(model, 'scheduling', display_config)
+
+# Main content tabs
+tab1, tab2, tab3 = st.tabs(["📅 Project Scheduling Database", "📝 Create New", "📈 Analytics"])
 
 with tab1:
-    st.subheader("📊 Project Schedule")
-    
-    if st.session_state.schedule_items:
-        df = pd.DataFrame(st.session_state.schedule_items)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search schedule items...", key="scheduling_search_1")
-        with col2:
-            status_filter = st.selectbox("Status", ["All", "Not Started", "In Progress", "Completed", "Delayed"])
-        with col3:
-            resource_filter = st.selectbox("Resource", ["All", "Excavation Crew", "Concrete Crew", "Steel Crew"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-            
-        if resource_filter != "All":
-            filtered_df = filtered_df[filtered_df['resource'] == resource_filter]
-        
-        st.write(f"**Total Schedule Items:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No schedule items created. Add your first schedule item in the Add tab!")
+    crud_controller.render_data_view('scheduling')
 
 with tab2:
-    st.subheader("📝 Add Schedule Item")
-    
-    with st.form("schedule_form"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            task_name = st.text_input("Task Name", placeholder="Activity description")
-            start_date = st.date_input("Start Date")
-            end_date = st.date_input("End Date")
-            duration = st.number_input("Duration (days)", min_value=1, value=1)
-        
-        with col2:
-            predecessor = st.text_input("Predecessor", placeholder="Previous task ID")
-            resource = st.text_input("Resource", placeholder="Assigned crew/team")
-            progress = st.slider("Progress %", 0, 100, 0)
-            priority = st.selectbox("Priority", ["Low", "Medium", "High", "Critical"])
-        
-        description = st.text_area("Task Description", placeholder="Detailed task description...")
-        
-        submitted = st.form_submit_button("📅 Add to Schedule", type="primary", use_container_width=True)
-        
-        if submitted and task_name:
-            new_task = {
-                "id": f"SCH-{len(st.session_state.schedule_items) + 1:03d}",
-                "task_name": task_name,
-                "start_date": str(start_date),
-                "end_date": str(end_date),
-                "duration": duration,
-                "predecessor": predecessor,
-                "resource": resource,
-                "progress": progress,
-                "priority": priority,
-                "description": description,
-                "status": "Not Started" if progress == 0 else "In Progress" if progress < 100 else "Completed"
-            }
-            st.session_state.schedule_items.insert(0, new_task)
-            st.success(f"Schedule item {new_task['id']} added successfully!")
-            st.rerun()
-
-with tab2:
-    st.subheader("📊 Project Schedule")
-    
-    if st.session_state.schedule_items:
-        df = pd.DataFrame(st.session_state.schedule_items)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("Search tasks...")
-        with col2:
-            status_filter = st.selectbox("Status", ["All", "Not Started", "In Progress", "Completed"])
-        with col3:
-            resource_filter = st.selectbox("Resource", ["All"] + list(df['resource'].unique()) if len(df) > 0 else ["All"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-            
-        if resource_filter != "All":
-            filtered_df = filtered_df[filtered_df['resource'] == resource_filter]
-        
-        st.write(f"**Total Schedule Items:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No schedule items created. Add your first task above!")
+    crud_controller.render_create_form(form_config)
 
 with tab3:
-    st.subheader("📈 Schedule Progress")
+    st.subheader("📈 Project Scheduling Analytics")
     
-    if st.session_state.schedule_items:
-        df = pd.DataFrame(st.session_state.schedule_items)
+    # Basic metrics
+    total_items = len(model.get_all())
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Total Scheduling", total_items)
+    
+    with col2:
+        if 'status' in model.schema.get('fields', {}):
+            active_items = len([item for item in model.get_all() if item.get('status') in ['Active', 'In Progress', 'Open']])
+            st.metric("Active Items", active_items)
+        else:
+            st.metric("Recent Items", min(total_items, 10))
+    
+    with col3:
+        if 'date' in model.schema.get('fields', {}):
+            from datetime import datetime, timedelta
+            recent_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            recent_items = len([item for item in model.get_all() if item.get('date', '') >= recent_date])
+            st.metric("Recent (30 days)", recent_items)
+        else:
+            st.metric("Total Records", total_items)
+    
+    with col4:
+        completion_rate = 100 if total_items == 0 else min(100, (total_items / max(1, total_items)) * 100)
+        st.metric("Completion Rate", f"{completion_rate:.1f}%")
+    
+    # Data visualization
+    if total_items > 0:
+        items_df = model.to_dataframe()
+        if not items_df.empty:
+            st.subheader("Data Analysis")
+            
+            # Show distribution by status if available
+            if 'status' in items_df.columns:
+                status_dist = items_df['status'].value_counts()
+                st.bar_chart(status_dist)
+                st.caption("Distribution by Status")
+            
+            # Show distribution by type if available  
+            elif 'type' in items_df.columns:
+                type_dist = items_df['type'].value_counts()
+                st.bar_chart(type_dist)
+                st.caption("Distribution by Type")
+
+# Sidebar
+with st.sidebar:
+    st.header("Project Scheduling Summary")
+    
+    items = model.get_all()
+    if items:
+        st.metric("Highland Tower Project Scheduling", len(items))
         
-        col1, col2, col3, col4 = st.columns(4)
+        # Show recent items
+        st.subheader("Recent Items")
+        recent_items = items[:3]  # Show first 3 items
         
-        with col1:
-            total_tasks = len(df)
-            st.metric("Total Tasks", total_tasks)
-        
-        with col2:
-            completed = len(df[df['status'] == 'Completed'])
-            st.metric("Completed", completed)
-        
-        with col3:
-            in_progress = len(df[df['status'] == 'In Progress'])
-            st.metric("In Progress", in_progress)
-        
-        with col4:
-            avg_progress = df['progress'].mean()
-            st.metric("Avg Progress", f"{avg_progress:.0f}%")
-    else:
-        st.info("No schedule data available for progress tracking.")
+        for item in recent_items:
+            with st.expander(f"📅 {item.get('id', 'Item')}"):
+                for key, value in list(item.items())[:3]:  # Show first 3 fields
+                    st.write(f"**{key.replace('_', ' ').title()}:** {value}")
+    
+    st.markdown("---")
+    st.write("**Highland Tower Development**")
+    st.write("$45.5M Mixed-Use Project")
+    st.write("Project Scheduling powered by gcPanel")

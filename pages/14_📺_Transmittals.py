@@ -1,157 +1,146 @@
 """
-Transmittals Management Page - Highland Tower Development
+Transmittals Page - Highland Tower Development
+Refactored using MVC pattern with models, controllers, and helpers
 """
 
 import streamlit as st
-import pandas as pd
-from datetime import datetime, date
 import sys
 import os
 
+# Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.helpers import check_authentication, initialize_session_state, clean_dataframe_for_display
 
+from models.all_models import TransmittalModel
+from controllers.crud_controller import CRUDController
+from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
+
+# Page configuration
 st.set_page_config(page_title="Transmittals - gcPanel", page_icon="📺", layout="wide")
-initialize_session_state()
 
-if not check_authentication():
-    st.switch_page("app.py")
+# Apply styling
+apply_highland_tower_styling()
 
-st.title("📺 Transmittals Management")
-st.markdown("Highland Tower Development - Document Transmittal Tracking")
-st.markdown("---")
+# Render header
+render_highland_header("📺 Transmittals", "Highland Tower Development - Document Transmission Management")
 
-if 'transmittals' not in st.session_state:
-    st.session_state.transmittals = []
+# Initialize model
+model = TransmittalModel()
 
-tab1, tab2 = st.tabs(["📊 Transmittal Log", "📝 Create Transmittal"])
+# Display configuration
+display_config = {
+    'title': 'Transmittals',
+    'item_name': 'Transmittals',
+    'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
+    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
+    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'primary_filter': {
+        'field': 'status',
+        'label': 'Status'
+    } if 'status' in model.schema.get('fields', {}) else None,
+    'secondary_filter': {
+        'field': 'type',
+        'label': 'Type'  
+    } if 'type' in model.schema.get('fields', {}) else None
+}
+
+# Form configuration - dynamically generate from schema
+form_fields = []
+for field_name, field_config in model.schema.get('fields', {}).items():
+    if field_name == 'id':
+        continue  # Skip ID field in forms
+    
+    field_type = field_config.get('type', 'text')
+    if field_type == 'date':
+        form_fields.append({'key': field_name, 'type': 'date', 'label': field_name.replace('_', ' ').title()})
+    elif field_type == 'number':
+        form_fields.append({'key': field_name, 'type': 'number', 'label': field_name.replace('_', ' ').title(), 'min_value': 0.0})
+    elif field_type == 'boolean':
+        form_fields.append({'key': field_name, 'type': 'select', 'label': field_name.replace('_', ' ').title(), 'options': [True, False]})
+    else:
+        form_fields.append({'key': field_name, 'type': 'text', 'label': field_name.replace('_', ' ').title()})
+
+form_config = {'fields': form_fields}
+
+# Initialize controller
+crud_controller = CRUDController(model, 'transmittals', display_config)
+
+# Main content tabs
+tab1, tab2, tab3 = st.tabs(["📺 Transmittals Database", "📝 Create New", "📈 Analytics"])
 
 with tab1:
-    st.subheader("📊 Transmittal Log")
-    
-    if st.session_state.transmittals:
-        df = pd.DataFrame(st.session_state.transmittals)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search transmittals...", key="transmittals_search_1")
-        with col2:
-            recipient_filter = st.selectbox("Recipient", ["All", "Architect", "Engineer", "Contractor", "Owner"])
-        with col3:
-            status_filter = st.selectbox("Status", ["All", "Sent", "Acknowledged", "Under Review"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if recipient_filter != "All":
-            filtered_df = filtered_df[filtered_df['recipient'] == recipient_filter]
-            
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-        
-        st.write(f"**Total Transmittals:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No transmittals sent. Create your first transmittal in the Create tab!")
+    crud_controller.render_data_view('transmittals')
 
 with tab2:
-    st.subheader("📝 Create New Transmittal")
-    
-    with st.form("transmittal_form"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            transmittal_number = st.text_input("Transmittal Number", 
-                value=f"TX-{len(st.session_state.transmittals) + 1:03d}", disabled=True)
-            to_company = st.text_input("To (Company)", placeholder="Recipient company")
-            to_attention = st.text_input("Attention", placeholder="Recipient contact person")
-            project_name = st.text_input("Project", value="Highland Tower Development")
-        
-        with col2:
-            transmittal_date = st.date_input("Date", value=date.today())
-            from_company = st.text_input("From (Company)", placeholder="Sender company")
-            delivery_method = st.selectbox("Delivery Method", 
-                ["Email", "Hand Delivery", "Courier", "Mail", "FTP", "Cloud"])
-            copies_to = st.text_input("Copies To", placeholder="Additional recipients")
-        
-        subject = st.text_input("Subject", placeholder="Purpose of transmittal")
-        description = st.text_area("Description", placeholder="Description of transmitted documents...")
-        
-        st.markdown("**Document List**")
-        doc_count = st.number_input("Number of Documents", min_value=1, max_value=20, value=1)
-        
-        documents = []
-        for i in range(doc_count):
-            col_a, col_b, col_c = st.columns(3)
-            with col_a:
-                doc_title = st.text_input(f"Document {i+1} Title", key=f"doc_title_{i}")
-            with col_b:
-                doc_number = st.text_input(f"Document {i+1} Number", key=f"doc_number_{i}")
-            with col_c:
-                doc_revision = st.text_input(f"Rev", key=f"doc_rev_{i}", value="0")
-            
-            if doc_title:
-                documents.append({
-                    "title": doc_title,
-                    "number": doc_number,
-                    "revision": doc_revision
-                })
-        
-        submitted = st.form_submit_button("📤 Send Transmittal", type="primary", use_container_width=True)
-        
-        if submitted and to_company and subject:
-            new_transmittal = {
-                "id": transmittal_number,
-                "date": str(transmittal_date),
-                "to_company": to_company,
-                "to_attention": to_attention,
-                "from_company": from_company,
-                "project_name": project_name,
-                "subject": subject,
-                "description": description,
-                "delivery_method": delivery_method,
-                "copies_to": copies_to,
-                "documents": documents,
-                "document_count": len(documents),
-                "status": "Sent",
-                "created_by": st.session_state.get('user_name', 'User')
-            }
-            st.session_state.transmittals.insert(0, new_transmittal)
-            st.success(f"Transmittal {new_transmittal['id']} created successfully!")
-            st.rerun()
+    crud_controller.render_create_form(form_config)
 
-with tab2:
-    st.subheader("📊 Transmittal Log")
+with tab3:
+    st.subheader("📈 Transmittals Analytics")
     
-    if st.session_state.transmittals:
-        df = pd.DataFrame(st.session_state.transmittals)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("Search transmittals...")
-        with col2:
-            company_filter = st.selectbox("To Company", ["All"] + list(df['to_company'].unique()) if len(df) > 0 else ["All"])
-        with col3:
-            method_filter = st.selectbox("Delivery Method", ["All", "Email", "Hand Delivery", "Courier"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if company_filter != "All":
-            filtered_df = filtered_df[filtered_df['to_company'] == company_filter]
+    # Basic metrics
+    total_items = len(model.get_all())
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Total Transmittals", total_items)
+    
+    with col2:
+        if 'status' in model.schema.get('fields', {}):
+            active_items = len([item for item in model.get_all() if item.get('status') in ['Active', 'In Progress', 'Open']])
+            st.metric("Active Items", active_items)
+        else:
+            st.metric("Recent Items", min(total_items, 10))
+    
+    with col3:
+        if 'date' in model.schema.get('fields', {}):
+            from datetime import datetime, timedelta
+            recent_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            recent_items = len([item for item in model.get_all() if item.get('date', '') >= recent_date])
+            st.metric("Recent (30 days)", recent_items)
+        else:
+            st.metric("Total Records", total_items)
+    
+    with col4:
+        completion_rate = 100 if total_items == 0 else min(100, (total_items / max(1, total_items)) * 100)
+        st.metric("Completion Rate", f"{completion_rate:.1f}%")
+    
+    # Data visualization
+    if total_items > 0:
+        items_df = model.to_dataframe()
+        if not items_df.empty:
+            st.subheader("Data Analysis")
             
-        if method_filter != "All":
-            filtered_df = filtered_df[filtered_df['delivery_method'] == method_filter]
+            # Show distribution by status if available
+            if 'status' in items_df.columns:
+                status_dist = items_df['status'].value_counts()
+                st.bar_chart(status_dist)
+                st.caption("Distribution by Status")
+            
+            # Show distribution by type if available  
+            elif 'type' in items_df.columns:
+                type_dist = items_df['type'].value_counts()
+                st.bar_chart(type_dist)
+                st.caption("Distribution by Type")
+
+# Sidebar
+with st.sidebar:
+    st.header("Transmittals Summary")
+    
+    items = model.get_all()
+    if items:
+        st.metric("Highland Tower Transmittals", len(items))
         
-        st.write(f"**Total Transmittals:** {len(filtered_df)}")
+        # Show recent items
+        st.subheader("Recent Items")
+        recent_items = items[:3]  # Show first 3 items
         
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No transmittals created. Create your first transmittal above!")
+        for item in recent_items:
+            with st.expander(f"📺 {item.get('id', 'Item')}"):
+                for key, value in list(item.items())[:3]:  # Show first 3 fields
+                    st.write(f"**{key.replace('_', ' ').title()}:** {value}")
+    
+    st.markdown("---")
+    st.write("**Highland Tower Development**")
+    st.write("$45.5M Mixed-Use Project")
+    st.write("Transmittals powered by gcPanel")

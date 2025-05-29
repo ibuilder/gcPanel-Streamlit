@@ -1,184 +1,146 @@
 """
 Equipment Tracking Page - Highland Tower Development
+Refactored using MVC pattern with models, controllers, and helpers
 """
 
 import streamlit as st
-import pandas as pd
-from datetime import datetime, date
 import sys
 import os
 
+# Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.helpers import check_authentication, initialize_session_state, clean_dataframe_for_display
 
+from models.all_models import EquipmentModel
+from controllers.crud_controller import CRUDController
+from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
+
+# Page configuration
 st.set_page_config(page_title="Equipment Tracking - gcPanel", page_icon="🚜", layout="wide")
-initialize_session_state()
 
-if not check_authentication():
-    st.switch_page("app.py")
+# Apply styling
+apply_highland_tower_styling()
 
-st.title("🚜 Equipment Tracking")
-st.markdown("Highland Tower Development - Construction Equipment Management")
-st.markdown("---")
+# Render header
+render_highland_header("🚜 Equipment Tracking", "Highland Tower Development - Construction Equipment Management")
 
-if 'equipment' not in st.session_state:
-    st.session_state.equipment = []
+# Initialize model
+model = EquipmentModel()
 
-tab1, tab2, tab3 = st.tabs(["🚜 Equipment Fleet", "📝 Add Equipment", "📊 Utilization"])
+# Display configuration
+display_config = {
+    'title': 'Equipment Tracking',
+    'item_name': 'Equipment Tracking',
+    'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
+    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
+    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'primary_filter': {
+        'field': 'status',
+        'label': 'Status'
+    } if 'status' in model.schema.get('fields', {}) else None,
+    'secondary_filter': {
+        'field': 'type',
+        'label': 'Type'  
+    } if 'type' in model.schema.get('fields', {}) else None
+}
+
+# Form configuration - dynamically generate from schema
+form_fields = []
+for field_name, field_config in model.schema.get('fields', {}).items():
+    if field_name == 'id':
+        continue  # Skip ID field in forms
+    
+    field_type = field_config.get('type', 'text')
+    if field_type == 'date':
+        form_fields.append({'key': field_name, 'type': 'date', 'label': field_name.replace('_', ' ').title()})
+    elif field_type == 'number':
+        form_fields.append({'key': field_name, 'type': 'number', 'label': field_name.replace('_', ' ').title(), 'min_value': 0.0})
+    elif field_type == 'boolean':
+        form_fields.append({'key': field_name, 'type': 'select', 'label': field_name.replace('_', ' ').title(), 'options': [True, False]})
+    else:
+        form_fields.append({'key': field_name, 'type': 'text', 'label': field_name.replace('_', ' ').title()})
+
+form_config = {'fields': form_fields}
+
+# Initialize controller
+crud_controller = CRUDController(model, 'equipment', display_config)
+
+# Main content tabs
+tab1, tab2, tab3 = st.tabs(["🚜 Equipment Tracking Database", "📝 Create New", "📈 Analytics"])
 
 with tab1:
-    st.subheader("🚜 Equipment Fleet")
-    
-    if st.session_state.equipment:
-        df = pd.DataFrame(st.session_state.equipment)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search equipment...", key="equipment_tracking_search_1")
-        with col2:
-            type_filter = st.selectbox("Type", ["All", "Excavator", "Crane", "Bulldozer", "Concrete Mixer"])
-        with col3:
-            status_filter = st.selectbox("Status", ["All", "Available", "In Use", "Maintenance", "Out of Service"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if type_filter != "All":
-            filtered_df = filtered_df[filtered_df['type'] == type_filter]
-            
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-        
-        st.write(f"**Total Equipment:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No equipment tracked. Add your first equipment in the Add tab!")
+    crud_controller.render_data_view('equipment')
 
 with tab2:
-    st.subheader("📝 Add Equipment")
-    
-    with st.form("equipment_form"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            equipment_name = st.text_input("Equipment Name", placeholder="Equipment description")
-            equipment_type = st.selectbox("Equipment Type", 
-                ["Crane", "Excavator", "Loader", "Truck", "Generator", "Pump", "Tool", "Other"])
-            make_model = st.text_input("Make/Model", placeholder="Manufacturer and model")
-            serial_number = st.text_input("Serial Number", placeholder="Equipment serial number")
-        
-        with col2:
-            rental_owned = st.selectbox("Rental/Owned", ["Rental", "Owned", "Leased"])
-            daily_rate = st.number_input("Daily Rate ($)", min_value=0.0, format="%.2f")
-            operator_required = st.selectbox("Operator Required", ["Yes", "No"])
-            current_location = st.text_input("Current Location", placeholder="Where equipment is located")
-        
-        with col1:
-            start_date = st.date_input("Start Date")
-            end_date = st.date_input("Expected End Date")
-        
-        with col2:
-            status = st.selectbox("Status", ["Available", "In Use", "Maintenance", "Off Site"])
-            assigned_operator = st.text_input("Assigned Operator", placeholder="Operator name")
-        
-        specifications = st.text_area("Specifications", placeholder="Equipment specifications and capabilities...")
-        maintenance_notes = st.text_area("Maintenance Notes", placeholder="Maintenance schedule and notes...")
-        
-        submitted = st.form_submit_button("🚜 Add Equipment", type="primary", use_container_width=True)
-        
-        if submitted and equipment_name:
-            new_equipment = {
-                "id": f"EQ-{len(st.session_state.equipment) + 1:03d}",
-                "equipment_name": equipment_name,
-                "equipment_type": equipment_type,
-                "make_model": make_model,
-                "serial_number": serial_number,
-                "rental_owned": rental_owned,
-                "daily_rate": daily_rate,
-                "operator_required": operator_required,
-                "current_location": current_location,
-                "start_date": str(start_date),
-                "end_date": str(end_date),
-                "status": status,
-                "assigned_operator": assigned_operator,
-                "specifications": specifications,
-                "maintenance_notes": maintenance_notes,
-                "hours_used": 0,
-                "added_date": str(date.today())
-            }
-            st.session_state.equipment.insert(0, new_equipment)
-            st.success(f"Equipment {new_equipment['id']} added successfully!")
-            st.rerun()
-
-with tab2:
-    st.subheader("🚜 Equipment Fleet")
-    
-    if st.session_state.equipment:
-        df = pd.DataFrame(st.session_state.equipment)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("Search equipment...")
-        with col2:
-            type_filter = st.selectbox("Equipment Type", ["All", "Crane", "Excavator", "Loader", "Truck"])
-        with col3:
-            status_filter = st.selectbox("Status", ["All", "Available", "In Use", "Maintenance"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if type_filter != "All":
-            filtered_df = filtered_df[filtered_df['equipment_type'] == type_filter]
-            
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-        
-        st.write(f"**Total Equipment:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            display_df = filtered_df.copy()
-            display_df['Daily Rate'] = display_df['daily_rate'].apply(lambda x: f"${x:.2f}")
-            
-            st.dataframe(clean_dataframe_for_display(display_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No equipment registered. Add your first equipment above!")
+    crud_controller.render_create_form(form_config)
 
 with tab3:
-    st.subheader("📊 Equipment Utilization")
+    st.subheader("📈 Equipment Tracking Analytics")
     
-    if st.session_state.equipment:
-        df = pd.DataFrame(st.session_state.equipment)
+    # Basic metrics
+    total_items = len(model.get_all())
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Total Equipment Tracking", total_items)
+    
+    with col2:
+        if 'status' in model.schema.get('fields', {}):
+            active_items = len([item for item in model.get_all() if item.get('status') in ['Active', 'In Progress', 'Open']])
+            st.metric("Active Items", active_items)
+        else:
+            st.metric("Recent Items", min(total_items, 10))
+    
+    with col3:
+        if 'date' in model.schema.get('fields', {}):
+            from datetime import datetime, timedelta
+            recent_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            recent_items = len([item for item in model.get_all() if item.get('date', '') >= recent_date])
+            st.metric("Recent (30 days)", recent_items)
+        else:
+            st.metric("Total Records", total_items)
+    
+    with col4:
+        completion_rate = 100 if total_items == 0 else min(100, (total_items / max(1, total_items)) * 100)
+        st.metric("Completion Rate", f"{completion_rate:.1f}%")
+    
+    # Data visualization
+    if total_items > 0:
+        items_df = model.to_dataframe()
+        if not items_df.empty:
+            st.subheader("Data Analysis")
+            
+            # Show distribution by status if available
+            if 'status' in items_df.columns:
+                status_dist = items_df['status'].value_counts()
+                st.bar_chart(status_dist)
+                st.caption("Distribution by Status")
+            
+            # Show distribution by type if available  
+            elif 'type' in items_df.columns:
+                type_dist = items_df['type'].value_counts()
+                st.bar_chart(type_dist)
+                st.caption("Distribution by Type")
+
+# Sidebar
+with st.sidebar:
+    st.header("Equipment Tracking Summary")
+    
+    items = model.get_all()
+    if items:
+        st.metric("Highland Tower Equipment Tracking", len(items))
         
-        col1, col2, col3, col4 = st.columns(4)
+        # Show recent items
+        st.subheader("Recent Items")
+        recent_items = items[:3]  # Show first 3 items
         
-        with col1:
-            total_equipment = len(df)
-            st.metric("Total Equipment", total_equipment)
-        
-        with col2:
-            in_use = len(df[df['status'] == 'In Use'])
-            st.metric("Currently In Use", in_use)
-        
-        with col3:
-            daily_cost = df['daily_rate'].sum()
-            st.metric("Total Daily Cost", f"${daily_cost:,.0f}")
-        
-        with col4:
-            available = len(df[df['status'] == 'Available'])
-            st.metric("Available", available)
-    else:
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.metric("Total Equipment", "0")
-        with col2:
-            st.metric("Currently In Use", "0")
-        with col3:
-            st.metric("Total Daily Cost", "$0")
-        with col4:
-            st.metric("Available", "0")
+        for item in recent_items:
+            with st.expander(f"🚜 {item.get('id', 'Item')}"):
+                for key, value in list(item.items())[:3]:  # Show first 3 fields
+                    st.write(f"**{key.replace('_', ' ').title()}:** {value}")
+    
+    st.markdown("---")
+    st.write("**Highland Tower Development**")
+    st.write("$45.5M Mixed-Use Project")
+    st.write("Equipment Tracking powered by gcPanel")

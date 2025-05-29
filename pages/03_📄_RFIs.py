@@ -1,265 +1,150 @@
 """
 RFI Management Page - Highland Tower Development
+Refactored using MVC pattern with models, controllers, and helpers
 """
 
 import streamlit as st
-import pandas as pd
-from datetime import datetime, date
 import sys
 import os
 
-# Add parent directory to path for imports
+# Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from utils.helpers import check_authentication, initialize_session_state, clean_dataframe_for_display
+from models.rfi_model import RFIModel
+from controllers.crud_controller import CRUDController
+from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling
 
-st.set_page_config(
-    page_title="RFIs - gcPanel",
-    page_icon="📄",
-    layout="wide"
-)
+# Page configuration
+st.set_page_config(page_title="RFIs - gcPanel", page_icon="📄", layout="wide")
 
-# Initialize session state
-initialize_session_state()
+# Apply styling
+apply_highland_tower_styling()
 
-if not check_authentication():
-    st.switch_page("app.py")
+# Render header
+render_highland_header("📄 Request for Information (RFI)", "Highland Tower Development - Design Clarifications")
 
-st.title("📄 Request for Information (RFI)")
-st.markdown("Highland Tower Development - Information Request Management")
-st.markdown("---")
+# Initialize model
+rfi_model = RFIModel()
 
-# Initialize RFIs in session state if not exists
-if 'rfis' not in st.session_state:
-    st.session_state.rfis = [
-        {
-            "id": "RFI-001",
-            "title": "Structural Steel Connection Detail",
-            "description": "Clarification needed on beam-to-column connection detail at Grid Line B-3",
-            "submittal_date": "2024-12-10",
-            "discipline": "Structural",
-            "priority": "High",
-            "status": "Open",
-            "submitted_by": "John Smith",
-            "assigned_to": "Structural Engineer",
-            "due_date": "2024-12-20"
-        },
-        {
-            "id": "RFI-002", 
-            "title": "HVAC Duct Routing",
-            "description": "Conflict between HVAC ductwork and structural beam at Level 3",
-            "submittal_date": "2024-12-12",
-            "discipline": "Mechanical",
-            "priority": "Medium",
-            "status": "In Review",
-            "submitted_by": "Mike Johnson",
-            "assigned_to": "MEP Coordinator",
-            "due_date": "2024-12-22"
-        }
+# Display configuration
+display_config = {
+    'title': 'RFIs',
+    'item_name': 'RFI',
+    'title_field': 'title',
+    'key_fields': ['id', 'priority', 'trade'],
+    'detail_fields': ['date_submitted', 'status', 'assignee'],
+    'search_fields': ['title', 'description', 'trade', 'submitted_by'],
+    'primary_filter': {
+        'field': 'status',
+        'label': 'Status'
+    },
+    'secondary_filter': {
+        'field': 'priority',
+        'label': 'Priority'
+    },
+    'column_config': {
+        "id": st.column_config.TextColumn("RFI ID"),
+        "title": st.column_config.TextColumn("Title"),
+        "trade": st.column_config.TextColumn("Trade"),
+        "priority": st.column_config.TextColumn("Priority"),
+        "submitted_by": st.column_config.TextColumn("Submitted By"),
+        "date_submitted": st.column_config.DateColumn("Date Submitted"),
+        "status": st.column_config.TextColumn("Status"),
+        "due_date": st.column_config.DateColumn("Due Date")
+    }
+}
+
+# Form configuration
+form_config = {
+    'fields': [
+        {'key': 'title', 'type': 'text', 'label': 'RFI Title', 'placeholder': 'Brief descriptive title'},
+        {'key': 'description', 'type': 'textarea', 'label': 'Description', 'placeholder': 'Detailed description of the request'},
+        {'key': 'trade', 'type': 'select', 'label': 'Trade',
+         'options': ['Architectural', 'Structural', 'Mechanical', 'Electrical', 'Plumbing', 'Civil', 'Vertical Transportation']},
+        {'key': 'priority', 'type': 'select', 'label': 'Priority',
+         'options': ['Low', 'Medium', 'High', 'Critical']},
+        {'key': 'submitted_by', 'type': 'text', 'label': 'Submitted By', 'placeholder': 'Company name'},
+        {'key': 'date_submitted', 'type': 'date', 'label': 'Date Submitted'},
+        {'key': 'assignee', 'type': 'text', 'label': 'Assigned To', 'placeholder': 'Responsible party'},
+        {'key': 'due_date', 'type': 'date', 'label': 'Due Date'},
+        {'key': 'location', 'type': 'text', 'label': 'Location', 'placeholder': 'Project location reference'},
+        {'key': 'drawing_reference', 'type': 'text', 'label': 'Drawing Reference', 'placeholder': 'Drawing numbers'}
     ]
+}
 
-# Main content
-tab1, tab2 = st.tabs(["📊 RFI Database", "📝 Create New RFI"])
+# Initialize controller
+crud_controller = CRUDController(rfi_model, 'rfis', display_config)
+
+# Main content tabs
+tab1, tab2, tab3 = st.tabs(["📊 RFI Database", "📝 Create RFI", "📈 RFI Analytics"])
 
 with tab1:
-    st.subheader("📊 RFI Database")
-    
-    if st.session_state.rfis:
-        df = pd.DataFrame(st.session_state.rfis)
-        
-        # Search and filter
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search RFIs...", placeholder="Search by title, description, or ID", key="rfis_search_1")
-        with col2:
-            status_filter = st.selectbox("Status", ["All", "Open", "In Review", "Answered", "Closed"])
-        with col3:
-            discipline_filter = st.selectbox("Discipline", ["All", "Architectural", "Structural", "Mechanical", "Electrical"])
-        
-        # Filter data
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[
-                filtered_df.astype(str).apply(
-                    lambda x: x.str.contains(search_term, case=False, na=False)
-                ).any(axis=1)
-            ]
-        
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-            
-        if discipline_filter != "All":
-            filtered_df = filtered_df[filtered_df['discipline'] == discipline_filter]
-        
-        # Display results
-        st.write(f"**Total RFIs:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            # Priority color coding
-            def get_priority_color(priority):
-                colors = {
-                    "Critical": "🔴",
-                    "High": "🟠", 
-                    "Medium": "🟡",
-                    "Low": "🟢"
-                }
-                return colors.get(priority, "⚪")
-            
-            # Add priority indicators
-            display_df = filtered_df.copy()
-            display_df['Priority'] = display_df['priority'].apply(lambda x: f"{get_priority_color(x)} {x}")
-            
-            # Display with column configuration
-            st.dataframe(
-                clean_dataframe_for_display(display_df),
-                column_config={
-                    "id": st.column_config.TextColumn("RFI ID"),
-                    "title": st.column_config.TextColumn("Title"),
-                    "submittal_date": st.column_config.DateColumn("Submitted"),
-                    "due_date": st.column_config.DateColumn("Due Date"),
-                    "status": st.column_config.SelectboxColumn("Status", 
-                        options=["Open", "In Review", "Answered", "Closed"]),
-                    "Priority": st.column_config.TextColumn("Priority")
-                },
-                hide_index=True,
-                use_container_width=True
-            )
-        else:
-            st.info("No RFIs found matching your criteria.")
-    else:
-        st.info("No RFIs available. Create your first RFI in the Create tab!")
+    crud_controller.render_data_view('rfis')
 
 with tab2:
-    st.subheader("📝 Create New RFI")
-    
-    with st.form("rfi_form"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            rfi_title = st.text_input("RFI Title*", placeholder="Brief description of the information request")
-            discipline = st.selectbox("Discipline", 
-                ["Architectural", "Structural", "Mechanical", "Electrical", "Plumbing", "Civil", "General"])
-            priority = st.selectbox("Priority", ["Low", "Medium", "High", "Critical"])
-            due_date = st.date_input("Response Due Date", value=date.today())
-        
-        with col2:
-            assigned_to = st.text_input("Assigned To", placeholder="Person/Team responsible for response")
-            project_location = st.text_input("Project Location", placeholder="Building area, floor, grid lines")
-            drawing_reference = st.text_input("Drawing Reference", placeholder="Drawing numbers, sheet references")
-            specification_reference = st.text_input("Specification Reference", placeholder="Spec section references")
-        
-        description = st.text_area("Detailed Description*", height=150,
-            placeholder="Provide detailed description of the information needed...")
-        
-        submitted = st.form_submit_button("📤 Submit RFI", type="primary", use_container_width=True)
-        
-        if submitted and rfi_title and description:
-            new_rfi = {
-                "id": f"RFI-{len(st.session_state.rfis) + 1:03d}",
-                "title": rfi_title,
-                "description": description,
-                "submittal_date": str(date.today()),
-                "discipline": discipline,
-                "priority": priority,
-                "status": "Open",
-                "submitted_by": st.session_state.get('user_name', 'User'),
-                "assigned_to": assigned_to,
-                "due_date": str(due_date),
-                "project_location": project_location,
-                "drawing_reference": drawing_reference,
-                "specification_reference": specification_reference
-            }
-            st.session_state.rfis.insert(0, new_rfi)
-            st.success(f"RFI {new_rfi['id']} submitted successfully!")
-            st.rerun()
-        elif submitted:
-            st.error("Please fill in all required fields (*)")
+    crud_controller.render_create_form(form_config)
 
-with tab2:
-    st.subheader("📊 RFI Database")
+with tab3:
+    st.subheader("📈 RFI Performance Analytics")
     
-    if st.session_state.rfis:
-        df = pd.DataFrame(st.session_state.rfis)
-        
-        # Search and filter
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search RFIs...", placeholder="Search by title, description, or ID", key="rfis_search_2")
-        with col2:
-            status_filter = st.selectbox("Status", ["All", "Open", "In Review", "Answered", "Closed"])
-        with col3:
-            discipline_filter = st.selectbox("Discipline", ["All", "Architectural", "Structural", "Mechanical", "Electrical"])
-        
-        # Filter data
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[
-                filtered_df.astype(str).apply(
-                    lambda x: x.str.contains(search_term, case=False, na=False)
-                ).any(axis=1)
-            ]
-        
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-            
-        if discipline_filter != "All":
-            filtered_df = filtered_df[filtered_df['discipline'] == discipline_filter]
-        
-        # Display results
-        st.write(f"**Total RFIs:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            # Priority color coding
-            def get_priority_color(priority):
-                colors = {
-                    "Critical": "🔴",
-                    "High": "🟠", 
-                    "Medium": "🟡",
-                    "Low": "🟢"
-                }
-                return colors.get(priority, "⚪")
-            
-            # Add priority indicators
-            display_df = filtered_df.copy()
-            display_df['Priority'] = display_df['priority'].apply(lambda x: f"{get_priority_color(x)} {x}")
-            
-            # Display with column configuration
-            st.dataframe(
-                clean_dataframe_for_display(display_df),
-                column_config={
-                    "id": st.column_config.TextColumn("RFI ID"),
-                    "title": st.column_config.TextColumn("Title"),
-                    "submittal_date": st.column_config.DateColumn("Submitted"),
-                    "due_date": st.column_config.DateColumn("Due Date"),
-                    "status": st.column_config.SelectboxColumn("Status", 
-                        options=["Open", "In Review", "Answered", "Closed"]),
-                    "Priority": st.column_config.TextColumn("Priority")
-                },
-                hide_index=True,
-                use_container_width=True
-            )
-        else:
-            st.info("No RFIs found matching your criteria.")
-    else:
-        st.info("No RFIs available. Create your first RFI above!")
-
-# Quick stats
-col1, col2, col3, col4 = st.columns(4)
-if st.session_state.rfis:
-    df = pd.DataFrame(st.session_state.rfis)
+    # RFI metrics
+    total_rfis = len(rfi_model.get_all())
+    pending_rfis = len(rfi_model.get_pending_rfis())
+    overdue_rfis = len(rfi_model.get_overdue_rfis())
+    
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        total_rfis = len(df)
         st.metric("Total RFIs", total_rfis)
     
     with col2:
-        open_rfis = len(df[df['status'] == 'Open'])
-        st.metric("Open RFIs", open_rfis)
+        st.metric("Pending Response", pending_rfis)
     
     with col3:
-        in_review = len(df[df['status'] == 'In Review'])
-        st.metric("In Review", in_review)
+        st.metric("Overdue", overdue_rfis)
     
     with col4:
-        overdue = len(df[pd.to_datetime(df['due_date']) < pd.Timestamp.now()])
-        st.metric("Overdue", overdue, delta_color="inverse")
+        response_rate = ((total_rfis - pending_rfis) / total_rfis * 100) if total_rfis > 0 else 100
+        st.metric("Response Rate", f"{response_rate:.1f}%")
+    
+    # RFI analysis charts
+    rfis_df = rfi_model.to_dataframe()
+    if not rfis_df.empty:
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.subheader("RFIs by Trade")
+            trade_dist = rfis_df['trade'].value_counts()
+            st.bar_chart(trade_dist)
+        
+        with col2:
+            st.subheader("RFIs by Priority")
+            priority_dist = rfis_df['priority'].value_counts()
+            st.bar_chart(priority_dist)
+
+# Sidebar
+with st.sidebar:
+    st.header("RFI Summary")
+    
+    rfis = rfi_model.get_all()
+    if rfis:
+        st.metric("Highland Tower RFIs", len(rfis))
+        
+        # High priority RFIs
+        high_priority = rfi_model.get_rfis_by_priority('High')
+        st.metric("High Priority", len(high_priority))
+        
+        # Recent RFIs
+        st.subheader("Recent RFIs")
+        recent_rfis = sorted(rfis, key=lambda x: x.get('date_submitted', ''), reverse=True)[:3]
+        
+        for rfi in recent_rfis:
+            with st.expander(f"📄 {rfi['id']}"):
+                st.write(f"**Title:** {rfi['title'][:40]}...")
+                st.write(f"**Trade:** {rfi['trade']}")
+                st.write(f"**Priority:** {rfi['priority']}")
+                st.write(f"**Status:** {rfi['status']}")
+    
+    st.markdown("---")
+    st.write("**Design Coordination**")
+    st.write("Ensuring clear communication and timely resolution of design questions for Highland Tower Development.")

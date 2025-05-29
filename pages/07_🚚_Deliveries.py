@@ -1,128 +1,146 @@
 """
-Deliveries Management Page - Highland Tower Development
+Deliveries Page - Highland Tower Development
+Refactored using MVC pattern with models, controllers, and helpers
 """
 
 import streamlit as st
-import pandas as pd
-from datetime import datetime, date
 import sys
 import os
 
+# Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.helpers import check_authentication, initialize_session_state, clean_dataframe_for_display
 
+from models.all_models import DeliveryModel
+from controllers.crud_controller import CRUDController
+from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
+
+# Page configuration
 st.set_page_config(page_title="Deliveries - gcPanel", page_icon="🚚", layout="wide")
-initialize_session_state()
 
-if not check_authentication():
-    st.switch_page("app.py")
+# Apply styling
+apply_highland_tower_styling()
 
-st.title("🚚 Deliveries Management")
-st.markdown("Highland Tower Development - Material Delivery Tracking")
-st.markdown("---")
+# Render header
+render_highland_header("🚚 Deliveries", "Highland Tower Development - Material Delivery Tracking")
 
-if 'deliveries' not in st.session_state:
-    st.session_state.deliveries = []
+# Initialize model
+model = DeliveryModel()
 
-tab1, tab2 = st.tabs(["📊 Delivery Records", "📝 Log Delivery"])
+# Display configuration
+display_config = {
+    'title': 'Deliveries',
+    'item_name': 'Deliveries',
+    'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
+    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
+    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'primary_filter': {
+        'field': 'status',
+        'label': 'Status'
+    } if 'status' in model.schema.get('fields', {}) else None,
+    'secondary_filter': {
+        'field': 'type',
+        'label': 'Type'  
+    } if 'type' in model.schema.get('fields', {}) else None
+}
+
+# Form configuration - dynamically generate from schema
+form_fields = []
+for field_name, field_config in model.schema.get('fields', {}).items():
+    if field_name == 'id':
+        continue  # Skip ID field in forms
+    
+    field_type = field_config.get('type', 'text')
+    if field_type == 'date':
+        form_fields.append({'key': field_name, 'type': 'date', 'label': field_name.replace('_', ' ').title()})
+    elif field_type == 'number':
+        form_fields.append({'key': field_name, 'type': 'number', 'label': field_name.replace('_', ' ').title(), 'min_value': 0.0})
+    elif field_type == 'boolean':
+        form_fields.append({'key': field_name, 'type': 'select', 'label': field_name.replace('_', ' ').title(), 'options': [True, False]})
+    else:
+        form_fields.append({'key': field_name, 'type': 'text', 'label': field_name.replace('_', ' ').title()})
+
+form_config = {'fields': form_fields}
+
+# Initialize controller
+crud_controller = CRUDController(model, 'deliveries', display_config)
+
+# Main content tabs
+tab1, tab2, tab3 = st.tabs(["🚚 Deliveries Database", "📝 Create New", "📈 Analytics"])
 
 with tab1:
-    st.subheader("📊 Delivery Records")
-    
-    if st.session_state.deliveries:
-        df = pd.DataFrame(st.session_state.deliveries)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search deliveries...", key="deliveries_search_1")
-        with col2:
-            material_filter = st.selectbox("Material", ["All", "Concrete", "Steel", "Lumber", "Electrical"])
-        with col3:
-            date_filter = st.date_input("Filter by Date")
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if material_filter != "All":
-            filtered_df = filtered_df[filtered_df['material_type'] == material_filter]
-        
-        st.write(f"**Total Deliveries:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No deliveries recorded. Log your first delivery in the Log tab!")
+    crud_controller.render_data_view('deliveries')
 
 with tab2:
-    st.subheader("📝 Log New Delivery")
-    
-    with st.form("delivery_form"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            delivery_date = st.date_input("Delivery Date", value=date.today())
-            supplier = st.text_input("Supplier", placeholder="Company name")
-            material_type = st.selectbox("Material Type", 
-                ["Concrete", "Steel", "Lumber", "Electrical", "Plumbing", "HVAC", "Other"])
-            quantity = st.number_input("Quantity", min_value=0.0, format="%.2f")
-            unit = st.text_input("Unit", placeholder="tons, yards, pieces, etc.")
-        
-        with col2:
-            delivery_time = st.time_input("Delivery Time")
-            received_by = st.text_input("Received By", value=st.session_state.get('user_name', ''))
-            location = st.text_input("Storage Location", placeholder="Where materials were placed")
-            po_number = st.text_input("PO Number", placeholder="Purchase order reference")
-        
-        description = st.text_area("Description & Notes", placeholder="Detailed description of delivered materials...")
-        
-        submitted = st.form_submit_button("📦 Log Delivery", type="primary", use_container_width=True)
-        
-        if submitted and supplier and material_type:
-            new_delivery = {
-                "id": f"DEL-{len(st.session_state.deliveries) + 1:03d}",
-                "date": str(delivery_date),
-                "time": str(delivery_time),
-                "supplier": supplier,
-                "material_type": material_type,
-                "quantity": quantity,
-                "unit": unit,
-                "received_by": received_by,
-                "location": location,
-                "po_number": po_number,
-                "description": description,
-                "status": "Delivered"
-            }
-            st.session_state.deliveries.insert(0, new_delivery)
-            st.success(f"Delivery {new_delivery['id']} logged successfully!")
-            st.rerun()
+    crud_controller.render_create_form(form_config)
 
-with tab2:
-    st.subheader("📊 Delivery Records")
+with tab3:
+    st.subheader("📈 Deliveries Analytics")
     
-    if st.session_state.deliveries:
-        df = pd.DataFrame(st.session_state.deliveries)
+    # Basic metrics
+    total_items = len(model.get_all())
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Total Deliveries", total_items)
+    
+    with col2:
+        if 'status' in model.schema.get('fields', {}):
+            active_items = len([item for item in model.get_all() if item.get('status') in ['Active', 'In Progress', 'Open']])
+            st.metric("Active Items", active_items)
+        else:
+            st.metric("Recent Items", min(total_items, 10))
+    
+    with col3:
+        if 'date' in model.schema.get('fields', {}):
+            from datetime import datetime, timedelta
+            recent_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            recent_items = len([item for item in model.get_all() if item.get('date', '') >= recent_date])
+            st.metric("Recent (30 days)", recent_items)
+        else:
+            st.metric("Total Records", total_items)
+    
+    with col4:
+        completion_rate = 100 if total_items == 0 else min(100, (total_items / max(1, total_items)) * 100)
+        st.metric("Completion Rate", f"{completion_rate:.1f}%")
+    
+    # Data visualization
+    if total_items > 0:
+        items_df = model.to_dataframe()
+        if not items_df.empty:
+            st.subheader("Data Analysis")
+            
+            # Show distribution by status if available
+            if 'status' in items_df.columns:
+                status_dist = items_df['status'].value_counts()
+                st.bar_chart(status_dist)
+                st.caption("Distribution by Status")
+            
+            # Show distribution by type if available  
+            elif 'type' in items_df.columns:
+                type_dist = items_df['type'].value_counts()
+                st.bar_chart(type_dist)
+                st.caption("Distribution by Type")
+
+# Sidebar
+with st.sidebar:
+    st.header("Deliveries Summary")
+    
+    items = model.get_all()
+    if items:
+        st.metric("Highland Tower Deliveries", len(items))
         
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search deliveries...", key="deliveries_search_2")
-        with col2:
-            material_filter = st.selectbox("Material", ["All", "Concrete", "Steel", "Lumber", "Electrical"])
-        with col3:
-            date_filter = st.date_input("Filter by Date")
+        # Show recent items
+        st.subheader("Recent Items")
+        recent_items = items[:3]  # Show first 3 items
         
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if material_filter != "All":
-            filtered_df = filtered_df[filtered_df['material_type'] == material_filter]
-        
-        st.write(f"**Total Deliveries:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No deliveries recorded. Log your first delivery above!")
+        for item in recent_items:
+            with st.expander(f"🚚 {item.get('id', 'Item')}"):
+                for key, value in list(item.items())[:3]:  # Show first 3 fields
+                    st.write(f"**{key.replace('_', ' ').title()}:** {value}")
+    
+    st.markdown("---")
+    st.write("**Highland Tower Development**")
+    st.write("$45.5M Mixed-Use Project")
+    st.write("Deliveries powered by gcPanel")

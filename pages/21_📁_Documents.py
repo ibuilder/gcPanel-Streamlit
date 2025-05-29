@@ -1,182 +1,146 @@
 """
 Document Management Page - Highland Tower Development
+Refactored using MVC pattern with models, controllers, and helpers
 """
 
 import streamlit as st
-import pandas as pd
-from datetime import datetime, date
 import sys
 import os
 
+# Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.helpers import check_authentication, initialize_session_state, clean_dataframe_for_display
 
-st.set_page_config(page_title="Documents - gcPanel", page_icon="📁", layout="wide")
-initialize_session_state()
+from models.all_models import DocumentModel
+from controllers.crud_controller import CRUDController
+from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
 
-if not check_authentication():
-    st.switch_page("app.py")
+# Page configuration
+st.set_page_config(page_title="Document Management - gcPanel", page_icon="📁", layout="wide")
 
-st.title("📁 Document Management")
-st.markdown("Highland Tower Development - Project Document Repository")
-st.markdown("---")
+# Apply styling
+apply_highland_tower_styling()
 
-if 'documents' not in st.session_state:
-    st.session_state.documents = []
+# Render header
+render_highland_header("📁 Document Management", "Highland Tower Development - Project Document Library")
 
-tab1, tab2, tab3 = st.tabs(["📁 Document Library", "📤 Upload Document", "🔍 Search & Filter"])
+# Initialize model
+model = DocumentModel()
+
+# Display configuration
+display_config = {
+    'title': 'Document Management',
+    'item_name': 'Documents',
+    'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
+    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
+    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'primary_filter': {
+        'field': 'status',
+        'label': 'Status'
+    } if 'status' in model.schema.get('fields', {}) else None,
+    'secondary_filter': {
+        'field': 'type',
+        'label': 'Type'  
+    } if 'type' in model.schema.get('fields', {}) else None
+}
+
+# Form configuration - dynamically generate from schema
+form_fields = []
+for field_name, field_config in model.schema.get('fields', {}).items():
+    if field_name == 'id':
+        continue  # Skip ID field in forms
+    
+    field_type = field_config.get('type', 'text')
+    if field_type == 'date':
+        form_fields.append({'key': field_name, 'type': 'date', 'label': field_name.replace('_', ' ').title()})
+    elif field_type == 'number':
+        form_fields.append({'key': field_name, 'type': 'number', 'label': field_name.replace('_', ' ').title(), 'min_value': 0.0})
+    elif field_type == 'boolean':
+        form_fields.append({'key': field_name, 'type': 'select', 'label': field_name.replace('_', ' ').title(), 'options': [True, False]})
+    else:
+        form_fields.append({'key': field_name, 'type': 'text', 'label': field_name.replace('_', ' ').title()})
+
+form_config = {'fields': form_fields}
+
+# Initialize controller
+crud_controller = CRUDController(model, 'documents', display_config)
+
+# Main content tabs
+tab1, tab2, tab3 = st.tabs(["📁 Document Management Database", "📝 Create New", "📈 Analytics"])
 
 with tab1:
-    st.subheader("📁 Document Library")
-    
-    if st.session_state.documents:
-        df = pd.DataFrame(st.session_state.documents)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search documents...", key="documents_search_1")
-        with col2:
-            category_filter = st.selectbox("Category", ["All", "Drawings", "Specifications", "Reports", "Contracts"])
-        with col3:
-            status_filter = st.selectbox("Status", ["All", "Draft", "Under Review", "Approved", "Archived"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if category_filter != "All":
-            filtered_df = filtered_df[filtered_df['category'] == category_filter]
-            
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-        
-        st.write(f"**Total Documents:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No documents uploaded. Upload your first document in the Upload tab!")
+    crud_controller.render_data_view('documents')
 
 with tab2:
-    st.subheader("📤 Upload New Document")
-    
-    with st.form("document_form"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            document_title = st.text_input("Document Title", placeholder="Descriptive document name")
-            document_type = st.selectbox("Document Type", 
-                ["Drawings", "Specifications", "Contracts", "Reports", "Photos", "Correspondence", "Permits", "Other"])
-            discipline = st.selectbox("Discipline", 
-                ["General", "Architectural", "Structural", "Mechanical", "Electrical", "Civil"])
-            version = st.text_input("Version/Revision", placeholder="e.g., Rev 1, v2.0")
-        
-        with col2:
-            upload_date = st.date_input("Upload Date", value=date.today())
-            uploaded_by = st.text_input("Uploaded By", value=st.session_state.get('user_name', ''))
-            project_phase = st.selectbox("Project Phase", 
-                ["Pre-Design", "Design Development", "Construction Documents", "Construction", "Closeout"])
-            confidentiality = st.selectbox("Confidentiality", ["Public", "Internal", "Confidential", "Restricted"])
-        
-        description = st.text_area("Description", placeholder="Document description and purpose...")
-        keywords = st.text_input("Keywords", placeholder="Comma-separated keywords for search")
-        
-        # File upload
-        uploaded_file = st.file_uploader("Choose file", type=['pdf', 'doc', 'docx', 'xls', 'xlsx', 'dwg', 'jpg', 'png'])
-        
-        submitted = st.form_submit_button("📁 Upload Document", type="primary", use_container_width=True)
-        
-        if submitted and document_title:
-            file_size = "N/A"
-            file_name = "No file selected"
-            if uploaded_file:
-                file_size = f"{len(uploaded_file.getvalue()) / 1024:.1f} KB"
-                file_name = uploaded_file.name
-            
-            new_document = {
-                "id": f"DOC-{len(st.session_state.documents) + 1:03d}",
-                "title": document_title,
-                "type": document_type,
-                "discipline": discipline,
-                "version": version,
-                "upload_date": str(upload_date),
-                "uploaded_by": uploaded_by,
-                "project_phase": project_phase,
-                "confidentiality": confidentiality,
-                "description": description,
-                "keywords": keywords,
-                "file_name": file_name,
-                "file_size": file_size,
-                "status": "Active"
-            }
-            st.session_state.documents.insert(0, new_document)
-            st.success(f"Document {new_document['id']} uploaded successfully!")
-            st.rerun()
-
-with tab2:
-    st.subheader("📁 Document Library")
-    
-    if st.session_state.documents:
-        df = pd.DataFrame(st.session_state.documents)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("Search documents...")
-        with col2:
-            type_filter = st.selectbox("Document Type", ["All", "Drawings", "Specifications", "Contracts"])
-        with col3:
-            discipline_filter = st.selectbox("Discipline", ["All", "Architectural", "Structural", "Mechanical"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if type_filter != "All":
-            filtered_df = filtered_df[filtered_df['type'] == type_filter]
-            
-        if discipline_filter != "All":
-            filtered_df = filtered_df[filtered_df['discipline'] == discipline_filter]
-        
-        st.write(f"**Total Documents:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No documents uploaded. Upload your first document above!")
+    crud_controller.render_create_form(form_config)
 
 with tab3:
-    st.subheader("🔍 Advanced Search & Analytics")
+    st.subheader("📈 Document Management Analytics")
     
-    if st.session_state.documents:
-        df = pd.DataFrame(st.session_state.documents)
+    # Basic metrics
+    total_items = len(model.get_all())
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Total Documents", total_items)
+    
+    with col2:
+        if 'status' in model.schema.get('fields', {}):
+            active_items = len([item for item in model.get_all() if item.get('status') in ['Active', 'In Progress', 'Open']])
+            st.metric("Active Items", active_items)
+        else:
+            st.metric("Recent Items", min(total_items, 10))
+    
+    with col3:
+        if 'date' in model.schema.get('fields', {}):
+            from datetime import datetime, timedelta
+            recent_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            recent_items = len([item for item in model.get_all() if item.get('date', '') >= recent_date])
+            st.metric("Recent (30 days)", recent_items)
+        else:
+            st.metric("Total Records", total_items)
+    
+    with col4:
+        completion_rate = 100 if total_items == 0 else min(100, (total_items / max(1, total_items)) * 100)
+        st.metric("Completion Rate", f"{completion_rate:.1f}%")
+    
+    # Data visualization
+    if total_items > 0:
+        items_df = model.to_dataframe()
+        if not items_df.empty:
+            st.subheader("Data Analysis")
+            
+            # Show distribution by status if available
+            if 'status' in items_df.columns:
+                status_dist = items_df['status'].value_counts()
+                st.bar_chart(status_dist)
+                st.caption("Distribution by Status")
+            
+            # Show distribution by type if available  
+            elif 'type' in items_df.columns:
+                type_dist = items_df['type'].value_counts()
+                st.bar_chart(type_dist)
+                st.caption("Distribution by Type")
+
+# Sidebar
+with st.sidebar:
+    st.header("Document Management Summary")
+    
+    items = model.get_all()
+    if items:
+        st.metric("Highland Tower Document Management", len(items))
         
-        # Document statistics
-        col1, col2, col3, col4 = st.columns(4)
+        # Show recent items
+        st.subheader("Recent Items")
+        recent_items = items[:3]  # Show first 3 items
         
-        with col1:
-            total_docs = len(df)
-            st.metric("Total Documents", total_docs)
-        
-        with col2:
-            recent_docs = len(df[pd.to_datetime(df['upload_date']) >= pd.Timestamp.now() - pd.Timedelta(days=7)])
-            st.metric("Added This Week", recent_docs)
-        
-        with col3:
-            drawings_count = len(df[df['type'] == 'Drawings'])
-            st.metric("Drawings", drawings_count)
-        
-        with col4:
-            specs_count = len(df[df['type'] == 'Specifications'])
-            st.metric("Specifications", specs_count)
-    else:
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.metric("Total Documents", "0")
-        with col2:
-            st.metric("Added This Week", "0")
-        with col3:
-            st.metric("Drawings", "0")
-        with col4:
-            st.metric("Specifications", "0")
+        for item in recent_items:
+            with st.expander(f"📁 {item.get('id', 'Item')}"):
+                for key, value in list(item.items())[:3]:  # Show first 3 fields
+                    st.write(f"**{key.replace('_', ' ').title()}:** {value}")
+    
+    st.markdown("---")
+    st.write("**Highland Tower Development**")
+    st.write("$45.5M Mixed-Use Project")
+    st.write("Document Management powered by gcPanel")

@@ -1,183 +1,146 @@
 """
 Subcontractor Management Page - Highland Tower Development
+Refactored using MVC pattern with models, controllers, and helpers
 """
 
 import streamlit as st
-import pandas as pd
-from datetime import datetime, date
 import sys
 import os
 
+# Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.helpers import check_authentication, initialize_session_state, clean_dataframe_for_display
 
-st.set_page_config(page_title="Subcontractors - gcPanel", page_icon="👷", layout="wide")
-initialize_session_state()
+from models.all_models import SubcontractorModel
+from controllers.crud_controller import CRUDController
+from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
 
-if not check_authentication():
-    st.switch_page("app.py")
+# Page configuration
+st.set_page_config(page_title="Subcontractor Management - gcPanel", page_icon="👷", layout="wide")
 
-st.title("👷 Subcontractor Management")
-st.markdown("Highland Tower Development - Subcontractor Coordination & Tracking")
-st.markdown("---")
+# Apply styling
+apply_highland_tower_styling()
 
-if 'subcontractors' not in st.session_state:
-    st.session_state.subcontractors = []
+# Render header
+render_highland_header("👷 Subcontractor Management", "Highland Tower Development - Subcontractor Coordination & Management")
 
-tab1, tab2, tab3 = st.tabs(["📊 Subcontractor Directory", "📝 Add Subcontractor", "📈 Performance Tracking"])
+# Initialize model
+model = SubcontractorModel()
+
+# Display configuration
+display_config = {
+    'title': 'Subcontractor Management',
+    'item_name': 'Subcontractor Management',
+    'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
+    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
+    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'primary_filter': {
+        'field': 'status',
+        'label': 'Status'
+    } if 'status' in model.schema.get('fields', {}) else None,
+    'secondary_filter': {
+        'field': 'type',
+        'label': 'Type'  
+    } if 'type' in model.schema.get('fields', {}) else None
+}
+
+# Form configuration - dynamically generate from schema
+form_fields = []
+for field_name, field_config in model.schema.get('fields', {}).items():
+    if field_name == 'id':
+        continue  # Skip ID field in forms
+    
+    field_type = field_config.get('type', 'text')
+    if field_type == 'date':
+        form_fields.append({'key': field_name, 'type': 'date', 'label': field_name.replace('_', ' ').title()})
+    elif field_type == 'number':
+        form_fields.append({'key': field_name, 'type': 'number', 'label': field_name.replace('_', ' ').title(), 'min_value': 0.0})
+    elif field_type == 'boolean':
+        form_fields.append({'key': field_name, 'type': 'select', 'label': field_name.replace('_', ' ').title(), 'options': [True, False]})
+    else:
+        form_fields.append({'key': field_name, 'type': 'text', 'label': field_name.replace('_', ' ').title()})
+
+form_config = {'fields': form_fields}
+
+# Initialize controller
+crud_controller = CRUDController(model, 'subcontractors', display_config)
+
+# Main content tabs
+tab1, tab2, tab3 = st.tabs(["👷 Subcontractor Management Database", "📝 Create New", "📈 Analytics"])
 
 with tab1:
-    st.subheader("📊 Subcontractor Directory")
-    
-    if st.session_state.subcontractors:
-        df = pd.DataFrame(st.session_state.subcontractors)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search subcontractors...", key="subcontractor_management_search_1")
-        with col2:
-            trade_filter = st.selectbox("Trade", ["All", "Electrical", "Plumbing", "HVAC", "Flooring"])
-        with col3:
-            status_filter = st.selectbox("Status", ["All", "Active", "Inactive", "Under Review"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if trade_filter != "All":
-            filtered_df = filtered_df[filtered_df['trade'] == trade_filter]
-            
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-        
-        st.write(f"**Total Subcontractors:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No subcontractors registered. Add your first subcontractor in the Add tab!")
+    crud_controller.render_data_view('subcontractors')
 
 with tab2:
-    st.subheader("📝 Add New Subcontractor")
-    
-    with st.form("subcontractor_form"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            company_name = st.text_input("Company Name", placeholder="Subcontractor company name")
-            trade = st.selectbox("Trade", 
-                ["General", "Electrical", "Plumbing", "HVAC", "Drywall", "Flooring", "Roofing", "Concrete", "Steel"])
-            contact_person = st.text_input("Primary Contact", placeholder="Main contact person")
-            phone = st.text_input("Phone Number", placeholder="Primary phone number")
-        
-        with col2:
-            email = st.text_input("Email", placeholder="Primary email address")
-            license_number = st.text_input("License Number", placeholder="Professional license number")
-            insurance_expiry = st.date_input("Insurance Expiry")
-            contract_value = st.number_input("Contract Value ($)", min_value=0.0, format="%.2f")
-        
-        address = st.text_area("Address", placeholder="Company address...")
-        scope_of_work = st.text_area("Scope of Work", placeholder="Detailed scope description...")
-        
-        col3, col4 = st.columns(2)
-        with col3:
-            start_date = st.date_input("Start Date")
-            status = st.selectbox("Status", ["Qualified", "Active", "Completed", "Suspended"])
-        with col4:
-            end_date = st.date_input("Expected End Date")
-            performance_rating = st.selectbox("Performance Rating", ["Excellent", "Good", "Fair", "Poor", "Not Rated"])
-        
-        submitted = st.form_submit_button("👷 Add Subcontractor", type="primary", use_container_width=True)
-        
-        if submitted and company_name and trade:
-            new_subcontractor = {
-                "id": f"SUB-{len(st.session_state.subcontractors) + 1:03d}",
-                "company_name": company_name,
-                "trade": trade,
-                "contact_person": contact_person,
-                "phone": phone,
-                "email": email,
-                "license_number": license_number,
-                "insurance_expiry": str(insurance_expiry),
-                "contract_value": contract_value,
-                "address": address,
-                "scope_of_work": scope_of_work,
-                "start_date": str(start_date),
-                "end_date": str(end_date),
-                "status": status,
-                "performance_rating": performance_rating,
-                "added_date": str(date.today())
-            }
-            st.session_state.subcontractors.insert(0, new_subcontractor)
-            st.success(f"Subcontractor {new_subcontractor['id']} added successfully!")
-            st.rerun()
-
-with tab2:
-    st.subheader("📊 Subcontractor Directory")
-    
-    if st.session_state.subcontractors:
-        df = pd.DataFrame(st.session_state.subcontractors)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("Search subcontractors...")
-        with col2:
-            trade_filter = st.selectbox("Trade", ["All", "Electrical", "Plumbing", "HVAC", "Drywall"])
-        with col3:
-            status_filter = st.selectbox("Status", ["All", "Qualified", "Active", "Completed"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if trade_filter != "All":
-            filtered_df = filtered_df[filtered_df['trade'] == trade_filter]
-            
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-        
-        st.write(f"**Total Subcontractors:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            display_df = filtered_df.copy()
-            display_df['Contract Value'] = display_df['contract_value'].apply(lambda x: f"${x:,.2f}")
-            
-            st.dataframe(clean_dataframe_for_display(display_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No subcontractors registered. Add your first subcontractor above!")
+    crud_controller.render_create_form(form_config)
 
 with tab3:
-    st.subheader("📈 Subcontractor Performance")
+    st.subheader("📈 Subcontractor Management Analytics")
     
-    if st.session_state.subcontractors:
-        df = pd.DataFrame(st.session_state.subcontractors)
+    # Basic metrics
+    total_items = len(model.get_all())
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Total Subcontractor Management", total_items)
+    
+    with col2:
+        if 'status' in model.schema.get('fields', {}):
+            active_items = len([item for item in model.get_all() if item.get('status') in ['Active', 'In Progress', 'Open']])
+            st.metric("Active Items", active_items)
+        else:
+            st.metric("Recent Items", min(total_items, 10))
+    
+    with col3:
+        if 'date' in model.schema.get('fields', {}):
+            from datetime import datetime, timedelta
+            recent_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            recent_items = len([item for item in model.get_all() if item.get('date', '') >= recent_date])
+            st.metric("Recent (30 days)", recent_items)
+        else:
+            st.metric("Total Records", total_items)
+    
+    with col4:
+        completion_rate = 100 if total_items == 0 else min(100, (total_items / max(1, total_items)) * 100)
+        st.metric("Completion Rate", f"{completion_rate:.1f}%")
+    
+    # Data visualization
+    if total_items > 0:
+        items_df = model.to_dataframe()
+        if not items_df.empty:
+            st.subheader("Data Analysis")
+            
+            # Show distribution by status if available
+            if 'status' in items_df.columns:
+                status_dist = items_df['status'].value_counts()
+                st.bar_chart(status_dist)
+                st.caption("Distribution by Status")
+            
+            # Show distribution by type if available  
+            elif 'type' in items_df.columns:
+                type_dist = items_df['type'].value_counts()
+                st.bar_chart(type_dist)
+                st.caption("Distribution by Type")
+
+# Sidebar
+with st.sidebar:
+    st.header("Subcontractor Management Summary")
+    
+    items = model.get_all()
+    if items:
+        st.metric("Highland Tower Subcontractor Management", len(items))
         
-        col1, col2, col3, col4 = st.columns(4)
+        # Show recent items
+        st.subheader("Recent Items")
+        recent_items = items[:3]  # Show first 3 items
         
-        with col1:
-            total_subs = len(df)
-            st.metric("Total Subcontractors", total_subs)
-        
-        with col2:
-            active_subs = len(df[df['status'] == 'Active'])
-            st.metric("Active", active_subs)
-        
-        with col3:
-            total_value = df['contract_value'].sum()
-            st.metric("Total Contract Value", f"${total_value:,.0f}")
-        
-        with col4:
-            avg_rating = len(df[df['performance_rating'].isin(['Excellent', 'Good'])])
-            st.metric("Good+ Rated", avg_rating)
-    else:
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.metric("Total Subcontractors", "0")
-        with col2:
-            st.metric("Active", "0")
-        with col3:
-            st.metric("Total Contract Value", "$0")
-        with col4:
-            st.metric("Good+ Rated", "0")
+        for item in recent_items:
+            with st.expander(f"👷 {item.get('id', 'Item')}"):
+                for key, value in list(item.items())[:3]:  # Show first 3 fields
+                    st.write(f"**{key.replace('_', ' ').title()}:** {value}")
+    
+    st.markdown("---")
+    st.write("**Highland Tower Development**")
+    st.write("$45.5M Mixed-Use Project")
+    st.write("Subcontractor Management powered by gcPanel")

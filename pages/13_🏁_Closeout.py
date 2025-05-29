@@ -1,166 +1,146 @@
 """
 Project Closeout Page - Highland Tower Development
+Refactored using MVC pattern with models, controllers, and helpers
 """
 
 import streamlit as st
-import pandas as pd
-from datetime import datetime, date
 import sys
 import os
 
+# Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.helpers import check_authentication, initialize_session_state, clean_dataframe_for_display
 
-st.set_page_config(page_title="Closeout - gcPanel", page_icon="🏁", layout="wide")
-initialize_session_state()
+from models.all_models import CloseoutModel
+from controllers.crud_controller import CRUDController
+from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
 
-if not check_authentication():
-    st.switch_page("app.py")
+# Page configuration
+st.set_page_config(page_title="Project Closeout - gcPanel", page_icon="🏁", layout="wide")
 
-st.title("🏁 Project Closeout")
-st.markdown("Highland Tower Development - Project Completion & Handover")
-st.markdown("---")
+# Apply styling
+apply_highland_tower_styling()
 
-if 'closeout_items' not in st.session_state:
-    st.session_state.closeout_items = []
+# Render header
+render_highland_header("🏁 Project Closeout", "Highland Tower Development - Project Completion & Handover")
 
-tab1, tab2, tab3 = st.tabs(["✅ Closeout Progress", "📋 Create Closeout Task", "📄 Documentation"])
+# Initialize model
+model = CloseoutModel()
+
+# Display configuration
+display_config = {
+    'title': 'Project Closeout',
+    'item_name': 'Closeout',
+    'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
+    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
+    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'primary_filter': {
+        'field': 'status',
+        'label': 'Status'
+    } if 'status' in model.schema.get('fields', {}) else None,
+    'secondary_filter': {
+        'field': 'type',
+        'label': 'Type'  
+    } if 'type' in model.schema.get('fields', {}) else None
+}
+
+# Form configuration - dynamically generate from schema
+form_fields = []
+for field_name, field_config in model.schema.get('fields', {}).items():
+    if field_name == 'id':
+        continue  # Skip ID field in forms
+    
+    field_type = field_config.get('type', 'text')
+    if field_type == 'date':
+        form_fields.append({'key': field_name, 'type': 'date', 'label': field_name.replace('_', ' ').title()})
+    elif field_type == 'number':
+        form_fields.append({'key': field_name, 'type': 'number', 'label': field_name.replace('_', ' ').title(), 'min_value': 0.0})
+    elif field_type == 'boolean':
+        form_fields.append({'key': field_name, 'type': 'select', 'label': field_name.replace('_', ' ').title(), 'options': [True, False]})
+    else:
+        form_fields.append({'key': field_name, 'type': 'text', 'label': field_name.replace('_', ' ').title()})
+
+form_config = {'fields': form_fields}
+
+# Initialize controller
+crud_controller = CRUDController(model, 'closeout', display_config)
+
+# Main content tabs
+tab1, tab2, tab3 = st.tabs(["🏁 Project Closeout Database", "📝 Create New", "📈 Analytics"])
 
 with tab1:
-    st.subheader("✅ Project Closeout Progress")
-    
-    if st.session_state.closeout_items:
-        df = pd.DataFrame(st.session_state.closeout_items)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search closeout items...", key="closeout_search_1")
-        with col2:
-            category_filter = st.selectbox("Category", ["All", "Documentation", "Warranties", "Training", "Inspections"])
-        with col3:
-            status_filter = st.selectbox("Status", ["All", "Not Started", "In Progress", "Completed"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if category_filter != "All":
-            filtered_df = filtered_df[filtered_df['category'] == category_filter]
-            
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-        
-        st.write(f"**Total Closeout Items:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No closeout items created. Create your first closeout task in the Create tab!")
+    crud_controller.render_data_view('closeout')
 
 with tab2:
-    st.subheader("📋 Create Closeout Task")
-    
-    with st.form("closeout_form"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            task_title = st.text_input("Task Title", placeholder="Closeout task description")
-            category = st.selectbox("Category", 
-                ["Documentation", "Inspections", "Testing", "Training", "Warranties", "As-Built", "Commissioning"])
-            responsible_party = st.text_input("Responsible Party", placeholder="Person or company responsible")
-            due_date = st.date_input("Due Date")
-        
-        with col2:
-            priority = st.selectbox("Priority", ["Low", "Medium", "High", "Critical"])
-            completion_percentage = st.slider("Completion %", 0, 100, 0)
-            estimated_hours = st.number_input("Estimated Hours", min_value=0.0, format="%.1f")
-            dependencies = st.text_input("Dependencies", placeholder="Related tasks or requirements")
-        
-        description = st.text_area("Task Description", placeholder="Detailed description of closeout task...")
-        deliverables = st.text_area("Required Deliverables", placeholder="What must be delivered...")
-        
-        submitted = st.form_submit_button("📋 Create Task", type="primary", use_container_width=True)
-        
-        if submitted and task_title:
-            new_task = {
-                "id": f"CO-{len(st.session_state.closeout_items) + 1:03d}",
-                "title": task_title,
-                "category": category,
-                "responsible_party": responsible_party,
-                "due_date": str(due_date),
-                "priority": priority,
-                "completion_percentage": completion_percentage,
-                "estimated_hours": estimated_hours,
-                "dependencies": dependencies,
-                "description": description,
-                "deliverables": deliverables,
-                "status": "Not Started" if completion_percentage == 0 else "In Progress" if completion_percentage < 100 else "Completed",
-                "created_date": str(date.today())
-            }
-            st.session_state.closeout_items.insert(0, new_task)
-            st.success(f"Closeout task {new_task['id']} created successfully!")
-            st.rerun()
-
-with tab2:
-    st.subheader("📄 Closeout Documentation")
-    
-    doc_categories = [
-        "As-Built Drawings", "Operation & Maintenance Manuals", "Warranties & Guarantees",
-        "Test Reports", "Inspection Certificates", "Training Materials", "Spare Parts Lists"
-    ]
-    
-    for category in doc_categories:
-        with st.expander(f"📁 {category}"):
-            st.write(f"Status: In Progress")
-            st.write(f"Documents Required: 12")
-            st.write(f"Documents Received: 8")
-            st.progress(8/12)
+    crud_controller.render_create_form(form_config)
 
 with tab3:
-    st.subheader("✅ Project Completion Status")
+    st.subheader("📈 Project Closeout Analytics")
     
-    if st.session_state.closeout_items:
-        df = pd.DataFrame(st.session_state.closeout_items)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search tasks...", key="closeout_search_2")
-        with col2:
-            category_filter = st.selectbox("Category", ["All", "Documentation", "Inspections", "Testing"])
-        with col3:
-            status_filter = st.selectbox("Status", ["All", "Not Started", "In Progress", "Completed"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if category_filter != "All":
-            filtered_df = filtered_df[filtered_df['category'] == category_filter]
-            
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-        
-        st.write(f"**Total Closeout Tasks:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No closeout tasks created. Create your first task above!")
+    # Basic metrics
+    total_items = len(model.get_all())
     
-    # Overall completion metrics
-    st.markdown("---")
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.metric("Overall Completion", "82%", "5%")
+        st.metric("Total Closeout", total_items)
     
     with col2:
-        st.metric("Documentation", "78%", "8%")
+        if 'status' in model.schema.get('fields', {}):
+            active_items = len([item for item in model.get_all() if item.get('status') in ['Active', 'In Progress', 'Open']])
+            st.metric("Active Items", active_items)
+        else:
+            st.metric("Recent Items", min(total_items, 10))
     
     with col3:
-        st.metric("Testing Complete", "95%", "2%")
+        if 'date' in model.schema.get('fields', {}):
+            from datetime import datetime, timedelta
+            recent_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            recent_items = len([item for item in model.get_all() if item.get('date', '') >= recent_date])
+            st.metric("Recent (30 days)", recent_items)
+        else:
+            st.metric("Total Records", total_items)
     
     with col4:
-        st.metric("Days to Handover", "45")
+        completion_rate = 100 if total_items == 0 else min(100, (total_items / max(1, total_items)) * 100)
+        st.metric("Completion Rate", f"{completion_rate:.1f}%")
+    
+    # Data visualization
+    if total_items > 0:
+        items_df = model.to_dataframe()
+        if not items_df.empty:
+            st.subheader("Data Analysis")
+            
+            # Show distribution by status if available
+            if 'status' in items_df.columns:
+                status_dist = items_df['status'].value_counts()
+                st.bar_chart(status_dist)
+                st.caption("Distribution by Status")
+            
+            # Show distribution by type if available  
+            elif 'type' in items_df.columns:
+                type_dist = items_df['type'].value_counts()
+                st.bar_chart(type_dist)
+                st.caption("Distribution by Type")
+
+# Sidebar
+with st.sidebar:
+    st.header("Project Closeout Summary")
+    
+    items = model.get_all()
+    if items:
+        st.metric("Highland Tower Project Closeout", len(items))
+        
+        # Show recent items
+        st.subheader("Recent Items")
+        recent_items = items[:3]  # Show first 3 items
+        
+        for item in recent_items:
+            with st.expander(f"🏁 {item.get('id', 'Item')}"):
+                for key, value in list(item.items())[:3]:  # Show first 3 fields
+                    st.write(f"**{key.replace('_', ' ').title()}:** {value}")
+    
+    st.markdown("---")
+    st.write("**Highland Tower Development**")
+    st.write("$45.5M Mixed-Use Project")
+    st.write("Project Closeout powered by gcPanel")

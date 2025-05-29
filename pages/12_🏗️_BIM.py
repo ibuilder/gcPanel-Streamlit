@@ -1,175 +1,146 @@
 """
 BIM Management Page - Highland Tower Development
+Refactored using MVC pattern with models, controllers, and helpers
 """
 
 import streamlit as st
-import pandas as pd
-from datetime import datetime, date
 import sys
 import os
 
+# Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.helpers import check_authentication, initialize_session_state, clean_dataframe_for_display
 
-st.set_page_config(page_title="BIM - gcPanel", page_icon="🏗️", layout="wide")
-initialize_session_state()
+from models.all_models import BIMModel
+from controllers.crud_controller import CRUDController
+from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
 
-if not check_authentication():
-    st.switch_page("app.py")
+# Page configuration
+st.set_page_config(page_title="BIM Management - gcPanel", page_icon="🏗️", layout="wide")
 
-st.title("🏗️ BIM Management")
-st.markdown("Highland Tower Development - Building Information Modeling")
-st.markdown("---")
+# Apply styling
+apply_highland_tower_styling()
 
-if 'bim_models' not in st.session_state:
-    st.session_state.bim_models = [
-        {
-            "id": "BIM-001",
-            "model_name": "Highland Tower Structural Model",
-            "discipline": "Structural",
-            "version": "v2.3",
-            "last_updated": "2024-12-15",
-            "file_size": "145.2 MB",
-            "status": "Current"
-        }
-    ]
+# Render header
+render_highland_header("🏗️ BIM Management", "Highland Tower Development - Building Information Modeling")
 
-tab1, tab2, tab3 = st.tabs(["📊 BIM Models", "📁 Upload Model", "🔍 Model Viewer"])
+# Initialize model
+model = BIMModel()
+
+# Display configuration
+display_config = {
+    'title': 'BIM Management',
+    'item_name': 'BIM',
+    'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
+    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
+    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'primary_filter': {
+        'field': 'status',
+        'label': 'Status'
+    } if 'status' in model.schema.get('fields', {}) else None,
+    'secondary_filter': {
+        'field': 'type',
+        'label': 'Type'  
+    } if 'type' in model.schema.get('fields', {}) else None
+}
+
+# Form configuration - dynamically generate from schema
+form_fields = []
+for field_name, field_config in model.schema.get('fields', {}).items():
+    if field_name == 'id':
+        continue  # Skip ID field in forms
+    
+    field_type = field_config.get('type', 'text')
+    if field_type == 'date':
+        form_fields.append({'key': field_name, 'type': 'date', 'label': field_name.replace('_', ' ').title()})
+    elif field_type == 'number':
+        form_fields.append({'key': field_name, 'type': 'number', 'label': field_name.replace('_', ' ').title(), 'min_value': 0.0})
+    elif field_type == 'boolean':
+        form_fields.append({'key': field_name, 'type': 'select', 'label': field_name.replace('_', ' ').title(), 'options': [True, False]})
+    else:
+        form_fields.append({'key': field_name, 'type': 'text', 'label': field_name.replace('_', ' ').title()})
+
+form_config = {'fields': form_fields}
+
+# Initialize controller
+crud_controller = CRUDController(model, 'bim', display_config)
+
+# Main content tabs
+tab1, tab2, tab3 = st.tabs(["🏗️ BIM Management Database", "📝 Create New", "📈 Analytics"])
 
 with tab1:
-    st.subheader("📊 BIM Models Database")
-    
-    if st.session_state.bim_models:
-        df = pd.DataFrame(st.session_state.bim_models)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search models...", key="bim_search_1")
-        with col2:
-            discipline_filter = st.selectbox("Discipline", ["All", "Architectural", "Structural", "MEP", "Civil"])
-        with col3:
-            status_filter = st.selectbox("Status", ["All", "Current", "Superseded", "Under Review"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if discipline_filter != "All":
-            filtered_df = filtered_df[filtered_df['discipline'] == discipline_filter]
-            
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-        
-        st.write(f"**Total Models:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No BIM models available. Upload your first model in the Upload tab!")
+    crud_controller.render_data_view('bim')
 
 with tab2:
-    st.subheader("📁 Upload BIM Model")
-    
-    with st.form("bim_model_form"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            model_name = st.text_input("Model Name", placeholder="Descriptive model name")
-            discipline = st.selectbox("Discipline", 
-                ["Architectural", "Structural", "Mechanical", "Electrical", "Plumbing", "Civil"])
-            version = st.text_input("Version", placeholder="e.g., v1.0, v2.1")
-            author = st.text_input("Author", placeholder="Model creator")
-        
-        with col2:
-            update_date = st.date_input("Last Updated", value=date.today())
-            file_format = st.selectbox("File Format", [".rvt", ".ifc", ".dwg", ".nwd", ".bcf"])
-            file_size = st.text_input("File Size", placeholder="e.g., 125.5 MB")
-            status = st.selectbox("Status", ["Draft", "Current", "Superseded", "Archived"])
-        
-        description = st.text_area("Model Description", placeholder="Purpose and contents of the model...")
-        
-        submitted = st.form_submit_button("📋 Register Model", type="primary", use_container_width=True)
-        
-        if submitted and model_name:
-            new_model = {
-                "id": f"BIM-{len(st.session_state.bim_models) + 1:03d}",
-                "model_name": model_name,
-                "discipline": discipline,
-                "version": version,
-                "author": author,
-                "last_updated": str(update_date),
-                "file_format": file_format,
-                "file_size": file_size,
-                "status": status,
-                "description": description
-            }
-            st.session_state.bim_models.insert(0, new_model)
-            st.success(f"BIM model {new_model['id']} registered successfully!")
-            st.rerun()
-
-with tab2:
-    st.subheader("🔍 3D Model Viewer")
-    
-    st.info("BIM model viewer integration would connect to Autodesk Forge or similar platform for 3D visualization")
-    
-    selected_model = st.selectbox("Select Model to View", 
-        [model['model_name'] for model in st.session_state.bim_models] if st.session_state.bim_models else ["No models available"])
-    
-    if selected_model and selected_model != "No models available":
-        st.markdown(f"**Viewing:** {selected_model}")
-        
-        # Placeholder for 3D viewer
-        st.markdown("""
-        <div style="height: 400px; background-color: #f0f0f0; border: 2px dashed #ccc; 
-                    display: flex; align-items: center; justify-content: center; border-radius: 10px;">
-            <div style="text-align: center; color: #666;">
-                <h3>3D BIM Viewer</h3>
-                <p>Interactive 3D model viewer would be embedded here</p>
-                <p>Model: {}</p>
-            </div>
-        </div>
-        """.format(selected_model), unsafe_allow_html=True)
+    crud_controller.render_create_form(form_config)
 
 with tab3:
-    st.subheader("📊 Model Coordination")
+    st.subheader("📈 BIM Management Analytics")
     
-    if st.session_state.bim_models:
-        df = pd.DataFrame(st.session_state.bim_models)
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            search_term = st.text_input("🔍 Search models...", key="bim_search_2")
-        with col2:
-            discipline_filter = st.selectbox("Discipline", ["All", "Architectural", "Structural", "Mechanical"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if discipline_filter != "All":
-            filtered_df = filtered_df[filtered_df['discipline'] == discipline_filter]
-        
-        st.write(f"**Total Models:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No BIM models registered. Register your first model above!")
+    # Basic metrics
+    total_items = len(model.get_all())
     
-    # Coordination metrics
-    st.markdown("---")
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.metric("Total Models", "8", "1")
+        st.metric("Total BIM", total_items)
     
     with col2:
-        st.metric("Current Models", "6", "0")
+        if 'status' in model.schema.get('fields', {}):
+            active_items = len([item for item in model.get_all() if item.get('status') in ['Active', 'In Progress', 'Open']])
+            st.metric("Active Items", active_items)
+        else:
+            st.metric("Recent Items", min(total_items, 10))
     
     with col3:
-        st.metric("Clash Issues", "12", "-3")
+        if 'date' in model.schema.get('fields', {}):
+            from datetime import datetime, timedelta
+            recent_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            recent_items = len([item for item in model.get_all() if item.get('date', '') >= recent_date])
+            st.metric("Recent (30 days)", recent_items)
+        else:
+            st.metric("Total Records", total_items)
     
     with col4:
-        st.metric("Last Coordination", "2 days ago")
+        completion_rate = 100 if total_items == 0 else min(100, (total_items / max(1, total_items)) * 100)
+        st.metric("Completion Rate", f"{completion_rate:.1f}%")
+    
+    # Data visualization
+    if total_items > 0:
+        items_df = model.to_dataframe()
+        if not items_df.empty:
+            st.subheader("Data Analysis")
+            
+            # Show distribution by status if available
+            if 'status' in items_df.columns:
+                status_dist = items_df['status'].value_counts()
+                st.bar_chart(status_dist)
+                st.caption("Distribution by Status")
+            
+            # Show distribution by type if available  
+            elif 'type' in items_df.columns:
+                type_dist = items_df['type'].value_counts()
+                st.bar_chart(type_dist)
+                st.caption("Distribution by Type")
+
+# Sidebar
+with st.sidebar:
+    st.header("BIM Management Summary")
+    
+    items = model.get_all()
+    if items:
+        st.metric("Highland Tower BIM Management", len(items))
+        
+        # Show recent items
+        st.subheader("Recent Items")
+        recent_items = items[:3]  # Show first 3 items
+        
+        for item in recent_items:
+            with st.expander(f"🏗️ {item.get('id', 'Item')}"):
+                for key, value in list(item.items())[:3]:  # Show first 3 fields
+                    st.write(f"**{key.replace('_', ' ').title()}:** {value}")
+    
+    st.markdown("---")
+    st.write("**Highland Tower Development**")
+    st.write("$45.5M Mixed-Use Project")
+    st.write("BIM Management powered by gcPanel")

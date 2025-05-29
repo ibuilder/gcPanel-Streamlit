@@ -1,179 +1,146 @@
 """
 Quality Control Page - Highland Tower Development
+Refactored using MVC pattern with models, controllers, and helpers
 """
 
 import streamlit as st
-import pandas as pd
-from datetime import datetime, date
 import sys
 import os
 
+# Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.helpers import check_authentication, initialize_session_state, clean_dataframe_for_display
 
+from models.all_models import QualityControlModel
+from controllers.crud_controller import CRUDController
+from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
+
+# Page configuration
 st.set_page_config(page_title="Quality Control - gcPanel", page_icon="🔍", layout="wide")
-initialize_session_state()
 
-if not check_authentication():
-    st.switch_page("app.py")
+# Apply styling
+apply_highland_tower_styling()
 
-st.title("🔍 Quality Control")
-st.markdown("Highland Tower Development - Quality Assurance & Inspection Management")
-st.markdown("---")
+# Render header
+render_highland_header("🔍 Quality Control", "Highland Tower Development - Quality Assurance & Inspections")
 
-if 'quality_items' not in st.session_state:
-    st.session_state.quality_items = []
+# Initialize model
+model = QualityControlModel()
 
-tab1, tab2, tab3 = st.tabs(["📊 QC Records", "📝 Create Quality Check", "📈 Quality Metrics"])
+# Display configuration
+display_config = {
+    'title': 'Quality Control',
+    'item_name': 'Quality Control',
+    'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
+    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
+    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'primary_filter': {
+        'field': 'status',
+        'label': 'Status'
+    } if 'status' in model.schema.get('fields', {}) else None,
+    'secondary_filter': {
+        'field': 'type',
+        'label': 'Type'  
+    } if 'type' in model.schema.get('fields', {}) else None
+}
+
+# Form configuration - dynamically generate from schema
+form_fields = []
+for field_name, field_config in model.schema.get('fields', {}).items():
+    if field_name == 'id':
+        continue  # Skip ID field in forms
+    
+    field_type = field_config.get('type', 'text')
+    if field_type == 'date':
+        form_fields.append({'key': field_name, 'type': 'date', 'label': field_name.replace('_', ' ').title()})
+    elif field_type == 'number':
+        form_fields.append({'key': field_name, 'type': 'number', 'label': field_name.replace('_', ' ').title(), 'min_value': 0.0})
+    elif field_type == 'boolean':
+        form_fields.append({'key': field_name, 'type': 'select', 'label': field_name.replace('_', ' ').title(), 'options': [True, False]})
+    else:
+        form_fields.append({'key': field_name, 'type': 'text', 'label': field_name.replace('_', ' ').title()})
+
+form_config = {'fields': form_fields}
+
+# Initialize controller
+crud_controller = CRUDController(model, 'quality_control', display_config)
+
+# Main content tabs
+tab1, tab2, tab3 = st.tabs(["🔍 Quality Control Database", "📝 Create New", "📈 Analytics"])
 
 with tab1:
-    st.subheader("📊 Quality Control Records")
-    
-    if st.session_state.quality_items:
-        df = pd.DataFrame(st.session_state.quality_items)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search QC records...", key="quality_control_search_1")
-        with col2:
-            type_filter = st.selectbox("Type", ["All", "Material Test", "Visual Inspection", "Performance Test"])
-        with col3:
-            result_filter = st.selectbox("Result", ["All", "Pass", "Fail", "Conditional"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if type_filter != "All":
-            filtered_df = filtered_df[filtered_df['type'] == type_filter]
-            
-        if result_filter != "All":
-            filtered_df = filtered_df[filtered_df['result'] == result_filter]
-        
-        st.write(f"**Total QC Records:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No quality control records available. Create your first QC check in the Create tab!")
+    crud_controller.render_data_view('quality_control')
 
 with tab2:
-    st.subheader("📝 Create Quality Check")
-    
-    with st.form("quality_form"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            inspection_type = st.selectbox("Inspection Type", 
-                ["Visual Inspection", "Dimensional Check", "Material Testing", "Safety Compliance", "Code Compliance"])
-            work_item = st.text_input("Work Item", placeholder="Component or area being inspected")
-            inspector = st.text_input("Inspector", value=st.session_state.get('user_name', ''))
-            inspection_date = st.date_input("Inspection Date", value=date.today())
-        
-        with col2:
-            location = st.text_input("Location", placeholder="Building area, floor, grid")
-            contractor = st.text_input("Contractor", placeholder="Responsible contractor")
-            specification_ref = st.text_input("Specification Reference", placeholder="Spec section")
-            drawing_ref = st.text_input("Drawing Reference", placeholder="Drawing numbers")
-        
-        inspection_criteria = st.text_area("Inspection Criteria", placeholder="Standards and requirements to check...")
-        findings = st.text_area("Findings", placeholder="Inspection results and observations...")
-        
-        col3, col4 = st.columns(2)
-        with col3:
-            result = st.selectbox("Result", ["Pass", "Fail", "Conditional Pass", "Re-inspection Required"])
-        with col4:
-            priority = st.selectbox("Priority", ["Low", "Medium", "High", "Critical"])
-        
-        corrective_actions = st.text_area("Corrective Actions", placeholder="Required actions if failed...")
-        
-        submitted = st.form_submit_button("🔍 Submit QC Check", type="primary", use_container_width=True)
-        
-        if submitted and work_item:
-            new_qc = {
-                "id": f"QC-{len(st.session_state.quality_items) + 1:03d}",
-                "inspection_type": inspection_type,
-                "work_item": work_item,
-                "inspector": inspector,
-                "inspection_date": str(inspection_date),
-                "location": location,
-                "contractor": contractor,
-                "specification_ref": specification_ref,
-                "drawing_ref": drawing_ref,
-                "inspection_criteria": inspection_criteria,
-                "findings": findings,
-                "result": result,
-                "priority": priority,
-                "corrective_actions": corrective_actions,
-                "status": "Completed" if result == "Pass" else "Action Required"
-            }
-            st.session_state.quality_items.insert(0, new_qc)
-            st.success(f"Quality check {new_qc['id']} submitted successfully!")
-            st.rerun()
-
-with tab2:
-    st.subheader("📊 Quality Control Records")
-    
-    if st.session_state.quality_items:
-        df = pd.DataFrame(st.session_state.quality_items)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("Search QC records...")
-        with col2:
-            result_filter = st.selectbox("Result", ["All", "Pass", "Fail", "Conditional Pass"])
-        with col3:
-            type_filter = st.selectbox("Type", ["All", "Visual Inspection", "Material Testing", "Safety Compliance"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if result_filter != "All":
-            filtered_df = filtered_df[filtered_df['result'] == result_filter]
-            
-        if type_filter != "All":
-            filtered_df = filtered_df[filtered_df['inspection_type'] == type_filter]
-        
-        st.write(f"**Total QC Records:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No quality control records. Create your first QC check above!")
+    crud_controller.render_create_form(form_config)
 
 with tab3:
-    st.subheader("📈 Quality Metrics")
+    st.subheader("📈 Quality Control Analytics")
     
-    if st.session_state.quality_items:
-        df = pd.DataFrame(st.session_state.quality_items)
+    # Basic metrics
+    total_items = len(model.get_all())
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Total Quality Control", total_items)
+    
+    with col2:
+        if 'status' in model.schema.get('fields', {}):
+            active_items = len([item for item in model.get_all() if item.get('status') in ['Active', 'In Progress', 'Open']])
+            st.metric("Active Items", active_items)
+        else:
+            st.metric("Recent Items", min(total_items, 10))
+    
+    with col3:
+        if 'date' in model.schema.get('fields', {}):
+            from datetime import datetime, timedelta
+            recent_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            recent_items = len([item for item in model.get_all() if item.get('date', '') >= recent_date])
+            st.metric("Recent (30 days)", recent_items)
+        else:
+            st.metric("Total Records", total_items)
+    
+    with col4:
+        completion_rate = 100 if total_items == 0 else min(100, (total_items / max(1, total_items)) * 100)
+        st.metric("Completion Rate", f"{completion_rate:.1f}%")
+    
+    # Data visualization
+    if total_items > 0:
+        items_df = model.to_dataframe()
+        if not items_df.empty:
+            st.subheader("Data Analysis")
+            
+            # Show distribution by status if available
+            if 'status' in items_df.columns:
+                status_dist = items_df['status'].value_counts()
+                st.bar_chart(status_dist)
+                st.caption("Distribution by Status")
+            
+            # Show distribution by type if available  
+            elif 'type' in items_df.columns:
+                type_dist = items_df['type'].value_counts()
+                st.bar_chart(type_dist)
+                st.caption("Distribution by Type")
+
+# Sidebar
+with st.sidebar:
+    st.header("Quality Control Summary")
+    
+    items = model.get_all()
+    if items:
+        st.metric("Highland Tower Quality Control", len(items))
         
-        col1, col2, col3, col4 = st.columns(4)
+        # Show recent items
+        st.subheader("Recent Items")
+        recent_items = items[:3]  # Show first 3 items
         
-        with col1:
-            total_inspections = len(df)
-            st.metric("Total Inspections", total_inspections)
-        
-        with col2:
-            pass_rate = len(df[df['result'] == 'Pass']) / len(df) * 100 if len(df) > 0 else 0
-            st.metric("Pass Rate", f"{pass_rate:.1f}%")
-        
-        with col3:
-            failed = len(df[df['result'] == 'Fail'])
-            st.metric("Failed Inspections", failed)
-        
-        with col4:
-            pending_actions = len(df[df['status'] == 'Action Required'])
-            st.metric("Pending Actions", pending_actions)
-    else:
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.metric("Total Inspections", "0")
-        with col2:
-            st.metric("Pass Rate", "N/A")
-        with col3:
-            st.metric("Failed Inspections", "0")
-        with col4:
-            st.metric("Pending Actions", "0")
+        for item in recent_items:
+            with st.expander(f"🔍 {item.get('id', 'Item')}"):
+                for key, value in list(item.items())[:3]:  # Show first 3 fields
+                    st.write(f"**{key.replace('_', ' ').title()}:** {value}")
+    
+    st.markdown("---")
+    st.write("**Highland Tower Development**")
+    st.write("$45.5M Mixed-Use Project")
+    st.write("Quality Control powered by gcPanel")

@@ -1,129 +1,146 @@
 """
 Field Operations Page - Highland Tower Development
+Refactored using MVC pattern with models, controllers, and helpers
 """
 
 import streamlit as st
-import pandas as pd
-from datetime import datetime, date
 import sys
 import os
 
+# Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.helpers import check_authentication, initialize_session_state, clean_dataframe_for_display
 
+from models.all_models import FieldOperationsModel
+from controllers.crud_controller import CRUDController
+from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
+
+# Page configuration
 st.set_page_config(page_title="Field Operations - gcPanel", page_icon="🏭", layout="wide")
-initialize_session_state()
 
-if not check_authentication():
-    st.switch_page("app.py")
+# Apply styling
+apply_highland_tower_styling()
 
-st.title("🏭 Field Operations")
-st.markdown("Highland Tower Development - Field Activity Management")
-st.markdown("---")
+# Render header
+render_highland_header("🏭 Field Operations", "Highland Tower Development - Daily Field Activity Management")
 
-if 'field_activities' not in st.session_state:
-    st.session_state.field_activities = []
+# Initialize model
+model = FieldOperationsModel()
 
-tab1, tab2 = st.tabs(["📊 Operations Log", "📝 Log Activity"])
+# Display configuration
+display_config = {
+    'title': 'Field Operations',
+    'item_name': 'Field Operations',
+    'title_field': 'title' if 'title' in model.schema.get('fields', {}) else 'id',
+    'key_fields': ['id', 'status', 'type'] if 'status' in model.schema.get('fields', {}) else ['id'],
+    'detail_fields': ['date', 'location', 'description'] if 'date' in model.schema.get('fields', {}) else [],
+    'search_fields': ['title', 'description', 'id'] if 'title' in model.schema.get('fields', {}) else ['id'],
+    'primary_filter': {
+        'field': 'status',
+        'label': 'Status'
+    } if 'status' in model.schema.get('fields', {}) else None,
+    'secondary_filter': {
+        'field': 'type',
+        'label': 'Type'  
+    } if 'type' in model.schema.get('fields', {}) else None
+}
+
+# Form configuration - dynamically generate from schema
+form_fields = []
+for field_name, field_config in model.schema.get('fields', {}).items():
+    if field_name == 'id':
+        continue  # Skip ID field in forms
+    
+    field_type = field_config.get('type', 'text')
+    if field_type == 'date':
+        form_fields.append({'key': field_name, 'type': 'date', 'label': field_name.replace('_', ' ').title()})
+    elif field_type == 'number':
+        form_fields.append({'key': field_name, 'type': 'number', 'label': field_name.replace('_', ' ').title(), 'min_value': 0.0})
+    elif field_type == 'boolean':
+        form_fields.append({'key': field_name, 'type': 'select', 'label': field_name.replace('_', ' ').title(), 'options': [True, False]})
+    else:
+        form_fields.append({'key': field_name, 'type': 'text', 'label': field_name.replace('_', ' ').title()})
+
+form_config = {'fields': form_fields}
+
+# Initialize controller
+crud_controller = CRUDController(model, 'field_operations', display_config)
+
+# Main content tabs
+tab1, tab2, tab3 = st.tabs(["🏭 Field Operations Database", "📝 Create New", "📈 Analytics"])
 
 with tab1:
-    st.subheader("📊 Field Operations Log")
+    crud_controller.render_data_view('field_operations')
+
+with tab2:
+    crud_controller.render_create_form(form_config)
+
+with tab3:
+    st.subheader("📈 Field Operations Analytics")
     
-    if st.session_state.field_activities:
-        df = pd.DataFrame(st.session_state.field_activities)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search activities...", key="field_operations_search_1")
-        with col2:
-            crew_filter = st.selectbox("Crew", ["All", "Crew A", "Crew B", "Crew C"])
-        with col3:
-            activity_filter = st.selectbox("Activity", ["All", "Concrete Pour", "Steel Installation", "Electrical Work"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if crew_filter != "All":
-            filtered_df = filtered_df[filtered_df['crew'] == crew_filter]
+    # Basic metrics
+    total_items = len(model.get_all())
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Total Field Operations", total_items)
+    
+    with col2:
+        if 'status' in model.schema.get('fields', {}):
+            active_items = len([item for item in model.get_all() if item.get('status') in ['Active', 'In Progress', 'Open']])
+            st.metric("Active Items", active_items)
+        else:
+            st.metric("Recent Items", min(total_items, 10))
+    
+    with col3:
+        if 'date' in model.schema.get('fields', {}):
+            from datetime import datetime, timedelta
+            recent_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            recent_items = len([item for item in model.get_all() if item.get('date', '') >= recent_date])
+            st.metric("Recent (30 days)", recent_items)
+        else:
+            st.metric("Total Records", total_items)
+    
+    with col4:
+        completion_rate = 100 if total_items == 0 else min(100, (total_items / max(1, total_items)) * 100)
+        st.metric("Completion Rate", f"{completion_rate:.1f}%")
+    
+    # Data visualization
+    if total_items > 0:
+        items_df = model.to_dataframe()
+        if not items_df.empty:
+            st.subheader("Data Analysis")
             
-        if activity_filter != "All":
-            filtered_df = filtered_df[filtered_df['activity_type'] == activity_filter]
-        
-        st.write(f"**Total Activities:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No field activities logged. Log your first activity in the Log tab!")
+            # Show distribution by status if available
+            if 'status' in items_df.columns:
+                status_dist = items_df['status'].value_counts()
+                st.bar_chart(status_dist)
+                st.caption("Distribution by Status")
+            
+            # Show distribution by type if available  
+            elif 'type' in items_df.columns:
+                type_dist = items_df['type'].value_counts()
+                st.bar_chart(type_dist)
+                st.caption("Distribution by Type")
 
-with tab2:
-    st.subheader("📝 Log Field Activity")
+# Sidebar
+with st.sidebar:
+    st.header("Field Operations Summary")
     
-    with st.form("field_activity_form"):
-        col1, col2 = st.columns(2)
+    items = model.get_all()
+    if items:
+        st.metric("Highland Tower Field Operations", len(items))
         
-        with col1:
-            activity_date = st.date_input("Activity Date", value=date.today())
-            activity_type = st.selectbox("Activity Type", 
-                ["Construction", "Inspection", "Survey", "Testing", "Installation", "Maintenance"])
-            crew_lead = st.text_input("Crew Lead", placeholder="Lead supervisor name")
-            crew_size = st.number_input("Crew Size", min_value=1, max_value=50, value=5)
+        # Show recent items
+        st.subheader("Recent Items")
+        recent_items = items[:3]  # Show first 3 items
         
-        with col2:
-            start_time = st.time_input("Start Time")
-            end_time = st.time_input("End Time")
-            location = st.text_input("Location", placeholder="Building area, floor, grid")
-            equipment_used = st.text_input("Equipment Used", placeholder="Heavy equipment, tools")
-        
-        description = st.text_area("Activity Description", placeholder="Detailed description of work performed...")
-        materials_used = st.text_area("Materials Used", placeholder="Materials consumed during activity...")
-        
-        submitted = st.form_submit_button("📋 Log Activity", type="primary", use_container_width=True)
-        
-        if submitted:
-            new_activity = {
-                "id": f"FO-{len(st.session_state.field_activities) + 1:03d}",
-                "date": str(activity_date),
-                "type": activity_type,
-                "crew_lead": crew_lead,
-                "crew_size": crew_size,
-                "start_time": str(start_time),
-                "end_time": str(end_time),
-                "location": location,
-                "equipment_used": equipment_used,
-                "description": description,
-                "materials_used": materials_used,
-                "logged_by": st.session_state.get('user_name', 'User')
-            }
-            st.session_state.field_activities.insert(0, new_activity)
-            st.success(f"Field activity {new_activity['id']} logged successfully!")
-            st.rerun()
-
-with tab2:
-    st.subheader("📊 Field Operations Log")
+        for item in recent_items:
+            with st.expander(f"🏭 {item.get('id', 'Item')}"):
+                for key, value in list(item.items())[:3]:  # Show first 3 fields
+                    st.write(f"**{key.replace('_', ' ').title()}:** {value}")
     
-    if st.session_state.field_activities:
-        df = pd.DataFrame(st.session_state.field_activities)
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            search_term = st.text_input("🔍 Search activities...", key="field_operations_search_2")
-        with col2:
-            type_filter = st.selectbox("Activity Type", ["All", "Construction", "Inspection", "Survey"])
-        
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[filtered_df.astype(str).apply(
-                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
-        
-        if type_filter != "All":
-            filtered_df = filtered_df[filtered_df['type'] == type_filter]
-        
-        st.write(f"**Total Activities:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
-    else:
-        st.info("No field activities logged. Log your first activity above!")
+    st.markdown("---")
+    st.write("**Highland Tower Development**")
+    st.write("$45.5M Mixed-Use Project")
+    st.write("Field Operations powered by gcPanel")

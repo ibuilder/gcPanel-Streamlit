@@ -1,293 +1,154 @@
 """
 Contracts Management Page - Highland Tower Development
+Refactored using MVC pattern with models, controllers, and helpers
 """
 
 import streamlit as st
-import pandas as pd
-from datetime import datetime, date
 import sys
 import os
 
-# Add parent directory to path for imports
+# Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from utils.helpers import check_authentication, initialize_session_state, clean_dataframe_for_display
+from models.contract_model import ContractModel
+from controllers.crud_controller import CRUDController
+from helpers.ui_helpers import format_currency, render_highland_header, apply_highland_tower_styling
 
-st.set_page_config(
-    page_title="Contracts - gcPanel",
-    page_icon="📑",
-    layout="wide"
-)
+# Page configuration
+st.set_page_config(page_title="Contracts - gcPanel", page_icon="📑", layout="wide")
 
-# Initialize session state
-initialize_session_state()
+# Apply styling
+apply_highland_tower_styling()
 
-if not check_authentication():
-    st.switch_page("app.py")
+# Render header
+render_highland_header("📑 Contracts Management", "Highland Tower Development - Contract Administration")
 
-st.title("📑 Contracts Management")
-st.markdown("Highland Tower Development - Contract Administration")
-st.markdown("---")
+# Initialize model and controller
+contract_model = ContractModel()
 
-# Initialize contracts in session state if not exists
-if 'contracts' not in st.session_state:
-    st.session_state.contracts = [
-        {
-            "id": "CNT-001",
-            "title": "Prime Construction Contract",
-            "contractor": "Highland Construction LLC",
-            "contract_value": 45500000,
-            "start_date": "2024-01-15",
-            "end_date": "2025-12-15",
-            "status": "Active",
-            "type": "Prime Contract",
-            "project_manager": "Sarah Johnson"
-        },
-        {
-            "id": "CNT-002",
-            "title": "Structural Steel Subcontract",
-            "contractor": "Steel Works Inc.",
-            "contract_value": 3200000,
-            "start_date": "2024-06-01",
-            "end_date": "2024-12-31",
-            "status": "Active",
-            "type": "Subcontract",
-            "project_manager": "Mike Chen"
-        }
+# Display configuration for the contracts module
+display_config = {
+    'title': 'Contracts',
+    'item_name': 'Contract',
+    'title_field': 'title',
+    'key_fields': ['id', 'type', 'contractor'],
+    'detail_fields': ['contract_value', 'status', 'start_date', 'end_date'],
+    'search_fields': ['title', 'contractor', 'id', 'type'],
+    'primary_filter': {
+        'field': 'status',
+        'label': 'Status'
+    },
+    'secondary_filter': {
+        'field': 'type', 
+        'label': 'Type'
+    },
+    'formatters': {
+        'contract_value': format_currency
+    },
+    'column_config': {
+        "id": st.column_config.TextColumn("Contract ID"),
+        "title": st.column_config.TextColumn("Title"),
+        "contractor": st.column_config.TextColumn("Contractor"),
+        "contract_value": st.column_config.NumberColumn("Contract Value", format="$%.2f"),
+        "start_date": st.column_config.DateColumn("Start Date"),
+        "end_date": st.column_config.DateColumn("End Date"),
+        "status": st.column_config.SelectboxColumn("Status", 
+            options=["Draft", "Active", "Completed", "Terminated"]),
+        "type": st.column_config.TextColumn("Type")
+    }
+}
+
+# Form configuration for creating new contracts
+form_config = {
+    'fields': [
+        {'key': 'title', 'type': 'text', 'label': 'Contract Title', 'placeholder': 'Enter contract title'},
+        {'key': 'contractor', 'type': 'text', 'label': 'Contractor', 'placeholder': 'Enter contractor name'},
+        {'key': 'contract_value', 'type': 'number', 'label': 'Contract Value ($)', 'min_value': 0.0},
+        {'key': 'type', 'type': 'select', 'label': 'Contract Type', 
+         'options': ['Prime Contract', 'Subcontract', 'Purchase Order', 'Service Agreement']},
+        {'key': 'status', 'type': 'select', 'label': 'Status',
+         'options': ['Draft', 'Active', 'Completed', 'Terminated']},
+        {'key': 'start_date', 'type': 'date', 'label': 'Start Date'},
+        {'key': 'end_date', 'type': 'date', 'label': 'End Date'},
+        {'key': 'description', 'type': 'textarea', 'label': 'Description', 'placeholder': 'Enter contract description'},
+        {'key': 'project_phase', 'type': 'select', 'label': 'Project Phase',
+         'options': ['Phase 1 - Structural', 'Phase 2 - MEP', 'Phase 3 - Envelope', 'Phase 4 - Finishes']},
+        {'key': 'retention_percentage', 'type': 'number', 'label': 'Retention %', 'min_value': 0.0},
+        {'key': 'payment_terms', 'type': 'select', 'label': 'Payment Terms',
+         'options': ['Net 30', 'Net 45', 'Net 60', 'Due on Receipt']}
     ]
+}
 
-# Main content
-tab1, tab2 = st.tabs(["📊 Contracts Database", "📝 Create New Contract"])
+# Initialize controller
+crud_controller = CRUDController(contract_model, 'contracts', display_config)
+
+# Main content tabs
+tab1, tab2, tab3 = st.tabs(["📊 Contracts Database", "📝 Create New Contract", "📈 Analytics"])
 
 with tab1:
-    st.subheader("📊 Contracts Database")
-    
-    if st.session_state.contracts:
-        df = pd.DataFrame(st.session_state.contracts)
-        
-        # Search and filter
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search contracts...", placeholder="Search by title, contractor, or ID", key="contracts_search_1")
-        with col2:
-            status_filter = st.selectbox("Status", ["All", "Draft", "Active", "Completed", "Terminated"])
-        with col3:
-            type_filter = st.selectbox("Type", ["All", "Prime Contract", "Subcontract", "Purchase Order", "Service Agreement"])
-        
-        # Filter data
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[
-                filtered_df.astype(str).apply(
-                    lambda x: x.str.contains(search_term, case=False, na=False)
-                ).any(axis=1)
-            ]
-        
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-            
-        if type_filter != "All":
-            filtered_df = filtered_df[filtered_df['type'] == type_filter]
-        
-        # Display results
-        st.write(f"**Total Contracts:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            # Format contract values for display
-            display_df = filtered_df.copy()
-            display_df['Contract Value'] = display_df['contract_value'].apply(lambda x: f"${x:,.2f}")
-            
-            # Display with column configuration
-            st.dataframe(
-                clean_dataframe_for_display(display_df),
-                column_config={
-                    "id": st.column_config.TextColumn("Contract ID"),
-                    "title": st.column_config.TextColumn("Title"),
-                    "contractor": st.column_config.TextColumn("Contractor"),
-                    "Contract Value": st.column_config.TextColumn("Contract Value"),
-                    "start_date": st.column_config.DateColumn("Start Date"),
-                    "end_date": st.column_config.DateColumn("End Date"),
-                    "status": st.column_config.SelectboxColumn("Status", 
-                        options=["Draft", "Active", "Completed", "Terminated"]),
-                    "type": st.column_config.TextColumn("Type")
-                },
-                hide_index=True,
-                use_container_width=True
-            )
-            
-            # Add enhanced card view with CRUD actions
-            st.markdown("---")
-            st.subheader("📋 Contract Cards with Actions")
-            
-            for idx, row in filtered_df.iterrows():
-                with st.container():
-                    col1, col2, col3 = st.columns([3, 2, 1])
-                    
-                    with col1:
-                        st.write(f"**📋 {row['title']}**")
-                        st.write(f"**ID:** {row['id']} | **Type:** {row['type']}")
-                        st.write(f"**Contractor:** {row['contractor']}")
-                    
-                    with col2:
-                        st.write(f"**Value:** ${row['contract_value']:,.2f}")
-                        st.write(f"**Status:** {row['status']}")
-                        st.write(f"**Period:** {row['start_date']} to {row['end_date']}")
-                    
-                    with col3:
-                        if st.button("👁️ View", key=f"view_contract_{row['id']}", help="View details"):
-                            with st.expander("Contract Details", expanded=True):
-                                st.json(row.to_dict())
-                        if st.button("✏️ Edit", key=f"edit_contract_{row['id']}", help="Edit contract"):
-                            st.info(f"Edit functionality for contract {row['id']} - Feature coming soon!")
-                    
-                    st.markdown("---")
-        else:
-            st.info("No contracts found matching your criteria.")
-    else:
-        st.info("No contracts available. Create your first contract in the Create tab!")
+    crud_controller.render_data_view('contracts')
 
 with tab2:
-    st.subheader("📝 Create New Contract")
+    crud_controller.render_create_form(form_config)
+
+with tab3:
+    st.subheader("📈 Contract Analytics")
     
-    with st.form("contract_form"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            contract_title = st.text_input("Contract Title*", placeholder="Description of contract")
-            contractor = st.text_input("Contractor/Vendor*", placeholder="Company name")
-            contract_value = st.number_input("Contract Value ($)*", min_value=0.0, format="%.2f")
-            contract_type = st.selectbox("Contract Type", 
-                ["Prime Contract", "Subcontract", "Purchase Order", "Service Agreement", "Change Order"])
-        
-        with col2:
-            start_date = st.date_input("Start Date*")
-            end_date = st.date_input("End Date*")
-            project_manager = st.text_input("Project Manager", placeholder="Assigned project manager")
-            payment_terms = st.selectbox("Payment Terms", 
-                ["Net 30", "Net 15", "Progress Payments", "Upon Completion", "Other"])
-        
-        scope_of_work = st.text_area("Scope of Work", height=100,
-            placeholder="Detailed description of work to be performed...")
-        
-        special_conditions = st.text_area("Special Conditions", height=80,
-            placeholder="Any special terms or conditions...")
-        
-        submitted = st.form_submit_button("📄 Create Contract", type="primary", use_container_width=True)
-        
-        if submitted and contract_title and contractor and contract_value > 0:
-            new_contract = {
-                "id": f"CNT-{len(st.session_state.contracts) + 1:03d}",
-                "title": contract_title,
-                "contractor": contractor,
-                "contract_value": contract_value,
-                "start_date": str(start_date),
-                "end_date": str(end_date),
-                "status": "Draft",
-                "type": contract_type,
-                "project_manager": project_manager,
-                "payment_terms": payment_terms,
-                "scope_of_work": scope_of_work,
-                "special_conditions": special_conditions,
-                "created_date": str(date.today()),
-                "created_by": st.session_state.get('user_name', 'User')
-            }
-            st.session_state.contracts.insert(0, new_contract)
-            st.success(f"Contract {new_contract['id']} created successfully!")
-            st.rerun()
-        elif submitted:
-            st.error("Please fill in all required fields (*)")
-
-with tab2:
-    st.subheader("📊 Contracts Database")
-    
-    if st.session_state.contracts:
-        df = pd.DataFrame(st.session_state.contracts)
-        
-        # Search and filter
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            search_term = st.text_input("🔍 Search contracts...", placeholder="Search by title, contractor, or ID", key="contracts_search_2")
-        with col2:
-            status_filter = st.selectbox("Status", ["All", "Draft", "Active", "Completed", "Terminated"])
-        with col3:
-            type_filter = st.selectbox("Type", ["All", "Prime Contract", "Subcontract", "Purchase Order", "Service Agreement"])
-        
-        # Filter data
-        filtered_df = df.copy()
-        if search_term:
-            filtered_df = filtered_df[
-                filtered_df.astype(str).apply(
-                    lambda x: x.str.contains(search_term, case=False, na=False)
-                ).any(axis=1)
-            ]
-        
-        if status_filter != "All":
-            filtered_df = filtered_df[filtered_df['status'] == status_filter]
-            
-        if type_filter != "All":
-            filtered_df = filtered_df[filtered_df['type'] == type_filter]
-        
-        # Display results
-        st.write(f"**Total Contracts:** {len(filtered_df)}")
-        
-        if not filtered_df.empty:
-            # Format contract values for display
-            display_df = filtered_df.copy()
-            display_df['Contract Value'] = display_df['contract_value'].apply(lambda x: f"${x:,.2f}")
-            
-            # Display with column configuration
-            st.dataframe(
-                clean_dataframe_for_display(display_df),
-                column_config={
-                    "id": st.column_config.TextColumn("Contract ID"),
-                    "title": st.column_config.TextColumn("Title"),
-                    "contractor": st.column_config.TextColumn("Contractor"),
-                    "Contract Value": st.column_config.TextColumn("Contract Value"),
-                    "start_date": st.column_config.DateColumn("Start Date"),
-                    "end_date": st.column_config.DateColumn("End Date"),
-                    "status": st.column_config.SelectboxColumn("Status", 
-                        options=["Draft", "Active", "Completed", "Terminated"]),
-                    "type": st.column_config.TextColumn("Type")
-                },
-                hide_index=True,
-                use_container_width=True
-            )
-        else:
-            st.info("No contracts found matching your criteria.")
-    else:
-        st.info("No contracts available. Create your first contract above!")
-
-# Contract summary statistics
-st.markdown("---")
-st.subheader("📈 Contract Summary")
-
-if st.session_state.contracts:
-    df = pd.DataFrame(st.session_state.contracts)
+    # Display key metrics using the model
+    total_contracts = len(contract_model.get_all())
+    active_contracts = len(contract_model.get_active_contracts())
+    total_value = contract_model.get_total_contract_value()
     
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        total_contracts = len(df)
         st.metric("Total Contracts", total_contracts)
     
     with col2:
-        active_contracts = len(df[df['status'] == 'Active'])
         st.metric("Active Contracts", active_contracts)
     
     with col3:
-        total_value = df['contract_value'].sum()
-        st.metric("Total Contract Value", f"${total_value:,.0f}")
+        st.metric("Total Value", format_currency(total_value))
     
     with col4:
-        avg_value = df['contract_value'].mean()
-        st.metric("Average Contract Value", f"${avg_value:,.0f}")
+        completion_rate = (active_contracts / total_contracts * 100) if total_contracts > 0 else 0
+        st.metric("Active Rate", f"{completion_rate:.1f}%")
     
-    # Contract value by type chart
-    if len(df) > 0:
-        st.markdown("**Contract Value by Type**")
-        type_summary = df.groupby('type')['contract_value'].sum().reset_index()
+    # Contract distribution by type
+    st.subheader("Contract Distribution by Type")
+    contracts_df = contract_model.to_dataframe()
+    if not contracts_df.empty:
+        type_distribution = contracts_df['type'].value_counts()
+        st.bar_chart(type_distribution)
+    
+    # Contract values by phase
+    st.subheader("Contract Values by Project Phase")
+    if not contracts_df.empty:
+        phase_values = contracts_df.groupby('project_phase')['contract_value'].sum()
+        st.bar_chart(phase_values)
+
+# Sidebar with additional contract information
+with st.sidebar:
+    st.header("Contract Summary")
+    
+    contracts = contract_model.get_all()
+    if contracts:
+        active_contracts = contract_model.get_active_contracts()
         
-        import plotly.express as px
-        fig = px.pie(type_summary, values='contract_value', names='type', 
-                    title="Contract Value Distribution")
-        st.plotly_chart(fig, use_container_width=True)
+        st.metric("Highland Tower Contracts", len(contracts))
+        st.metric("Currently Active", len(active_contracts))
+        
+        # Show recent contracts
+        st.subheader("Recent Contracts")
+        recent_contracts = sorted(contracts, key=lambda x: x.get('created_at', ''), reverse=True)[:3]
+        
+        for contract in recent_contracts:
+            with st.expander(f"📋 {contract['title'][:30]}..."):
+                st.write(f"**Contractor:** {contract['contractor']}")
+                st.write(f"**Value:** {format_currency(contract['contract_value'])}")
+                st.write(f"**Status:** {contract['status']}")
+    
+    st.markdown("---")
+    st.write("**Highland Tower Development**")
+    st.write("$45.5M Mixed-Use Project")
+    st.write("Contract management powered by gcPanel")

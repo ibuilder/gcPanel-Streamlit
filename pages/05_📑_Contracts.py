@@ -60,6 +60,66 @@ if 'contracts' not in st.session_state:
 tab1, tab2 = st.tabs(["📊 Contracts Database", "📝 Create New Contract"])
 
 with tab1:
+    st.subheader("📊 Contracts Database")
+    
+    if st.session_state.contracts:
+        df = pd.DataFrame(st.session_state.contracts)
+        
+        # Search and filter
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search contracts...", placeholder="Search by title, contractor, or ID")
+        with col2:
+            status_filter = st.selectbox("Status", ["All", "Draft", "Active", "Completed", "Terminated"])
+        with col3:
+            type_filter = st.selectbox("Type", ["All", "Prime Contract", "Subcontract", "Purchase Order", "Service Agreement"])
+        
+        # Filter data
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[
+                filtered_df.astype(str).apply(
+                    lambda x: x.str.contains(search_term, case=False, na=False)
+                ).any(axis=1)
+            ]
+        
+        if status_filter != "All":
+            filtered_df = filtered_df[filtered_df['status'] == status_filter]
+            
+        if type_filter != "All":
+            filtered_df = filtered_df[filtered_df['type'] == type_filter]
+        
+        # Display results
+        st.write(f"**Total Contracts:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            # Format contract values for display
+            display_df = filtered_df.copy()
+            display_df['Contract Value'] = display_df['contract_value'].apply(lambda x: f"${x:,.2f}")
+            
+            # Display with column configuration
+            st.dataframe(
+                clean_dataframe_for_display(display_df),
+                column_config={
+                    "id": st.column_config.TextColumn("Contract ID"),
+                    "title": st.column_config.TextColumn("Title"),
+                    "contractor": st.column_config.TextColumn("Contractor"),
+                    "Contract Value": st.column_config.TextColumn("Contract Value"),
+                    "start_date": st.column_config.DateColumn("Start Date"),
+                    "end_date": st.column_config.DateColumn("End Date"),
+                    "status": st.column_config.SelectboxColumn("Status", 
+                        options=["Draft", "Active", "Completed", "Terminated"]),
+                    "type": st.column_config.TextColumn("Type")
+                },
+                hide_index=True,
+                use_container_width=True
+            )
+        else:
+            st.info("No contracts found matching your criteria.")
+    else:
+        st.info("No contracts available. Create your first contract in the Create tab!")
+
+with tab2:
     st.subheader("📝 Create New Contract")
     
     with st.form("contract_form"):

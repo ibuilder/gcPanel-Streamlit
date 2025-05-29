@@ -226,8 +226,15 @@ class CRUDController:
         # Display edit form
         if f"{key_prefix}_edit_record" in st.session_state:
             st.divider()
+            st.subheader("Edit Record")
             record = st.session_state[f"{key_prefix}_edit_record"]
-            self._show_edit_form(record, key_prefix)
+            
+            try:
+                self._show_edit_form(record, key_prefix)
+            except Exception as e:
+                st.error(f"Error displaying edit form: {str(e)}")
+                st.write("Record data:", record)
+            
             if st.button("Cancel Edit", key=f"{key_prefix}_cancel_edit"):
                 del st.session_state[f"{key_prefix}_edit_record"]
                 st.rerun()

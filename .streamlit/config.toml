@@ -6,10 +6,10 @@ enableCORS = false
 enableXsrfProtection = false
 
 [theme]
-primaryColor = "#1e40af"
-backgroundColor = "#f9fafb"
-secondaryBackgroundColor = "#e5e7eb"
-textColor = "#111827"
+primaryColor = "#4A90E2"
+backgroundColor = "#1A1D29"
+secondaryBackgroundColor = "#252A3A"
+textColor = "#FFFFFF"
 
 [browser]
 gatherUsageStats = false

@@ -20,6 +20,10 @@ author = "agent"
 task = "workflow.run"
 args = "gcPanel Enhanced"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "gcPanel"
+
 [[workflows.workflow]]
 name = "gcPanel Enhanced"
 author = "agent"
@@ -27,6 +31,15 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "streamlit run gcpanel_enhanced_navigation.py --server.port 5000"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "gcPanel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "streamlit run app.py --server.port 5000"
 waitForPort = 5000
 
 [[ports]]

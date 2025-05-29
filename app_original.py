@@ -1,25 +1,18 @@
 """
-Highland Tower Development - Enhanced Navigation Construction Management Platform
-$45.5M Mixed-Use Development - Complete Module Structure
+gcPanel - Construction Management Platform
+Highland Tower Development - $45.5M Mixed-Use Development
 
-Features comprehensive navigation structure with all modules implemented in pure Python
+Main application entry point with authentication and navigation
 """
 
 import streamlit as st
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-from datetime import datetime, timedelta
-import json
 import hashlib
-import os
-from typing import Dict, List, Any
+from datetime import datetime
+from utils.helpers import initialize_session_state
 
 # Import database and file management modules
 try:
-    from database.connection import save_daily_report, get_daily_reports, authenticate_user, update_user_login
-    from modules.file_manager import render_document_upload_section, render_progress_photo_upload
-    from config.environment import display_configuration_status
+    from database.connection import authenticate_user, update_user_login
     DATABASE_AVAILABLE = True
 except ImportError as e:
     print(f"Database modules not available: {e}")

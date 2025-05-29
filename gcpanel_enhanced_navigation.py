@@ -1358,27 +1358,49 @@ def render_dashboard():
     
     with col1:
         st.subheader("📊 Weekly Progress Tracking")
-        progress_data = pd.DataFrame({
-            'Week': ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'],
-            'Planned': [15, 30, 45, 60, 75],
-            'Actual': [12, 28, 48, 65, 68]
-        })
-        
-        fig = px.line(progress_data, x='Week', y=['Planned', 'Actual'], 
-                     title="Progress vs Planned")
-        st.plotly_chart(fig, use_container_width=True)
+        try:
+            progress_data = pd.DataFrame({
+                'Week': ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'],
+                'Planned': [15, 30, 45, 60, 75],
+                'Actual': [12, 28, 48, 65, 68]
+            })
+            
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=progress_data['Week'], y=progress_data['Planned'], 
+                                   mode='lines+markers', name='Planned', line=dict(color='#0066cc')))
+            fig.add_trace(go.Scatter(x=progress_data['Week'], y=progress_data['Actual'], 
+                                   mode='lines+markers', name='Actual', line=dict(color='#10b981')))
+            
+            fig.update_layout(title="Progress vs Planned", xaxis_title="Week", yaxis_title="Progress (%)",
+                            height=400, showlegend=True)
+            st.plotly_chart(fig, use_container_width=True)
+        except Exception as e:
+            st.error(f"Chart error: {str(e)}")
+            # Fallback table
+            st.dataframe(progress_data, use_container_width=True)
     
     with col2:
         st.subheader("💰 Cost Breakdown by Phase")
-        cost_data = pd.DataFrame({
-            'Phase': ['Foundation', 'Structure', 'MEP', 'Finishes', 'Sitework'],
-            'Spent': [8500000, 12300000, 6800000, 2900000, 700000],
-            'Budget': [9000000, 13500000, 7200000, 4800000, 1000000]
-        })
-        
-        fig = px.bar(cost_data, x='Phase', y=['Spent', 'Budget'], 
-                    title="Cost Analysis by Phase", barmode='group')
-        st.plotly_chart(fig, use_container_width=True)
+        try:
+            cost_data = pd.DataFrame({
+                'Phase': ['Foundation', 'Structure', 'MEP', 'Finishes', 'Sitework'],
+                'Spent': [8.5, 12.3, 6.8, 2.9, 0.7],
+                'Budget': [9.0, 13.5, 7.2, 4.8, 1.0]
+            })
+            
+            fig = go.Figure()
+            fig.add_trace(go.Bar(x=cost_data['Phase'], y=cost_data['Spent'], 
+                               name='Spent', marker_color='#ef4444'))
+            fig.add_trace(go.Bar(x=cost_data['Phase'], y=cost_data['Budget'], 
+                               name='Budget', marker_color='#0066cc'))
+            
+            fig.update_layout(title="Cost Analysis by Phase ($M)", xaxis_title="Phase", 
+                            yaxis_title="Cost ($M)", barmode='group', height=400)
+            st.plotly_chart(fig, use_container_width=True)
+        except Exception as e:
+            st.error(f"Chart error: {str(e)}")
+            # Fallback table
+            st.dataframe(cost_data, use_container_width=True)
 
 def render_daily_reports():
     """Enterprise Daily Reports module with robust Python backend"""

@@ -49,7 +49,7 @@ def render_highland_integrations():
         render_advanced_features()
     
     with tab2:
-        render_system_integrations_with_settings()
+        render_system_integrations()
     
     with tab3:
         render_integration_health()

@@ -34,7 +34,7 @@ with tab1:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            search_term = st.text_input("🔍 Search documentation...")
+            search_term = st.text_input("🔍 Search documentation...", key="engineering_search")
         with col2:
             type_filter = st.selectbox("Type", ["All", "Drawing", "Calculation", "Specification", "Report"])
         with col3:

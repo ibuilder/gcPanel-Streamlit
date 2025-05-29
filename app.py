@@ -153,27 +153,14 @@ def main():
     st.title("🏗️ gcPanel - Construction Management")
     st.markdown(f"Welcome back, **{st.session_state.get('user_name', 'User')}** ({st.session_state.get('user_role', 'User')})")
     
-    # Sidebar navigation
+    # Sidebar with logout functionality
     with st.sidebar:
-        st.markdown("### Navigation")
-        
-        if st.button("🏠 Dashboard"):
-            st.switch_page("pages/01_📊_Dashboard.py")
-        
-        if st.button("📋 Daily Reports"):
-            st.switch_page("pages/02_📋_Daily_Reports.py")
-        
-        if st.button("📄 RFIs"):
-            st.switch_page("pages/03_📄_RFIs.py")
-        
-        if st.button("📨 Submittals"):
-            st.switch_page("pages/04_📨_Submittals.py")
-        
-        if st.button("📑 Contracts"):
-            st.switch_page("pages/05_📑_Contracts.py")
+        st.markdown("### User Info")
+        st.write(f"**Role:** {st.session_state.get('user_role', 'User')}")
+        st.write(f"**Login:** {st.session_state.get('login_time', 'N/A')}")
         
         st.markdown("---")
-        if st.button("🚪 Logout"):
+        if st.button("🚪 Logout", use_container_width=True):
             logout()
             st.rerun()
     

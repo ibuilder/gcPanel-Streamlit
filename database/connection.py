@@ -21,6 +21,10 @@ class DatabaseManager:
         
     def get_connection(self):
         """Get database connection"""
+        if not self.database_url or self.database_url.startswith('https://'):
+            logger.warning("Invalid database URL format. Database functionality disabled.")
+            return None
+            
         if self.connection is None or self.connection.closed:
             try:
                 self.connection = psycopg2.connect(

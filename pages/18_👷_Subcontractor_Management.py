@@ -24,9 +24,41 @@ st.markdown("---")
 if 'subcontractors' not in st.session_state:
     st.session_state.subcontractors = []
 
-tab1, tab2, tab3 = st.tabs(["📝 Add Subcontractor", "📊 Subcontractor Directory", "📈 Performance Tracking"])
+tab1, tab2, tab3 = st.tabs(["📊 Subcontractor Directory", "📝 Add Subcontractor", "📈 Performance Tracking"])
 
 with tab1:
+    st.subheader("📊 Subcontractor Directory")
+    
+    if st.session_state.subcontractors:
+        df = pd.DataFrame(st.session_state.subcontractors)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search subcontractors...")
+        with col2:
+            trade_filter = st.selectbox("Trade", ["All", "Electrical", "Plumbing", "HVAC", "Flooring"])
+        with col3:
+            status_filter = st.selectbox("Status", ["All", "Active", "Inactive", "Under Review"])
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[filtered_df.astype(str).apply(
+                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
+        
+        if trade_filter != "All":
+            filtered_df = filtered_df[filtered_df['trade'] == trade_filter]
+            
+        if status_filter != "All":
+            filtered_df = filtered_df[filtered_df['status'] == status_filter]
+        
+        st.write(f"**Total Subcontractors:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
+    else:
+        st.info("No subcontractors registered. Add your first subcontractor in the Add tab!")
+
+with tab2:
     st.subheader("📝 Add New Subcontractor")
     
     with st.form("subcontractor_form"):

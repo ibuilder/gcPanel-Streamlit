@@ -24,9 +24,38 @@ st.markdown("---")
 if 'progress_photos' not in st.session_state:
     st.session_state.progress_photos = []
 
-tab1, tab2, tab3 = st.tabs(["📸 Upload Photos", "🖼️ Photo Gallery", "📊 Photo Log"])
+tab1, tab2, tab3 = st.tabs(["🖼️ Photo Gallery", "📸 Upload Photos", "📊 Photo Log"])
 
 with tab1:
+    st.subheader("🖼️ Progress Photo Gallery")
+    
+    if st.session_state.progress_photos:
+        df = pd.DataFrame(st.session_state.progress_photos)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search photos...")
+        with col2:
+            location_filter = st.selectbox("Location", ["All", "Lobby", "Floor 2", "Floor 3", "Roof"])
+        with col3:
+            date_filter = st.date_input("Filter by Date")
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[filtered_df.astype(str).apply(
+                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
+        
+        if location_filter != "All":
+            filtered_df = filtered_df[filtered_df['location'] == location_filter]
+        
+        st.write(f"**Total Photos:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
+    else:
+        st.info("No progress photos uploaded. Upload your first photo in the Upload tab!")
+
+with tab2:
     st.subheader("📸 Upload Progress Photos")
     
     with st.form("photo_upload_form"):

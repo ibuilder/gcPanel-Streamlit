@@ -24,9 +24,41 @@ st.markdown("---")
 if 'quality_items' not in st.session_state:
     st.session_state.quality_items = []
 
-tab1, tab2, tab3 = st.tabs(["📝 Quality Check", "📊 QC Records", "📈 Quality Metrics"])
+tab1, tab2, tab3 = st.tabs(["📊 QC Records", "📝 Create Quality Check", "📈 Quality Metrics"])
 
 with tab1:
+    st.subheader("📊 Quality Control Records")
+    
+    if st.session_state.quality_items:
+        df = pd.DataFrame(st.session_state.quality_items)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search QC records...")
+        with col2:
+            type_filter = st.selectbox("Type", ["All", "Material Test", "Visual Inspection", "Performance Test"])
+        with col3:
+            result_filter = st.selectbox("Result", ["All", "Pass", "Fail", "Conditional"])
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[filtered_df.astype(str).apply(
+                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
+        
+        if type_filter != "All":
+            filtered_df = filtered_df[filtered_df['type'] == type_filter]
+            
+        if result_filter != "All":
+            filtered_df = filtered_df[filtered_df['result'] == result_filter]
+        
+        st.write(f"**Total QC Records:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
+    else:
+        st.info("No quality control records available. Create your first QC check in the Create tab!")
+
+with tab2:
     st.subheader("📝 Create Quality Check")
     
     with st.form("quality_form"):

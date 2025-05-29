@@ -47,9 +47,41 @@ if 'schedule_items' not in st.session_state:
         }
     ]
 
-tab1, tab2, tab3 = st.tabs(["📝 Add Schedule Item", "📊 Schedule View", "📈 Progress Tracking"])
+tab1, tab2, tab3 = st.tabs(["📊 Schedule View", "📝 Add Schedule Item", "📈 Progress Tracking"])
 
 with tab1:
+    st.subheader("📊 Project Schedule")
+    
+    if st.session_state.schedule_items:
+        df = pd.DataFrame(st.session_state.schedule_items)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            search_term = st.text_input("🔍 Search schedule items...")
+        with col2:
+            status_filter = st.selectbox("Status", ["All", "Not Started", "In Progress", "Completed", "Delayed"])
+        with col3:
+            resource_filter = st.selectbox("Resource", ["All", "Excavation Crew", "Concrete Crew", "Steel Crew"])
+        
+        filtered_df = df.copy()
+        if search_term:
+            filtered_df = filtered_df[filtered_df.astype(str).apply(
+                lambda x: x.str.contains(search_term, case=False, na=False)).any(axis=1)]
+        
+        if status_filter != "All":
+            filtered_df = filtered_df[filtered_df['status'] == status_filter]
+            
+        if resource_filter != "All":
+            filtered_df = filtered_df[filtered_df['resource'] == resource_filter]
+        
+        st.write(f"**Total Schedule Items:** {len(filtered_df)}")
+        
+        if not filtered_df.empty:
+            st.dataframe(clean_dataframe_for_display(filtered_df), use_container_width=True, hide_index=True)
+    else:
+        st.info("No schedule items created. Add your first schedule item in the Add tab!")
+
+with tab2:
     st.subheader("📝 Add Schedule Item")
     
     with st.form("schedule_form"):

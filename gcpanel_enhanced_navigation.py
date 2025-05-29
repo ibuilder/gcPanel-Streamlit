@@ -1381,7 +1381,9 @@ def render_sidebar():
         # Logout Button
         st.markdown("<br><br>", unsafe_allow_html=True)
         if st.button("🚪 Logout", key="logout", use_container_width=True):
-            st.session_state.current_page = "login"
+            logout()
+            st.success("Logged out successfully!")
+            st.rerun()
 
 def initialize_session_state():
     """Initialize session state with all required data structures"""

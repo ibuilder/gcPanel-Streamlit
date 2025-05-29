@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gcpanel-config
+  namespace: highland-tower
+data:
+  streamlit-config.toml: |
+    [server]
+    headless = true
+    address = "0.0.0.0"
+    port = 5000
+    enableCORS = false
+    enableXsrfProtection = true
+    
+    [browser]
+    gatherUsageStats = false
+    
+    [theme]
+    primaryColor = "#0066cc"
+    backgroundColor = "#ffffff"
+    secondaryBackgroundColor = "#f0f2f6"
+    textColor = "#262730"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gcpanel-pvc
+  namespace: highland-tower
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi

@@ -8,12 +8,12 @@ import sys
 import os
 
 # Add project root to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.helpers import check_authentication
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from lib.utils.helpers import check_authentication
 
-from models.all_models import BIMModel
-from controllers.crud_controller import CRUDController
-from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
+from lib.models.all_models import BIMModel
+from lib.controllers.crud_controller import CRUDController
+from lib.helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, format_currency
 
 # Page configuration
 st.set_page_config(page_title="BIM Management - gcPanel", page_icon="🏗️", layout="wide")

@@ -11,9 +11,9 @@ import sys
 import os
 
 # Add parent directory to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from utils.helpers import check_authentication, initialize_session_state
+from lib.utils.helpers import check_authentication, initialize_session_state
 import plotly.express as px
 import plotly.graph_objects as go
 

@@ -8,8 +8,8 @@ from datetime import datetime, date
 import sys
 import os
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.helpers import check_authentication, initialize_session_state
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from lib.utils.helpers import check_authentication, initialize_session_state
 
 st.set_page_config(page_title="Settings - gcPanel", page_icon="⚙️", layout="wide")
 initialize_session_state()

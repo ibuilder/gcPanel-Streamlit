@@ -8,12 +8,12 @@ import sys
 import os
 
 # Add project root to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from utils.helpers import check_authentication
-from models.all_models import SafetyModel
-from controllers.crud_controller import CRUDController
-from helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, render_status_badge
+from lib.utils.helpers import check_authentication
+from lib.models.all_models import SafetyModel
+from lib.controllers.crud_controller import CRUDController
+from lib.helpers.ui_helpers import render_highland_header, apply_highland_tower_styling, render_status_badge
 
 # Page configuration
 st.set_page_config(page_title="Safety - gcPanel", page_icon="🦺", layout="wide")

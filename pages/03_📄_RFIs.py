@@ -12,7 +12,7 @@ sys.path.insert(0, project_root)
 
 try:
     from templates.mvc_page_template import create_mvc_page
-    from models.all_models import RFIModel
+    from lib.models.all_models import RFIModel
     template_available = True
 except ImportError:
     template_available = False

@@ -8,7 +8,7 @@ Main application entry point with authentication and navigation
 import streamlit as st
 import hashlib
 from datetime import datetime
-from utils.helpers import initialize_session_state, check_authentication
+from lib.utils.helpers import initialize_session_state, check_authentication
 
 # Configure page
 st.set_page_config(
@@ -20,7 +20,7 @@ st.set_page_config(
 
 # Import authentication modules
 try:
-    from database.connection import authenticate_user, update_user_login
+    from lib.database.connection import authenticate_user, update_user_login
     DATABASE_AVAILABLE = True
 except ImportError:
     DATABASE_AVAILABLE = False

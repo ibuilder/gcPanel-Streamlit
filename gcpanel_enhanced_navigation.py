@@ -230,6 +230,23 @@ def apply_styling():
         overflow: visible !important;
     }
     
+    /* Additional scrolling fixes */
+    html, body, [data-testid="stAppViewContainer"] {
+        overflow-y: auto !important;
+        height: 100% !important;
+    }
+    
+    /* Force scroll for long forms */
+    .stForm {
+        overflow-y: auto !important;
+        max-height: 85vh !important;
+    }
+    
+    /* Ensure proper page height */
+    .main .block-container {
+        min-height: 100vh !important;
+    }
+    
     /* === ENTERPRISE SIDEBAR === */
     
     /* Primary sidebar container - multiple selectors for compatibility */

@@ -26,20 +26,14 @@ def clean_dataframe_for_display(df):
     # Convert mixed type columns to consistent types
     for col in df_clean.columns:
         if df_clean[col].dtype == 'object':
-            # Convert string numbers to numeric where possible
-            try:
-                numeric_series = pd.to_numeric(df_clean[col], errors='coerce')
-                if not numeric_series.isna().all():
-                    df_clean[col] = numeric_series
-                else:
-                    # Ensure all values are strings
-                    df_clean[col] = df_clean[col].astype(str)
-            except:
-                df_clean[col] = df_clean[col].astype(str)
+            # Force all object columns to string to prevent mixed type issues
+            df_clean[col] = df_clean[col].astype(str)
         
-        # Replace infinite values
-        if df_clean[col].dtype in ['float64', 'float32']:
-            df_clean[col] = df_clean[col].replace([float('inf'), float('-inf')], None)
+        # Replace infinite values in numeric columns
+        if df_clean[col].dtype in ['float64', 'float32', 'int64', 'int32']:
+            df_clean[col] = df_clean[col].replace([float('inf'), float('-inf')], 0)
+            # Fill NaN values
+            df_clean[col] = df_clean[col].fillna(0)
     
     return df_clean
 
@@ -1569,7 +1563,7 @@ def render_dashboard():
             for col in display_data.columns:
                 if display_data[col].dtype == 'object':
                     display_data[col] = display_data[col].astype(str)
-            st.dataframe(display_data, use_container_width=True)
+            st.dataframe(clean_dataframe_for_display(display_data), use_container_width=True)
     
     with col2:
         st.subheader("💰 Cost Breakdown by Phase")
@@ -1602,7 +1596,7 @@ def render_dashboard():
             for col in display_data.columns:
                 if display_data[col].dtype == 'object':
                     display_data[col] = display_data[col].astype(str)
-            st.dataframe(display_data, use_container_width=True)
+            st.dataframe(clean_dataframe_for_display(display_data), use_container_width=True)
 
 def render_daily_reports():
     """Enterprise Daily Reports module with robust Python backend"""
@@ -1892,7 +1886,7 @@ def render_daily_reports_basic():
                 {"Metric": "Total Safety Incidents", "Value": sum(r['safety_incidents'] for r in st.session_state.daily_reports)},
                 {"Metric": "Reports This Month", "Value": len([r for r in st.session_state.daily_reports if r['date'].startswith('2025-05')])},
             ])
-            st.dataframe(stats_data, use_container_width=True)
+            st.dataframe(clean_dataframe_for_display(stats_data), use_container_width=True)
 
 def render_deliveries():
     """Complete Deliveries Management with full CRUD functionality"""
@@ -2157,7 +2151,7 @@ def render_deliveries():
                 {"Metric": "Pending Count", "Value": len([d for d in st.session_state.deliveries if d['status'] in ['Scheduled', 'En Route']])},
                 {"Metric": "Total Value", "Value": f"${sum(d['total_cost'] for d in st.session_state.deliveries):,.2f}"},
             ])
-            st.dataframe(stats_data, use_container_width=True)
+            st.dataframe(clean_dataframe_for_display(stats_data), use_container_width=True)
         
         # Clear all data (for testing)
         st.markdown("**⚠️ Data Management**")
@@ -3127,7 +3121,7 @@ def render_preconstruction():
                     
                     if bid_data:
                         bid_df = pd.DataFrame(bid_data)
-                        st.dataframe(bid_df, use_container_width=True)
+                        st.dataframe(clean_dataframe_for_display(bid_df), use_container_width=True)
                     
                     # Action buttons
                     col1, col2, col3 = st.columns(3)
@@ -3268,7 +3262,7 @@ def render_preconstruction():
                     {"Metric": "Total Estimated Value", "Value": f"${sum(e['total_cost'] for e in st.session_state.estimates):,.2f}"},
                     {"Metric": "Average Estimate", "Value": f"${sum(e['total_cost'] for e in st.session_state.estimates) / len(st.session_state.estimates):,.2f}"},
                 ])
-                st.dataframe(est_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(est_stats_data), use_container_width=True)
         
         with col2:
             st.markdown("**📋 Bid Summary**")
@@ -3279,7 +3273,7 @@ def render_preconstruction():
                     {"Metric": "Total Invited Contractors", "Value": sum(len(b['invited_contractors']) for b in st.session_state.bids)},
                     {"Metric": "Bids Received", "Value": sum(len([rb for rb in b['received_bids'] if rb['submitted']]) for b in st.session_state.bids)},
                 ])
-                st.dataframe(bid_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(bid_stats_data), use_container_width=True)
         
         # Data management
         st.markdown("**⚠️ Data Management**")
@@ -3854,7 +3848,7 @@ def render_engineering():
                     {"Metric": "High Priority", "Value": len([r for r in st.session_state.engineering_rfis if r['priority'] == 'High'])},
                     {"Metric": "Total Cost Impact", "Value": f"${sum(r['cost_impact'] for r in st.session_state.engineering_rfis):,.0f}"},
                 ])
-                st.dataframe(rfi_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(rfi_stats_data), use_container_width=True)
         
         with col2:
             st.markdown("**📋 Change Order Summary**")
@@ -3865,7 +3859,7 @@ def render_engineering():
                     {"Metric": "Pending Approval", "Value": len([c for c in st.session_state.change_orders if c['status'] != 'Approved'])},
                     {"Metric": "Total Value", "Value": f"${sum(c['amount'] for c in st.session_state.change_orders):,.2f}"},
                 ])
-                st.dataframe(co_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(co_stats_data), use_container_width=True)
         
         with col3:
             st.markdown("**🔧 Review Summary**")
@@ -3876,7 +3870,7 @@ def render_engineering():
                     {"Metric": "Under Review", "Value": len([r for r in st.session_state.technical_reviews if r['status'] == 'Under Review'])},
                     {"Metric": "Require Revisions", "Value": len([r for r in st.session_state.technical_reviews if r['revision_required']])},
                 ])
-                st.dataframe(tr_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(tr_stats_data), use_container_width=True)
         
         # Data management
         st.markdown("**⚠️ Data Management**")
@@ -4468,7 +4462,7 @@ def render_field_operations():
                     {"Metric": "Total Workers", "Value": sum(c['workers'] for c in st.session_state.crews)},
                     {"Metric": "Avg Productivity", "Value": f"{sum(c['productivity'] for c in st.session_state.crews) / len(st.session_state.crews):.1f}%"},
                 ])
-                st.dataframe(crew_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(crew_stats_data), use_container_width=True)
         
         with col2:
             st.markdown("**🏗️ Work Package Summary**")
@@ -4479,7 +4473,7 @@ def render_field_operations():
                     {"Metric": "Completed", "Value": len([wp for wp in st.session_state.work_packages if wp['status'] == 'Completed'])},
                     {"Metric": "Avg Progress", "Value": f"{sum(wp['progress'] for wp in st.session_state.work_packages) / len(st.session_state.work_packages):.1f}%"},
                 ])
-                st.dataframe(wp_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(wp_stats_data), use_container_width=True)
         
         with col3:
             st.markdown("**⚡ Equipment Summary**")
@@ -4490,7 +4484,7 @@ def render_field_operations():
                     {"Metric": "In Maintenance", "Value": len([eq for eq in st.session_state.equipment if eq['status'] == 'Maintenance'])},
                     {"Metric": "Daily Cost", "Value": f"${sum(eq['daily_rate'] for eq in st.session_state.equipment):,.2f}"},
                 ])
-                st.dataframe(eq_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(eq_stats_data), use_container_width=True)
         
         # Data management
         st.markdown("**⚠️ Data Management**")
@@ -4975,7 +4969,7 @@ def render_contracts():
                     {"Metric": "Total Contract Value", "Value": f"${sum(c['contract_value'] for c in st.session_state.contracts):,.2f}"},
                     {"Metric": "Total Paid", "Value": f"${sum(c['total_paid'] for c in st.session_state.contracts):,.2f}"},
                 ])
-                st.dataframe(contract_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(contract_stats_data), use_container_width=True)
         
         with col2:
             st.markdown("**📋 Change Order Summary**")
@@ -4986,7 +4980,7 @@ def render_contracts():
                     {"Metric": "Pending", "Value": len([co for co in st.session_state.contract_change_orders if co['status'] != 'Approved'])},
                     {"Metric": "Total CO Value", "Value": f"${sum(co['amount'] for co in st.session_state.contract_change_orders):,.2f}"},
                 ])
-                st.dataframe(co_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(co_stats_data), use_container_width=True)
         
         # Data management
         st.markdown("**⚠️ Data Management**")
@@ -5539,7 +5533,7 @@ def render_cost_management_basic():
                     {"Metric": "Total Committed", "Value": f"${sum(item['committed_amount'] for item in st.session_state.budget_items):,.2f}"},
                     {"Metric": "Budget Items", "Value": len(st.session_state.budget_items)},
                 ])
-                st.dataframe(budget_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(budget_stats_data), use_container_width=True)
         
         with col2:
             st.markdown("**📈 Forecast Summary**")
@@ -5551,7 +5545,7 @@ def render_cost_management_basic():
                     {"Metric": "Variance from Budget", "Value": f"${latest_forecast['variance_from_budget']:,.2f}"},
                     {"Metric": "Confidence Level", "Value": latest_forecast['confidence_level']},
                 ])
-                st.dataframe(forecast_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(forecast_stats_data), use_container_width=True)
         
         with col3:
             st.markdown("**💳 Payment Summary**")
@@ -5566,7 +5560,7 @@ def render_cost_management_basic():
                     {"Metric": "Total Paid", "Value": f"${total_paid:,.2f}"},
                     {"Metric": "Paid Applications", "Value": len(paid_apps)},
                 ])
-                st.dataframe(payment_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(payment_stats_data), use_container_width=True)
         
         # Data management
         st.markdown("**⚠️ Data Management**")
@@ -6642,7 +6636,7 @@ def render_bim():
                     {"Metric": "Current Models", "Value": len([m for m in st.session_state.bim_models if m['status'] == 'Current'])},
                     {"Metric": "Total Size", "Value": f"{sum(float(m['file_size'].split()[0]) for m in st.session_state.bim_models):.1f} GB"},
                 ])
-                st.dataframe(model_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(model_stats_data), use_container_width=True)
         
         with col2:
             st.markdown("**⚠️ Clash Summary**")
@@ -6653,7 +6647,7 @@ def render_bim():
                     {"Metric": "Critical Clashes", "Value": len([c for c in st.session_state.clash_detections if c['priority'] == 'Critical'])},
                     {"Metric": "Resolved", "Value": len([c for c in st.session_state.clash_detections if c['status'] == 'Resolved'])},
                 ])
-                st.dataframe(clash_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(clash_stats_data), use_container_width=True)
         
         with col3:
             st.markdown("**📅 Meeting Summary**")
@@ -6664,7 +6658,7 @@ def render_bim():
                     {"Metric": "Completed", "Value": len([m for m in st.session_state.coordination_meetings if m['status'] == 'Completed'])},
                     {"Metric": "This Week", "Value": "1"},
                 ])
-                st.dataframe(meeting_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(meeting_stats_data), use_container_width=True)
         
         # Data management
         st.markdown("**⚠️ Data Management**")
@@ -7414,7 +7408,7 @@ def render_closeout():
                     {"Metric": "In Progress", "Value": len([i for i in st.session_state.punch_list_items if i['status'] == 'In Progress'])},
                     {"Metric": "Total Cost Impact", "Value": f"${sum(i['cost_impact'] for i in st.session_state.punch_list_items):,.2f}"},
                 ])
-                st.dataframe(punch_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(punch_stats_data), use_container_width=True)
         
         with col2:
             st.markdown("**📋 Document Summary**")
@@ -7425,7 +7419,7 @@ def render_closeout():
                     {"Metric": "Under Review", "Value": len([d for d in st.session_state.closeout_documents if d['status'] == 'Under Review'])},
                     {"Metric": "In Progress", "Value": len([d for d in st.session_state.closeout_documents if d['status'] == 'In Progress'])},
                 ])
-                st.dataframe(doc_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(doc_stats_data), use_container_width=True)
         
         with col3:
             st.markdown("**🛡️ Warranty Summary**")
@@ -7438,7 +7432,7 @@ def render_closeout():
                     {"Metric": "Active", "Value": len(st.session_state.warranties) - expiring_soon},
                     {"Metric": "Coverage Types", "Value": len(set(w['warranty_type'] for w in st.session_state.warranties))},
                 ])
-                st.dataframe(warranty_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(warranty_stats_data), use_container_width=True)
         
         # Data management
         st.markdown("**⚠️ Data Management**")
@@ -9161,7 +9155,7 @@ def render_scheduling_basic():
                     {"Metric": "In Progress", "Value": len([t for t in st.session_state.schedule_tasks if t['status'] == 'In Progress'])},
                     {"Metric": "Critical Path", "Value": len([t for t in st.session_state.schedule_tasks if t['critical_path']])},
                 ])
-                st.dataframe(task_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(task_stats_data), use_container_width=True)
         
         with col2:
             st.markdown("**🎯 Milestone Summary**")
@@ -9172,7 +9166,7 @@ def render_scheduling_basic():
                     {"Metric": "Pending", "Value": len([m for m in st.session_state.project_milestones if m['status'] == 'Pending'])},
                     {"Metric": "Critical", "Value": len([m for m in st.session_state.project_milestones if m['critical']])},
                 ])
-                st.dataframe(milestone_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(milestone_stats_data), use_container_width=True)
         
         with col3:
             st.markdown("**👥 Resource Summary**")
@@ -9183,7 +9177,7 @@ def render_scheduling_basic():
                     {"Metric": "Daily Cost", "Value": f"${sum(r['daily_cost'] for r in st.session_state.resource_allocations):,.2f}"},
                     {"Metric": "Avg Utilization", "Value": f"{sum(r['utilization'] for r in st.session_state.resource_allocations) / len(st.session_state.resource_allocations):.1f}%"},
                 ])
-                st.dataframe(resource_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(resource_stats_data), use_container_width=True)
         
         # Data management
         st.markdown("**⚠️ Data Management**")
@@ -9795,7 +9789,7 @@ def render_quality_control():
                     {"Metric": "Failed", "Value": len([i for i in st.session_state.qc_inspections if i['status'] == 'Failed'])},
                     {"Metric": "In Progress", "Value": len([i for i in st.session_state.qc_inspections if i['status'] == 'In Progress'])},
                 ])
-                st.dataframe(insp_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(insp_stats_data), use_container_width=True)
         
         with col2:
             st.markdown("**📋 Checklist Summary**")
@@ -9806,7 +9800,7 @@ def render_quality_control():
                     {"Metric": "In Progress", "Value": len([c for c in st.session_state.qc_checklists if c['overall_status'] == 'In Progress'])},
                     {"Metric": "Avg Completion", "Value": f"{sum(c['completion_percentage'] for c in st.session_state.qc_checklists) / len(st.session_state.qc_checklists):.1f}%"},
                 ])
-                st.dataframe(checklist_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(checklist_stats_data), use_container_width=True)
         
         with col3:
             st.markdown("**⚠️ Defect Summary**")
@@ -9817,7 +9811,7 @@ def render_quality_control():
                     {"Metric": "Resolved", "Value": len([d for d in st.session_state.qc_defects if d['status'] == 'Resolved'])},
                     {"Metric": "Total Cost Impact", "Value": f"${sum(d['cost_impact'] for d in st.session_state.qc_defects):,.2f}"},
                 ])
-                st.dataframe(defect_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(defect_stats_data), use_container_width=True)
         
         # Data management
         st.markdown("**⚠️ Data Management**")
@@ -10505,7 +10499,7 @@ def render_progress_photos_basic():
                     {"Metric": "Under Review", "Value": len([p for p in st.session_state.progress_photos if p['status'] == 'Under Review'])},
                     {"Metric": "Avg Progress", "Value": f"{sum(p['progress_percentage'] for p in st.session_state.progress_photos) / len(st.session_state.progress_photos):.1f}%"},
                 ])
-                st.dataframe(photo_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(photo_stats_data), use_container_width=True)
         
         with col2:
             st.markdown("**📁 Album Summary**")
@@ -10516,7 +10510,7 @@ def render_progress_photos_basic():
                     {"Metric": "Project Albums", "Value": len([a for a in st.session_state.photo_albums if a['access_level'] == 'Project Team'])},
                     {"Metric": "Total Album Photos", "Value": sum(a['photo_count'] for a in st.session_state.photo_albums)},
                 ])
-                st.dataframe(album_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(album_stats_data), use_container_width=True)
         
         with col3:
             st.markdown("**💾 Storage Summary**")
@@ -10528,7 +10522,7 @@ def render_progress_photos_basic():
                     {"Metric": "Largest File", "Value": f"{max(float(p['file_size'].replace(' MB', '')) for p in st.session_state.progress_photos if 'MB' in p['file_size']):.1f} MB"},
                     {"Metric": "Storage Limit", "Value": "5000 MB"},
                 ])
-                st.dataframe(storage_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(storage_stats_data), use_container_width=True)
         
         # Data management
         st.markdown("**⚠️ Data Management**")
@@ -11644,7 +11638,7 @@ def render_subcontractor_management_basic():
                     {"Metric": "Scheduled", "Value": len([s for s in st.session_state.subcontractors if s['status'] == 'Scheduled'])},
                     {"Metric": "Avg Performance", "Value": f"{sum(s['performance_rating'] for s in st.session_state.subcontractors if s['performance_rating'] > 0) / len([s for s in st.session_state.subcontractors if s['performance_rating'] > 0]):.1f}/5.0" if any(s['performance_rating'] > 0 for s in st.session_state.subcontractors) else "N/A"},
                 ])
-                st.dataframe(sub_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(sub_stats_data), use_container_width=True)
         
         with col2:
             st.markdown("**📊 Evaluation Summary**")
@@ -11655,7 +11649,7 @@ def render_subcontractor_management_basic():
                     {"Metric": "Highest Score", "Value": f"{max(e['overall_score'] for e in st.session_state.subcontractor_evaluations):.1f}/5.0"},
                     {"Metric": "Due This Month", "Value": "TBD"},
                 ])
-                st.dataframe(eval_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(eval_stats_data), use_container_width=True)
         
         with col3:
             st.markdown("**🛡️ Insurance Summary**")
@@ -11674,7 +11668,7 @@ def render_subcontractor_management_basic():
                     {"Metric": "Expiring Soon", "Value": expiring_soon},
                     {"Metric": "Certificates Received", "Value": len([i for i in st.session_state.insurance_tracking if i['certificate_received']])},
                 ])
-                st.dataframe(ins_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(ins_stats_data), use_container_width=True)
         
         # Data management
         st.markdown("**⚠️ Data Management**")
@@ -13167,7 +13161,7 @@ def render_documents_basic():
                     {"Metric": "Under Review", "Value": len([d for d in st.session_state.documents if d['status'] == 'Under Review'])},
                     {"Metric": "Avg File Size", "Value": f"{sum(float(d['file_size'].replace(' MB', '')) for d in st.session_state.documents) / len(st.session_state.documents):.1f} MB"},
                 ])
-                st.dataframe(doc_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(doc_stats_data), use_container_width=True)
         
         with col2:
             st.markdown("**📁 Folder Summary**")
@@ -13178,7 +13172,7 @@ def render_documents_basic():
                     {"Metric": "Sub Folders", "Value": len([f for f in st.session_state.document_folders if f['parent_folder']])},
                     {"Metric": "Avg Documents", "Value": f"{sum(f['document_count'] for f in st.session_state.document_folders) / len(st.session_state.document_folders):.1f}"},
                 ])
-                st.dataframe(folder_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(folder_stats_data), use_container_width=True)
         
         with col3:
             st.markdown("**🔍 Review Summary**")
@@ -13189,7 +13183,7 @@ def render_documents_basic():
                     {"Metric": "Pending", "Value": len([r for r in st.session_state.document_reviews if r['review_status'] == 'Pending'])},
                     {"Metric": "Avg Rating", "Value": f"{sum(r['rating'] for r in st.session_state.document_reviews) / len(st.session_state.document_reviews):.1f}/5"},
                 ])
-                st.dataframe(review_stats_data, use_container_width=True)
+                st.dataframe(clean_dataframe_for_display(review_stats_data), use_container_width=True)
         
         # Data management
         st.markdown("**⚠️ Data Management**")

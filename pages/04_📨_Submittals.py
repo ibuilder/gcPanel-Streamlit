@@ -8,9 +8,8 @@ import sys
 import os
 
 # Add project root to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
-
-from utils.helpers import check_authentication)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils.helpers import check_authentication
 
 from models.submittal_model import SubmittalModel
 from controllers.crud_controller import CRUDController
